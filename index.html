@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>بازی حکم کلاسیک</title>
+    <!-- Tailwind CSS CDN for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts for Classic Look -->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Merriweather:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        /* General Classic Theme Background and Fonts */
+        html, body, #app { /* Ensure these take full viewport height */
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            overflow: hidden; /* Prevent body scrollbars */
+        }
+        body {
+            font-family: 'Merriweather', serif; /* Default body font for readability */
+            /* Deep, rich, slightly textured background for classic feel */
+            background: radial-gradient(ellipse at bottom, #100C08 0%, #000000 100%); /* Darker, more intense background */
+            color: #E0E0E0; /* Softer white text for elegance */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        h1, h2 {
+            font-family: 'Playfair Display', serif; /* Elegant headings */
+            color: #FFD700; /* Gold color for titles */
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5); /* Subtle text shadow for depth */
+        }
+
+        /* Custom spinner for loading screen - Gold themed */
+        .spinner {
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-top: 4px solid #DAA520; /* Gold spinner */
+            border-radius: 50%;
+            width: 50px; /* Slightly larger spinner */
+            height: 50px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Page transition animation */
+        .page-transition-active {
+            transition: opacity 0.6s ease-in-out; /* Slightly slower transition */
+        }
+        .page-transition-hidden {
+            opacity: 0;
+        }
+        .page-transition-visible {
+            opacity: 1;
+        }
+
+        /* Classic Card/Modal Styling - More detailed */
+        .classic-card {
+            background: linear-gradient(145deg, #4B0000 0%, #660000 60%, #800000 100%); /* Deeper ruby red velvet effect */
+            border: 4px solid #DAA520; /* Goldenrod border */
+            border-radius: 20px; /* Slightly larger radius */
+            box-shadow: 0 15px 30px rgba(0,0,0,0.6), inset 0 0 15px rgba(255,255,255,0.1); /* Deeper outer shadow, subtle inner light */
+            backdrop-filter: blur(10px); /* Stronger blur for more prominent glass effect */
+            -webkit-backdrop-filter: blur(10px); /* For Safari */
+            position: relative; /* For pseudo-elements */
+            max-height: 90vh; /* Ensure card doesn't overflow viewport */
+            overflow-y: auto; /* Enable scrolling if content exceeds max-height */
+        }
+        .classic-card::before { /* Top left ornamental corner */
+            content: '';
+            position: absolute;
+            top: -10px;
+            left: -10px;
+            width: 30px;
+            height: 30px;
+            border-top: 5px solid #FFD700;
+            border-left: 5px solid #FFD700;
+            border-radius: 5px 0 0 0;
+            box-shadow: 0 0 10px rgba(255,215,0,0.5);
+        }
+        .classic-card::after { /* Bottom right ornamental corner */
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            right: -10px;
+            width: 30px;
+            height: 30px;
+            border-bottom: 5px solid #FFD700;
+            border-right: 5px solid #FFD700;
+            border-radius: 0 0 5px 0;
+            box-shadow: 0 0 10px rgba(255,215,0,0.5);
+        }
+
+
+        /* Button Base Styles - More polished Classic Look */
+        .classic-btn {
+            border: 2px solid #DAA520; /* Golden border for all buttons */
+            border-radius: 15px; /* Slightly rounded corners */
+            font-weight: 700; /* Bold text */
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.6); /* Text shadow for elegance */
+            transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1); /* Smoother transition */
+            box-shadow: 0 8px 16px rgba(0,0,0,0.4), inset 0 0 8px rgba(255,255,255,0.1); /* Deeper outer shadow, subtle inner light */
+            color: #FFFFFF; /* White text on buttons */
+            padding: 0.875rem 1.5rem; /* Equivalent to py-3.5 px-6 */
+            font-size: 1.125rem; /* Equivalent to text-lg */
+            position: relative; /* For pseudo-elements */
+            overflow: hidden; /* To contain the hover overlay */
+        }
+        .classic-btn::before { /* Subtle light effect on hover */
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: rgba(255,255,255,0.1);
+            transform: skewX(-30deg);
+            transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+        .classic-btn:hover::before {
+            left: 100%;
+        }
+        .classic-btn:hover {
+            transform: translateY(-5px) scale(1.03); /* More pronounced lift and scale */
+            box-shadow: 0 12px 24px rgba(0,0,0,0.6), inset 0 0 10px rgba(255,255,255,0.2); /* Stronger shadow on hover */
+        }
+
+        /* Specific Button Colors - Classic Pallette */
+        .btn-purple-classic {
+            background: linear-gradient(145deg, #8A2BE2 0%, #6A0DAD 100%); /* Amethyst */
+        }
+        .btn-blue-classic {
+            background: linear-gradient(145deg, #4682B4 0%, #2A52BE 100%); /* Steel Blue / Royal Blue */
+        }
+        .btn-green-classic {
+            background: linear-gradient(145deg, #228B22 0%, #006400 100%); /* Forest Green */
+        }
+        .btn-red-classic {
+            background: linear-gradient(145deg, #CD5C5C 0%, #B22222 100%); /* Indian Red / Firebrick */
+        }
+        .btn-gray-classic {
+            background: linear-gradient(145deg, #A9A9A9 0%, #808080 100%); /* Dark Gray */
+        }
+        .btn-brown-classic { /* New for Profile/Shop */
+            background: linear-gradient(145deg, #8B4513 0%, #69320E 100%); /* Saddle Brown / Dark Sienna */
+        }
+
+        /* Input Field Styles - More refined Classic Look */
+        input {
+            background-color: #202020; /* Even darker input background */
+            border: 2px solid #5A5A5A; /* Dark gray border */
+            color: #E0E0E0; /* Light text color */
+            padding: 0.875rem; /* Equivalent to p-3.5 */
+            border-radius: 0.75rem; /* Equivalent to rounded-xl */
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.5); /* Inner shadow for depth */
+        }
+        input::placeholder {
+            color: #A0A0A0; /* Lighter placeholder text */
+        }
+        input:focus {
+            border-color: #DAA520 !important; /* Gold border on focus */
+            box-shadow: 0 0 0 4px rgba(218, 165, 32, 0.5) !important, inset 0 2px 4px rgba(0,0,0,0.5) !important; /* Gold focus ring with inner shadow */
+        }
+
+        /* Header specific styles - Richer Gold/Brown */
+        .app-header {
+            background: linear-gradient(to right, #4A2B00 0%, #7A4C00 50%, #4A2B00 100%); /* Richer gold/brown gradient */
+            border-bottom: 3px solid #FFD700; /* Thicker gold border */
+            box-shadow: 0 8px 20px rgba(0,0,0,0.7); /* Deeper shadow */
+            height: 70px; /* Fixed height for header */
+            position: fixed; /* Explicitly fixed */
+            top: 0; left: 0; right: 0;
+            z-index: 40;
+            padding: 0.75rem 1rem; /* Adjust padding */
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .app-footer {
+            background: linear-gradient(to left, #4A2B00 0%, #7A4C00 50%, #4A2B00 100%); /* Richer gold/brown gradient */
+            border-top: 3px solid #FFD700; /* Thicker gold border */
+            box-shadow: 0 -8px 20px rgba(0,0,0,0.7); /* Deeper shadow */
+            height: 90px; /* Fixed height for footer */
+            position: fixed; /* Explicitly fixed */
+            bottom: 0; left: 0; right: 0;
+            z-index: 40;
+            padding: 1rem; /* Adjust padding */
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+        }
+
+        /* Main content area padding to avoid overlap with fixed header/footer */
+        .main-content-area {
+            padding-top: 70px; /* Header height */
+            padding-bottom: 90px; /* Footer height */
+            flex-grow: 1; /* Allow content to fill available space */
+            overflow-y: auto; /* Enable scrolling for main content */
+            width: 100%; /* Ensure it takes full width */
+            display: flex;
+            flex-direction: column;
+            justify-content: center; /* Center content vertically */
+            align-items: center; /* Center content horizontally */
+            background: linear-gradient(180deg, #2C2C2C 0%, #1A1A1A 100%); /* Subtle dark grey gradient for main area */
+            position: relative; /* For any absolute positioned elements inside */
+        }
+        
+        /* Profile Modal specific styles */
+        .profile-modal-overlay {
+            background-color: rgba(0,0,0,0.7); /* Darker overlay */
+            transition: opacity 0.3s ease-in-out;
+        }
+        .profile-modal-content {
+            transform: translateY(-20px); /* Initial slightly elevated */
+            transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+        .profile-modal-enter-active .profile-modal-content {
+            transform: translateY(0);
+        }
+        .profile-modal-leave-active .profile-modal-content {
+            transform: translateY(-20px);
+            opacity: 0;
+        }
+
+        /* Responsive adjustments for smaller screens */
+        @media (max-width: 640px) {
+            .max-w-md {
+                max-width: 95%;
+            }
+            .p-6, .p-8 {
+                padding: 1.5rem;
+            }
+            .text-3xl {
+                font-size: 2rem;
+            }
+            .space-y-5 > *:not([hidden]) ~ *:not([hidden]) {
+                margin-top: 1.25rem;
+            }
+            .space-y-4 > *:not([hidden]) ~ *:not([hidden]) {
+                margin-top: 1rem;
+            }
+            .sm\\:flex-row {
+                flex-direction: column;
+            }
+            .sm\\:w-1\\/2 {
+                width: 100%;
+            }
+            .sm\\:space-x-4 {
+                margin-left: 0;
+                margin-right: 0;
+            }
+            .sm\\:space-y-0 {
+                margin-top: 1rem; /* Add some space between stacked buttons */
+            }
+             .classic-card {
+                border-radius: 15px; /* Slightly smaller radius on mobile for consistency */
+                /* Ensure it fits on smaller screens */
+                max-height: 85vh; /* Slightly less max-height for mobile */
+            }
+             .classic-btn {
+                padding: 0.75rem 1.25rem; /* Slightly smaller padding on mobile */
+                font-size: 1rem; /* Slightly smaller font on mobile buttons */
+            }
+            .app-header, .app-footer {
+                padding: 0.5rem; /* Smaller padding on mobile */
+            }
+            .app-header {
+                height: 60px; /* Slightly smaller header on mobile */
+            }
+            .app-footer {
+                height: 80px; /* Slightly smaller footer on mobile */
+            }
+            .main-content-area {
+                padding-top: 60px; /* Adjust for smaller header */
+                padding-bottom: 80px; /* Adjust for smaller footer */
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Main container for all screens -->
+    <div id="app" class="relative w-full h-full flex justify-center items-center">
+
+        <!-- 1. Loading Screen -->
+        <div id="loading-screen" class="absolute inset-0 flex flex-col justify-center items-center bg-gray-900 z-50 page-transition-active page-transition-visible" tabindex="-1">
+            <div class="spinner mb-4"></div>
+            <p class="text-xl md:text-2xl font-semibold text-blue-400">در حال بارگذاری...</p>
+        </div>
+
+        <!-- 2. Authentication Screen (Login/Register) -->
+        <div id="auth-screen" class="hidden absolute inset-0 flex justify-center items-center bg-gray-900 bg-opacity-90 z-40 page-transition-active page-transition-hidden" tabindex="-1">
+            <div class="classic-card p-6 sm:p-8 w-11/12 max-w-md text-center">
+                <h2 class="text-2xl sm:text-3xl font-bold mb-6">ورود / ثبت نام</h2>
+                <form id="auth-form" class="space-y-5">
+                    <div>
+                        <input type="email" id="email" placeholder="ایمیل شما"
+                               class="w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
+                               required>
+                    </div>
+                    <div id="display-name-field" class="hidden">
+                         <input type="text" id="display-name" placeholder="نام نمایشی (در بازی)"
+                               class="w-full focus:outline-none focus:ring-2 focus:ring-green-500">
+                    </div>
+                    <div>
+                        <input type="password" id="password" placeholder="رمز عبور (حداقل ۶ کاراکتر)"
+                               class="w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
+                               required>
+                    </div>
+                    <!-- Toggle buttons for Auth mode -->
+                    <div class="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4 sm:space-x-reverse mt-6">
+                        <button type="button" id="login-toggle-btn"
+                                class="w-full sm:w-1/2 classic-btn btn-blue-classic text-xl sm:text-2xl">
+                            ورود
+                        </button>
+                        <button type="button" id="register-toggle-btn"
+                                class="w-full sm:w-1/2 classic-btn btn-green-classic text-xl sm:text-2xl">
+                            ثبت نام
+                        </button>
+                    </div>
+                    <!-- Main submit button, text changes based on authMode -->
+                    <button type="submit" id="submit-auth-btn"
+                            class="w-full mt-4 classic-btn btn-purple-classic text-xl sm:text-2xl hidden">
+                        ادامه
+                    </button>
+                </form>
+                <!-- Message box for user feedback -->
+                <div id="message-box" class="mt-5 p-3.5 rounded-xl text-base text-center hidden" role="alert"></div>
+            </div>
+        </div>
+
+        <!-- 3. Main Screen -->
+        <!-- Using a full-height, full-width flex container to manage fixed header/footer and scrollable content -->
+        <div id="main-screen" class="hidden absolute inset-0 flex flex-col z-30 page-transition-active page-transition-hidden" tabindex="-1">
+            <!-- Header for Main Screen - Fixed at top -->
+            <header class="app-header">
+                <!-- User Info and ID - Aligned Right (for RTL) -->
+                <div id="profile-summary" class="flex items-center space-x-2 space-x-reverse cursor-pointer p-2 rounded-lg hover:bg-gray-700 transition-colors duration-200" title="مشاهده پروفایل">
+                     <!-- User icon SVG -->
+                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-user-circle">
+                        <circle cx="12" cy="12" r="10"/><circle cx="12" cy="10" r="3"/><path d="M7 20.662V19a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v1.662"/>
+                    </svg>
+                    <div class="flex flex-col text-right">
+                        <span id="header-display-name" class="font-bold text-lg text-white">نام کاربری</span>
+                        <span id="header-user-id" class="text-xs text-gray-300 break-all">ID: ---</span>
+                    </div>
+                </div>
+                <!-- Hamburger Menu Icon - Aligned Left (for RTL) -->
+                <button id="menu-btn" class="text-white text-3xl p-2 rounded-full hover:bg-gray-700 transition-colors duration-200">
+                    <!-- Hamburger icon SVG -->
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-menu">
+                        <line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/>
+                    </svg>
+                </button>
+            </header>
+
+            <!-- Main Content Area - Scrollable between fixed header and footer -->
+            <div class="main-content-area">
+                <!-- This area is now empty, ready for future game visuals/elements -->
+            </div>
+
+            <!-- Footer Navigation - Fixed at bottom -->
+            <footer class="app-footer">
+                <button id="friendly-game-btn"
+                        class="classic-btn btn-purple-classic text-base sm:text-lg w-1/2 mx-2 py-3.5 px-4">
+                    بازی دوستانه
+                </button>
+                <!-- Placeholder for other main buttons like 'Rated Game' -->
+                <button id="rated-game-btn"
+                        class="classic-btn btn-brown-classic text-base sm:text-lg w-1/2 mx-2 py-3.5 px-4">
+                    بازی امتیازی
+                </button>
+            </footer>
+        </div>
+
+        <!-- 4. Profile Modal (Hidden by default) -->
+        <div id="profile-modal" class="hidden fixed inset-0 flex justify-center items-center z-50 profile-modal-overlay">
+            <div class="classic-card profile-modal-content p-6 sm:p-8 w-11/12 max-w-md text-center relative">
+                <h2 class="text-2xl sm:text-3xl font-bold mb-6">پروفایل کاربری</h2>
+                <button id="close-profile-modal-btn" class="absolute top-4 left-4 text-white hover:text-gray-300 transition-colors duration-200">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-x">
+                        <path d="M18 6 6 18"/><path d="m6 6 12 12"/>
+                    </svg>
+                </button>
+                <div class="text-lg space-y-4 mb-8 text-white">
+                    <p><strong>نام نمایشی:</strong> <span id="profile-display-name">---</span></p>
+                    <p><strong>ایمیل:</strong> <span id="profile-email">---</span></p>
+                    <p><strong>شناسه کاربر (UID):</strong> <span id="profile-uid" class="break-all text-sm text-gray-400">---</span></p>
+                    <!-- Add more profile stats here later (e.g., wins, losses) -->
+                </div>
+                <button id="profile-logout-btn"
+                        class="w-full classic-btn btn-red-classic text-lg sm:text-xl">
+                    خروج از حساب
+                </button>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Firebase SDKs -->
+    <script type="module">
+        // Import the functions you need from the SDKs you need
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Firebase Configuration (from user's input)
+        const firebaseConfig = {
+            apiKey: "AIzaSyBpVHnjF5gdTm3vJiHEoAZCowsRkTapj_4",
+            authDomain: "hokm-d6911.firebaseapp.com",
+            projectId: "hokm-d6911",
+            storageBucket: "hokm-d6911.appspot.com", // Corrected storageBucket format
+            messagingSenderId: "128133280011",
+            appId: "1:128133280011:web:c9fe28f5201eef7a3a320e",
+            measurementId: "G-LN0S9W86MK"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // Global variables for Firebase context (as per environment instructions)
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+
+        // DOM Elements
+        const loadingScreen = document.getElementById('loading-screen');
+        const authScreen = document.getElementById('auth-screen');
+        const mainScreen = document.getElementById('main-screen');
+        const authForm = document.getElementById('auth-form');
+        const emailInput = document.getElementById('email');
+        const displayNameInput = document.getElementById('display-name');
+        const displayNameField = document.getElementById('display-name-field');
+        const passwordInput = document.getElementById('password');
+        const loginToggleBtn = document.getElementById('login-toggle-btn');
+        const registerToggleBtn = document.getElementById('register-toggle-btn');
+        const submitAuthBtn = document.getElementById('submit-auth-btn');
+        const messageBox = document.getElementById('message-box');
+
+        // Main Screen UI Elements
+        const menuBtn = document.getElementById('menu-btn');
+        const profileSummary = document.getElementById('profile-summary');
+        const headerDisplayName = document.getElementById('header-display-name');
+        const headerUserId = document.getElementById('header-user-id');
+        const friendlyGameBtn = document.getElementById('friendly-game-btn');
+        const ratedGameBtn = document.getElementById('rated-game-btn');
+
+        // Profile Modal Elements
+        const profileModal = document.getElementById('profile-modal');
+        const closeProfileModalBtn = document.getElementById('close-profile-modal-btn');
+        const profileDisplayName = document.getElementById('profile-display-name');
+        const profileEmail = document.getElementById('profile-email');
+        const profileUid = document.getElementById('profile-uid');
+        const profileLogoutBtn = document.getElementById('profile-logout-btn');
+
+
+        // State variables for authentication mode (login or register)
+        let authMode = 'login'; // Default mode is login
+
+        // Global variable to keep track of the current active screen
+        let currentActiveScreen = loadingScreen;
+        let currentUserData = null; // To store user's profile data
+
+        // Function to show custom message box
+        function showMessage(message, type = 'info') {
+            messageBox.textContent = message;
+            messageBox.className = 'mt-5 p-3.5 rounded-xl text-base text-center';
+            if (type === 'error') {
+                messageBox.classList.add('bg-red-500', 'text-white');
+            } else if (type === 'success') {
+                messageBox.classList.add('bg-green-500', 'text-white');
+            } else {
+                messageBox.classList.add('bg-blue-500', 'text-white');
+            }
+            messageBox.classList.remove('hidden');
+            console.log(`پیام نمایش داده شد (${type}): ${message}`);
+            setTimeout(() => {
+                messageBox.classList.add('hidden');
+            }, 5000);
+        }
+
+        // Function to transition between screens
+        function setActiveScreen(newScreen) {
+            console.log(`درخواست تغییر صفحه به: ${newScreen.id}. صفحه فعلی: ${currentActiveScreen.id}`);
+
+            // Hide the current screen with transition
+            currentActiveScreen.classList.remove('page-transition-visible');
+            currentActiveScreen.classList.add('page-transition-hidden');
+            currentActiveScreen.setAttribute('tabindex', '-1'); // Remove focus capability
+            // Remove focus from any active element on the current screen
+            if (document.activeElement instanceof HTMLElement) {
+                document.activeElement.blur();
+            }
+
+            setTimeout(() => {
+                currentActiveScreen.classList.add('hidden'); // Fully hide
+                currentActiveScreen.classList.remove('page-transition-hidden'); // Clean up class
+
+                // Show the new screen with transition
+                newScreen.classList.remove('hidden');
+                // Force reflow to ensure transition starts from hidden state
+                void newScreen.offsetWidth;
+                newScreen.classList.add('page-transition-visible');
+                newScreen.removeAttribute('tabindex'); // Allow focus for new screen
+                console.log(`صفحه ${newScreen.id} اکنون قابل مشاهده است.`);
+
+                // Manage focus based on the new screen
+                if (newScreen === authScreen) {
+                    emailInput.focus(); // Focus on email input for auth screen
+                } else if (newScreen === mainScreen) {
+                    document.activeElement.blur(); // Ensure no input has focus on main screen
+                }
+
+                currentActiveScreen = newScreen; // Update the current active screen
+
+            }, 600); // Matches CSS transition duration
+        }
+
+        // Function to open the profile modal
+        function openProfileModal() {
+            profileModal.classList.remove('hidden');
+            void profileModal.offsetWidth; // Trigger reflow for transition
+            profileModal.classList.add('profile-modal-enter-active');
+            // Populate profile data
+            if (currentUserData) {
+                profileDisplayName.textContent = currentUserData.displayName || 'ناشناس';
+                profileEmail.textContent = currentUserData.email || 'ناشناس';
+                profileUid.textContent = currentUserData.uid || 'ناشناس';
+            }
+        }
+
+        // Function to close the profile modal
+        function closeProfileModal() {
+            profileModal.classList.remove('profile-modal-enter-active');
+            profileModal.classList.add('profile-modal-leave-active');
+            setTimeout(() => {
+                profileModal.classList.add('hidden');
+                profileModal.classList.remove('profile-modal-leave-active');
+            }, 300); // Match modal transition duration
+        }
+
+
+        // Firebase Authentication State Listener
+        onAuthStateChanged(auth, async (user) => {
+            console.log("onAuthStateChanged فایر بیس فعال شد. وضعیت کاربر:", user ? user.uid : "کاربر وارد نشده");
+            if (user) {
+                setActiveScreen(mainScreen);
+                try {
+                    const userDocRef = doc(db, `artifacts/${appId}/users/${user.uid}/profile/data`);
+                    const userDocSnap = await getDoc(userDocRef);
+                    currentUserData = {
+                        uid: user.uid,
+                        email: user.email,
+                        displayName: (userDocSnap.exists() && userDocSnap.data().displayName)
+                                    ? userDocSnap.data().displayName
+                                    : (user.email ? user.email.split('@')[0] : 'کاربر')
+                    };
+                    
+                    // Update header display
+                    headerDisplayName.textContent = currentUserData.displayName;
+                    // Shorten User ID for display in header
+                    headerUserId.textContent = `ID: ${currentUserData.uid.substring(0, 8)}...`; 
+
+                    console.log("نام نمایشی کاربر: " + currentUserData.displayName);
+                } catch (firestoreError) {
+                    console.error("خطا در دریافت پروفایل کاربر از Firestore:", firestoreError);
+                    currentUserData = {
+                        uid: user.uid,
+                        email: user.email,
+                        displayName: user.email ? user.email.split('@')[0] : 'کاربر'
+                    };
+                    headerDisplayName.textContent = currentUserData.displayName;
+                    headerUserId.textContent = `ID: ${currentUserData.uid.substring(0, 8)}...`;
+                }
+
+            } else {
+                setActiveScreen(authScreen);
+                // Reset auth form on logout
+                authForm.reset();
+                displayNameField.classList.add('hidden'); // Hide display name field
+                submitAuthBtn.classList.add('hidden'); // Hide submit button initially
+                loginToggleBtn.classList.remove('hidden'); // Show login toggle
+                registerToggleBtn.classList.remove('hidden'); // Show register toggle
+                authMode = 'login'; // Reset mode to login
+                currentUserData = null; // Clear user data
+            }
+            console.log("onAuthStateChanged به پایان رسید.");
+        });
+
+        // Initial Firebase Authentication when the app loads
+        async function initializeFirebaseAndAuth() {
+            console.log("تابع initializeFirebaseAndAuth فراخوانی شد.");
+            try {
+                if (initialAuthToken) {
+                    console.log("تلاش برای ورود با custom token...");
+                    await signInWithCustomToken(auth, initialAuthToken);
+                    console.log("با custom token وارد شدید.");
+                } else {
+                    await signInAnonymously(auth);
+                    console.log("به صورت ناشناس وارد شدید.");
+                }
+            } catch (error) {
+                console.error("خطا در احراز هویت اولیه فایربیس:", error);
+                showMessage(`خطا در ورود اولیه: ${error.message}`, 'error');
+            }
+        }
+
+        // --- Event Listeners for Auth Screen Toggles ---
+        loginToggleBtn.addEventListener('click', () => {
+            authMode = 'login';
+            displayNameField.classList.add('hidden'); // Hide display name field for login
+            submitAuthBtn.textContent = 'ورود'; // Set text for submit button
+            submitAuthBtn.classList.remove('hidden'); // Show submit button
+            loginToggleBtn.classList.add('hidden'); // Hide login toggle
+            registerToggleBtn.classList.remove('hidden'); // Show register toggle
+            emailInput.focus(); // Focus on email input
+            console.log("حالت احراز هویت به: ورود تغییر یافت.");
+        });
+
+        registerToggleBtn.addEventListener('click', () => {
+            authMode = 'register';
+            displayNameField.classList.remove('hidden'); // Show display name field for register
+            submitAuthBtn.textContent = 'ثبت نام'; // Set text for submit button
+            submitAuthBtn.classList.remove('hidden'); // Show submit button
+            registerToggleBtn.classList.add('hidden'); // Hide register toggle
+            loginToggleBtn.classList.remove('hidden'); // Show login toggle
+            emailInput.focus(); // Focus on email input
+            console.log("حالت احراز هویت به: ثبت نام تغییر یافت.");
+        });
+
+        // --- Event Listener for Main Auth Form Submission ---
+        submitAuthBtn.addEventListener('click', async (e) => {
+            e.preventDefault(); // Prevent default form submission
+            console.log(`فرم احراز هویت در حالت ${authMode} ارسال شد.`);
+
+            const email = emailInput.value.trim();
+            const password = passwordInput.value.trim();
+            const displayName = displayNameInput.value.trim(); // Get display name
+
+            if (!email || !password) {
+                showMessage("لطفاً ایمیل و رمز عبور را وارد کنید.", 'error');
+                return;
+            }
+
+            if (authMode === 'register' && !displayName) {
+                showMessage("لطفاً نام نمایشی خود را وارد کنید.", 'error');
+                return;
+            }
+
+            if (authMode === 'login') {
+                try {
+                    await signInWithEmailAndPassword(auth, email, password);
+                    showMessage(`با موفقیت وارد شدید!`, 'success');
+                } catch (error) {
+                    console.error("خطا در ورود:", error);
+                    let errorMessage = "خطا در ورود.";
+                    if (error.code === 'auth/invalid-email') {
+                        errorMessage = "فرمت ایمیل نامعتبر است.";
+                    } else if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password' || error.code === 'auth/invalid-credential') {
+                        errorMessage = "ایمیل یا رمز عبور اشتباه است.";
+                    } else if (error.code === 'auth/too-many-requests') {
+                        errorMessage = "تعداد تلاش‌های زیاد. لطفاً بعداً امتحان کنید.";
+                    }
+                    showMessage(errorMessage, 'error');
+                }
+            } else if (authMode === 'register') {
+                try {
+                    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                    // Save user's display name to Firestore
+                    const userDocRef = doc(db, `artifacts/${appId}/users/${userCredential.user.uid}/profile/data`);
+                    await setDoc(userDocRef, { displayName: displayName, email: email }, { merge: true });
+
+                    showMessage(`ثبت نام با موفقیت انجام شد!`, 'success');
+                } catch (error) {
+                    console.error("خطا در ثبت نام:", error);
+                    let errorMessage = "خطا در ثبت نام.";
+                    if (error.code === 'auth/email-already-in-use') {
+                        errorMessage = "این ایمیل قبلاً ثبت نام شده است.";
+                    } else if (error.code === 'auth/invalid-email') {
+                        errorMessage = "فرمت ایمیل نامعتبر است.";
+                    } else if (error.code === 'auth/weak-password') {
+                        errorMessage = "رمز عبور بسیار ضعیف است (حداقل ۶ کاراکتر).";
+                    }
+                    showMessage(errorMessage, 'error');
+                }
+            }
+        });
+
+        // Prevent default form submission for the main form
+        authForm.addEventListener('submit', (e) => e.preventDefault());
+
+
+        // --- Event Listeners for Main Screen UI ---
+        menuBtn.addEventListener('click', () => {
+            openProfileModal(); // Menu button opens profile modal
+            console.log("دکمه منو (سه خط) کلیک شد.");
+        });
+
+        profileSummary.addEventListener('click', () => {
+            openProfileModal(); // Profile summary also opens profile modal
+            console.log("روی خلاصه پروفایل کلیک شد.");
+        });
+
+        closeProfileModalBtn.addEventListener('click', closeProfileModal);
+
+        profileModal.addEventListener('click', (e) => {
+            // Close modal if clicked outside content
+            if (e.target === profileModal) {
+                closeProfileModal();
+            }
+        });
+
+        friendlyGameBtn.addEventListener('click', () => {
+            showMessage("صفحه بازی دوستانه به زودی!");
+            console.log("دکمه بازی دوستانه کلیک شد.");
+        });
+
+        ratedGameBtn.addEventListener('click', () => {
+            showMessage("صفحه بازی امتیازی به زودی!");
+            console.log("دکمه بازی امتیازی کلیک شد.");
+        });
+
+        // Logout button is now inside the profile modal
+        profileLogoutBtn.addEventListener('click', async () => {
+            console.log("دکمه خروج کلیک شد.");
+            try {
+                await signOut(auth);
+                showMessage("با موفقیت از حساب کاربری خود خارج شدید.", 'info');
+                closeProfileModal(); // Close modal after logout
+            } catch (error) {
+                console.error("خطا در خروج:", error);
+                showMessage(`خطا در خروج: ${error.message}`, 'error');
+            }
+        });
+
+        // Start Firebase initialization when the window loads
+        window.onload = initializeFirebaseAndAuth;
+
+    </script>
+</body>
+</html>
