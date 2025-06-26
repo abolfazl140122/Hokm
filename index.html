@@ -803,42 +803,64 @@
 
 
         // Firebase Authentication State Listener
+        // This listener is crucial for managing the UI state based on user authentication.
+        // It fetches/updates currentUserData and handles screen transitions.
         onAuthStateChanged(auth, async (user) => {
             console.log("onAuthStateChanged فایر بیس فعال شد. وضعیت کاربر:", user ? user.uid : "کاربر وارد نشده");
             if (user) {
-                // Ensure auth state is ready before attempting Firestore read
+                // User is signed in. Fetch or update their profile data.
                 try {
                     const userDocRef = doc(db, `artifacts/${appId}/users/${user.uid}/profile/data`);
                     const userDocSnap = await getDoc(userDocRef);
+
+                    // Initialize currentUserData based on Firebase user and Firestore profile
                     currentUserData = {
                         uid: user.uid,
                         email: user.email,
+                        // Prioritize displayName from Firestore, then user.displayName (if set by Firebase, e.g., Google Sign-in),
+                        // then fallback to part of email.
                         displayName: (userDocSnap.exists() && userDocSnap.data().displayName)
                                     ? userDocSnap.data().displayName
-                                    : (user.email ? user.email.split('@')[0] : 'کاربر')
+                                    : (user.displayName || (user.email ? user.email.split('@')[0] : 'کاربر ناشناس'))
                     };
                     
-                    // Update header display
+                    // If a user just registered and displayName was provided in the form,
+                    // ensure it's saved in Firestore if it wasn't already.
+                    if (userDocSnap.exists() && !userDocSnap.data().displayName && displayNameInput.value.trim() !== '') {
+                        await setDoc(userDocRef, { displayName: displayNameInput.value.trim() }, { merge: true });
+                        currentUserData.displayName = displayNameInput.value.trim(); // Update current data immediately
+                    } else if (!userDocSnap.exists() && authMode === 'register' && displayNameInput.value.trim() !== '') {
+                        // This case should ideally be covered by the initial register logic, but as a fallback
+                         await setDoc(userDocRef, { displayName: displayNameInput.value.trim(), email: user.email }, { merge: true });
+                         currentUserData.displayName = displayNameInput.value.trim();
+                    }
+
+
+                    // Update header display with fetched/derived data
                     headerDisplayName.textContent = currentUserData.displayName;
-                    // Shorten User ID for display in header
-                    headerUserId.textContent = `ID: ${currentUserData.uid.substring(0, 8)}...`; 
+                    headerUserId.textContent = `شناسه: ${currentUserData.uid.substring(0, 8)}...`; // Display first 8 chars of UID
 
                     console.log("نام نمایشی کاربر: " + currentUserData.displayName);
+                    setActiveScreen(mainScreen); // Transition to main screen once user data is ready
+
                 } catch (firestoreError) {
-                    console.error("خطا در دریافت پروفایل کاربر از Firestore:", firestoreError);
+                    console.error("خطا در دریافت/به‌روزرسانی پروفایل کاربر از Firestore:", firestoreError);
+                    // Fallback if Firestore read fails
                     currentUserData = {
                         uid: user.uid,
                         email: user.email,
-                        displayName: user.email ? user.email.split('@')[0] : 'کاربر'
+                        displayName: user.displayName || (user.email ? user.email.split('@')[0] : 'کاربر ناشناس')
                     };
                     headerDisplayName.textContent = currentUserData.displayName;
-                    headerUserId.textContent = `ID: ${currentUserData.uid.substring(0, 8)}...`;
+                    headerUserId.textContent = `شناسه: ${currentUserData.uid.substring(0, 8)}...`;
+                    setActiveScreen(mainScreen); // Still transition even if profile fetch fails
+                    showMessageBox("مشکلی در بارگذاری پروفایل شما پیش آمد.", "error");
                 }
-                setActiveScreen(mainScreen); // Only switch to main screen after user data is potentially loaded
 
             } else {
-                setActiveScreen(authScreen);
-                // Reset auth form on logout
+                // User is signed out or not signed in.
+                setActiveScreen(authScreen); // Transition to authentication screen
+                // Reset auth form state
                 authForm.reset();
                 displayNameField.classList.add('hidden'); // Hide display name field
                 submitAuthBtn.classList.add('hidden'); // Hide submit button initially
@@ -846,7 +868,7 @@
                 registerToggleBtn.classList.remove('hidden'); // Show register toggle
                 authMode = 'login'; // Reset mode to login
                 currentUserData = null; // Clear user data
-                // If there's an active lobby listener, unsubscribe it
+                // If there's an active lobby listener, unsubscribe it to prevent unauthorized access
                 if (unsubscribeLobbies) {
                     unsubscribeLobbies();
                     unsubscribeLobbies = null;
@@ -859,21 +881,53 @@
         async function initializeFirebaseAndAuth() {
             console.log("تابع initializeFirebaseAndAuth فراخوانی شد.");
             try {
+                // This will trigger onAuthStateChanged after completion
                 if (initialAuthToken) {
                     console.log("تلاش برای ورود با custom token...");
                     await signInWithCustomToken(auth, initialAuthToken);
-                    console.log("با custom token وارد شدید.");
                 } else {
                     await signInAnonymously(auth);
-                    console.log("به صورت ناشناس وارد شدید.");
                 }
+                console.log("احراز هویت اولیه تکمیل شد. onAuthStateChanged وضعیت را مدیریت می‌کند.");
             } catch (error) {
                 console.error("خطا در احراز هویت اولیه فایربیس:", error);
-                showMessageBox(`خطا در ورود اولیه: ${error.message}`, 'error');
+                showMessageBox(`خطا در ورود اولیه: ${getFirebaseErrorMessage(error.code)}`, 'error');
+                setActiveScreen(authScreen); // Ensure auth screen is shown on critical initial auth failure
             }
         }
 
-        // --- Firebase Lobby Functions (NEW) ---
+        /**
+         * Maps Firebase auth error codes to user-friendly Persian messages.
+         * @param {string} errorCode - The Firebase error code.
+         * @returns {string} User-friendly message.
+         */
+        function getFirebaseErrorMessage(errorCode) {
+            switch (errorCode) {
+                case 'auth/invalid-email':
+                    return "فرمت ایمیل وارد شده نامعتبر است. لطفا یک ایمیل معتبر وارد کنید.";
+                case 'auth/user-disabled':
+                    return "حساب کاربری شما غیرفعال شده است. لطفاً با پشتیبانی تماس بگیرید.";
+                case 'auth/user-not-found':
+                    return "کاربری با این ایمیل یافت نشد. لطفا ثبت نام کنید یا ایمیل را بررسی کنید.";
+                case 'auth/wrong-password':
+                case 'auth/invalid-credential': // Modern Firebase error for wrong password/email
+                    return "ایمیل یا رمز عبور اشتباه است.";
+                case 'auth/email-already-in-use':
+                    return "این ایمیل قبلاً ثبت نام شده است. لطفاً وارد شوید یا از ایمیل دیگری استفاده کنید.";
+                case 'auth/weak-password':
+                    return "رمز عبور بسیار ضعیف است. لطفاً رمزی با حداقل ۶ کاراکتر انتخاب کنید.";
+                case 'auth/operation-not-allowed':
+                    return "این نوع احراز هویت در حال حاضر فعال نیست. لطفاً با پشتیبانی تماس بگیرید.";
+                case 'auth/network-request-failed':
+                    return "مشکل در اتصال به اینترنت. لطفاً اتصال خود را بررسی کنید.";
+                case 'auth/too-many-requests':
+                    return "تعداد تلاش‌های ناموفق بیش از حد مجاز. لطفاً بعداً امتحان کنید.";
+                default:
+                    return "خطایی ناشناخته رخ داده است. لطفاً دوباره تلاش کنید.";
+            }
+        }
+
+        // --- Firebase Lobby Functions ---
 
         /**
          * Creates a new lobby document in Firestore.
@@ -884,12 +938,15 @@
          */
         async function createLobby(lobbyName, userId, displayName) {
             try {
+                // Ensure display name is not empty or null
+                const creatorDisplayName = displayName && displayName.trim() !== '' ? displayName : 'ناشناس';
+
                 const lobbiesRef = collection(db, `artifacts/${appId}/public/data/lobbies`);
                 const newLobbyRef = await addDoc(lobbiesRef, {
                     name: lobbyName,
                     hostId: userId,
                     status: "waiting", // Initial status: waiting for players
-                    players: [{ uid: userId, displayName: displayName }], // Host is the first player
+                    players: [{ uid: userId, displayName: creatorDisplayName }], // Host is the first player
                     createdAt: serverTimestamp(), // Firestore timestamp for ordering/cleanup
                     gameSettings: { // Default game settings
                         maxPlayers: 4, // Hokm is typically 4 players
@@ -939,7 +996,12 @@
 
                 // Sort lobbies client-side if needed (e.g., by createdAt if available and if orderBy was removed)
                 // If createdAt is available and you removed orderBy from query, you can sort here:
-                lobbiesToDisplay.sort((a, b) => b.createdAt?.seconds - a.createdAt?.seconds); // Sort by newest first
+                lobbiesToDisplay.sort((a, b) => {
+                    // Handle cases where createdAt might be missing (though serverTimestamp should ensure it's there)
+                    const timeA = a.createdAt?.seconds || 0;
+                    const timeB = b.createdAt?.seconds || 0;
+                    return timeB - timeA; // Sort by newest first
+                });
 
                 if (lobbiesToDisplay.length === 0) {
                     lobbiesList.innerHTML = '<p class="text-gray-400">در حال حاضر لابی فعالی وجود ندارد. اولین نفر باشید!</p>';
@@ -947,10 +1009,11 @@
                     lobbiesToDisplay.forEach((lobby) => {
                         const playerCount = lobby.players ? lobby.players.length : 0;
                         const maxPlayers = lobby.gameSettings?.maxPlayers || 4; // Default to 4 if not set
-
-                        // Check if current user is already in this lobby
-                        const isInLobby = lobby.players.some(p => p.uid === auth.currentUser?.uid);
                         
+                        const hostDisplayName = lobby.players && lobby.players.length > 0
+                                                ? lobby.players[0].displayName || 'ناشناس'
+                                                : 'ناشناس';
+
                         // Make the join button always disabled for now as per user request
                         const joinButtonHtml = `<button data-lobby-id="${lobby.id}" class="join-lobby-btn classic-btn btn-blue-classic text-sm py-2 px-4 opacity-50 cursor-not-allowed" disabled>
                                                 ورود به لابی
@@ -962,7 +1025,7 @@
                         lobbyItem.innerHTML = `
                             <div class="mb-2 sm:mb-0 text-center sm:text-right">
                                 <h3 class="text-xl font-bold text-yellow-300">${lobby.name}</h3>
-                                <p class="text-sm text-gray-300">سازنده: ${lobby.players[0]?.displayName || 'ناشناس'}</p>
+                                <p class="text-sm text-gray-300">سازنده: ${hostDisplayName}</p>
                                 <p class="text-sm text-gray-300">بازیکنان: ${playerCount}/${maxPlayers}</p>
                             </div>
                             <div class="mt-2 sm:mt-0">
@@ -1097,35 +1160,19 @@
                     showMessageBox(`با موفقیت وارد شدید!`, 'success');
                 } catch (error) {
                     console.error("خطا در ورود:", error);
-                    let errorMessage = "خطا در ورود.";
-                    if (error.code === 'auth/invalid-email') {
-                        errorMessage = "فرمت ایمیل نامعتبر است.";
-                    } else if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password' || error.code === 'auth/invalid-credential') {
-                        errorMessage = "ایمیل یا رمز عبور اشتباه است.";
-                    } else if (error.code === 'auth/too-many-requests') {
-                        errorMessage = "تعداد تلاش‌های زیاد. لطفاً بعداً امتحان کنید.";
-                    }
-                    showMessageBox(errorMessage, 'error');
+                    showMessageBox(getFirebaseErrorMessage(error.code), 'error');
                 }
             } else if (authMode === 'register') {
                 try {
                     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-                    // Save user's display name to Firestore
+                    // Save user's display name to Firestore immediately after successful registration
                     const userDocRef = doc(db, `artifacts/${appId}/users/${userCredential.user.uid}/profile/data`);
-                    await setDoc(userDocRef, { displayName: displayName, email: email }, { merge: true });
-
+                    await setDoc(userDocRef, { displayName: displayName, email: email }, { merge: true }); // Use merge:true to avoid overwriting if doc exists
                     showMessageBox(`ثبت نام با موفقیت انجام شد!`, 'success');
+                    // onAuthStateChanged will handle screen transition and data load after this
                 } catch (error) {
                     console.error("خطا در ثبت نام:", error);
-                    let errorMessage = "خطا در ثبت نام.";
-                    if (error.code === 'auth/email-already-in-use') {
-                        errorMessage = "این ایمیل قبلاً ثبت نام شده است.";
-                    } else if (error.code === 'auth/invalid-email') {
-                        errorMessage = "فرمت ایمیل نامعتبر است.";
-                    } else if (error.code === 'auth/weak-password') {
-                        errorMessage = "رمز عبور بسیار ضعیف است (حداقل ۶ کاراکتر).";
-                    }
-                    showMessageBox(errorMessage, 'error');
+                    showMessageBox(getFirebaseErrorMessage(error.code), 'error');
                 }
             }
         });
@@ -1180,7 +1227,7 @@
                 // onAuthStateChanged will handle screen transition
             } catch (error) {
                 console.error("خطا در خروج:", error);
-                showMessageBox(`خطا در خروج: ${error.message}`, 'error');
+                showMessageBox(`خطا در خروج: ${getFirebaseErrorMessage(error.code)}`, 'error');
             }
         });
 
@@ -1210,8 +1257,8 @@
         // createLobbyBtn.addEventListener('click', ...) // No longer needed
 
         // Create Lobby Modal form submission
-        createLobbyForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
+        submitCreateLobbyBtn.addEventListener('click', async (e) => {
+            e.preventDefault(); // Prevent default form submission
             const lobbyName = newLobbyNameInput.value.trim();
 
             if (!lobbyName) {
@@ -1225,13 +1272,14 @@
             }
 
             try {
+                // Pass display name along with UID
                 await createLobby(lobbyName, auth.currentUser.uid, currentUserData.displayName);
                 showCreateLobbyMessageBox("لابی شما با موفقیت ساخته شد!", "success");
                 newLobbyNameInput.value = ''; // Clear input
                 setTimeout(closeCreateLobbyModal, 1500); // Close modal after a short delay
             } catch (error) {
                 console.error("خطا در ساخت لابی از مودال:", error);
-                showCreateLobbyMessageBox(`خطا در ساخت لابی: ${error.message}`, "error");
+                showCreateLobbyMessageBox(`خطا در ساخت لابی: ${error.message}`, "error"); // Use raw error message for debug
             }
         });
 
