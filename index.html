@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
@@ -695,6 +696,7 @@
         let currentActiveScreen = loadingScreen;
         let currentUserData = null; // To store user's profile data
         let unsubscribeLobbies = null; // Global variable to store the unsubscribe function for lobby listener
+        let isAuthResolved = false; // NEW: Flag to indicate if onAuthStateChanged has run at least once
 
         // Function to show custom message box (re-used for auth and create lobby modals)
         function showCustomMessage(element, message, type = 'info') {
@@ -807,6 +809,8 @@
         // It fetches/updates currentUserData and handles screen transitions.
         onAuthStateChanged(auth, async (user) => {
             console.log("onAuthStateChanged فایر بیس فعال شد. وضعیت کاربر:", user ? user.uid : "کاربر وارد نشده");
+            isAuthResolved = true; // Set flag that auth state has been checked
+
             if (user) {
                 // User is signed in. Fetch or update their profile data.
                 try {
@@ -826,11 +830,13 @@
                     
                     // If a user just registered and displayName was provided in the form,
                     // ensure it's saved in Firestore if it wasn't already.
+                    // This scenario is mostly for robustness; primary save is during registration.
                     if (userDocSnap.exists() && !userDocSnap.data().displayName && displayNameInput.value.trim() !== '') {
+                        console.log("Updating displayName in Firestore from auth form.");
                         await setDoc(userDocRef, { displayName: displayNameInput.value.trim() }, { merge: true });
                         currentUserData.displayName = displayNameInput.value.trim(); // Update current data immediately
                     } else if (!userDocSnap.exists() && authMode === 'register' && displayNameInput.value.trim() !== '') {
-                        // This case should ideally be covered by the initial register logic, but as a fallback
+                        console.log("Creating user profile in Firestore after registration.");
                          await setDoc(userDocRef, { displayName: displayNameInput.value.trim(), email: user.email }, { merge: true });
                          currentUserData.displayName = displayNameInput.value.trim();
                     }
@@ -854,12 +860,16 @@
                     headerDisplayName.textContent = currentUserData.displayName;
                     headerUserId.textContent = `شناسه: ${currentUserData.uid.substring(0, 8)}...`;
                     setActiveScreen(mainScreen); // Still transition even if profile fetch fails
-                    showMessageBox("مشکلی در بارگذاری پروفایل شما پیش آمد.", "error");
+                    showMessageBox("مشکلی در بارگذاری پروفایل شما پیش آمد. لطفا دوباره امتحان کنید.", "error");
                 }
 
             } else {
                 // User is signed out or not signed in.
-                setActiveScreen(authScreen); // Transition to authentication screen
+                // Only transition to auth screen if auth state has been initially resolved
+                // This prevents flickering if app is just loading and auth hasn't fully checked yet.
+                if (isAuthResolved) {
+                    setActiveScreen(authScreen); // Transition to authentication screen
+                }
                 // Reset auth form state
                 authForm.reset();
                 displayNameField.classList.add('hidden'); // Hide display name field
@@ -881,14 +891,16 @@
         async function initializeFirebaseAndAuth() {
             console.log("تابع initializeFirebaseAndAuth فراخوانی شد.");
             try {
-                // This will trigger onAuthStateChanged after completion
+                // Removed signInAnonymously(auth); as per user request to stop automatic anonymous sign-in.
+                // Now, only if initialAuthToken is present, a custom sign-in occurs.
+                // Otherwise, the onAuthStateChanged listener will detect no user and route to auth screen.
                 if (initialAuthToken) {
                     console.log("تلاش برای ورود با custom token...");
                     await signInWithCustomToken(auth, initialAuthToken);
                 } else {
-                    await signInAnonymously(auth);
+                    console.log("بدون custom token. منتظر وضعیت احراز هویت firebase (onAuthStateChanged) می‌مانیم.");
+                    // No explicit action here; onAuthStateChanged will handle the UI based on whether a user is found or not.
                 }
-                console.log("احراز هویت اولیه تکمیل شد. onAuthStateChanged وضعیت را مدیریت می‌کند.");
             } catch (error) {
                 console.error("خطا در احراز هویت اولیه فایربیس:", error);
                 showMessageBox(`خطا در ورود اولیه: ${getFirebaseErrorMessage(error.code)}`, 'error');
@@ -922,6 +934,8 @@
                     return "مشکل در اتصال به اینترنت. لطفاً اتصال خود را بررسی کنید.";
                 case 'auth/too-many-requests':
                     return "تعداد تلاش‌های ناموفق بیش از حد مجاز. لطفاً بعداً امتحان کنید.";
+                case 'auth/cancelled-popup-request': // For cases like pop-ups being blocked
+                    return "عملیات ورود لغو شد. پنجره بازشو ممکن است مسدود شده باشد.";
                 default:
                     return "خطایی ناشناخته رخ داده است. لطفاً دوباره تلاش کنید.";
             }
@@ -1121,6 +1135,8 @@
             loginToggleBtn.classList.add('hidden'); // Hide login toggle
             registerToggleBtn.classList.remove('hidden'); // Show register toggle
             emailInput.focus(); // Focus on email input
+            showMessageBox("", "info"); // Clear any previous messages
+            authForm.reset(); // Clear form fields
             console.log("حالت احراز هویت به: ورود تغییر یافت.");
         });
 
@@ -1132,6 +1148,8 @@
             registerToggleBtn.classList.add('hidden'); // Hide register toggle
             loginToggleBtn.classList.remove('hidden'); // Show login toggle
             emailInput.focus(); // Focus on email input
+            showMessageBox("", "info"); // Clear any previous messages
+            authForm.reset(); // Clear form fields
             console.log("حالت احراز هویت به: ثبت نام تغییر یافت.");
         });
 
@@ -1149,15 +1167,22 @@
                 return;
             }
 
+            // Basic client-side validation for display name on registration
             if (authMode === 'register' && !displayName) {
                 showMessageBox("لطفاً نام نمایشی خود را وارد کنید.", 'error');
                 return;
             }
+            if (authMode === 'register' && password.length < 6) {
+                showMessageBox("رمز عبور باید حداقل ۶ کاراکتر باشد.", "error");
+                return;
+            }
+
 
             if (authMode === 'login') {
                 try {
                     await signInWithEmailAndPassword(auth, email, password);
                     showMessageBox(`با موفقیت وارد شدید!`, 'success');
+                    // onAuthStateChanged will handle screen transition
                 } catch (error) {
                     console.error("خطا در ورود:", error);
                     showMessageBox(getFirebaseErrorMessage(error.code), 'error');
@@ -1245,6 +1270,7 @@
 
         // Footer Add Icon Button opens the create lobby modal
         addIconBtn.addEventListener('click', () => {
+            // Ensure user is authenticated and has display name before allowing lobby creation
             if (!auth.currentUser || !currentUserData || !currentUserData.displayName) {
                 showMessageBox("برای ساخت لابی، باید وارد حساب کاربری خود شوید و نام نمایشی داشته باشید.", "error");
                 return;
@@ -1257,7 +1283,7 @@
         // createLobbyBtn.addEventListener('click', ...) // No longer needed
 
         // Create Lobby Modal form submission
-        submitCreateLobbyBtn.addEventListener('click', async (e) => {
+        createLobbyForm.addEventListener('submit', async (e) => {
             e.preventDefault(); // Prevent default form submission
             const lobbyName = newLobbyNameInput.value.trim();
 
@@ -1279,7 +1305,7 @@
                 setTimeout(closeCreateLobbyModal, 1500); // Close modal after a short delay
             } catch (error) {
                 console.error("خطا در ساخت لابی از مودال:", error);
-                showCreateLobbyMessageBox(`خطا در ساخت لابی: ${error.message}`, "error"); // Use raw error message for debug
+                showCreateLobbyMessageBox(`خطا در ساخت لابی: ${getFirebaseErrorMessage(error.code) || error.message}`, "error");
             }
         });
 
@@ -1335,6 +1361,7 @@
 
 
         // Start Firebase initialization when the window loads
+        // Changed to wait for onAuthStateChanged to resolve before setting screen.
         window.onload = initializeFirebaseAndAuth;
 
     </script>
