@@ -404,32 +404,88 @@
             margin-top: 0.25rem;
         }
         
-        .lobby-item .flex.items-center {
+        .lobby-item .lobby-actions { /* Container for buttons in lobby item */
             margin-top: 1rem; /* Space between text and buttons */
+            display: flex;
+            flex-direction: column; /* Stack buttons on mobile */
+            width: 100%; /* Take full width on mobile */
+            gap: 0.75rem; /* Space between stacked buttons */
+        }
+
+        /* Ensure buttons within lobby-item are full width on mobile */
+        .lobby-item .join-lobby-btn,
+        .lobby-item .close-lobby-btn {
+            width: 100%; /* Take full width on small screens */
+            padding: 0.75rem 1rem; /* Consistent padding */
+            font-size: 1rem; /* Consistent font size */
+        }
+
+        /* Responsive adjustments for lobby-item buttons on larger screens */
+        @media (min-width: 640px) { /* sm breakpoint */
+            .lobby-item {
+                flex-direction: row; /* Align items in a row */
+                text-align: right; /* Text aligned right in RTL */
+            }
+            .lobby-item .lobby-actions {
+                flex-direction: row; /* Buttons side-by-side */
+                width: auto; /* Buttons take their natural width */
+                margin-top: 0; /* No top margin when side-by-side */
+                gap: 0.5rem; /* Small gap between buttons */
+            }
+            /* Add margin-left to close button for spacing from join button */
+            .lobby-item .close-lobby-btn {
+                margin-right: 0.5rem; /* Space from join button in RTL */
+            }
+            .lobby-item .join-lobby-btn,
+            .lobby-item .close-lobby-btn {
+                width: auto; /* Allow buttons to size naturally */
+                font-size: 0.9rem; /* Slightly smaller for compactness */
+                padding: 0.6rem 1.2rem; /* Adjusted padding */
+            }
         }
 
         /* Styles for the Lobby Detail Screen */
-        .lobby-detail-container {
+        .lobby-detail-screen-full { /* New class for full-screen lobby detail */
+            padding-top: 70px; /* Header height */
+            padding-bottom: 90px; /* Footer height */
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start; /* Start content from top */
+            align-items: center; /* Center horizontally */
+            width: 100%;
+            height: 100%;
+            overflow-y: hidden; /* No scroll on main detail screen */
+            overflow-x: hidden;
+            background: linear-gradient(180deg, #2C2C2C 0%, #1A1A1A 100%); /* Subtle dark grey gradient */
+        }
+
+        .lobby-detail-content { /* Content container inside full screen */
             background: linear-gradient(145deg, #1A1A1A 0%, #0D0D0D 100%); /* Darker, more intense background */
             border: 3px solid #DAA520;
             border-radius: 20px;
             box-shadow: 0 10px 20px rgba(0,0,0,0.7);
             padding: 2rem;
             text-align: center;
-            max-width: 600px;
-            width: 95%;
-            margin: 20px auto;
+            width: 95%; /* Responsive width */
+            max-width: 700px; /* Max width for larger screens */
+            flex-grow: 1; /* Allow to grow and take available space */
             display: flex;
             flex-direction: column;
             align-items: center;
             gap: 1.5rem; /* Spacing between elements */
-            overflow-y: auto; /* Allow scrolling within the detail screen if content is long */
-            max-height: calc(100vh - 160px); /* Adjust based on header/footer height */
+            margin-top: 2rem; /* Space from top after header */
+            margin-bottom: 2rem; /* Space from bottom before footer */
+            overflow-y: auto; /* Allow scroll if content is too large *within this container*, though layout aims to avoid it */
+            -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+        }
+        /* Further ensure no horizontal scroll for content */
+        .lobby-detail-content > * {
+            max-width: 100%;
         }
 
         .player-slots-grid {
             display: grid;
-            grid-template-columns: repeat(2, 1fr); /* 2 columns for players */
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); /* Responsive grid for players */
             gap: 1rem; /* Space between slots */
             width: 100%;
             max-width: 400px; /* Limit grid width */
@@ -555,7 +611,7 @@
                 align-items: center;
                 text-align: center;
             }
-            .lobby-item .flex.items-center {
+            .lobby-item .lobby-actions { /* Ensure this wraps for mobile */
                 flex-direction: column;
                 width: 100%;
             }
@@ -563,6 +619,7 @@
                 width: 100%;
                 margin-top: 0.5rem; /* Space between stacked buttons */
                 margin-left: 0 !important; /* Remove horizontal margin */
+                margin-right: 0 !important; /* Remove horizontal margin */
             }
             .lobby-item h3 {
                 font-size: 1.5rem;
@@ -573,6 +630,17 @@
 
             .player-slots-grid {
                 grid-template-columns: 1fr; /* Single column on mobile */
+            }
+
+            /* Lobby Detail Screen on Mobile */
+            .lobby-detail-screen-full {
+                padding-top: 60px; /* Adjust for smaller header */
+                padding-bottom: 80px; /* Adjust for smaller footer */
+            }
+            .lobby-detail-content {
+                padding: 1.5rem;
+                margin-top: 1rem;
+                margin-bottom: 1rem;
             }
         }
     </style>
@@ -793,8 +861,10 @@
         </div>
 
         <!-- 8. Lobby Detail Screen (NEW) -->
-        <div id="lobby-detail-screen" class="hidden absolute inset-0 flex flex-col justify-center items-center z-30 page-transition-active page-transition-hidden" tabindex="-1">
-            <div class="lobby-detail-container">
+        <!-- تغییرات: کلاس جدید برای تمام صفحه شدن و مدیریت پدینگ برای هدر و فوتر -->
+        <div id="lobby-detail-screen" class="hidden absolute inset-0 z-30 page-transition-active page-transition-hidden lobby-detail-screen-full" tabindex="-1">
+            <!-- تغییرات: کانتینر اصلی محتوا، اکنون تمام فضای موجود را اشغال می‌کند -->
+            <div class="lobby-detail-content">
                 <h2 id="detail-lobby-name" class="text-3xl font-bold text-yellow-300">نام لابی</h2>
                 <p id="detail-host-name" class="text-lg text-gray-300">سازنده: ---</p>
                 
@@ -1485,24 +1555,24 @@
                         let joinButtonHtml = '';
                         if (isCurrentUserHostOfThisLobby) {
                             // If current user is the host of this lobby, show a "Go to My Lobby" button
-                            joinButtonHtml = `<button data-lobby-id="${lobby.id}" class="view-my-lobby-btn classic-btn btn-blue-classic text-sm py-2 px-4">
+                            joinButtonHtml = `<button data-lobby-id="${lobby.id}" class="view-my-lobby-btn classic-btn btn-blue-classic">
                                                 ورود به لابی من
                                             </button>`;
                         } else if (canJoinThisLobby) {
                             // If user can join, make the button active
-                            joinButtonHtml = `<button data-lobby-id="${lobby.id}" class="join-lobby-btn classic-btn btn-blue-classic text-sm py-2 px-4">
+                            joinButtonHtml = `<button data-lobby-id="${lobby.id}" class="join-lobby-btn classic-btn btn-blue-classic">
                                                 ورود به لابی
                                             </button>`;
                         } else {
                             // Otherwise, disable the button for joining
-                            joinButtonHtml = `<button data-lobby-id="${lobby.id}" class="join-lobby-btn classic-btn btn-blue-classic text-sm py-2 px-4 opacity-50 cursor-not-allowed" disabled>
+                            joinButtonHtml = `<button data-lobby-id="${lobby.id}" class="join-lobby-btn classic-btn btn-blue-classic opacity-50 cursor-not-allowed" disabled>
                                                 ورود به لابی
                                             </button>`;
                         }
                         
                         // Close button for host only with a small margin-left for spacing
                         const closeButtonHtml = isCurrentUserHostOfThisLobby 
-                            ? `<button data-lobby-id="${lobby.id}" class="close-lobby-btn classic-btn btn-red-classic text-sm py-2 px-4 mr-2">
+                            ? `<button data-lobby-id="${lobby.id}" class="close-lobby-btn classic-btn btn-red-classic">
                                 بستن لابی
                                </button>`
                             : ''; // Empty string if not host
@@ -1516,7 +1586,8 @@
                                 <p class="text-sm">سازنده: ${hostDisplayName}</p>
                                 <p class="text-sm">بازیکنان: ${playerCount}/${maxPlayers}</p>
                             </div>
-                            <div class="mt-2 sm:mt-0 flex items-center">
+                            <!-- تغییرات: اضافه کردن کلاس lobby-actions برای مدیریت چیدمان دکمه‌ها -->
+                            <div class="lobby-actions">
                                 ${closeButtonHtml}
                                 ${joinButtonHtml}
                             </div>
@@ -2138,3 +2209,4 @@
     </script>
 </body>
 </html>
+
