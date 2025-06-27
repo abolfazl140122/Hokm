@@ -1,0 +1,641 @@
+/* General Classic Theme Background and Fonts */
+html, body, #app { /* Ensure these take full viewport height */
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    overflow: hidden; /* Prevent body scrollbars, including horizontal */
+}
+body {
+    font-family: 'Merriweather', serif; /* Default body font for readability */
+    /* Deep, rich, slightly textured background for classic feel */
+    background: radial-gradient(ellipse at bottom, #100C08 0%, #000000 100%); /* Darker, more intense background */
+    color: #E0E0E0; /* Softer white text for elegance */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
+
+h1, h2 {
+    font-family: 'Playfair Display', serif; /* Elegant headings */
+    color: #FFD700; /* Gold color for titles */
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.5); /* Subtle text shadow for depth */
+}
+
+/* Custom spinner for loading screen - Gold themed */
+.spinner {
+    border: 4px solid rgba(255, 255, 255, 0.3);
+    border-top: 4px solid #DAA520; /* Gold spinner */
+    border-radius: 50%;
+    width: 50px; /* Slightly larger spinner */
+    height: 50px;
+    animation: spin 1s linear infinite;
+}
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Page transition animation */
+.page-transition-active {
+    transition: opacity 0.6s ease-in-out; /* Slightly slower transition */
+}
+.page-transition-hidden {
+    opacity: 0;
+}
+.page-transition-visible {
+    opacity: 1;
+}
+
+/* Classic Card/Modal Styling - More detailed */
+.classic-card {
+    background: linear-gradient(145deg, #4B0000 0%, #660000 60%, #800000 100%); /* Deeper ruby red velvet effect */
+    border: 4px solid #DAA520; /* Goldenrod border */
+    border-radius: 20px; /* Slightly larger radius */
+    box-shadow: 0 15px 30px rgba(0,0,0,0.6), inset 0 0 15px rgba(255,255,255,0.1); /* Deeper outer shadow, subtle inner light */
+    backdrop-filter: blur(10px); /* Stronger blur for more prominent glass effect */
+    -webkit-backdrop-filter: blur(10px); /* For Safari */
+    position: relative; /* For pseudo-elements */
+    max-height: 90vh; /* Ensure card doesn't overflow viewport */
+    overflow-y: hidden; /* Removed vertical scrollbars */
+    overflow-x: hidden; /* Ensure horizontal scrollbar is hidden for cards */
+}
+.classic-card::before { /* Top left ornamental corner */
+    content: '';
+    position: absolute;
+    top: -10px;
+    left: -10px;
+    width: 30px;
+    height: 30px;
+    border-top: 5px solid #FFD700;
+    border-left: 5px solid #FFD700;
+    border-radius: 5px 0 0 0;
+    box-shadow: 0 0 10px rgba(255,215,0,0.5);
+}
+.classic-card::after { /* Bottom right ornamental corner */
+    content: '';
+    position: absolute;
+    bottom: -10px;
+    right: -10px;
+    width: 30px;
+    height: 30px;
+    border-bottom: 5px solid #FFD700;
+    border-right: 5px solid #FFD700;
+    border-radius: 0 0 5px 0;
+    box-shadow: 0 0 10px rgba(255,215,0,0.5);
+}
+
+
+/* Button Base Styles - More polished Classic Look */
+.classic-btn {
+    border: 2px solid #DAA520; /* Golden border for all buttons */
+    border-radius: 15px; /* Slightly rounded corners */
+    font-weight: 700; /* Bold text */
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.6); /* Text shadow for elegance */
+    transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1); /* Smoother transition */
+    box-shadow: 0 8px 16px rgba(0,0,0,0.4), inset 0 0 8px rgba(255,255,255,0.1); /* Deeper outer shadow, subtle inner light */
+    color: #FFFFFF; /* White text on buttons */
+    padding: 0.875rem 1.5rem; /* Equivalent to py-3.5 px-6 */
+    font-size: 1.125rem; /* Equivalent to text-lg */
+    position: relative; /* For pseudo-elements */
+    overflow: hidden; /* To contain the hover overlay */
+}
+.classic-btn::before { /* Subtle light effect on hover */
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: rgba(255,255,255,0.1);
+    transform: skewX(-30deg);
+    transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.classic-btn:hover::before {
+    left: 100%;
+}
+.classic-btn:hover {
+    transform: translateY(-5px) scale(1.03); /* More pronounced lift and scale */
+    box-shadow: 0 12px 24px rgba(0,0,0,0.6), inset 0 0 10px rgba(255,255,255,0.2); /* Stronger shadow on hover */
+}
+
+/* Specific Button Colors - Classic Pallette */
+.btn-purple-classic {
+    background: linear-gradient(145deg, #8A2BE2 0%, #6A0DAD 100%); /* Amethyst */
+}
+.btn-blue-classic {
+    background: linear-gradient(145deg, #4682B4 0%, #2A52BE 100%); /* Steel Blue / Royal Blue */
+}
+.btn-green-classic {
+    background: linear-gradient(145deg, #228B22 0%, #006400 100%); /* Forest Green */
+}
+.btn-red-classic {
+    background: linear-gradient(145deg, #CD5C5C 0%, #B22222 100%); /* Indian Red / Firebrick */
+}
+.btn-gray-classic {
+    background: linear-gradient(145deg, #A9A9A9 0%, #808080 100%); /* Dark Gray */
+}
+.btn-brown-classic { /* New for Profile/Shop */
+    background: linear-gradient(145deg, #8B4513 0%, #69320E 100%); /* Saddle Brown / Dark Sienna */
+}
+.btn-gold-classic { /* For footer icons */
+    background: linear-gradient(145deg, #FFD700 0%, #DAA520 100%); /* Gold */
+    border: none; /* No border for these small buttons */
+    padding: 0.5rem;
+    border-radius: 10px;
+}
+.btn-gold-classic:hover {
+    transform: translateY(-2px) scale(1.05);
+    box-shadow: 0 6px 12px rgba(0,0,0,0.5), inset 0 0 5px rgba(255,255,255,0.3);
+}
+
+
+/* Input Field Styles - More refined Classic Look */
+input {
+    background-color: #202020; /* Even darker input background */
+    border: 2px solid #5A5A5A; /* Dark gray border */
+    color: #E0E0E0; /* Light text color */
+    padding: 0.875rem; /* Equivalent to p-3.5 */
+    border-radius: 0.75rem; /* Equivalent to rounded-xl */
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.5); /* Inner shadow for depth */
+}
+input::placeholder {
+    color: #A0A0A0; /* Lighter placeholder text */
+}
+input:focus {
+    border-color: #DAA520 !important; /* Gold border on focus */
+    box-shadow: 0 0 0 4px rgba(218, 165, 32, 0.5) !important, inset 0 2px 4px rgba(0,0,0,0.5) !important; /* Gold focus ring with inner shadow */
+}
+
+/* Header specific styles - Richer Gold/Brown */
+.app-header {
+    background: linear-gradient(to right, #4A2B00 0%, #7A4C00 50%, #4A2B00 100%); /* Richer gold/brown gradient */
+    border-bottom: 3px solid #FFD700; /* Thicker gold border */
+    box-shadow: 0 8px 20px rgba(0,0,0,0.7); /* Deeper shadow */
+    height: 70px; /* Fixed height for header */
+    position: fixed; /* Explicitly fixed */
+    top: 0; left: 0; right: 0;
+    z-index: 40;
+    padding: 0.75rem 1rem; /* Adjust padding */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+/* Lobby Screen Specific Header */
+.lobby-header {
+    background: linear-gradient(to right, #4A2B00 0%, #7A4C00 50%, #4A2B00 100%);
+    border-bottom: 3px solid #FFD700;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.7);
+    height: 70px;
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 40;
+    padding: 0.75rem 1rem;
+    display: flex;
+    align-items: center; /* Align items vertically */
+    justify-content: center; /* Center horizontally by default */
+}
+.lobby-header .search-container {
+    display: flex;
+    flex-grow: 1; /* Allow search container to take available space */
+    max-width: 600px; /* Limit max width on larger screens */
+    margin: 0 auto; /* Center the search container */
+    align-items: center;
+    background-color: #303030; /* Darker background for search bar */
+    border-radius: 15px; /* Rounded corners for search bar */
+    border: 2px solid #5A5A5A;
+    padding: 0.5rem 1rem; /* Adjust padding */
+}
+.lobby-header .search-container input {
+    flex-grow: 1;
+    background-color: transparent; /* Transparent background */
+    border: none; /* No border for input inside search bar */
+    padding: 0.25rem 0.5rem;
+    outline: none; /* No outline on focus */
+    text-align: right; /* Align text to right for RTL */
+}
+.lobby-header .search-container input::placeholder {
+    color: #A0A0A0;
+}
+.lobby-header .search-container svg {
+    color: #DAA520; /* Gold color for icons */
+    min-width: 24px; /* Ensure icons don't shrink */
+    min-height: 24px;
+}
+.lobby-header .search-container button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0 0.5rem;
+}
+.lobby-header .back-btn-wrapper {
+    margin-left: 10px; /* Space between back button and search bar (for RTL) */
+}
+.lobby-header .search-icon-wrapper {
+    margin-right: 10px; /* Space between search icon and search input (RTL) */
+}
+
+
+.app-footer {
+    background: linear-gradient(to left, #4A2B00 0%, #7A4C00 50%, #4A2B00 100%); /* Richer gold/brown gradient */
+    border-top: 3px solid #FFD700; /* Thicker gold border */
+    box-shadow: 0 -8px 20px rgba(0,0,0,0.7); /* Deeper shadow */
+    height: 90px; /* Fixed height for footer */
+    position: fixed; /* Explicitly fixed */
+    bottom: 0; left: 0; right: 0;
+    z-index: 40;
+    padding: 1rem; /* Adjust padding */
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+}
+/* Lobby Screen Specific Footer */
+.lobby-footer {
+    background: linear-gradient(to left, #4A2B00 0%, #7A4C00 50%, #4A2B00 100%);
+    border-top: 3px solid #FFD700;
+    box-shadow: 0 -8px 20px rgba(0,0,0,0.7);
+    height: 90px;
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    z-index: 40;
+    padding: 1rem;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+}
+.lobby-footer .icon-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: #FFD700; /* Gold color for icons */
+    font-size: 0.8rem;
+    text-align: center;
+    cursor: pointer;
+    transition: transform 0.2s ease-in-out;
+}
+.lobby-footer .icon-btn:hover {
+    transform: translateY(-5px);
+}
+.lobby-footer .icon-btn svg {
+    width: 30px;
+    height: 30px;
+    margin-bottom: 5px;
+}
+.lobby-footer .games-running-text {
+    color: #E0E0E0;
+    font-size: 1.1rem;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+/* Main content area padding to avoid overlap with fixed header/footer */
+.main-content-area {
+    padding-top: 70px; /* Header height */
+    padding-bottom: 90px; /* Footer height */
+    flex-grow: 1; /* Allow content to fill available space */
+    overflow-y: hidden; /* Removed vertical scrollbars */
+    overflow-x: hidden; /* Ensure horizontal scrollbar is hidden for main content */
+    width: 100%; /* Ensure it takes full width */
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start; /* Align content to start for scrollable lists */
+    align-items: center; /* Center content horizontally */
+    background: linear-gradient(180deg, #2C2C2C 0%, #1A1A1A 100%); /* Subtle dark grey gradient for main area */
+    position: relative; /* For any absolute positioned elements inside */
+}
+
+/* Profile Modal specific styles */
+.profile-modal-overlay {
+    background-color: rgba(0,0,0,0.7); /* Darker overlay */
+    transition: opacity 0.3s ease-in-out;
+}
+.profile-modal-content {
+    transform: translateY(-20px); /* Initial slightly elevated */
+    transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.profile-modal-enter-active .profile-modal-content {
+    transform: translateY(0);
+}
+.profile-modal-leave-active .profile-modal-content {
+    transform: translateY(-20px);
+    opacity: 0;
+}
+
+/* Create Lobby Modal Specific Styles */
+#create-lobby-modal {
+    background-color: rgba(0,0,0,0.7);
+    transition: opacity 0.3s ease-in-out;
+}
+
+/* Confirmation Modal Styles */
+#confirmation-modal {
+    background-color: rgba(0,0,0,0.7);
+    transition: opacity 0.3s ease-in-out;
+}
+
+/* Animation for lobby items when closing */
+.lobby-item.fade-out {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.5s ease-out, transform 0.5s ease-out;
+}
+
+/* NEW: Enhanced Lobby Item Styling */
+.lobby-item {
+    background: linear-gradient(145deg, #2A2A2A 0%, #1A1A1A 100%); /* Deep gradient background */
+    border: 2px solid #DAA520; /* Gold border */
+    border-radius: 15px; /* Rounded corners */
+    box-shadow: 0 8px 16px rgba(0,0,0,0.5), inset 0 0 10px rgba(255,215,0,0.1); /* Deep outer shadow, subtle inner glow */
+    transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1); /* Smooth transitions for hover effects */
+    position: relative; /* For overflow hidden and pseudo-elements */
+    overflow: hidden; /* Ensures internal elements stay within rounded corners */
+    padding: 1.25rem 1.5rem; /* More generous padding */
+    display: flex;
+    flex-direction: column; /* Default to column for small screens */
+    justify-content: space-between;
+    align-items: center;
+    text-align: center;
+}
+
+.lobby-item::before { /* Subtle light overlay on hover */
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: rgba(255,255,255,0.05);
+    transform: skewX(-30deg);
+    transition: all 0.3s ease-in-out;
+}
+
+.lobby-item:hover::before {
+    left: 100%;
+}
+
+.lobby-item:hover {
+    transform: translateY(-8px) scale(1.02); /* More pronounced lift and slight scale */
+    box-shadow: 0 15px 25px rgba(0,0,0,0.6), inset 0 0 12px rgba(255,215,0,0.2); /* Stronger shadow, more glow */
+}
+
+.lobby-item h3 {
+    color: #FFD700; /* Gold for lobby names */
+    font-size: 1.75rem; /* Larger font for name */
+    font-family: 'Playfair Display', serif;
+    text-shadow: 1px 1px 3px rgba(0,0,0,0.7);
+}
+
+.lobby-item p {
+    color: #C0C0C0; /* Silver for details */
+    font-size: 1rem;
+    margin-top: 0.25rem;
+}
+
+.lobby-item .lobby-actions { /* Container for buttons in lobby item */
+    margin-top: 1rem; /* Space between text and buttons */
+    display: flex;
+    flex-direction: column; /* Stack buttons on mobile */
+    width: 100%; /* Take full width on mobile */
+    gap: 0.75rem; /* Space between stacked buttons */
+}
+
+/* Ensure buttons within lobby-item are full width on mobile */
+.lobby-item .join-lobby-btn,
+.lobby-item .close-lobby-btn {
+    width: 100%; /* Take full width on small screens */
+    padding: 0.75rem 1rem; /* Consistent padding */
+    font-size: 1rem; /* Consistent font size */
+}
+
+/* Responsive adjustments for lobby-item buttons on larger screens */
+@media (min-width: 640px) { /* sm breakpoint */
+    .lobby-item {
+        flex-direction: row; /* Align items in a row */
+        text-align: right; /* Text aligned right in RTL */
+    }
+    .lobby-item .lobby-actions {
+        flex-direction: row; /* Buttons side-by-side */
+        width: auto; /* Buttons take their natural width */
+        margin-top: 0; /* No top margin when side-by-side */
+        gap: 0.5rem; /* Small gap between buttons */
+    }
+    /* Add margin-left to close button for spacing from join button */
+    .lobby-item .close-lobby-btn {
+        margin-right: 0.5rem; /* Space from join button in RTL */
+    }
+    .lobby-item .join-lobby-btn,
+    .lobby-item .close-lobby-btn {
+        width: auto; /* Allow buttons to size naturally */
+        font-size: 0.9rem; /* Slightly smaller for compactness */
+        padding: 0.6rem 1.2rem; /* Adjusted padding */
+    }
+}
+
+/* Styles for the Lobby Detail Screen */
+.lobby-detail-screen-full { /* New class for full-screen lobby detail */
+    padding-top: 70px; /* Header height */
+    padding-bottom: 90px; /* Footer height */
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start; /* Start content from top */
+    align-items: center; /* Center horizontally */
+    width: 100%;
+    height: 100%;
+    overflow-y: hidden; /* No scroll on main detail screen */
+    overflow-x: hidden;
+    background: linear-gradient(180deg, #2C2C2C 0%, #1A1A1A 100%); /* Subtle dark grey gradient */
+}
+
+.lobby-detail-content { /* Content container inside full screen */
+    background: linear-gradient(145deg, #1A1A1A 0%, #0D0D0D 100%); /* Darker, more intense background */
+    border: 3px solid #DAA520;
+    border-radius: 20px;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.7);
+    padding: 2rem;
+    text-align: center;
+    width: 95%; /* Responsive width */
+    max-width: 700px; /* Max width for larger screens */
+    flex-grow: 1; /* Allow to grow and take available space */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.5rem; /* Spacing between elements */
+    margin-top: 2rem; /* Space from top after header */
+    margin-bottom: 2rem; /* Space from bottom before footer */
+    overflow-y: auto; /* Allow scroll if content is too large *within this container*, though layout aims to avoid it */
+    -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+}
+/* Further ensure no horizontal scroll for content */
+.lobby-detail-content > * {
+    max-width: 100%;
+}
+
+.player-slots-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); /* Responsive grid for players */
+    gap: 1rem; /* Space between slots */
+    width: 100%;
+    max-width: 400px; /* Limit grid width */
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+}
+
+.player-slot {
+    background-color: rgba(0,0,0,0.5); /* Semi-transparent dark background */
+    border: 2px dashed #FFD700; /* Dashed gold border for empty slots */
+    border-radius: 10px;
+    padding: 0.75rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100px; /* Fixed height for consistent look */
+    position: relative;
+    font-weight: bold;
+    color: #E0E0E0;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.6);
+    transition: all 0.3s ease-in-out;
+}
+/* Add hover effect for clickable player slots (host's view) */
+.player-slot.clickable:hover {
+    cursor: pointer;
+    background-color: rgba(0,0,0,0.7);
+    box-shadow: 0 6px 12px rgba(0,0,0,0.6);
+    transform: translateY(-3px);
+}
+
+.player-slot.filled {
+    border-style: solid; /* Solid border for filled slots */
+    background: linear-gradient(45deg, #333 0%, #222 100%); /* Solid background for filled slots */
+    color: #FFD700; /* Gold text for filled slots */
+    box-shadow: 0 4px 8px rgba(0,0,0,0.4);
+}
+
+.player-slot .player-avatar {
+    font-size: 2.5rem; /* Larger icon */
+    margin-bottom: 0.5rem;
+    color: #FFD700; /* Gold avatar icon */
+}
+
+/* Start Game Button (Host Only) */
+.start-game-btn {
+    background: linear-gradient(145deg, #228B22 0%, #006400 100%); /* Forest Green */
+    border: 2px solid #DAA520;
+    font-size: 1.5rem;
+    padding: 0.75rem 2rem;
+    margin-top: 1.5rem;
+}
+.start-game-btn:hover {
+    background: linear-gradient(145deg, #006400 0%, #228B22 100%);
+}
+.start-game-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    background: linear-gradient(145deg, #555 0%, #444 100%);
+    border-color: #777;
+}
+
+/* Responsive adjustments for smaller screens */
+@media (max-width: 640px) {
+    .max-w-md {
+        max-width: 95%;
+    }
+    .p-6, .p-8 {
+        padding: 1.5rem;
+    }
+    .text-3xl {
+        font-size: 2rem;
+    }
+    .space-y-5 > *:not([hidden]) ~ *:not([hidden]) {
+        margin-top: 1.25rem;
+    }
+    .space-y-4 > *:not([hidden]) ~ *:not([hidden]) {
+        margin-top: 1rem;
+    }
+    .sm\\:flex-row {
+        flex-direction: column;
+    }
+    .sm\\:w-1\\/2 {
+        width: 100%;
+    }
+    .sm\\:space-x-4 {
+        margin-left: 0;
+        margin-right: 0;
+    }
+    .sm\\:space-y-0 {
+        margin-top: 1rem; /* Add some space between stacked buttons */
+    }
+     .classic-card {
+        border-radius: 15px; /* Slightly smaller radius on mobile for consistency */
+        /* Ensure it fits on smaller screens */
+        max-height: 85vh; /* Slightly less max-height for mobile */
+    }
+     .classic-btn {
+        padding: 0.75rem 1.25rem; /* Slightly smaller padding on mobile */
+        font-size: 1rem; /* Slightly smaller font on mobile buttons */
+    }
+    .app-header, .lobby-header, .app-footer, .lobby-footer {
+        padding: 0.5rem; /* Smaller padding on mobile */
+    }
+    .app-header, .lobby-header {
+        height: 60px; /* Slightly smaller header on mobile */
+    }
+    .lobby-header .search-container {
+        padding: 0.3rem 0.8rem;
+    }
+    .app-footer, .lobby-footer {
+        height: 80px; /* Slightly smaller footer on mobile */
+    }
+    .main-content-area {
+        padding-top: 60px; /* Adjust for smaller header */
+        padding-bottom: 80px; /* Adjust for smaller footer */
+    }
+    .lobby-footer .icon-btn svg {
+        width: 25px;
+        height: 25px;
+    }
+    .lobby-footer .games-running-text {
+        font-size: 0.9rem;
+    }
+
+    /* Responsive adjustments for lobby items on small screens */
+    .lobby-item {
+        padding: 1rem;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+    .lobby-item .lobby-actions { /* Ensure this wraps for mobile */
+        flex-direction: column;
+        width: 100%;
+    }
+    .lobby-item .close-lobby-btn, .lobby-item .join-lobby-btn {
+        width: 100%;
+        margin-top: 0.5rem; /* Space between stacked buttons */
+        margin-left: 0 !important; /* Remove horizontal margin */
+        margin-right: 0 !important; /* Remove horizontal margin */
+    }
+    .lobby-item h3 {
+        font-size: 1.5rem;
+    }
+    .lobby-item p {
+        font-size: 0.9rem;
+    }
+
+    .player-slots-grid {
+        grid-template-columns: 1fr; /* Single column on mobile */
+    }
+
+    /* Lobby Detail Screen on Mobile */
+    .lobby-detail-screen-full {
+        padding-top: 60px; /* Adjust for smaller header */
+        padding-bottom: 80px; /* Adjust for smaller footer */
+    }
+    .lobby-detail-content {
+        padding: 1.5rem;
+        margin-top: 1rem;
+        margin-bottom: 1rem;
+    }
+}
