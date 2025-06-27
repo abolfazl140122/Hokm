@@ -64,10 +64,13 @@
         </div>
 
         <!-- 3. Main Screen -->
+        <!-- Using a full-height, full-width flex container to manage fixed header/footer and scrollable content -->
         <div id="main-screen" class="hidden absolute inset-0 flex flex-col z-30 page-transition-active page-transition-hidden" tabindex="-1">
-            <!-- Header for Main Screen -->
+            <!-- Header for Main Screen - Fixed at top -->
             <header class="app-header">
+                <!-- User Info and ID - Aligned Right (for RTL) -->
                 <div id="profile-summary" class="flex items-center space-x-2 space-x-reverse cursor-pointer p-2 rounded-lg hover:bg-gray-700 transition-colors duration-200" title="مشاهده پروفایل">
+                     <!-- User icon SVG -->
                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-user-circle">
                         <circle cx="12" cy="12" r="10"/><circle cx="12" cy="10" r="3"/><path d="M7 20.662V19a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v1.662"/>
                     </svg>
@@ -76,25 +79,29 @@
                         <span id="header-user-id" class="text-xs text-gray-300 break-all">ID: ---</span>
                     </div>
                 </div>
+                <!-- Hamburger Menu Icon - Aligned Left (for RTL) -->
                 <button id="menu-btn" class="text-white text-3xl p-2 rounded-full hover:bg-gray-700 transition-colors duration-200">
+                    <!-- Hamburger icon SVG -->
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-menu">
                         <line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/>
                     </svg>
                 </button>
             </header>
 
-            <!-- Main Content Area -->
+            <!-- Main Content Area - Scrollable between fixed header and footer -->
             <div class="main-content-area">
+                <!-- This area is now empty, ready for future game visuals/elements -->
                 <h1 class="text-4xl text-yellow-300 font-bold mb-8">به بازی حکم خوش آمدید!</h1>
                 <p class="text-lg text-gray-300">لطفاً یکی از گزینه‌های زیر را انتخاب کنید.</p>
             </div>
 
-            <!-- Footer Navigation -->
+            <!-- Footer Navigation - Fixed at bottom -->
             <footer class="app-footer">
                 <button id="friendly-game-btn"
                         class="classic-btn btn-purple-classic text-base sm:text-lg w-1/2 mx-2 py-3.5 px-4">
                     بازی دوستانه
                 </button>
+                <!-- Placeholder for other main buttons like 'Rated Game' -->
                 <button id="rated-game-btn"
                         class="classic-btn btn-brown-classic text-base sm:text-lg w-1/2 mx-2 py-3.5 px-4">
                     بازی امتیازی
@@ -102,17 +109,20 @@
             </footer>
         </div>
 
-        <!-- 4. Lobby Screen -->
+        <!-- 4. Lobby Screen (صفحه جدید برای لابی‌ها) -->
         <div id="lobby-screen" class="hidden absolute inset-0 flex flex-col z-30 page-transition-active page-transition-hidden" tabindex="-1">
+            <!-- Header for Lobby Screen -->
             <header class="lobby-header">
                 <div class="search-container">
                     <button id="back-to-main-btn" class="p-1">
+                        <!-- Right arrow icon for back (in RTL, it points left visually) -->
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-right">
                             <path d="M5 12h14"/><path d="m12 5 7 7-7 7"/>
                         </svg>
                     </button>
                     <input type="text" id="lobby-search-input" placeholder="جستجو بر اساس نام لابی، سازنده یا سناریو" class="flex-grow text-sm">
                     <button id="search-lobbies-btn" class="p-1">
+                        <!-- Search icon -->
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-search">
                             <circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>
                         </svg>
@@ -120,15 +130,18 @@
                 </div>
             </header>
 
+            <!-- Main Content Area for Lobby Screen -->
             <div class="main-content-area p-4 sm:p-6 text-center">
                 <div class="max-w-xl mx-auto space-y-6 w-full">
                     <h2 class="text-xl sm:text-2xl font-bold text-white mb-4">لیست لابی‌های فعال</h2>
                     <div id="lobbies-list" class="space-y-3 w-full">
+                        <!-- Lobby items will be dynamically loaded here by JavaScript -->
                         <p class="text-gray-400">در حال بارگذاری لابی‌ها...</p>
                     </div>
                 </div>
             </div>
 
+            <!-- Footer for Lobby Screen -->
             <footer class="lobby-footer">
                 <button id="add-icon-btn" class="icon-btn">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-plus-square">
@@ -155,7 +168,7 @@
             </footer>
         </div>
 
-        <!-- 5. Profile Modal -->
+        <!-- 5. Profile Modal (Hidden by default) -->
         <div id="profile-modal" class="hidden fixed inset-0 flex justify-center items-center z-50 profile-modal-overlay">
             <div class="classic-card profile-modal-content p-6 sm:p-8 w-11/12 max-w-md text-center relative">
                 <h2 class="text-2xl sm:text-3xl font-bold mb-6">پروفایل کاربری</h2>
@@ -168,6 +181,7 @@
                     <p><strong>نام نمایشی:</strong> <span id="profile-display-name">---</span></p>
                     <p><strong>ایمیل:</strong> <span id="profile-email">---</span></p>
                     <p><strong>شناسه کاربر (UID):</strong> <span id="profile-uid" class="break-all text-sm text-gray-400">---</span></p>
+                    <!-- Add more profile stats here later (e.g., wins, losses) -->
                 </div>
                 <button id="profile-logout-btn"
                         class="w-full classic-btn btn-red-classic text-lg sm:text-xl">
@@ -176,7 +190,7 @@
             </div>
         </div>
 
-        <!-- 6. Create Lobby Input Modal -->
+        <!-- 6. Create Lobby Input Modal (NEW) -->
         <div id="create-lobby-modal" class="hidden fixed inset-0 flex justify-center items-center z-50 profile-modal-overlay">
             <div class="classic-card profile-modal-content p-6 sm:p-8 w-11/12 max-w-md text-center relative">
                 <h2 class="text-2xl sm:text-3xl font-bold mb-6">ساخت لابی جدید</h2>
@@ -212,31 +226,19 @@
             </div>
         </div>
 
-        <!-- 8. Lobby Detail Screen -->
+        <!-- 8. Lobby Detail Screen (NEW) -->
         <div id="lobby-detail-screen" class="hidden absolute inset-0 z-30 page-transition-active page-transition-hidden lobby-detail-screen-full" tabindex="-1">
             <div class="lobby-detail-content">
                 <h2 id="detail-lobby-name" class="text-3xl font-bold text-yellow-300">نام لابی</h2>
                 <p id="detail-host-name" class="text-lg text-gray-300">سازنده: ---</p>
-
+                
                 <div class="player-slots-grid">
                     <!-- Player slots will be dynamically loaded here -->
                 </div>
 
-                <!-- VOICE CHAT UI - ADDED -->
-                <div id="voice-chat-container" class="w-full max-w-md mt-2 p-3 rounded-lg bg-black bg-opacity-30">
-                    <h4 class="text-lg font-bold text-yellow-200 mb-2 text-center">چت صوتی</h4>
-                    <div id="voice-chat-controls" class="flex justify-center items-center mb-2">
-                         <button id="toggle-mute-btn" class="classic-btn btn-blue-classic p-3 rounded-full flex items-center justify-center">
-                            <!-- Icon will be set by JS -->
-                         </button>
-                    </div>
-                    <div id="voice-chat-users" class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-center">
-                        <!-- Voice chat user indicators will be populated here -->
-                    </div>
-                </div>
+                <p id="detail-player-count" class="text-md font-semibold text-white">بازیکنان: 0/4</p>
 
-                <p id="detail-player-count" class="text-md font-semibold text-white mt-2">بازیکنان: 0/4</p>
-
+                <!-- NEW: Buttons for Host actions (Start Game & View Kicked Players) -->
                 <div id="host-actions-container" class="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4 sm:space-x-reverse w-full justify-center mt-4">
                     <button id="start-game-btn" class="classic-btn start-game-btn w-full sm:w-auto text-xl" disabled>
                         شروع بازی
@@ -250,11 +252,9 @@
                     ترک لابی
                 </button>
             </div>
-            <!-- This container will hold the remote audio streams -->
-            <div id="remote-audio-container"></div>
         </div>
 
-        <!-- Kick Player Confirmation Modal -->
+        <!-- NEW: Kick Player Confirmation Modal -->
         <div id="kick-player-confirm-modal" class="hidden fixed inset-0 flex justify-center items-center z-50 profile-modal-overlay">
             <div class="classic-card profile-modal-content p-6 sm:p-8 w-11/12 max-w-md text-center relative">
                 <h2 class="text-2xl sm:text-3xl font-bold mb-6 text-yellow-300">اخراج بازیکن</h2>
@@ -271,7 +271,7 @@
             </div>
         </div>
 
-        <!-- Kicked Message Modal -->
+        <!-- NEW: Kicked Message Modal -->
         <div id="kicked-message-modal" class="hidden fixed inset-0 flex justify-center items-center z-50 profile-modal-overlay">
             <div class="classic-card profile-modal-content p-6 sm:p-8 w-11/12 max-w-md text-center relative">
                 <h2 class="text-2xl sm:text-3xl font-bold mb-6 text-red-400">شما اخراج شدید!</h2>
@@ -280,7 +280,7 @@
             </div>
         </div>
 
-        <!-- Kicked Players List Modal -->
+        <!-- NEW: Kicked Players List Modal -->
         <div id="kicked-players-list-modal" class="hidden fixed inset-0 flex justify-center items-center z-50 profile-modal-overlay">
             <div class="classic-card profile-modal-content p-6 sm:p-8 w-11/12 max-w-md text-center relative">
                 <h2 class="text-2xl sm:text-3xl font-bold mb-6 text-yellow-300">لیست بازیکنان اخراج شده</h2>
@@ -290,6 +290,7 @@
                     </svg>
                 </button>
                 <div id="kicked-players-list-content" class="space-y-4 mb-8 text-white text-left max-h-60 overflow-y-auto custom-scrollbar">
+                    <!-- Kicked players will be dynamically loaded here -->
                     <p class="text-gray-400 text-center">هیچ بازیکنی اخراج نشده است.</p>
                 </div>
                 <button id="kicked-list-ok-btn" class="w-full classic-btn btn-gray-classic">بستن</button>
@@ -299,6 +300,7 @@
     </div>
 
     <!-- لینک به فایل جاوا اسکریپت خارجی -->
+    <!-- مهم: این کد باید قبل از بسته شدن تگ بادی قرار بگیرد -->
     <script type="module" src="script.js"></script>
 </body>
 </html>
