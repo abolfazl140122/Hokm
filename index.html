@@ -465,7 +465,7 @@
             }
         }
 
-        /* === NEW Lobby Detail Screen Styles (Major Redesign) === */
+        /* === Lobby Detail Screen Styles (Major Redesign) === */
         .lobby-detail-screen-full {
             padding-top: 0; /* No padding, the content will manage it */
             padding-bottom: 0;
@@ -564,11 +564,11 @@
             flex-grow: 1; /* Key change: makes chat take all vertical space */
             display: flex;
             flex-direction: column;
-            overflow: hidden;
+            overflow: hidden; /* CRITICAL: This contains the scrolling child */
         }
         .lobby-chat-messages {
-            flex-grow: 1;
-            overflow-y: auto;
+            flex-grow: 1; /* CRITICAL: This element grows to fill the parent */
+            overflow-y: auto; /* CRITICAL: This element gets the scrollbar */
             padding-right: 0.5rem;
             display: flex;
             flex-direction: column;
@@ -597,7 +597,7 @@
             margin-top: 0.75rem;
             display: flex;
             gap: 0.5rem;
-            flex-shrink: 0;
+            flex-shrink: 0; /* CRITICAL: Prevents the input form from shrinking */
         }
 
         .lobby-actions-footer {
@@ -635,22 +635,23 @@
         #player-list-container::-webkit-scrollbar-thumb:hover,
         .lobby-chat-messages::-webkit-scrollbar-thumb:hover { background: #FFD700; }
         
-        /* Responsive adjustments for new lobby detail screen */
+        /* ===== CORRECTED RESPONSIVE STYLES ===== */
         @media (max-width: 860px) {
             .lobby-detail-content {
                 flex-direction: column; /* Stack panels on smaller screens */
                 height: calc(100% - 80px); /* Adjust height */
                 margin: 40px auto;
                 padding: 1rem;
-                overflow-y: auto; /* Allow whole card to scroll if needed */
+                overflow: hidden; /* ** THE MAIN FIX **: Prevent the whole card from scrolling */
             }
             .lobby-sidebar {
                 width: 100%; /* Sidebar takes full width */
-                flex-shrink: 1;
+                flex-shrink: 0; /* ** FIX **: Prevent sidebar from shrinking when keyboard opens */
                 max-height: 250px; /* Limit sidebar height */
             }
             .lobby-main-panel {
-                min-height: 400px; /* Ensure chat has enough space */
+                flex-grow: 1; /* ** FIX **: Allow panel to fill remaining vertical space */
+                min-height: 0; /* ** FIX **: Flexbox fix to allow shrinking properly */
             }
         }
         /* General Responsive */
@@ -2188,3 +2189,4 @@
     </script>
 </body>
 </html>
+```
