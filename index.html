@@ -465,114 +465,137 @@
             }
         }
 
-        /* === NEW Lobby Detail Screen Styles (Major Redesign) === */
-        .lobby-detail-screen-full {
-            padding-top: 0; /* No padding, the content will manage it */
-            padding-bottom: 0;
+        /* Styles for the Lobby Detail Screen */
+        .lobby-detail-screen-full { /* New class for full-screen lobby detail */
+            padding-top: 70px; /* Header height */
+            padding-bottom: 90px; /* Footer height */
             display: flex;
             flex-direction: column;
+            justify-content: flex-start; /* Start content from top */
+            align-items: center; /* Center horizontally */
             width: 100%;
             height: 100%;
-            background: linear-gradient(180deg, #2C2C2C 0%, #1A1A1A 100%);
+            overflow-y: hidden; /* No scroll on main detail screen */
+            overflow-x: hidden;
+            background: linear-gradient(180deg, #2C2C2C 0%, #1A1A1A 100%); /* Subtle dark grey gradient */
         }
 
-        .lobby-detail-content {
-            background: linear-gradient(145deg, #1A1A1A 0%, #0D0D0D 100%);
+        .lobby-detail-content { /* Content container inside full screen */
+            background: linear-gradient(145deg, #1A1A1A 0%, #0D0D0D 100%); /* Darker, more intense background */
             border: 3px solid #DAA520;
             border-radius: 20px;
             box-shadow: 0 10px 20px rgba(0,0,0,0.7);
             padding: 1.5rem;
-            width: 95%;
-            max-width: 1200px;
-            height: calc(100% - 100px); /* Fill available space minus header/margins */
-            display: flex;
-            flex-direction: row; /* Side-by-side layout on desktop */
-            gap: 1.5rem;
-            margin: 50px auto; /* Centered with margin top/bottom */
-            overflow: hidden; /* Prevent content from spilling */
-        }
-
-        /* Sidebar for player info */
-        .lobby-sidebar {
+            text-align: center;
+            width: 95%; /* Responsive width */
+            max-width: 800px; /* Max width for larger screens */
+            height: calc(100% - 4rem); /* Fill available space minus margins */
             display: flex;
             flex-direction: column;
-            flex-shrink: 0;
-            width: 300px;
-            background-color: rgba(0,0,0,0.3);
-            border-radius: 15px;
-            padding: 1rem;
-            border: 1px solid #444;
-            overflow-y: auto;
+            gap: 1rem; /* Spacing between elements */
+            margin-top: 2rem; /* Space from top after header */
+            margin-bottom: 2rem; /* Space from bottom before footer */
+            overflow-y: auto; /* MODIFIED: Allow vertical scrolling if content overflows */
         }
-
-        /* Main panel for chat and actions */
-        .lobby-main-panel {
-            display: flex;
-            flex-direction: column;
-            flex-grow: 1;
-            min-width: 0; /* Flexbox fix for overflow */
-        }
+        /* NEW: Custom scrollbar for the lobby detail content area */
+        .lobby-detail-content::-webkit-scrollbar { width: 8px; }
+        .lobby-detail-content::-webkit-scrollbar-track { background: #202020; border-radius: 4px; }
+        .lobby-detail-content::-webkit-scrollbar-thumb { background: #DAA520; border-radius: 4px; }
+        .lobby-detail-content::-webkit-scrollbar-thumb:hover { background: #FFD700; }
         
-        #player-list-container {
-            margin-top: 1rem;
-            flex-grow: 1; /* Allow list to take space */
-            overflow-y: auto; /* Scroll if many players */
+        /* Further ensure no horizontal scroll for content */
+        .lobby-detail-content > * {
+            max-width: 100%;
         }
-        .player-list-item {
-            background-color: rgba(255, 255, 255, 0.05);
-            border-radius: 8px;
+
+        .player-slots-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); /* Responsive grid for players */
+            gap: 1rem; /* Space between slots */
+            width: 100%;
+            max-width: 600px; /* Limit grid width */
+            margin: 0.5rem 0;
+        }
+
+        .player-slot {
+            background-color: rgba(0,0,0,0.5); /* Semi-transparent dark background */
+            border: 2px dashed #FFD700; /* Dashed gold border for empty slots */
+            border-radius: 10px;
             padding: 0.75rem;
-            margin-bottom: 0.5rem;
             display: flex;
-            justify-content: space-between;
+            flex-direction: column;
             align-items: center;
-            border: 1px solid transparent;
-            transition: all 0.2s ease-in-out;
-        }
-        .player-list-item.is-host {
-            border-color: #FFD700;
-        }
-        .player-list-item .player-name {
+            justify-content: center;
+            height: 100px; /* Fixed height for consistent look */
+            position: relative;
             font-weight: bold;
             color: #E0E0E0;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.6);
+            transition: all 0.3s ease-in-out;
         }
-        .player-list-item .host-label {
-            color: #FFD700;
-            font-size: 0.8rem;
-            margin-right: 0.5rem;
-        }
-        .kick-player-btn {
-            background: none;
-            border: 1px solid #B22222;
-            color: #B22222;
-            border-radius: 5px;
-            padding: 0.2rem 0.5rem;
-            font-size: 0.8rem;
+        /* Add hover effect for clickable player slots (host's view) */
+        .player-slot.clickable:hover {
             cursor: pointer;
-            transition: all 0.2s ease;
-        }
-        .kick-player-btn:hover {
-            background: #B22222;
-            color: white;
+            background-color: rgba(0,0,0,0.7);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.6);
+            transform: translateY(-3px);
         }
 
+        .player-slot.filled {
+            border-style: solid; /* Solid border for filled slots */
+            background: linear-gradient(45deg, #333 0%, #222 100%); /* Solid background for filled slots */
+            color: #FFD700; /* Gold text for filled slots */
+            box-shadow: 0 4px 8px rgba(0,0,0,0.4);
+        }
+
+        .player-slot .player-avatar {
+            font-size: 2.5rem; /* Larger icon */
+            margin-bottom: 0.5rem;
+            color: #FFD700; /* Gold avatar icon */
+        }
+
+        /* Start Game Button (Host Only) */
+        .start-game-btn {
+            background: linear-gradient(145deg, #228B22 0%, #006400 100%); /* Forest Green */
+            border: 2px solid #DAA520;
+            font-size: 1.2rem;
+            padding: 0.75rem 1.5rem;
+        }
+        .start-game-btn:hover {
+            background: linear-gradient(145deg, #006400 0%, #228B22 100%);
+        }
+        .start-game-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            background: linear-gradient(145deg, #555 0%, #444 100%);
+            border-color: #777;
+        }
+        
+        /* NEW: Styles for Lobby Chat */
         .lobby-chat-container {
             background-color: rgba(0,0,0,0.4);
             border: 2px solid #5A5A5A;
             border-radius: 10px;
             padding: 0.75rem;
-            flex-grow: 1; /* Key change: makes chat take all vertical space */
+            flex-grow: 1; /* Take remaining vertical space */
             display: flex;
             flex-direction: column;
-            overflow: hidden;
+            overflow: hidden; /* To contain scrolling area */
+            margin-top: 1rem;
         }
         .lobby-chat-messages {
             flex-grow: 1;
-            overflow-y: auto;
-            padding-right: 0.5rem;
+            overflow-y: auto; /* Scrollable message area */
+            padding-right: 0.5rem; /* Space for scrollbar */
             display: flex;
-            flex-direction: column;
+            flex-direction: column; /* Stack messages vertically */
         }
+        /* Custom scrollbar for chat */
+        .lobby-chat-messages::-webkit-scrollbar { width: 8px; }
+        .lobby-chat-messages::-webkit-scrollbar-track { background: #202020; border-radius: 4px; }
+        .lobby-chat-messages::-webkit-scrollbar-thumb { background: #DAA520; border-radius: 4px; }
+        .lobby-chat-messages::-webkit-scrollbar-thumb:hover { background: #FFD700; }
+
         .chat-message {
             background-color: #333;
             padding: 0.5rem 0.75rem;
@@ -580,11 +603,11 @@
             margin-bottom: 0.5rem;
             max-width: 80%;
             word-wrap: break-word;
-            align-self: flex-start;
+            align-self: flex-start; /* Align to right for RTL */
         }
         .chat-message.current-user {
-            background-color: #4682B4;
-            align-self: flex-end;
+            background-color: #4682B4; /* Steel Blue for current user's messages */
+            align-self: flex-end; /* Align to left for RTL */
         }
         .chat-message .sender-name {
             font-weight: bold;
@@ -593,83 +616,156 @@
             font-size: 0.9em;
             margin-bottom: 0.2rem;
         }
+        .chat-message .message-text {
+            color: #E0E0E0;
+            font-size: 1em;
+        }
+
         .lobby-chat-input-form {
             margin-top: 0.75rem;
             display: flex;
             gap: 0.5rem;
-            flex-shrink: 0;
+        }
+        .lobby-chat-input-form input {
+            flex-grow: 1;
+            padding: 0.5rem 0.75rem;
+        }
+        .lobby-chat-input-form button {
+            padding: 0.5rem 1rem;
+            font-size: 0.9rem;
+            white-space: nowrap; /* Prevent "ارسال" from wrapping */
         }
 
-        .lobby-actions-footer {
-            flex-shrink: 0; /* Prevent shrinking */
-            margin-top: 1rem;
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: space-between;
-            align-items: center;
-            gap: 1rem;
-        }
-        .start-game-btn {
-            background: linear-gradient(145deg, #228B22 0%, #006400 100%);
-            border: 2px solid #DAA520;
-            font-size: 1.1rem;
-            padding: 0.6rem 1.2rem;
-        }
-        #host-actions-container {
-             display: flex;
-             flex-wrap: wrap;
-             gap: 1rem;
-        }
 
-        /* Custom Scrollbars */
-        .lobby-sidebar::-webkit-scrollbar,
-        #player-list-container::-webkit-scrollbar,
-        .lobby-chat-messages::-webkit-scrollbar { width: 8px; }
-        .lobby-sidebar::-webkit-scrollbar-track,
-        #player-list-container::-webkit-scrollbar-track,
-        .lobby-chat-messages::-webkit-scrollbar-track { background: #202020; border-radius: 4px; }
-        .lobby-sidebar::-webkit-scrollbar-thumb,
-        #player-list-container::-webkit-scrollbar-thumb,
-        .lobby-chat-messages::-webkit-scrollbar-thumb { background: #DAA520; border-radius: 4px; }
-        .lobby-sidebar::-webkit-scrollbar-thumb:hover,
-        #player-list-container::-webkit-scrollbar-thumb:hover,
-        .lobby-chat-messages::-webkit-scrollbar-thumb:hover { background: #FFD700; }
-        
-        /* Responsive adjustments for new lobby detail screen */
-        @media (max-width: 860px) {
-            .lobby-detail-content {
-                flex-direction: column; /* Stack panels on smaller screens */
-                height: calc(100% - 80px); /* Adjust height */
-                margin: 40px auto;
-                padding: 1rem;
-                overflow-y: auto; /* Allow whole card to scroll if needed */
-            }
-            .lobby-sidebar {
-                width: 100%; /* Sidebar takes full width */
-                flex-shrink: 1;
-                max-height: 250px; /* Limit sidebar height */
-            }
-            .lobby-main-panel {
-                min-height: 400px; /* Ensure chat has enough space */
-            }
-        }
-        /* General Responsive */
+        /* Responsive adjustments for smaller screens */
         @media (max-width: 640px) {
-            .max-w-md { max-width: 95%; }
-            .p-6, .p-8 { padding: 1.5rem; }
-            .text-3xl { font-size: 2rem; }
-            .classic-btn { padding: 0.75rem 1.25rem; font-size: 1rem; }
-            .app-header, .lobby-header, .app-footer, .lobby-footer { padding: 0.5rem; }
-            .app-header, .lobby-header { height: 60px; }
-            .app-footer, .lobby-footer { height: 80px; }
-            .main-content-area { padding-top: 60px; padding-bottom: 80px; }
-            .lobby-detail-content { margin: 20px auto; height: calc(100% - 40px); }
+            .max-w-md {
+                max-width: 95%;
+            }
+            .p-6, .p-8 {
+                padding: 1.5rem;
+            }
+            .text-3xl {
+                font-size: 2rem;
+            }
+            .space-y-5 > *:not([hidden]) ~ *:not([hidden]) {
+                margin-top: 1.25rem;
+            }
+            .space-y-4 > *:not([hidden]) ~ *:not([hidden]) {
+                margin-top: 1rem;
+            }
+            .sm\\:flex-row {
+                flex-direction: column;
+            }
+            .sm\\:w-1\\/2 {
+                width: 100%;
+            }
+            .sm\\:space-x-4 {
+                margin-left: 0;
+                margin-right: 0;
+            }
+            .sm\\:space-y-0 {
+                margin-top: 1rem; /* Add some space between stacked buttons */
+            }
+             .classic-card {
+                border-radius: 15px; /* Slightly smaller radius on mobile for consistency */
+                /* Ensure it fits on smaller screens */
+                max-height: 85vh; /* Slightly less max-height for mobile */
+            }
+             .classic-btn {
+                padding: 0.75rem 1.25rem; /* Slightly smaller padding on mobile */
+                font-size: 1rem; /* Slightly smaller font on mobile buttons */
+            }
+            .app-header, .lobby-header, .app-footer, .lobby-footer {
+                padding: 0.5rem; /* Smaller padding on mobile */
+            }
+            .app-header, .lobby-header {
+                height: 60px; /* Slightly smaller header on mobile */
+            }
+            .lobby-header .search-container {
+                padding: 0.3rem 0.8rem;
+            }
+            .app-footer, .lobby-footer {
+                height: 80px; /* Slightly smaller footer on mobile */
+            }
+            .main-content-area {
+                padding-top: 60px; /* Adjust for smaller header */
+                padding-bottom: 80px; /* Adjust for smaller footer */
+            }
+            .lobby-footer .icon-btn svg {
+                width: 25px;
+                height: 25px;
+            }
+            .lobby-footer .games-running-text {
+                font-size: 0.9rem;
+            }
+
+            /* Responsive adjustments for lobby items on small screens */
+            .lobby-item {
+                padding: 1rem;
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+            }
+            .lobby-item .lobby-actions { /* Ensure this wraps for mobile */
+                flex-direction: column;
+                width: 100%;
+            }
+            .lobby-item .close-lobby-btn, .lobby-item .join-lobby-btn {
+                width: 100%;
+                margin-top: 0.5rem; /* Space between stacked buttons */
+                margin-left: 0 !important; /* Remove horizontal margin */
+                margin-right: 0 !important; /* Remove horizontal margin */
+            }
+            .lobby-item h3 {
+                font-size: 1.5rem;
+            }
+            .lobby-item p {
+                font-size: 0.9rem;
+            }
+
+            .player-slots-grid {
+                grid-template-columns: 1fr 1fr; /* Two columns on mobile */
+            }
+
+            /* Lobby Detail Screen on Mobile */
+            .lobby-detail-screen-full {
+                padding-top: 60px; /* Adjust for smaller header */
+                padding-bottom: 80px; /* Adjust for smaller footer */
+            }
+            .lobby-detail-content {
+                padding: 1rem;
+                margin-top: 1rem;
+                margin-bottom: 1rem;
+                height: calc(100% - 2rem);
+            }
         }
         
-        /* Lobby Type Toggle Styles */
-        .lobby-type-btn { padding: 0.5rem 1.5rem; border: 2px solid #DAA520; border-radius: 10px; transition: all 0.2s ease-in-out; background-color: transparent; color: #DAA520; font-weight: bold; }
-        .lobby-type-btn.active { background-color: #DAA520; color: #1A1A1A; box-shadow: 0 0 10px rgba(255,215,0,0.5); }
-        .lobby-lock-icon { width: 1.2rem; height: 1.2rem; margin-left: 0.5rem; color: #FFD700; display: inline-block; vertical-align: middle; }
+        /* NEW: Styles for Public/Private lobby type toggle buttons */
+        .lobby-type-btn {
+            padding: 0.5rem 1.5rem;
+            border: 2px solid #DAA520;
+            border-radius: 10px;
+            transition: all 0.2s ease-in-out;
+            background-color: transparent;
+            color: #DAA520;
+            font-weight: bold;
+        }
+        .lobby-type-btn.active {
+            background-color: #DAA520;
+            color: #1A1A1A;
+            box-shadow: 0 0 10px rgba(255,215,0,0.5);
+        }
+
+        /* NEW: Style for lock icon in lobby list */
+        .lobby-lock-icon {
+            width: 1.2rem;
+            height: 1.2rem;
+            margin-left: 0.5rem; /* Space between icon and text in RTL */
+            color: #FFD700;
+            display: inline-block;
+            vertical-align: middle;
+        }
     </style>
 </head>
 <body>
@@ -677,7 +773,6 @@
     <!-- Main container for all screens -->
     <div id="app" class="relative w-full h-full flex justify-center items-center">
 
-        <!-- All Modals and other screens remain the same... -->
         <!-- 1. Loading Screen -->
         <div id="loading-screen" class="absolute inset-0 flex flex-col justify-center items-center bg-gray-900 z-50 page-transition-active page-transition-visible" tabindex="-1">
             <div class="spinner mb-4"></div>
@@ -910,56 +1005,49 @@
             </div>
         </div>
 
-        <!-- 8. Lobby Detail Screen (REDESIGNED) -->
+        <!-- 8. Lobby Detail Screen (NEW) -->
         <div id="lobby-detail-screen" class="hidden absolute inset-0 z-30 page-transition-active page-transition-hidden lobby-detail-screen-full" tabindex="-1">
             <div class="lobby-detail-content">
-                
-                <!-- Sidebar: Lobby Info & Players -->
-                <div class="lobby-sidebar">
-                    <h2 id="detail-lobby-name" class="text-2xl sm:text-3xl font-bold text-yellow-300 truncate">نام لابی</h2>
-                    <p id="detail-host-name" class="text-md text-gray-300 mt-2">سازنده: ---</p>
-                    <p id="detail-player-count" class="text-sm font-semibold text-white mb-4">بازیکنان: 0/4</p>
+                <!-- Top Section: Lobby Info & Players -->
+                <div class="w-full">
+                    <h2 id="detail-lobby-name" class="text-2xl sm:text-3xl font-bold text-yellow-300">نام لابی</h2>
+                    <p id="detail-host-name" class="text-md sm:text-lg text-gray-300">سازنده: ---</p>
+                    <p id="detail-player-count" class="text-sm font-semibold text-white">بازیکنان: 0/4</p>
                     
-                    <div class="w-full h-px bg-yellow-600 mb-4"></div>
-
-                    <div id="player-list-container">
-                        <!-- Player list items will be dynamically loaded here -->
+                    <div class="player-slots-grid">
+                        <!-- Player slots will be dynamically loaded here -->
                     </div>
                 </div>
 
-                <!-- Main Panel: Chat & Actions -->
-                <div class="lobby-main-panel">
-                    <!-- Chat Container -->
-                    <div class="lobby-chat-container">
-                        <div id="lobby-chat-messages" class="lobby-chat-messages">
-                            <!-- Chat messages will appear here -->
-                        </div>
-                        <form id="lobby-chat-form" class="lobby-chat-input-form">
-                            <input type="text" id="lobby-chat-input" placeholder="پیام خود را بنویسید..." autocomplete="off">
-                            <button type="submit" id="lobby-chat-send-btn" class="classic-btn btn-blue-classic text-sm py-2 px-4">ارسال</button>
-                        </form>
+                <!-- NEW: Lobby Chat Section -->
+                <div class="lobby-chat-container w-full">
+                    <div id="lobby-chat-messages" class="lobby-chat-messages">
+                        <!-- Chat messages will appear here -->
                     </div>
+                    <form id="lobby-chat-form" class="lobby-chat-input-form">
+                        <input type="text" id="lobby-chat-input" placeholder="پیام خود را بنویسید..." autocomplete="off">
+                        <button type="submit" id="lobby-chat-send-btn" class="classic-btn btn-blue-classic">ارسال</button>
+                    </form>
+                </div>
 
-                    <!-- Action Buttons Footer -->
-                    <div class="lobby-actions-footer">
-                        <div id="host-actions-container" style="display: none;">
-                            <button id="start-game-btn" class="classic-btn start-game-btn" disabled>
-                                شروع بازی
-                            </button>
-                            <button id="view-kicked-players-btn" class="classic-btn btn-brown-classic text-sm py-2 px-4">
-                                لیست اخراجی‌ها
-                            </button>
-                        </div>
-                        <button id="leave-lobby-btn" class="classic-btn btn-red-classic text-sm py-2 px-4">
-                            ترک لابی
+                <!-- Bottom Section: Action Buttons (MODIFIED) -->
+                <div class="w-full mt-auto flex flex-wrap justify-center sm:justify-between items-center gap-4 p-2">
+                    <div id="host-actions-container" class="flex flex-wrap justify-center gap-4" style="display: none;">
+                        <button id="start-game-btn" class="classic-btn start-game-btn" disabled>
+                            شروع بازی
+                        </button>
+                        <button id="view-kicked-players-btn" class="classic-btn btn-brown-classic">
+                            لیست اخراجی‌ها
                         </button>
                     </div>
-                </div>
 
+                    <button id="leave-lobby-btn" class="classic-btn btn-red-classic">
+                        ترک لابی
+                    </button>
+                </div>
             </div>
         </div>
 
-        <!-- ... All other modals (kick, kicked message, etc.) remain the same ... -->
         <!-- NEW: Kick Player Confirmation Modal -->
         <div id="kick-player-confirm-modal" class="hidden fixed inset-0 flex justify-center items-center z-50 profile-modal-overlay">
             <div class="classic-card profile-modal-content p-6 sm:p-8 w-11/12 max-w-md text-center relative">
@@ -1116,16 +1204,17 @@
         const confirmYesBtn = document.getElementById('confirm-yes-btn');
         const confirmNoBtn = document.getElementById('confirm-no-btn');
 
-        // Lobby Detail Screen Elements (UPDATED)
+        // Lobby Detail Screen Elements
         const lobbyDetailScreen = document.getElementById('lobby-detail-screen');
         const detailLobbyName = document.getElementById('detail-lobby-name');
         const detailHostName = document.getElementById('detail-host-name');
-        const playerListContainer = document.getElementById('player-list-container'); // NEW: For the player list
+        const playerSlotsGrid = lobbyDetailScreen.querySelector('.player-slots-grid');
         const detailPlayerCount = document.getElementById('detail-player-count');
         const hostActionsContainer = document.getElementById('host-actions-container');
         const startGameBtn = document.getElementById('start-game-btn');
         const viewKickedPlayersBtn = document.getElementById('view-kicked-players-btn');
         const leaveLobbyBtn = document.getElementById('leave-lobby-btn');
+        // NEW: Lobby Chat Elements
         const lobbyChatMessages = document.getElementById('lobby-chat-messages');
         const lobbyChatForm = document.getElementById('lobby-chat-form');
         const lobbyChatInput = document.getElementById('lobby-chat-input');
@@ -1463,6 +1552,7 @@
         }
 
         // --- Firebase Lobby Functions ---
+        // REVISED: createLobby now uses a map for players
         async function createLobby(lobbyName, userId, displayName, lobbyType, password) {
             try {
                 const creatorDisplayName = displayName && displayName.trim() !== '' ? displayName : 'ناشناس';
@@ -1531,6 +1621,7 @@
             }
         }
         
+        // REVISED: setupLobbyListener now works with the player map
         function setupLobbyListener(searchTerm = '') {
             console.log(`شروع راه‌اندازی Listener لابی‌ها با عبارت جستجو: "${searchTerm}"`);
             if (unsubscribeLobbyDetail) {
@@ -1688,6 +1779,7 @@
             return unsubscribe;
         }
 
+        // REVISED: joinLobby now uses a map for players
         async function joinLobby(lobbyId, userId, displayName) {
             const lobbyRef = doc(db, `global_lobbies`, lobbyId);
             try {
@@ -1727,7 +1819,7 @@
             }
         }
         
-        // REVISED: setupLobbyDetailListener now uses the new two-panel layout
+        // REVISED: setupLobbyDetailListener now works with the player map
         function setupLobbyDetailListener(lobbyId) {
             console.log(`Listening to lobby details for ID: ${lobbyId}`);
             if (unsubscribeLobbies) { unsubscribeLobbies(); unsubscribeLobbies = null; }
@@ -1753,47 +1845,38 @@
                         return;
                     }
 
-                    playerListContainer.innerHTML = ''; // Clear the new player list container
+                    playerSlotsGrid.innerHTML = '';
                     const isCurrentUserHost = auth.currentUser && lobbyData.hostId === auth.currentUser.uid;
                     
+                    // Create a sorted list of players, with the host always first
                     const playerList = Object.entries(playersMap).map(([uid, displayName]) => ({ uid, displayName }));
-
-                    for (const player of playerList) {
-                        const isHost = player.uid === lobbyData.hostId;
-                        const playerItem = document.createElement('div');
-                        playerItem.className = 'player-list-item';
-                        if (isHost) {
-                            playerItem.classList.add('is-host');
-                        }
-
-                        let kickButtonHtml = '';
-                        if (isCurrentUserHost && !isHost) {
-                            kickButtonHtml = `<button class="kick-player-btn" data-player-uid="${player.uid}" data-player-name="${player.displayName}">اخراج</button>`;
-                        }
-                        
-                        const hostLabelHtml = isHost ? '<span class="host-label">(سازنده)</span>' : '';
-
-                        playerItem.innerHTML = `
-                            <div class="flex items-center">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="mr-2 lucide lucide-user"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-                                <span class="player-name">${player.displayName}</span>
-                                ${hostLabelHtml}
-                            </div>
-                            ${kickButtonHtml}
-                        `;
-                        playerListContainer.appendChild(playerItem);
+                    const hostIndex = playerList.findIndex(p => p.uid === lobbyData.hostId);
+                    if (hostIndex > 0) {
+                        const [host] = playerList.splice(hostIndex, 1);
+                        playerList.unshift(host);
                     }
 
-                    // Add click listeners for new kick buttons
-                    playerListContainer.querySelectorAll('.kick-player-btn').forEach(button => {
-                        button.addEventListener('click', (e) => {
-                           openKickPlayerConfirmModal(e.currentTarget.dataset.playerName, e.currentTarget.dataset.playerUid);
-                        });
-                    });
+                    for (let i = 0; i < maxPlayers; i++) {
+                        const player = playerList[i];
+                        const playerSlot = document.createElement('div');
+                        playerSlot.className = `player-slot ${player ? 'filled' : ''}`;
+                        playerSlot.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="player-avatar" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg><span>${player ? player.displayName : 'جایگاه خالی'}</span>`;
+                        
+                        if (isCurrentUserHost && player && player.uid !== auth.currentUser.uid) {
+                            playerSlot.classList.add('clickable');
+                            playerSlot.dataset.playerUid = player.uid;
+                            playerSlot.dataset.playerName = player.displayName;
+                            playerSlot.addEventListener('click', (e) => {
+                                openKickPlayerConfirmModal(e.currentTarget.dataset.playerName, e.currentTarget.dataset.playerUid);
+                            });
+                        }
+                        playerSlotsGrid.appendChild(playerSlot);
+                    }
 
-                    // Manage Host Actions
                     if (isCurrentUserHost) {
                         hostActionsContainer.style.display = 'flex';
+                        startGameBtn.style.display = 'block';
+                        viewKickedPlayersBtn.style.display = 'block';
                         startGameBtn.disabled = playerCount !== maxPlayers;
                         startGameBtn.textContent = `شروع بازی (${playerCount}/${maxPlayers})`;
                     } else {
@@ -1814,6 +1897,7 @@
             return unsubscribe;
         }
 
+        // REVISED: leaveLobby now uses deleteField for the player map
         async function leaveLobby() {
             if (!currentLobbyId || !auth.currentUser) return;
             const lobbyRef = doc(db, `global_lobbies`, currentLobbyId);
@@ -1839,6 +1923,7 @@
             } catch (e) { console.error("Error leaving lobby:", e); showMessageBox("خطا در ترک لابی.", "error"); }
         }
 
+        // REVISED: kickPlayer now uses deleteField and adds to kickedPlayers array
         async function kickPlayer(lobbyId, playerToKickUid, playerToKickDisplayName) {
             const lobbyRef = doc(db, `global_lobbies`, lobbyId);
             try {
@@ -1889,6 +1974,7 @@
             });
         }
         
+        // --- NEW: Lobby Chat Functions ---
         async function sendLobbyMessage(lobbyId, text) {
             if (!text.trim() || !auth.currentUser || !currentUserData) return;
             const messagesRef = collection(db, `global_lobbies/${lobbyId}/messages`);
@@ -1929,13 +2015,13 @@
                 lobbyChatMessages.scrollTop = lobbyChatMessages.scrollHeight;
             }, (error) => {
                 console.error("Lobby chat listener error:", error);
+                // Don't show a modal for this, just log it. It's not a critical failure.
                 console.warn("Could not load chat messages:", error.message);
             });
         }
 
 
         // --- Event Listeners ---
-        // (No changes needed in most event listeners, only the ones related to lobby detail screen)
         loginToggleBtn.addEventListener('click', () => {
             authMode = 'login';
             displayNameField.classList.add('hidden');
@@ -2000,7 +2086,7 @@
             setActiveScreen(mainScreen);
             if (unsubscribeLobbies) unsubscribeLobbies();
             if (unsubscribeLobbyDetail) unsubscribeLobbyDetail();
-            if (unsubscribeLobbyChat) unsubscribeLobbyChat();
+            if (unsubscribeLobbyChat) unsubscribeLobbyChat(); // NEW: Cleanup chat listener
             unsubscribeLobbies = unsubscribeLobbyDetail = unsubscribeLobbyChat = null;
         });
 
@@ -2047,22 +2133,39 @@
         closeCreateLobbyModalBtn.addEventListener('click', closeCreateLobbyModal);
         createLobbyModal.addEventListener('click', (e) => e.target === createLobbyModal && closeCreateLobbyModal());
         
+        // REVISED: Refresh button listener with visual feedback
         refreshLobbiesBtn.addEventListener('click', () => {
-            if (isRefreshing) return;
-            if (!auth.currentUser) { showMessageBox("برای بروزرسانی لابی‌ها، ابتدا وارد شوید.", "info"); return; }
+            if (isRefreshing) return; // Prevent multiple clicks
+
+            if (!auth.currentUser) {
+                showMessageBox("برای بروزرسانی لابی‌ها، ابتدا وارد شوید.", "info");
+                return;
+            }
+
+            // 1. Set refreshing state and give visual feedback
             isRefreshing = true;
             refreshLobbiesBtn.disabled = true;
             const refreshIconSvg = refreshLobbiesBtn.querySelector('svg');
             refreshIconSvg.classList.add('is-refreshing');
             lobbiesList.innerHTML = '<p class="text-gray-400">در حال بروزرسانی لیست...</p>';
-            if (unsubscribeLobbies) { unsubscribeLobbies(); unsubscribeLobbies = null; }
+
+            // 2. Unsubscribe from the old listener
+            if (unsubscribeLobbies) {
+                unsubscribeLobbies();
+                unsubscribeLobbies = null;
+            }
+
+            // 3. Re-subscribe to get the latest data. setupLobbyListener will populate the list.
             unsubscribeLobbies = setupLobbyListener(lobbySearchInput.value.trim().toLowerCase());
+            
+            // 4. Reset the button and state after a delay to allow animation to play
             setTimeout(() => {
                 isRefreshing = false;
                 refreshLobbiesBtn.disabled = false;
                 refreshIconSvg.classList.remove('is-refreshing');
+                // The message box is now shown here to confirm the action is complete
                 showMessageBox("لیست لابی‌ها بروزرسانی شد.", "info");
-            }, 1000);
+            }, 1000); // 1-second delay for user feedback
         });
 
         myLobbiesBtn.addEventListener('click', () => showMessageBox("لابی‌های من به زودی!", "info"));
@@ -2095,6 +2198,7 @@
         kickedListOkBtn.addEventListener('click', closeKickedPlayersListModal);
         kickedPlayersListModal.addEventListener('click', (e) => e.target === kickedPlayersListModal && closeKickedPlayersListModal());
         
+        // --- Private Lobby Feature Code ---
         function showPasswordPromptMessage(message, type = 'error') {
             passwordPromptMessageBox.textContent = message;
             passwordPromptMessageBox.className = 'mt-5 p-3.5 rounded-xl text-base text-center';
@@ -2177,6 +2281,7 @@
             }
         });
         
+        // NEW: Event listener for lobby chat form
         lobbyChatForm.addEventListener('submit', (e) => {
             e.preventDefault();
             if (currentLobbyId) {
@@ -2184,7 +2289,10 @@
             }
         });
 
+
+        // Start Firebase initialization when the window loads
         window.onload = initializeFirebaseAndAuth;
+
     </script>
 </body>
 </html>
