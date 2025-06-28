@@ -47,6 +47,15 @@
             100% { transform: rotate(360deg); }
         }
 
+        /* NEW: Animation for refresh button icon */
+        @keyframes spin-refresh {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        .is-refreshing {
+            animation: spin-refresh 0.8s ease-in-out;
+        }
+
         /* Page transition animation */
         .page-transition-active {
             transition: opacity 0.6s ease-in-out; /* Slightly slower transition */
@@ -293,10 +302,16 @@
         .lobby-footer .icon-btn:hover {
             transform: translateY(-5px);
         }
+        .lobby-footer .icon-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
         .lobby-footer .icon-btn svg {
             width: 30px;
             height: 30px;
             margin-bottom: 5px;
+            transition: transform 0.8s ease-in-out;
         }
         .lobby-footer .games-running-text {
             color: #E0E0E0;
@@ -1155,6 +1170,7 @@
         let currentLobbyId = null; // Stores the ID of the lobby the current user is in
         let kickedPlayerToProcess = null; // Stores UID/name of player selected for kicking
         let lobbyToJoin = null; // To store data of private lobby user wants to join
+        let isRefreshing = false; // NEW: State for refresh button
 
         // Promise resolver for custom confirmation modal
         let resolveCustomConfirm;
@@ -1356,7 +1372,6 @@
 
         /**
          * Calls a simulated AI content moderation API to check if the lobby name is appropriate.
-         * In a real application, this would be a backend call to a robust moderation service.
          * @param {string} lobbyName - The name of the lobby to check.
          * @returns {Promise<{is_appropriate: boolean, reason: string}>} - The moderation result.
          */
@@ -1445,8 +1460,6 @@
         }
 
         // --- Firebase Lobby Functions ---
-        
-        // REPLACE the existing createLobby function with this one
         async function createLobby(lobbyName, userId, displayName, lobbyType, password) {
             try {
                 const creatorDisplayName = displayName && displayName.trim() !== '' ? displayName : 'ناشناس';
@@ -1463,7 +1476,6 @@
         
                 const lobbiesRef = collection(db, `global_lobbies`);
                 
-                // NEW: Prepare lobby data with type and password
                 const newLobbyData = {
                     name: lobbyName,
                     hostId: userId,
@@ -1472,15 +1484,10 @@
                     players: [{ uid: userId, displayName: creatorDisplayName }],
                     kickedPlayers: [],
                     createdAt: serverTimestamp(),
-                    gameSettings: {
-                        maxPlayers: 4,
-                        roundsToWin: 7
-                    }
+                    gameSettings: { maxPlayers: 4, roundsToWin: 7 }
                 };
         
                 if (lobbyType === 'private') {
-                    // In a real production app, this password should be hashed.
-                    // For this project, storing as plain text is acceptable.
                     newLobbyData.password = password;
                 }
         
@@ -1519,14 +1526,12 @@
             }
         }
 
-        // REPLACE the entire setupLobbyListener function with this one
         function setupLobbyListener(searchTerm = '') {
             console.log(`شروع راه‌اندازی Listener لابی‌ها با عبارت جستجو: "${searchTerm}"`);
             if (unsubscribeLobbyDetail) {
                 unsubscribeLobbyDetail();
                 unsubscribeLobbyDetail = null;
                 currentLobbyId = null;
-                console.log("Listener جزئیات لابی غیرفعال شد.");
             }
             if (unsubscribeKickedPlayers) {
                 unsubscribeKickedPlayers();
@@ -1543,7 +1548,6 @@
             );
         
             const unsubscribe = onSnapshot(q, (snapshot) => {
-                console.log("آپدیت جدید از Firestore دریافت شد.");
                 lobbiesList.innerHTML = '';
         
                 let activeGamesCountNum = 0;
@@ -1551,15 +1555,11 @@
                 let currentUserIsInAnyLobby = false;
         
                 snapshot.forEach((doc) => {
-                    const lobby = { id: doc.id, ...doc.data() }; // Include ID in lobby object
-                    
+                    const lobby = { id: doc.id, ...doc.data() };
                     const lobbyName = (lobby.name || '').toLowerCase();
-                    const hostDisplayName = (lobby.players && lobby.players.length > 0 && lobby.players[0].displayName)
-                                            ? lobby.players[0].displayName.toLowerCase()
-                                            : '';
+                    const hostDisplayName = (lobby.players?.[0]?.displayName || '').toLowerCase();
                     
-                    const isCurrentUserPlayer = auth.currentUser && lobby.players.some(p => p.uid === auth.currentUser.uid);
-                    if (isCurrentUserPlayer) {
+                    if (auth.currentUser && lobby.players.some(p => p.uid === auth.currentUser.uid)) {
                         currentUserIsInAnyLobby = true;
                     }
         
@@ -1587,7 +1587,6 @@
                         const isCurrentUserKicked = auth.currentUser && lobby.kickedPlayers?.some(p => p.uid === auth.currentUser.uid);
                         const canJoinThisLobby = auth.currentUser && !currentUserIsInAnyLobby && playerCount < maxPlayers && !isCurrentUserKicked;
         
-                        // NEW: Add a lock icon for private lobbies
                         const lockIconHtml = lobby.type === 'private' 
                             ? `<svg xmlns="http://www.w3.org/2000/svg" class="lobby-lock-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>` 
                             : '';
@@ -1598,7 +1597,6 @@
                         } else if (isCurrentUserHostOfThisLobby) {
                             joinButtonHtml = `<button data-lobby-id="${lobby.id}" class="view-my-lobby-btn classic-btn btn-blue-classic">ورود به لابی من</button>`;
                         } else if (canJoinThisLobby) {
-                            // Pass lobby type and name to the button's data attributes
                             joinButtonHtml = `<button data-lobby-id="${lobby.id}" data-lobby-type="${lobby.type || 'public'}" data-lobby-name="${lobby.name}" class="join-lobby-btn classic-btn btn-blue-classic">ورود به لابی</button>`;
                         } else {
                             joinButtonHtml = `<button class="join-lobby-btn classic-btn btn-blue-classic opacity-50 cursor-not-allowed" disabled>ورود به لابی</button>`;
@@ -1627,7 +1625,6 @@
                 
                 activeGamesCount.textContent = activeGamesCountNum;
         
-                // Attach Event Listeners
                 lobbiesList.querySelectorAll('.join-lobby-btn:not([disabled])').forEach(button => {
                     button.addEventListener('click', async (e) => {
                         const lobbyId = e.currentTarget.dataset.lobbyId;
@@ -1635,10 +1632,8 @@
                         const lobbyName = e.currentTarget.dataset.lobbyName;
                         
                         if (lobbyType === 'private') {
-                            // NEW: Open password prompt instead of joining directly
                             openEnterPasswordModal(lobbyId, lobbyName);
                         } else {
-                            // For public lobbies, join directly
                             try {
                                 await joinLobby(lobbyId, auth.currentUser.uid, currentUserData.displayName);
                             } catch (error) {
@@ -1649,7 +1644,6 @@
                     });
                 });
         
-                // Attach other listeners (no changes needed for view/close buttons)
                 lobbiesList.querySelectorAll('.view-my-lobby-btn').forEach(button => {
                     button.addEventListener('click', (e) => {
                         const lobbyId = e.target.dataset.lobbyId;
@@ -1696,7 +1690,6 @@
                     throw new Error("شما از این لابی اخراج شده‌اید.");
                 }
                 if (players.some(p => p.uid === userId)) {
-                    showMessageBox("شما قبلاً در این لابی هستید.", "info");
                     currentLobbyId = lobbyId;
                     setActiveScreen(lobbyDetailScreen);
                     unsubscribeLobbyDetail = setupLobbyDetailListener(lobbyId);
@@ -1733,10 +1726,7 @@
                     detailPlayerCount.textContent = `بازیکنان: ${players.length}/${maxPlayers}`;
 
                     if (auth.currentUser && lobbyData.kickedPlayers?.some(p => p.uid === auth.currentUser.uid)) {
-                        console.log("Current user has been kicked.");
                         showKickedMessageModal(lobbyData.name);
-                        currentLobbyId = null;
-                        userHasActiveLobby = false;
                         return;
                     }
 
@@ -1769,10 +1759,7 @@
                     }
 
                 } else {
-                    console.log("Lobby deleted. Returning to lobby screen.");
                     showMessageBox("لابی که در آن بودید بسته شد.", "info");
-                    currentLobbyId = null;
-                    userHasActiveLobby = false;
                     setActiveScreen(lobbyScreen);
                     unsubscribeLobbies = setupLobbyListener('');
                 }
@@ -1801,7 +1788,10 @@
                     const confirmed = await showCustomConfirm("شما سازنده لابی هستید. خروج شما باعث بسته شدن لابی برای همه می‌شود. آیا مطمئن هستید؟");
                     if (confirmed) await deleteDoc(lobbyRef);
                 } else {
-                    await updateDoc(lobbyRef, { players: arrayRemove({ uid: userId, displayName: currentUserData.displayName }) });
+                    const playerToRemove = lobbySnap.data().players.find(p => p.uid === userId);
+                    if(playerToRemove) {
+                        await updateDoc(lobbyRef, { players: arrayRemove(playerToRemove) });
+                    }
                     setActiveScreen(lobbyScreen);
                     unsubscribeLobbies = setupLobbyListener('');
                 }
@@ -1811,12 +1801,18 @@
         async function kickPlayer(lobbyId, playerToKickUid, playerToKickDisplayName) {
             const lobbyRef = doc(db, `global_lobbies`, lobbyId);
             try {
-                await updateDoc(lobbyRef, {
-                    players: arrayRemove({ uid: playerToKickUid, displayName: playerToKickDisplayName }),
-                    kickedPlayers: arrayUnion({ uid: playerToKickUid, displayName: playerToKickDisplayName })
-                });
-                showMessageBox(`بازیکن "${playerToKickDisplayName}" اخراج شد.`, "success");
-                closeKickPlayerConfirmModal();
+                const lobbySnap = await getDoc(lobbyRef);
+                if (lobbySnap.exists()) {
+                    const playerToKick = lobbySnap.data().players.find(p => p.uid === playerToKickUid);
+                    if (playerToKick) {
+                         await updateDoc(lobbyRef, {
+                            players: arrayRemove(playerToKick),
+                            kickedPlayers: arrayUnion(playerToKick)
+                        });
+                        showMessageBox(`بازیکن "${playerToKickDisplayName}" اخراج شد.`, "success");
+                        closeKickPlayerConfirmModal();
+                    }
+                }
             } catch (e) { console.error("Error kicking player:", e); showMessageBox("خطا در اخراج بازیکن.", "error"); }
         }
 
@@ -1932,46 +1928,22 @@
             openCreateLobbyModal();
         });
         
-        // REPLACE the existing createLobbyForm 'submit' event listener
         createLobbyForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             const lobbyName = newLobbyNameInput.value.trim();
             const lobbyType = document.querySelector('input[name="lobby-type"]:checked').value;
             const password = newLobbyPasswordInput.value;
         
-            if (!lobbyName) {
-                showCreateLobbyMessageBox("لطفاً نام لابی را وارد کنید.", "error");
-                return;
-            }
-        
-            if (lobbyType === 'private' && password.length < 4) {
-                showCreateLobbyMessageBox("رمز عبور برای لابی خصوصی باید حداقل ۴ کاراکتر باشد.", "error");
-                return;
-            }
-        
-            if (!auth.currentUser || !currentUserData || !currentUserData.displayName) {
-                showCreateLobbyMessageBox("مشکلی در اطلاعات کاربری شما وجود دارد.", "error");
-                return;
-            }
-            
-            if (userHasActiveLobby) {
-                showCreateLobbyMessageBox("شما از قبل در یک لابی فعال هستید.", "info");
-                closeCreateLobbyModal();
-                return;
-            }
+            if (!lobbyName) { showCreateLobbyMessageBox("لطفاً نام لابی را وارد کنید.", "error"); return; }
+            if (lobbyType === 'private' && password.length < 4) { showCreateLobbyMessageBox("رمز عبور برای لابی خصوصی باید حداقل ۴ کاراکتر باشد.", "error"); return; }
+            if (!auth.currentUser || !currentUserData?.displayName) { showCreateLobbyMessageBox("مشکلی در اطلاعات کاربری شما وجود دارد.", "error"); return; }
+            if (userHasActiveLobby) { showCreateLobbyMessageBox("شما از قبل در یک لابی فعال هستید.", "info"); closeCreateLobbyModal(); return; }
         
             showCreateLobbyMessageBox("در حال بررسی نام لابی...", "info");
             try {
                 const moderationResult = await checkLobbyNameWithAI(lobbyName);
-                if (!moderationResult.is_appropriate) {
-                    showCreateLobbyMessageBox(`نام لابی نامناسب: ${moderationResult.reason}`, "error"); 
-                    return;
-                }
-            } catch (aiError) {
-                console.error("خطا در بررسی AI نام لابی:", aiError);
-                showCreateLobbyMessageBox("خطایی در بررسی نام لابی پیش آمد.", "error");
-                return;
-            }
+                if (!moderationResult.is_appropriate) { showCreateLobbyMessageBox(`نام لابی نامناسب: ${moderationResult.reason}`, "error");  return; }
+            } catch (aiError) { console.error("خطا در بررسی AI نام لابی:", aiError); showCreateLobbyMessageBox("خطایی در بررسی نام لابی پیش آمد.", "error"); return; }
         
             try {
                 const newLobbyId = await createLobby(lobbyName, auth.currentUser.uid, currentUserData.displayName, lobbyType, password);
@@ -1993,12 +1965,39 @@
         closeCreateLobbyModalBtn.addEventListener('click', closeCreateLobbyModal);
         createLobbyModal.addEventListener('click', (e) => e.target === createLobbyModal && closeCreateLobbyModal());
         
+        // REVISED: Refresh button listener with visual feedback
         refreshLobbiesBtn.addEventListener('click', () => {
-            if (auth.currentUser) {
-                if (unsubscribeLobbies) unsubscribeLobbies();
-                unsubscribeLobbies = setupLobbyListener(lobbySearchInput.value.trim().toLowerCase());
-                showMessageBox("لیست لابی‌ها بروزرسانی شد.", "info");
+            if (isRefreshing) return; // Prevent multiple clicks
+
+            if (!auth.currentUser) {
+                showMessageBox("برای بروزرسانی لابی‌ها، ابتدا وارد شوید.", "info");
+                return;
             }
+
+            // 1. Set refreshing state and give visual feedback
+            isRefreshing = true;
+            refreshLobbiesBtn.disabled = true;
+            const refreshIconSvg = refreshLobbiesBtn.querySelector('svg');
+            refreshIconSvg.classList.add('is-refreshing');
+            lobbiesList.innerHTML = '<p class="text-gray-400">در حال بروزرسانی لیست...</p>';
+
+            // 2. Unsubscribe from the old listener
+            if (unsubscribeLobbies) {
+                unsubscribeLobbies();
+                unsubscribeLobbies = null;
+            }
+
+            // 3. Re-subscribe to get the latest data. setupLobbyListener will populate the list.
+            unsubscribeLobbies = setupLobbyListener(lobbySearchInput.value.trim().toLowerCase());
+            
+            // 4. Reset the button and state after a delay to allow animation to play
+            setTimeout(() => {
+                isRefreshing = false;
+                refreshLobbiesBtn.disabled = false;
+                refreshIconSvg.classList.remove('is-refreshing');
+                // The message box is now shown here to confirm the action is complete
+                showMessageBox("لیست لابی‌ها بروزرسانی شد.", "info");
+            }, 1000); // 1-second delay for user feedback
         });
 
         myLobbiesBtn.addEventListener('click', () => showMessageBox("لابی‌های من به زودی!", "info"));
@@ -2031,7 +2030,7 @@
         kickedListOkBtn.addEventListener('click', closeKickedPlayersListModal);
         kickedPlayersListModal.addEventListener('click', (e) => e.target === kickedPlayersListModal && closeKickedPlayersListModal());
         
-        // --- START: NEW Private Lobby Feature Code ---
+        // --- Private Lobby Feature Code ---
         function showPasswordPromptMessage(message, type = 'error') {
             passwordPromptMessageBox.textContent = message;
             passwordPromptMessageBox.className = 'mt-5 p-3.5 rounded-xl text-base text-center';
@@ -2113,8 +2112,6 @@
                 submitJoinPasswordBtn.textContent = 'ورود';
             }
         });
-        // --- END: NEW Private Lobby Feature Code ---
-
 
         // Start Firebase initialization when the window loads
         window.onload = initializeFirebaseAndAuth;
