@@ -480,27 +480,41 @@
             background: linear-gradient(180deg, #2C2C2C 0%, #1A1A1A 100%); /* Subtle dark grey gradient */
         }
 
-        .lobby-detail-content { /* Content container inside full screen */
-            background: linear-gradient(145deg, #1A1A1A 0%, #0D0D0D 100%); /* Darker, more intense background */
+        /* MODIFIED: Flexbox layout for lobby content to solve keyboard & scroll issues */
+        .lobby-detail-content {
+            background: linear-gradient(145deg, #1A1A1A 0%, #0D0D0D 100%);
             border: 3px solid #DAA520;
             border-radius: 20px;
             box-shadow: 0 10px 20px rgba(0,0,0,0.7);
-            padding: 1.5rem;
+            padding: 1rem; /* Adjusted padding */
             text-align: center;
-            width: 95%; /* Responsive width */
-            max-width: 800px; /* Max width for larger screens */
-            height: calc(100% - 4rem); /* Fill available space minus margins */
+            width: 95%;
+            max-width: 800px;
+            height: calc(100% - 2rem); /* Fill space minus margins */
             display: flex;
             flex-direction: column;
-            gap: 1rem; /* Spacing between elements */
-            margin-top: 2rem; /* Space from top after header */
-            margin-bottom: 2rem; /* Space from bottom before footer */
-            overflow-y: hidden; /* Main container does not scroll */
+            gap: 1rem;
+            margin-top: 1rem;
+            margin-bottom: 1rem;
+            overflow: hidden; /* Main container does not scroll */
         }
         /* Further ensure no horizontal scroll for content */
         .lobby-detail-content > * {
             max-width: 100%;
         }
+        
+        /* NEW: Wrapper for top section to enable scrolling */
+        .lobby-scrollable-top-section {
+            overflow-y: auto;
+            flex-shrink: 0; /* Prevent this section from shrinking */
+            padding: 0.5rem;
+        }
+        /* Custom scrollbar for this section */
+        .lobby-scrollable-top-section::-webkit-scrollbar { width: 8px; }
+        .lobby-scrollable-top-section::-webkit-scrollbar-track { background: #202020; border-radius: 4px; }
+        .lobby-scrollable-top-section::-webkit-scrollbar-thumb { background: #DAA520; border-radius: 4px; }
+        .lobby-scrollable-top-section::-webkit-scrollbar-thumb:hover { background: #FFD700; }
+
 
         .player-slots-grid {
             display: grid;
@@ -508,7 +522,7 @@
             gap: 1rem; /* Space between slots */
             width: 100%;
             max-width: 600px; /* Limit grid width */
-            margin: 0.5rem 0;
+            margin: 0.5rem auto; /* Center the grid */
         }
 
         .player-slot {
@@ -547,6 +561,21 @@
             margin-bottom: 0.5rem;
             color: #FFD700; /* Gold avatar icon */
         }
+        
+        /* NEW: Wrapper for bottom action buttons */
+        .lobby-bottom-actions {
+            flex-shrink: 0; /* Prevent buttons from shrinking */
+            margin-top: auto; /* Push to bottom of flex container */
+            padding-top: 0.5rem;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            sm:flex-row;
+            sm:justify-between;
+            align-items: center;
+            gap: 1rem;
+        }
+
 
         /* Start Game Button (Host Only) */
         .start-game-btn {
@@ -565,7 +594,7 @@
             border-color: #777;
         }
         
-        /* NEW: Styles for Lobby Chat */
+        /* MODIFIED: Make chat container fill available vertical space (solves keyboard issue) */
         .lobby-chat-container {
             background-color: rgba(0,0,0,0.4);
             border: 2px solid #5A5A5A;
@@ -575,7 +604,7 @@
             display: flex;
             flex-direction: column;
             overflow: hidden; /* To contain scrolling area */
-            margin-top: 1rem;
+            min-height: 150px; /* Give it a minimum height */
         }
         .lobby-chat-messages {
             flex-grow: 1;
@@ -619,6 +648,7 @@
             margin-top: 0.75rem;
             display: flex;
             gap: 0.5rem;
+            flex-shrink: 0; /* Prevent this form from shrinking */
         }
         .lobby-chat-input-form input {
             flex-grow: 1;
@@ -728,10 +758,14 @@
                 padding-bottom: 80px; /* Adjust for smaller footer */
             }
             .lobby-detail-content {
-                padding: 1rem;
-                margin-top: 1rem;
-                margin-bottom: 1rem;
-                height: calc(100% - 2rem);
+                padding: 0.5rem; /* Reduced padding on mobile */
+                margin-top: 0.5rem;
+                margin-bottom: 0.5rem;
+                height: calc(100% - 1rem);
+            }
+             /* Responsive styles for bottom action buttons */
+            .lobby-bottom-actions {
+                flex-direction: column;
             }
         }
         
@@ -999,11 +1033,12 @@
             </div>
         </div>
 
-        <!-- 8. Lobby Detail Screen (NEW) -->
+        <!-- 8. Lobby Detail Screen (MODIFIED HTML STRUCTURE) -->
         <div id="lobby-detail-screen" class="hidden absolute inset-0 z-30 page-transition-active page-transition-hidden lobby-detail-screen-full" tabindex="-1">
             <div class="lobby-detail-content">
-                <!-- Top Section: Lobby Info & Players -->
-                <div class="w-full">
+                
+                <!-- NEW: Scrollable wrapper for top section -->
+                <div class="lobby-scrollable-top-section">
                     <h2 id="detail-lobby-name" class="text-2xl sm:text-3xl font-bold text-yellow-300">نام لابی</h2>
                     <p id="detail-host-name" class="text-md sm:text-lg text-gray-300">سازنده: ---</p>
                     <p id="detail-player-count" class="text-sm font-semibold text-white">بازیکنان: 0/4</p>
@@ -1013,7 +1048,7 @@
                     </div>
                 </div>
 
-                <!-- NEW: Lobby Chat Section -->
+                <!-- Chat Section (will grow and shrink) -->
                 <div class="lobby-chat-container w-full">
                     <div id="lobby-chat-messages" class="lobby-chat-messages">
                         <!-- Chat messages will appear here -->
@@ -1024,8 +1059,8 @@
                     </form>
                 </div>
 
-                <!-- Bottom Section: Action Buttons -->
-                <div class="w-full mt-auto flex flex-col sm:flex-row sm:justify-between items-center gap-4">
+                <!-- NEW: Wrapper for bottom action buttons -->
+                <div class="lobby-bottom-actions">
                     <div id="host-actions-container" class="flex flex-col sm:flex-row gap-4">
                         <button id="start-game-btn" class="classic-btn start-game-btn" disabled>
                             شروع بازی
@@ -1039,6 +1074,7 @@
                         ترک لابی
                     </button>
                 </div>
+
             </div>
         </div>
 
