@@ -485,17 +485,19 @@
             border: 3px solid #DAA520;
             border-radius: 20px;
             box-shadow: 0 10px 20px rgba(0,0,0,0.7);
-            padding: 1.5rem;
+            padding: 2rem;
             text-align: center;
             width: 95%; /* Responsive width */
-            max-width: 800px; /* Max width for larger screens */
-            height: calc(100% - 4rem); /* Fill available space minus margins */
+            max-width: 700px; /* Max width for larger screens */
+            flex-grow: 1; /* Allow to grow and take available space */
             display: flex;
             flex-direction: column;
-            gap: 1rem; /* Spacing between elements */
+            align-items: center;
+            gap: 1.5rem; /* Spacing between elements */
             margin-top: 2rem; /* Space from top after header */
             margin-bottom: 2rem; /* Space from bottom before footer */
-            overflow-y: hidden; /* Main container does not scroll */
+            overflow-y: auto; /* Allow scroll if content is too large *within this container*, though layout aims to avoid it */
+            -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
         }
         /* Further ensure no horizontal scroll for content */
         .lobby-detail-content > * {
@@ -507,8 +509,9 @@
             grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); /* Responsive grid for players */
             gap: 1rem; /* Space between slots */
             width: 100%;
-            max-width: 600px; /* Limit grid width */
-            margin: 0.5rem 0;
+            max-width: 400px; /* Limit grid width */
+            margin-top: 1rem;
+            margin-bottom: 1rem;
         }
 
         .player-slot {
@@ -552,8 +555,9 @@
         .start-game-btn {
             background: linear-gradient(145deg, #228B22 0%, #006400 100%); /* Forest Green */
             border: 2px solid #DAA520;
-            font-size: 1.2rem;
-            padding: 0.75rem 1.5rem;
+            font-size: 1.5rem;
+            padding: 0.75rem 2rem;
+            margin-top: 1.5rem;
         }
         .start-game-btn:hover {
             background: linear-gradient(145deg, #006400 0%, #228B22 100%);
@@ -564,72 +568,6 @@
             background: linear-gradient(145deg, #555 0%, #444 100%);
             border-color: #777;
         }
-        
-        /* NEW: Styles for Lobby Chat */
-        .lobby-chat-container {
-            background-color: rgba(0,0,0,0.4);
-            border: 2px solid #5A5A5A;
-            border-radius: 10px;
-            padding: 0.75rem;
-            flex-grow: 1; /* Take remaining vertical space */
-            display: flex;
-            flex-direction: column;
-            overflow: hidden; /* To contain scrolling area */
-            margin-top: 1rem;
-        }
-        .lobby-chat-messages {
-            flex-grow: 1;
-            overflow-y: auto; /* Scrollable message area */
-            padding-right: 0.5rem; /* Space for scrollbar */
-            display: flex;
-            flex-direction: column; /* Stack messages vertically */
-        }
-        /* Custom scrollbar for chat */
-        .lobby-chat-messages::-webkit-scrollbar { width: 8px; }
-        .lobby-chat-messages::-webkit-scrollbar-track { background: #202020; border-radius: 4px; }
-        .lobby-chat-messages::-webkit-scrollbar-thumb { background: #DAA520; border-radius: 4px; }
-        .lobby-chat-messages::-webkit-scrollbar-thumb:hover { background: #FFD700; }
-
-        .chat-message {
-            background-color: #333;
-            padding: 0.5rem 0.75rem;
-            border-radius: 10px;
-            margin-bottom: 0.5rem;
-            max-width: 80%;
-            word-wrap: break-word;
-            align-self: flex-start; /* Align to right for RTL */
-        }
-        .chat-message.current-user {
-            background-color: #4682B4; /* Steel Blue for current user's messages */
-            align-self: flex-end; /* Align to left for RTL */
-        }
-        .chat-message .sender-name {
-            font-weight: bold;
-            color: #FFD700;
-            display: block;
-            font-size: 0.9em;
-            margin-bottom: 0.2rem;
-        }
-        .chat-message .message-text {
-            color: #E0E0E0;
-            font-size: 1em;
-        }
-
-        .lobby-chat-input-form {
-            margin-top: 0.75rem;
-            display: flex;
-            gap: 0.5rem;
-        }
-        .lobby-chat-input-form input {
-            flex-grow: 1;
-            padding: 0.5rem 0.75rem;
-        }
-        .lobby-chat-input-form button {
-            padding: 0.5rem 1rem;
-            font-size: 0.9rem;
-            white-space: nowrap; /* Prevent "ارسال" from wrapping */
-        }
-
 
         /* Responsive adjustments for smaller screens */
         @media (max-width: 640px) {
@@ -719,7 +657,7 @@
             }
 
             .player-slots-grid {
-                grid-template-columns: 1fr 1fr; /* Two columns on mobile */
+                grid-template-columns: 1fr; /* Single column on mobile */
             }
 
             /* Lobby Detail Screen on Mobile */
@@ -728,10 +666,9 @@
                 padding-bottom: 80px; /* Adjust for smaller footer */
             }
             .lobby-detail-content {
-                padding: 1rem;
+                padding: 1.5rem;
                 margin-top: 1rem;
                 margin-bottom: 1rem;
-                height: calc(100% - 2rem);
             }
         }
         
@@ -1002,43 +939,28 @@
         <!-- 8. Lobby Detail Screen (NEW) -->
         <div id="lobby-detail-screen" class="hidden absolute inset-0 z-30 page-transition-active page-transition-hidden lobby-detail-screen-full" tabindex="-1">
             <div class="lobby-detail-content">
-                <!-- Top Section: Lobby Info & Players -->
-                <div class="w-full">
-                    <h2 id="detail-lobby-name" class="text-2xl sm:text-3xl font-bold text-yellow-300">نام لابی</h2>
-                    <p id="detail-host-name" class="text-md sm:text-lg text-gray-300">سازنده: ---</p>
-                    <p id="detail-player-count" class="text-sm font-semibold text-white">بازیکنان: 0/4</p>
-                    
-                    <div class="player-slots-grid">
-                        <!-- Player slots will be dynamically loaded here -->
-                    </div>
+                <h2 id="detail-lobby-name" class="text-3xl font-bold text-yellow-300">نام لابی</h2>
+                <p id="detail-host-name" class="text-lg text-gray-300">سازنده: ---</p>
+                
+                <div class="player-slots-grid">
+                    <!-- Player slots will be dynamically loaded here -->
                 </div>
 
-                <!-- NEW: Lobby Chat Section -->
-                <div class="lobby-chat-container w-full">
-                    <div id="lobby-chat-messages" class="lobby-chat-messages">
-                        <!-- Chat messages will appear here -->
-                    </div>
-                    <form id="lobby-chat-form" class="lobby-chat-input-form">
-                        <input type="text" id="lobby-chat-input" placeholder="پیام خود را بنویسید..." autocomplete="off">
-                        <button type="submit" id="lobby-chat-send-btn" class="classic-btn btn-blue-classic">ارسال</button>
-                    </form>
-                </div>
+                <p id="detail-player-count" class="text-md font-semibold text-white">بازیکنان: 0/4</p>
 
-                <!-- Bottom Section: Action Buttons -->
-                <div class="w-full mt-auto flex flex-col sm:flex-row sm:justify-between items-center gap-4">
-                    <div id="host-actions-container" class="flex flex-col sm:flex-row gap-4">
-                        <button id="start-game-btn" class="classic-btn start-game-btn" disabled>
-                            شروع بازی
-                        </button>
-                        <button id="view-kicked-players-btn" class="classic-btn btn-brown-classic" style="display: none;">
-                            لیست اخراجی‌ها
-                        </button>
-                    </div>
-
-                    <button id="leave-lobby-btn" class="classic-btn btn-red-classic">
-                        ترک لابی
+                <!-- NEW: Buttons for Host actions (Start Game & View Kicked Players) -->
+                <div id="host-actions-container" class="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4 sm:space-x-reverse w-full justify-center mt-4">
+                    <button id="start-game-btn" class="classic-btn start-game-btn w-full sm:w-auto text-xl" disabled>
+                        شروع بازی
+                    </button>
+                    <button id="view-kicked-players-btn" class="classic-btn btn-brown-classic w-full sm:w-auto text-xl" style="display: none;">
+                        لیست اخراجی‌ها
                     </button>
                 </div>
+
+                <button id="leave-lobby-btn" class="classic-btn btn-red-classic w-full sm:w-auto text-xl mt-4">
+                    ترک لابی
+                </button>
             </div>
         </div>
 
@@ -1112,7 +1034,7 @@
         // Import the functions you need from the SDKs you need
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, signInWithCustomToken, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, setDoc, getDoc, collection, addDoc, serverTimestamp, query, where, onSnapshot, updateDoc, arrayUnion, arrayRemove, deleteDoc, getDocs, orderBy } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js"; 
+        import { getFirestore, doc, setDoc, getDoc, collection, addDoc, serverTimestamp, query, where, onSnapshot, updateDoc, arrayUnion, arrayRemove, deleteDoc, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js"; 
 
         // Firebase Configuration (from user's input)
         // **IMPORTANT**: You should replace these with your actual Firebase project configuration.
@@ -1207,11 +1129,6 @@
         const startGameBtn = document.getElementById('start-game-btn');
         const viewKickedPlayersBtn = document.getElementById('view-kicked-players-btn');
         const leaveLobbyBtn = document.getElementById('leave-lobby-btn');
-        // NEW: Lobby Chat Elements
-        const lobbyChatMessages = document.getElementById('lobby-chat-messages');
-        const lobbyChatForm = document.getElementById('lobby-chat-form');
-        const lobbyChatInput = document.getElementById('lobby-chat-input');
-        const lobbyChatSendBtn = document.getElementById('lobby-chat-send-btn');
 
         // Kick Player Confirmation Modal Elements
         const kickPlayerConfirmModal = document.getElementById('kick-player-confirm-modal');
@@ -1248,7 +1165,6 @@
         let unsubscribeLobbies = null; // Global variable to store the unsubscribe function for lobby list listener
         let unsubscribeLobbyDetail = null; // Global variable for single lobby detail listener
         let unsubscribeKickedPlayers = null; // Listener for kicked players list
-        let unsubscribeLobbyChat = null; // NEW: Listener for lobby chat messages
         let isAuthResolved = false; // Flag to indicate if onAuthStateChanged has run at least once
         let userHasActiveLobby = false; // Track if the current user has an active lobby (created or joined)
         let currentLobbyId = null; // Stores the ID of the lobby the current user is in
@@ -1516,8 +1432,7 @@
                 if (unsubscribeLobbies) unsubscribeLobbies();
                 if (unsubscribeLobbyDetail) unsubscribeLobbyDetail();
                 if (unsubscribeKickedPlayers) unsubscribeKickedPlayers();
-                if (unsubscribeLobbyChat) unsubscribeLobbyChat(); // NEW: Cleanup chat listener
-                unsubscribeLobbies = unsubscribeLobbyDetail = unsubscribeKickedPlayers = unsubscribeLobbyChat = null;
+                unsubscribeLobbies = unsubscribeLobbyDetail = unsubscribeKickedPlayers = null;
                 currentLobbyId = null;
             }
         });
@@ -1621,11 +1536,6 @@
             if (unsubscribeKickedPlayers) {
                 unsubscribeKickedPlayers();
                 unsubscribeKickedPlayers = null;
-            }
-            // NEW: Cleanup chat listener when going back to lobby list
-            if (unsubscribeLobbyChat) {
-                unsubscribeLobbyChat();
-                unsubscribeLobbyChat = null;
             }
         
             lobbiesList.innerHTML = '<p class="text-gray-400">در حال بارگذاری لابی‌ها...</p>';
@@ -1804,10 +1714,6 @@
             console.log(`Listening to lobby details for ID: ${lobbyId}`);
             if (unsubscribeLobbies) { unsubscribeLobbies(); unsubscribeLobbies = null; }
             if (unsubscribeKickedPlayers) { unsubscribeKickedPlayers(); unsubscribeKickedPlayers = null; }
-            if (unsubscribeLobbyChat) { unsubscribeLobbyChat(); unsubscribeLobbyChat = null; } // NEW: Clean up previous chat listener
-            
-            // NEW: Setup the chat listener for this lobby
-            unsubscribeLobbyChat = setupLobbyChatListener(lobbyId);
 
             const lobbyRef = doc(db, `global_lobbies`, lobbyId);
             const unsubscribe = onSnapshot(lobbyRef, async (docSnap) => {
@@ -1947,52 +1853,6 @@
                 }
             });
         }
-        
-        // --- NEW: Lobby Chat Functions ---
-        async function sendLobbyMessage(lobbyId, text) {
-            if (!text.trim() || !auth.currentUser || !currentUserData) return;
-            const messagesRef = collection(db, `global_lobbies/${lobbyId}/messages`);
-            try {
-                await addDoc(messagesRef, {
-                    text: text.trim(),
-                    senderUid: auth.currentUser.uid,
-                    senderName: currentUserData.displayName,
-                    timestamp: serverTimestamp()
-                });
-                lobbyChatInput.value = ''; // Clear input after sending
-            } catch (error) {
-                console.error("Error sending chat message:", error);
-                showMessageBox("خطا در ارسال پیام.", "error");
-            }
-        }
-
-        function setupLobbyChatListener(lobbyId) {
-            const messagesRef = collection(db, `global_lobbies/${lobbyId}/messages`);
-            const q = query(messagesRef, orderBy("timestamp", "asc"));
-
-            return onSnapshot(q, (snapshot) => {
-                lobbyChatMessages.innerHTML = '';
-                snapshot.forEach(doc => {
-                    const messageData = doc.data();
-                    const messageDiv = document.createElement('div');
-                    messageDiv.classList.add('chat-message');
-                    if (messageData.senderUid === auth.currentUser.uid) {
-                        messageDiv.classList.add('current-user');
-                    }
-                    messageDiv.innerHTML = `
-                        <span class="sender-name">${messageData.senderName}</span>
-                        <p class="message-text">${messageData.text}</p>
-                    `;
-                    lobbyChatMessages.appendChild(messageDiv);
-                });
-                // Auto-scroll to the bottom
-                lobbyChatMessages.scrollTop = lobbyChatMessages.scrollHeight;
-            }, (error) => {
-                console.error("Lobby chat listener error:", error);
-                showMessageBox("خطا در بارگذاری چت.", "error");
-            });
-        }
-
 
         // --- Event Listeners ---
         loginToggleBtn.addEventListener('click', () => {
@@ -2059,8 +1919,7 @@
             setActiveScreen(mainScreen);
             if (unsubscribeLobbies) unsubscribeLobbies();
             if (unsubscribeLobbyDetail) unsubscribeLobbyDetail();
-            if (unsubscribeLobbyChat) unsubscribeLobbyChat(); // NEW: Cleanup chat listener
-            unsubscribeLobbies = unsubscribeLobbyDetail = unsubscribeLobbyChat = null;
+            unsubscribeLobbies = unsubscribeLobbyDetail = null;
         });
 
         addIconBtn.addEventListener('click', () => {
@@ -2253,15 +2112,6 @@
                 submitJoinPasswordBtn.textContent = 'ورود';
             }
         });
-        
-        // NEW: Event listener for lobby chat form
-        lobbyChatForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-            if (currentLobbyId) {
-                sendLobbyMessage(currentLobbyId, lobbyChatInput.value);
-            }
-        });
-
 
         // Start Firebase initialization when the window loads
         window.onload = initializeFirebaseAndAuth;
