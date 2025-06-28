@@ -581,10 +581,17 @@
             max-width: 80%;
             word-wrap: break-word;
             align-self: flex-start;
+            display: flex; /* NEW: Flex layout for message content and delete button */
+            align-items: center; /* NEW: Vertically align content and button */
+            gap: 0.5rem; /* NEW: Space between message and button */
         }
         .chat-message.current-user {
             background-color: #4682B4;
             align-self: flex-end;
+            flex-direction: row-reverse; /* NEW: Puts delete button on the left for RTL */
+        }
+        .chat-message-content {
+             flex-grow: 1; /* NEW: Allows text content to take up available space */
         }
         .chat-message .sender-name {
             font-weight: bold;
@@ -593,6 +600,28 @@
             font-size: 0.9em;
             margin-bottom: 0.2rem;
         }
+        .chat-message .message-text-deleted { /* NEW STYLE */
+            font-style: italic;
+            color: #999;
+        }
+        .delete-message-btn { /* NEW STYLE */
+            background: none;
+            border: none;
+            color: #aaa;
+            cursor: pointer;
+            padding: 0.25rem;
+            opacity: 0.5;
+            transition: all 0.2s ease;
+            flex-shrink: 0; /* Prevent button from shrinking */
+        }
+        .chat-message:hover .delete-message-btn { /* NEW STYLE */
+            opacity: 1;
+        }
+        .delete-message-btn:hover { /* NEW STYLE */
+            color: #ff6b6b;
+            transform: scale(1.1);
+        }
+
         .lobby-chat-input-form {
             margin-top: 0.75rem;
             display: flex;
@@ -947,6 +976,9 @@
                             <button id="start-game-btn" class="classic-btn start-game-btn" disabled>
                                 شروع بازی
                             </button>
+                             <button id="toggle-chat-lock-btn" class="classic-btn btn-gray-classic text-sm py-2 px-4">
+                                قفل کردن چت
+                            </button>
                             <button id="view-kicked-players-btn" class="classic-btn btn-brown-classic text-sm py-2 px-4">
                                 لیست اخراجی‌ها
                             </button>
@@ -1121,10 +1153,11 @@
         const lobbyDetailScreen = document.getElementById('lobby-detail-screen');
         const detailLobbyName = document.getElementById('detail-lobby-name');
         const detailHostName = document.getElementById('detail-host-name');
-        const playerListContainer = document.getElementById('player-list-container'); // NEW: For the player list
+        const playerListContainer = document.getElementById('player-list-container');
         const detailPlayerCount = document.getElementById('detail-player-count');
         const hostActionsContainer = document.getElementById('host-actions-container');
         const startGameBtn = document.getElementById('start-game-btn');
+        const toggleChatLockBtn = document.getElementById('toggle-chat-lock-btn'); // NEW
         const viewKickedPlayersBtn = document.getElementById('view-kicked-players-btn');
         const leaveLobbyBtn = document.getElementById('leave-lobby-btn');
         const lobbyChatMessages = document.getElementById('lobby-chat-messages');
@@ -1490,6 +1523,7 @@
                     },
                     kickedPlayers: [], // Still an array of objects
                     createdAt: serverTimestamp(),
+                    isChatLocked: false, // NEW: Chat is open by default
                     gameSettings: { maxPlayers: 4, roundsToWin: 7 }
                 };
         
@@ -1728,15 +1762,12 @@
             }
         }
         
-        // REVISED: setupLobbyDetailListener now uses the new two-panel layout
         function setupLobbyDetailListener(lobbyId) {
             console.log(`Listening to lobby details for ID: ${lobbyId}`);
             if (unsubscribeLobbies) { unsubscribeLobbies(); unsubscribeLobbies = null; }
             if (unsubscribeKickedPlayers) { unsubscribeKickedPlayers(); unsubscribeKickedPlayers = null; }
             if (unsubscribeLobbyChat) { unsubscribeLobbyChat(); unsubscribeLobbyChat = null; }
             
-            unsubscribeLobbyChat = setupLobbyChatListener(lobbyId);
-
             const lobbyRef = doc(db, `global_lobbies`, lobbyId);
             const unsubscribe = onSnapshot(lobbyRef, async (docSnap) => {
                 if (docSnap.exists()) {
@@ -1744,6 +1775,12 @@
                     const playersMap = lobbyData.players || {};
                     const playerCount = Object.keys(playersMap).length;
                     const maxPlayers = lobbyData.gameSettings?.maxPlayers || 4;
+                    const isCurrentUserHost = auth.currentUser && lobbyData.hostId === auth.currentUser.uid;
+                    const isChatLocked = lobbyData.isChatLocked || false;
+
+                    // Unsubscribe previous chat listener if host changes
+                    if (unsubscribeLobbyChat) unsubscribeLobbyChat();
+                    unsubscribeLobbyChat = setupLobbyChatListener(lobbyId, lobbyData.hostId);
 
                     detailLobbyName.textContent = lobbyData.name;
                     detailHostName.textContent = `سازنده: ${playersMap[lobbyData.hostId] || 'ناشناس'}`;
@@ -1754,23 +1791,18 @@
                         return;
                     }
 
-                    playerListContainer.innerHTML = ''; // Clear the new player list container
-                    const isCurrentUserHost = auth.currentUser && lobbyData.hostId === auth.currentUser.uid;
-                    
+                    playerListContainer.innerHTML = '';
                     const playerList = Object.entries(playersMap).map(([uid, displayName]) => ({ uid, displayName }));
 
                     for (const player of playerList) {
                         const isHost = player.uid === lobbyData.hostId;
                         const playerItem = document.createElement('div');
                         playerItem.className = 'player-list-item';
-                        if (isHost) {
-                            playerItem.classList.add('is-host');
-                        }
+                        if (isHost) playerItem.classList.add('is-host');
 
-                        let kickButtonHtml = '';
-                        if (isCurrentUserHost && !isHost) {
-                            kickButtonHtml = `<button class="kick-player-btn" data-player-uid="${player.uid}" data-player-name="${player.displayName}">اخراج</button>`;
-                        }
+                        const kickButtonHtml = (isCurrentUserHost && !isHost) 
+                            ? `<button class="kick-player-btn" data-player-uid="${player.uid}" data-player-name="${player.displayName}">اخراج</button>` 
+                            : '';
                         
                         const hostLabelHtml = isHost ? '<span class="host-label">(سازنده)</span>' : '';
 
@@ -1785,7 +1817,6 @@
                         playerListContainer.appendChild(playerItem);
                     }
 
-                    // Add click listeners for new kick buttons
                     playerListContainer.querySelectorAll('.kick-player-btn').forEach(button => {
                         button.addEventListener('click', (e) => {
                            openKickPlayerConfirmModal(e.currentTarget.dataset.playerName, e.currentTarget.dataset.playerUid);
@@ -1797,9 +1828,25 @@
                         hostActionsContainer.style.display = 'flex';
                         startGameBtn.disabled = playerCount !== maxPlayers;
                         startGameBtn.textContent = `شروع بازی (${playerCount}/${maxPlayers})`;
+                        
+                        // Manage chat lock button
+                        toggleChatLockBtn.textContent = isChatLocked ? 'باز کردن چت' : 'قفل کردن چت';
+
                     } else {
                         hostActionsContainer.style.display = 'none';
                     }
+
+                    // Manage Chat Input for ALL users based on lock state
+                    if (isChatLocked && !isCurrentUserHost) {
+                        lobbyChatInput.disabled = true;
+                        lobbyChatSendBtn.disabled = true;
+                        lobbyChatInput.placeholder = "چت توسط سازنده قفل شده است";
+                    } else {
+                        lobbyChatInput.disabled = false;
+                        lobbyChatSendBtn.disabled = false;
+                        lobbyChatInput.placeholder = "پیام خود را بنویسید...";
+                    }
+
 
                 } else {
                     showMessageBox("لابی که در آن بودید بسته شد.", "info");
@@ -1898,7 +1945,8 @@
                     text: text.trim(),
                     senderUid: auth.currentUser.uid,
                     senderName: currentUserData.displayName,
-                    timestamp: serverTimestamp()
+                    timestamp: serverTimestamp(),
+                    isDeleted: false // NEW
                 });
                 lobbyChatInput.value = ''; // Clear input after sending
             } catch (error) {
@@ -1906,8 +1954,22 @@
                 showMessageBox("خطا در ارسال پیام.", "error");
             }
         }
+        
+        // NEW: Soft-deletes a message
+        async function deleteLobbyMessage(lobbyId, messageId) {
+            const messageRef = doc(db, `global_lobbies/${lobbyId}/messages`, messageId);
+            try {
+                await updateDoc(messageRef, {
+                    text: "[این پیام حذف شده است]",
+                    isDeleted: true
+                });
+            } catch (error) {
+                console.error("Error deleting message:", error);
+                showMessageBox("خطا در حذف پیام.", "error");
+            }
+        }
 
-        function setupLobbyChatListener(lobbyId) {
+        function setupLobbyChatListener(lobbyId, hostId) {
             const messagesRef = collection(db, `global_lobbies/${lobbyId}/messages`);
             const q = query(messagesRef, orderBy("timestamp", "asc"));
 
@@ -1915,14 +1977,36 @@
                 lobbyChatMessages.innerHTML = '';
                 snapshot.forEach(doc => {
                     const messageData = doc.data();
+                    const messageId = doc.id;
+                    const isCurrentUserMsg = messageData.senderUid === auth.currentUser.uid;
+                    const isCurrentUserHost = auth.currentUser.uid === hostId;
+
+                    const canDelete = !messageData.isDeleted && (isCurrentUserMsg || isCurrentUserHost);
+
                     const messageDiv = document.createElement('div');
                     messageDiv.classList.add('chat-message');
-                    if (messageData.senderUid === auth.currentUser.uid) {
+                    if (isCurrentUserMsg) {
                         messageDiv.classList.add('current-user');
                     }
-                    messageDiv.innerHTML = `
+                    
+                    const deleteButtonHtml = canDelete ? `
+                        <button class="delete-message-btn" data-message-id="${messageId}" title="حذف پیام">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-trash-2"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg>
+                        </button>
+                    ` : '';
+
+                    const messageContentHtml = messageData.isDeleted ? `
+                        <p class="message-text-deleted">${messageData.text}</p>
+                    ` : `
                         <span class="sender-name">${messageData.senderName}</span>
                         <p class="message-text">${messageData.text}</p>
+                    `;
+
+                    messageDiv.innerHTML = `
+                        <div class="chat-message-content">
+                            ${messageContentHtml}
+                        </div>
+                        ${deleteButtonHtml}
                     `;
                     lobbyChatMessages.appendChild(messageDiv);
                 });
@@ -1936,7 +2020,7 @@
 
 
         // --- Event Listeners ---
-        // (No changes needed in most event listeners, only the ones related to lobby detail screen)
+        // Auth, Profile, Modals, Lobby List
         loginToggleBtn.addEventListener('click', () => {
             authMode = 'login';
             displayNameField.classList.add('hidden');
@@ -2077,6 +2161,7 @@
             unsubscribeLobbies = setupLobbyListener(lobbySearchInput.value.trim().toLowerCase());
         });
 
+        // --- Lobby Detail Screen Event Listeners ---
         leaveLobbyBtn.addEventListener('click', leaveLobby);
         startGameBtn.addEventListener('click', async () => {
             if (currentLobbyId && auth.currentUser) {
@@ -2085,7 +2170,24 @@
                 // Future: Transition to game board
             }
         });
+        
+        // NEW: Toggle Chat Lock Listener
+        toggleChatLockBtn.addEventListener('click', async () => {
+            if (!currentLobbyId || !auth.currentUser) return;
+            const lobbyRef = doc(db, 'global_lobbies', currentLobbyId);
+            try {
+                const lobbySnap = await getDoc(lobbyRef);
+                if (lobbySnap.exists() && lobbySnap.data().hostId === auth.currentUser.uid) {
+                    const currentLockState = lobbySnap.data().isChatLocked || false;
+                    await updateDoc(lobbyRef, { isChatLocked: !currentLockState });
+                }
+            } catch (error) {
+                console.error("Error toggling chat lock:", error);
+                showMessageBox("خطا در تغییر وضعیت چت.", "error");
+            }
+        });
 
+        // Kick/Unkick related
         kickPlayerConfirmBtn.addEventListener('click', () => kickedPlayerToProcess && kickPlayer(currentLobbyId, kickedPlayerToProcess.uid, kickedPlayerToProcess.displayName));
         cancelKickPlayerBtn.addEventListener('click', closeKickPlayerConfirmModal);
         closeKickPlayerConfirmModalBtn.addEventListener('click', closeKickPlayerConfirmModal);
@@ -2096,6 +2198,7 @@
         kickedListOkBtn.addEventListener('click', closeKickedPlayersListModal);
         kickedPlayersListModal.addEventListener('click', (e) => e.target === kickedPlayersListModal && closeKickedPlayersListModal());
         
+        // Private lobby password related
         function showPasswordPromptMessage(message, type = 'error') {
             passwordPromptMessageBox.textContent = message;
             passwordPromptMessageBox.className = 'mt-5 p-3.5 rounded-xl text-base text-center';
@@ -2178,10 +2281,26 @@
             }
         });
         
+        // Chat Form Submission
         lobbyChatForm.addEventListener('submit', (e) => {
             e.preventDefault();
             if (currentLobbyId) {
                 sendLobbyMessage(currentLobbyId, lobbyChatInput.value);
+            }
+        });
+
+        // NEW: Event Delegation for Message Deletion
+        lobbyChatMessages.addEventListener('click', (e) => {
+            const deleteButton = e.target.closest('.delete-message-btn');
+            if (deleteButton) {
+                const messageId = deleteButton.dataset.messageId;
+                if (currentLobbyId && messageId) {
+                    // Optional: Add a confirmation dialog here if you want
+                    // const confirmed = await showCustomConfirm("آیا از حذف این پیام مطمئن هستید؟");
+                    // if (confirmed) {
+                        deleteLobbyMessage(currentLobbyId, messageId);
+                    // }
+                }
             }
         });
 
