@@ -6,6 +6,8 @@
     <title>بازی حکم کلاسیک</title>
     <!-- Tailwind CSS CDN for styling -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- --- NEW: VOICE CHAT --- Agora Web SDK -->
+    <script src="https://download.agora.io/sdk/release/AgoraRTC_N.js"></script>
     <!-- Google Fonts for Classic Look -->
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Merriweather:wght@400;700&display=swap" rel="stylesheet">
     <style>
@@ -575,6 +577,54 @@
             background: #DAA520;
             color: #1A1A1A;
         }
+        
+        /* --- NEW: VOICE CHAT --- Styles for voice status icons */
+        .player-voice-status {
+            width: 20px;
+            height: 20px;
+            margin-left: 8px;
+            color: #888; /* Default inactive color */
+            transition: color 0.2s, transform 0.2s;
+        }
+        .player-voice-status.is-muted {
+            color: #B22222; /* Red when muted */
+        }
+        .player-voice-status.is-speaking {
+            color: #22c55e; /* Green when speaking */
+            transform: scale(1.2);
+            animation: pulse-green 1s infinite;
+        }
+        @keyframes pulse-green {
+            0% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(34, 197, 94, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
+        }
+
+        /* --- NEW: VOICE CHAT --- Styles for the voice control panel */
+        #voice-chat-panel {
+            background-color: rgba(0,0,0,0.4);
+            border-radius: 10px;
+            padding: 1rem;
+            margin-top: auto; /* Pushes it to the bottom of the sidebar */
+            border: 1px solid #444;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+        #voice-status-text {
+            text-align: center;
+            font-size: 0.9rem;
+            font-weight: bold;
+        }
+        #voice-controls {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+        }
+        .voice-control-btn {
+            padding: 0.5rem 1rem;
+            font-size: 0.9rem;
+        }
 
         .lobby-chat-container {
             background-color: rgba(0,0,0,0.4);
@@ -965,7 +1015,7 @@
         <div id="lobby-detail-screen" class="hidden absolute inset-0 z-30 page-transition-active page-transition-hidden lobby-detail-screen-full" tabindex="-1">
             <div class="lobby-detail-content">
                 
-                <!-- Sidebar: Lobby Info & Players -->
+                <!-- Sidebar: Lobby Info, Players & Voice Chat -->
                 <div class="lobby-sidebar">
                     <h2 id="detail-lobby-name" class="text-2xl sm:text-3xl font-bold text-yellow-300 truncate">نام لابی</h2>
                     <p id="detail-host-name" class="text-md text-gray-300 mt-2">سازنده: ---</p>
@@ -976,6 +1026,23 @@
                     <div id="player-list-container">
                         <!-- Player list items will be dynamically loaded here -->
                     </div>
+                    
+                    <!-- --- NEW: VOICE CHAT --- Voice Chat Control Panel -->
+                    <div id="voice-chat-panel">
+                        <p id="voice-status-text" class="text-gray-400">چت صوتی قطع است</p>
+                        <div id="voice-controls" class="hidden">
+                            <button id="mute-voice-btn" class="classic-btn btn-blue-classic voice-control-btn">
+                                Mute
+                            </button>
+                            <button id="leave-voice-btn" class="classic-btn btn-red-classic voice-control-btn">
+                                خروج
+                            </button>
+                        </div>
+                        <button id="join-voice-btn" class="classic-btn btn-green-classic voice-control-btn">
+                            اتصال به چت صوتی
+                        </button>
+                    </div>
+
                 </div>
 
                 <!-- Main Panel: Chat & Actions -->
@@ -1108,6 +1175,16 @@
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
         const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
 
+        // --- NEW: VOICE CHAT --- Agora Configuration
+        const agoraAppId = "YOUR_AGORA_APP_ID"; // <<<=================  PASTE YOUR AGORA APP ID HERE
+        const agoraTempToken = null; // Can be used for testing. Set to null to use token-less mode (less secure).
+                                    // For production, a server should generate tokens.
+        let agoraClient = null;
+        let localAudioTrack = null;
+        let remoteUsers = {};
+        let isMuted = false;
+        let isVoiceChannelJoined = false;
+
         // DOM Elements
         const loadingScreen = document.getElementById('loading-screen');
         const authScreen = document.getElementById('auth-screen');
@@ -1178,13 +1255,22 @@
         const detailPlayerCount = document.getElementById('detail-player-count');
         const hostActionsContainer = document.getElementById('host-actions-container');
         const startGameBtn = document.getElementById('start-game-btn');
-        const toggleChatLockBtn = document.getElementById('toggle-chat-lock-btn'); // NEW
+        const toggleChatLockBtn = document.getElementById('toggle-chat-lock-btn');
         const viewKickedPlayersBtn = document.getElementById('view-kicked-players-btn');
         const leaveLobbyBtn = document.getElementById('leave-lobby-btn');
         const lobbyChatMessages = document.getElementById('lobby-chat-messages');
         const lobbyChatForm = document.getElementById('lobby-chat-form');
         const lobbyChatInput = document.getElementById('lobby-chat-input');
         const lobbyChatSendBtn = document.getElementById('lobby-chat-send-btn');
+        
+        // --- NEW: VOICE CHAT --- Voice Chat UI Elements
+        const voiceChatPanel = document.getElementById('voice-chat-panel');
+        const voiceStatusText = document.getElementById('voice-status-text');
+        const voiceControls = document.getElementById('voice-controls');
+        const joinVoiceBtn = document.getElementById('join-voice-btn');
+        const leaveVoiceBtn = document.getElementById('leave-voice-btn');
+        const muteVoiceBtn = document.getElementById('mute-voice-btn');
+
 
         // Kick Player Confirmation Modal Elements
         const kickPlayerConfirmModal = document.getElementById('kick-player-confirm-modal');
@@ -1291,10 +1377,15 @@
 
 
         // Function to transition between screens
-        function setActiveScreen(newScreen) {
+        async function setActiveScreen(newScreen) {
             console.log(`درخواست تغییر صفحه به: ${newScreen.id}. صفحه فعلی: ${currentActiveScreen.id}`);
 
             if (currentActiveScreen === newScreen) return;
+            
+            // --- NEW: VOICE CHAT --- Clean up voice channel if leaving lobby detail screen
+            if (currentActiveScreen === lobbyDetailScreen && newScreen !== lobbyDetailScreen) {
+                await leaveVoiceChannel(false); // Leave voice without updating Firestore, as we're leaving the lobby anyway
+            }
 
             // Hide the current screen with transition
             currentActiveScreen.classList.remove('page-transition-visible');
@@ -1317,6 +1408,11 @@
 
                 if (newScreen === authScreen) emailInput.focus();
                 else if (newScreen === lobbyScreen) lobbySearchInput.focus();
+                
+                // --- NEW: VOICE CHAT --- Initialize Agora when entering lobby detail screen
+                if (newScreen === lobbyDetailScreen) {
+                    initAgora();
+                }
 
                 currentActiveScreen = newScreen;
 
@@ -1489,7 +1585,7 @@
                 if (unsubscribeLobbies) unsubscribeLobbies();
                 if (unsubscribeLobbyDetail) unsubscribeLobbyDetail();
                 if (unsubscribeKickedPlayers) unsubscribeKickedPlayers();
-                if (unsubscribeLobbyChat) unsubscribeLobbyChat(); // NEW: Cleanup chat listener
+                if (unsubscribeLobbyChat) unsubscribeLobbyChat(); // Cleanup chat listener
                 unsubscribeLobbies = unsubscribeLobbyDetail = unsubscribeKickedPlayers = unsubscribeLobbyChat = null;
                 currentLobbyId = null;
             }
@@ -1516,6 +1612,168 @@
             };
             return messages[errorCode] || "خطایی ناشناخته رخ داده است.";
         }
+        
+        // --- NEW: VOICE CHAT --- Agora Voice Chat Functions
+        
+        function initAgora() {
+            if (agoraAppId === "YOUR_AGORA_APP_ID") {
+                console.error("Please set your Agora App ID in the script.");
+                voiceStatusText.textContent = "خطا در تنظیمات چت صوتی";
+                voiceStatusText.classList.add("text-red-500");
+                joinVoiceBtn.disabled = true;
+                return;
+            }
+            agoraClient = AgoraRTC.createClient({ mode: "rtc", codec: "opus" });
+            console.log("Agora client initialized.");
+            
+            agoraClient.on("user-published", handleUserPublished);
+            agoraClient.on("user-unpublished", handleUserUnpublished);
+            agoraClient.on("user-left", handleUserUnpublished); // Handle abrupt disconnects
+
+            // Enable volume indicator
+            agoraClient.enableAudioVolumeIndicator();
+            agoraClient.on("volume-indicator", handleVolumeIndicator);
+
+            updateVoiceUI();
+        }
+
+        async function joinVoiceChannel() {
+            if (!agoraClient || !currentLobbyId || !auth.currentUser) return;
+
+            try {
+                voiceStatusText.textContent = "در حال اتصال...";
+                const uid = auth.currentUser.uid;
+                
+                // Using the lobby ID as the channel name
+                await agoraClient.join(agoraAppId, currentLobbyId, agoraTempToken, uid);
+                
+                localAudioTrack = await AgoraRTC.createMicrophoneAudioTrack();
+                await agoraClient.publish([localAudioTrack]);
+                
+                isVoiceChannelJoined = true;
+                isMuted = false;
+                voiceStatusText.textContent = "متصل ✅";
+                console.log("Voice channel joined successfully.");
+
+                // Update Firestore state
+                await updateVoiceStateInFirestore(true, false);
+
+            } catch (error) {
+                console.error("Failed to join or publish in voice channel", error);
+                voiceStatusText.textContent = "خطا در اتصال";
+                isVoiceChannelJoined = false;
+            }
+            updateVoiceUI();
+        }
+
+        async function leaveVoiceChannel(updateFirestore = true) {
+            if (!agoraClient || !isVoiceChannelJoined) return;
+            isVoiceChannelJoined = false;
+
+            try {
+                if (localAudioTrack) {
+                    localAudioTrack.stop();
+                    localAudioTrack.close();
+                    localAudioTrack = null;
+                }
+                
+                // Unsubscribe all remote users
+                for (const uid in remoteUsers) {
+                    agoraClient.unsubscribe(remoteUsers[uid]);
+                }
+                remoteUsers = {};
+
+                await agoraClient.leave();
+                console.log("Left voice channel.");
+
+                if (updateFirestore) {
+                    await updateVoiceStateInFirestore(false, false);
+                }
+
+            } catch (error) {
+                console.error("Error leaving voice channel", error);
+            }
+            
+            voiceStatusText.textContent = "چت صوتی قطع است";
+            updateVoiceUI();
+        }
+
+        async function toggleMute() {
+            if (!localAudioTrack || !isVoiceChannelJoined) return;
+            isMuted = !isMuted;
+            await localAudioTrack.setEnabled(!isMuted);
+            muteVoiceBtn.textContent = isMuted ? "Unmute" : "Mute";
+            console.log(`Mic ${isMuted ? 'muted' : 'unmuted'}`);
+
+            // Update Firestore state
+            await updateVoiceStateInFirestore(true, isMuted);
+            updateVoiceUI();
+        }
+        
+        async function handleUserPublished(user, mediaType) {
+            await agoraClient.subscribe(user, mediaType);
+            if (mediaType === "audio") {
+                remoteUsers[user.uid] = user;
+                user.audioTrack.play();
+                console.log(`Subscribed to remote user: ${user.uid}`);
+            }
+        }
+
+        function handleUserUnpublished(user) {
+            if (remoteUsers[user.uid]) {
+                delete remoteUsers[user.uid];
+                console.log(`Unsubscribed from remote user: ${user.uid}`);
+            }
+        }
+        
+        function handleVolumeIndicator(volumes) {
+            // Reset all speaker icons
+            document.querySelectorAll('.player-voice-status').forEach(icon => {
+                icon.classList.remove('is-speaking');
+            });
+
+            volumes.forEach(volume => {
+                if (volume.level > 5) { // Threshold to detect active speaking
+                    const speakerIcon = document.querySelector(`.player-voice-status[data-player-uid="${volume.uid}"]`);
+                    if (speakerIcon && !speakerIcon.classList.contains('is-muted')) {
+                        speakerIcon.classList.add('is-speaking');
+                    }
+                }
+            });
+        }
+        
+        function updateVoiceUI() {
+            if (isVoiceChannelJoined) {
+                joinVoiceBtn.classList.add('hidden');
+                voiceControls.classList.remove('hidden');
+                muteVoiceBtn.textContent = isMuted ? "Unmute" : "Mute";
+            } else {
+                joinVoiceBtn.classList.remove('hidden');
+                voiceControls.classList.add('hidden');
+            }
+        }
+
+        async function updateVoiceStateInFirestore(isOnline, isCurrentlyMuted) {
+            if (!currentLobbyId || !auth.currentUser) return;
+            const lobbyRef = doc(db, 'global_lobbies', currentLobbyId);
+            const userVoiceStatePath = `voiceState.${auth.currentUser.uid}`;
+            
+            try {
+                if (isOnline) {
+                    await updateDoc(lobbyRef, {
+                        [userVoiceStatePath]: { isMuted: isCurrentlyMuted }
+                    });
+                } else {
+                    // User is leaving the voice channel
+                    await updateDoc(lobbyRef, {
+                        [userVoiceStatePath]: deleteField()
+                    });
+                }
+            } catch (error) {
+                console.error("Error updating voice state in Firestore:", error);
+            }
+        }
+
 
         // --- Firebase Lobby Functions ---
         async function createLobby(lobbyName, userId, displayName, lobbyType, password) {
@@ -1545,6 +1803,7 @@
                     kickedPlayers: [], // Still an array of objects
                     createdAt: serverTimestamp(),
                     isChatLocked: false, 
+                    voiceState: {}, // --- NEW: VOICE CHAT --- Initial empty voice state map
                     gameSettings: { maxPlayers: 4, roundsToWin: 7 }
                 };
         
@@ -1589,19 +1848,10 @@
         
         function setupLobbyListener(searchTerm = '') {
             console.log(`شروع راه‌اندازی Listener لابی‌ها با عبارت جستجو: "${searchTerm}"`);
-            if (unsubscribeLobbyDetail) {
-                unsubscribeLobbyDetail();
-                unsubscribeLobbyDetail = null;
-                currentLobbyId = null;
-            }
-            if (unsubscribeKickedPlayers) {
-                unsubscribeKickedPlayers();
-                unsubscribeKickedPlayers = null;
-            }
-            if (unsubscribeLobbyChat) {
-                unsubscribeLobbyChat();
-                unsubscribeLobbyChat = null;
-            }
+            if (unsubscribeLobbyDetail) { unsubscribeLobbyDetail(); unsubscribeLobbyDetail = null; }
+            if (unsubscribeKickedPlayers) { unsubscribeKickedPlayers(); unsubscribeKickedPlayers = null; }
+            if (unsubscribeLobbyChat) { unsubscribeLobbyChat(); unsubscribeLobbyChat = null; }
+            if (currentLobbyId) { currentLobbyId = null; }
         
             lobbiesList.innerHTML = '<p class="text-gray-400">در حال بارگذاری لابی‌ها...</p>';
             userHasActiveLobby = false;
@@ -1798,6 +2048,7 @@
                     const maxPlayers = lobbyData.gameSettings?.maxPlayers || 4;
                     const isCurrentUserHost = auth.currentUser && lobbyData.hostId === auth.currentUser.uid;
                     const isChatLocked = lobbyData.isChatLocked || false;
+                    const voiceState = lobbyData.voiceState || {}; // --- NEW: VOICE CHAT ---
 
                     // Unsubscribe previous chat listener if host changes
                     if (unsubscribeLobbyChat) unsubscribeLobbyChat();
@@ -1819,21 +2070,29 @@
                         const isHost = player.uid === lobbyData.hostId;
                         const playerItem = document.createElement('div');
                         playerItem.className = 'player-list-item';
+                        playerItem.dataset.playerUid = player.uid; // Add UID for easy selection
                         if (isHost) playerItem.classList.add('is-host');
                         
                         const hostLabelHtml = isHost ? '<span class="host-label">(سازنده)</span>' : '';
                         
-                        // NEW: Conditionally create host action buttons
                         let actionButtonsHtml = '';
                         if (isCurrentUserHost && !isHost) {
                             const kickButtonHtml = `<button class="kick-player-btn" data-player-uid="${player.uid}" data-player-name="${player.displayName}">اخراج</button>`;
                             const makeHostButtonHtml = `<button class="make-host-btn" data-player-uid="${player.uid}" data-player-name="${player.displayName}">واگذاری مالکیت</button>`;
                             actionButtonsHtml = `<div class="player-action-buttons">${makeHostButtonHtml}${kickButtonHtml}</div>`;
                         }
+                        
+                        // --- NEW: VOICE CHAT --- Voice status icon logic
+                        const playerVoiceState = voiceState[player.uid];
+                        const isPlayerMuted = playerVoiceState ? playerVoiceState.isMuted : false;
+                        const micIconClass = `player-voice-status ${isPlayerMuted ? 'is-muted' : ''}`;
+                        const micIconSvg = isPlayerMuted 
+                            ? `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="${micIconClass}" data-player-uid="${player.uid}"><line x1="1" y1="1" x2="23" y2="23"/><path d="M9 9v3a3 3 0 0 0 5.12 2.12M15 9.34V4a3 3 0 0 0-5.94-.6"/><path d="M17 16.95A7 7 0 0 1 5 12v-2m14 0v2a7 7 0 0 1-.11 1.23"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>`
+                            : `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="${micIconClass}" data-player-uid="${player.uid}"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>`;
 
                         playerItem.innerHTML = `
                             <div class="flex items-center">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="mr-2 lucide lucide-user"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                                ${micIconSvg}
                                 <span class="player-name">${player.displayName}</span>
                                 ${hostLabelHtml}
                             </div>
@@ -1848,7 +2107,6 @@
                         startGameBtn.disabled = playerCount !== maxPlayers;
                         startGameBtn.textContent = `شروع بازی (${playerCount}/${maxPlayers})`;
                         
-                        // Manage chat lock button
                         toggleChatLockBtn.textContent = isChatLocked ? 'باز کردن چت' : 'قفل کردن چت';
 
                     } else {
@@ -1886,6 +2144,9 @@
             const lobbyRef = doc(db, `global_lobbies`, currentLobbyId);
             const userId = auth.currentUser.uid;
             try {
+                // --- NEW: VOICE CHAT --- Ensure we leave voice channel first
+                await leaveVoiceChannel(false); // We handle Firestore update manually below or via delete
+
                 const lobbySnap = await getDoc(lobbyRef);
                 if (!lobbySnap.exists()) {
                     setActiveScreen(lobbyScreen);
@@ -1898,7 +2159,8 @@
                     if (confirmed) await deleteDoc(lobbyRef);
                 } else {
                     await updateDoc(lobbyRef, {
-                        [`players.${userId}`]: deleteField()
+                        [`players.${userId}`]: deleteField(),
+                        [`voiceState.${userId}`]: deleteField() // Also remove from voice state
                     });
                     setActiveScreen(lobbyScreen);
                     unsubscribeLobbies = setupLobbyListener('');
@@ -1911,6 +2173,7 @@
             try {
                 await updateDoc(lobbyRef, {
                     [`players.${playerToKickUid}`]: deleteField(),
+                    [`voiceState.${playerToKickUid}`]: deleteField(), // --- NEW: VOICE CHAT --- Also remove from voice state
                     kickedPlayers: arrayUnion({ uid: playerToKickUid, displayName: playerToKickDisplayName })
                 });
                 showMessageBox(`بازیکن "${playerToKickDisplayName}" اخراج شد.`, "success");
@@ -2184,7 +2447,6 @@
             }, 1000);
         });
 
-        // MODIFIED: Replaced myLobbiesBtn with quickJoinBtn
         quickJoinBtn.addEventListener('click', async () => {
             if (!auth.currentUser) { showMessageBox("برای ورود، ابتدا وارد شوید.", "info"); return; }
             if (userHasActiveLobby) { showMessageBox("شما از قبل در یک لابی فعال هستید.", "info"); return; }
@@ -2259,6 +2521,11 @@
                 showMessageBox("خطا در تغییر وضعیت چت.", "error");
             }
         });
+
+        // --- NEW: VOICE CHAT --- Event listeners for voice controls
+        joinVoiceBtn.addEventListener('click', joinVoiceChannel);
+        leaveVoiceBtn.addEventListener('click', () => leaveVoiceChannel(true));
+        muteVoiceBtn.addEventListener('click', toggleMute);
 
         // Event delegation for player list actions (Kick, Make Host)
         playerListContainer.addEventListener('click', async (e) => {
