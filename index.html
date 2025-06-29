@@ -541,6 +541,11 @@
             font-size: 0.8rem;
             margin-right: 0.5rem;
         }
+        /* NEW: Container for host action buttons next to player name */
+        .player-action-buttons {
+            display: flex;
+            gap: 0.5rem;
+        }
         .kick-player-btn {
             background: none;
             border: 1px solid #B22222;
@@ -554,6 +559,21 @@
         .kick-player-btn:hover {
             background: #B22222;
             color: white;
+        }
+        /* NEW: Style for Make Host button */
+        .make-host-btn {
+            background: none;
+            border: 1px solid #DAA520;
+            color: #DAA520;
+            border-radius: 5px;
+            padding: 0.2rem 0.5rem;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .make-host-btn:hover {
+            background: #DAA520;
+            color: #1A1A1A;
         }
 
         .lobby-chat-container {
@@ -846,11 +866,12 @@
                     </svg>
                     <span>بروزرسانی</span>
                 </button>
-                <button id="my-lobbies-btn" class="icon-btn">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-users">
-                        <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                <!-- MODIFIED: "My Lobbies" button is now "Quick Join" -->
+                <button id="quick-join-btn" class="icon-btn">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-zap">
+                        <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
                     </svg>
-                    <span>لابی‌های من</span>
+                    <span>ورود سریع</span>
                 </button>
                 <div class="games-running-text">
                     <span id="active-games-count">0</span>
@@ -1117,7 +1138,7 @@
         const lobbiesList = document.getElementById('lobbies-list');
         const addIconBtn = document.getElementById('add-icon-btn'); // Footer icon
         const refreshLobbiesBtn = document.getElementById('refresh-lobbies-btn'); // Footer icon
-        const myLobbiesBtn = document.getElementById('my-lobbies-btn'); // Footer icon
+        const quickJoinBtn = document.getElementById('quick-join-btn'); // MODIFIED: Was myLobbiesBtn
         const activeGamesCount = document.getElementById('active-games-count');
 
         // Profile Modal Elements
@@ -1523,7 +1544,7 @@
                     },
                     kickedPlayers: [], // Still an array of objects
                     createdAt: serverTimestamp(),
-                    isChatLocked: false, // NEW: Chat is open by default
+                    isChatLocked: false, 
                     gameSettings: { maxPlayers: 4, roundsToWin: 7 }
                 };
         
@@ -1799,12 +1820,16 @@
                         const playerItem = document.createElement('div');
                         playerItem.className = 'player-list-item';
                         if (isHost) playerItem.classList.add('is-host');
-
-                        const kickButtonHtml = (isCurrentUserHost && !isHost) 
-                            ? `<button class="kick-player-btn" data-player-uid="${player.uid}" data-player-name="${player.displayName}">اخراج</button>` 
-                            : '';
                         
                         const hostLabelHtml = isHost ? '<span class="host-label">(سازنده)</span>' : '';
+                        
+                        // NEW: Conditionally create host action buttons
+                        let actionButtonsHtml = '';
+                        if (isCurrentUserHost && !isHost) {
+                            const kickButtonHtml = `<button class="kick-player-btn" data-player-uid="${player.uid}" data-player-name="${player.displayName}">اخراج</button>`;
+                            const makeHostButtonHtml = `<button class="make-host-btn" data-player-uid="${player.uid}" data-player-name="${player.displayName}">واگذاری مالکیت</button>`;
+                            actionButtonsHtml = `<div class="player-action-buttons">${makeHostButtonHtml}${kickButtonHtml}</div>`;
+                        }
 
                         playerItem.innerHTML = `
                             <div class="flex items-center">
@@ -1812,16 +1837,10 @@
                                 <span class="player-name">${player.displayName}</span>
                                 ${hostLabelHtml}
                             </div>
-                            ${kickButtonHtml}
+                            ${actionButtonsHtml}
                         `;
                         playerListContainer.appendChild(playerItem);
                     }
-
-                    playerListContainer.querySelectorAll('.kick-player-btn').forEach(button => {
-                        button.addEventListener('click', (e) => {
-                           openKickPlayerConfirmModal(e.currentTarget.dataset.playerName, e.currentTarget.dataset.playerUid);
-                        });
-                    });
 
                     // Manage Host Actions
                     if (isCurrentUserHost) {
@@ -1897,6 +1916,21 @@
                 showMessageBox(`بازیکن "${playerToKickDisplayName}" اخراج شد.`, "success");
                 closeKickPlayerConfirmModal();
             } catch (e) { console.error("Error kicking player:", e); showMessageBox("خطا در اخراج بازیکن.", "error"); }
+        }
+
+        // NEW: Function to transfer lobby ownership
+        async function transferLobbyOwnership(lobbyId, newHostUid) {
+            if (!lobbyId || !newHostUid) return;
+            const lobbyRef = doc(db, 'global_lobbies', lobbyId);
+            try {
+                await updateDoc(lobbyRef, {
+                    hostId: newHostUid
+                });
+                showMessageBox("مالکیت لابی با موفقیت منتقل شد.", "success");
+            } catch (e) {
+                console.error("Error transferring ownership:", e);
+                showMessageBox("خطا در انتقال مالکیت لابی.", "error");
+            }
         }
 
         async function unkickPlayer(lobbyId, playerToUnkickUid) {
@@ -2150,7 +2184,47 @@
             }, 1000);
         });
 
-        myLobbiesBtn.addEventListener('click', () => showMessageBox("لابی‌های من به زودی!", "info"));
+        // MODIFIED: Replaced myLobbiesBtn with quickJoinBtn
+        quickJoinBtn.addEventListener('click', async () => {
+            if (!auth.currentUser) { showMessageBox("برای ورود، ابتدا وارد شوید.", "info"); return; }
+            if (userHasActiveLobby) { showMessageBox("شما از قبل در یک لابی فعال هستید.", "info"); return; }
+
+            quickJoinBtn.disabled = true;
+            showMessageBox("در حال جستجوی لابی برای ورود سریع...", "info");
+
+            try {
+                const q = query(
+                    collection(db, "global_lobbies"),
+                    where("status", "==", "waiting"),
+                    where("type", "==", "public")
+                );
+                const querySnapshot = await getDocs(q);
+                
+                let availableLobbies = [];
+                querySnapshot.forEach(doc => {
+                    const lobby = { id: doc.id, ...doc.data() };
+                    const playerCount = Object.keys(lobby.players || {}).length;
+                    const maxPlayers = lobby.gameSettings?.maxPlayers || 4;
+                    const isKicked = lobby.kickedPlayers?.some(p => p.uid === auth.currentUser.uid);
+                    if (playerCount < maxPlayers && !isKicked) {
+                        availableLobbies.push(lobby);
+                    }
+                });
+
+                if (availableLobbies.length > 0) {
+                    const randomLobby = availableLobbies[Math.floor(Math.random() * availableLobbies.length)];
+                    await joinLobby(randomLobby.id, auth.currentUser.uid, currentUserData.displayName);
+                } else {
+                    showMessageBox("هیچ لابی عمومی برای ورود سریع یافت نشد.", "error");
+                }
+            } catch (error) {
+                console.error("Error during Quick Join:", error);
+                showMessageBox("خطا در عملیات ورود سریع.", "error");
+            } finally {
+                quickJoinBtn.disabled = false;
+            }
+        });
+        
         lobbySearchInput.addEventListener('input', (e) => {
             if (unsubscribeLobbies) unsubscribeLobbies();
             unsubscribeLobbies = setupLobbyListener(e.target.value.trim().toLowerCase());
@@ -2171,7 +2245,6 @@
             }
         });
         
-        // NEW: Toggle Chat Lock Listener
         toggleChatLockBtn.addEventListener('click', async () => {
             if (!currentLobbyId || !auth.currentUser) return;
             const lobbyRef = doc(db, 'global_lobbies', currentLobbyId);
@@ -2184,6 +2257,27 @@
             } catch (error) {
                 console.error("Error toggling chat lock:", error);
                 showMessageBox("خطا در تغییر وضعیت چت.", "error");
+            }
+        });
+
+        // Event delegation for player list actions (Kick, Make Host)
+        playerListContainer.addEventListener('click', async (e) => {
+            const kickButton = e.target.closest('.kick-player-btn');
+            const makeHostButton = e.target.closest('.make-host-btn');
+
+            if (kickButton) {
+                const playerName = kickButton.dataset.playerName;
+                const playerUid = kickButton.dataset.playerUid;
+                openKickPlayerConfirmModal(playerName, playerUid);
+            }
+
+            if (makeHostButton) {
+                const playerName = makeHostButton.dataset.playerName;
+                const playerUid = makeHostButton.dataset.playerUid;
+                const confirmed = await showCustomConfirm(`آیا مطمئن هستید که می‌خواهید مالکیت لابی را به "${playerName}" منتقل کنید؟ شما تمام اختیارات سازندگی را از دست خواهید داد.`, 'واگذاری مالکیت');
+                if (confirmed) {
+                    await transferLobbyOwnership(currentLobbyId, playerUid);
+                }
             }
         });
 
@@ -2289,7 +2383,7 @@
             }
         });
 
-        // NEW: Event Delegation for Message Deletion
+        // Event Delegation for Message Deletion
         lobbyChatMessages.addEventListener('click', (e) => {
             const deleteButton = e.target.closest('.delete-message-btn');
             if (deleteButton) {
