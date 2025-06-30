@@ -2453,6 +2453,8 @@
                 const handContainer = playerSlots[slotName].querySelector('.player-hand');
                 handContainer.innerHTML = ''; // Clear old cards
 
+                /*
+                // --- CARD RENDERING LOGIC DISABLED AS PER INSTRUCTIONS ---
                 if (uid === myUid) {
                     // My hand - face up
                     hand.sort(); // Sort my hand for better view
@@ -2465,6 +2467,7 @@
                         handContainer.appendChild(createCardElement(null, true));
                     });
                 }
+                */
             }
              // TODO: Render scores, hokm, and play area later
         }
