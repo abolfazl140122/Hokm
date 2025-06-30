@@ -701,30 +701,77 @@
         .lobby-type-btn.active { background-color: #DAA520; color: #1A1A1A; box-shadow: 0 0 10px rgba(255,215,0,0.5); }
         .lobby-lock-icon { width: 1.2rem; height: 1.2rem; margin-left: 0.5rem; color: #FFD700; display: inline-block; vertical-align: middle; }
 
-        /* === Game Screen Styles (NEW) === */
+        /* === Game Screen Styles (REDESIGNED) === */
         #game-screen {
-            background: linear-gradient(180deg, #2C2C2C 0%, #1A1A1A 100%);
+            background: radial-gradient(ellipse at bottom, #100C08 0%, #000000 100%);
+            transform-style: preserve-3d;
+            perspective: 2000px;
         }
         #game-table {
-            background: radial-gradient(ellipse at center, #004d00 0%, #002900 100%); /* Dark green felt */
+            background: #6B4F35; /* Fallback color for the wooden table */
+            background-image: radial-gradient(ellipse at center, rgba(160, 127, 92, 0.8) 0%, rgba(74, 51, 32, 0.9) 100%),
+                              repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(255,255,255,0.02) 10px, rgba(255,255,255,0.02) 20px);
+            border: 15px solid #4A3320;
+            border-image-source: linear-gradient(145deg, #4A3320, #8C6F4F, #4A3320);
+            border-image-slice: 1;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.85), inset 0 0 40px rgba(0,0,0,0.7);
+            border-radius: 100px;
             transform-style: preserve-3d;
+            position: relative;
         }
         .player-slot {
             transform-style: preserve-3d; /* Allows child transforms to work correctly */
         }
+
+        /* NEW: Player Info Pod Styling */
+        .player-area-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem; /* 8px */
+            padding: 0.5rem; /* 8px */
+            border-radius: 12px;
+            transition: all 0.3s ease-in-out;
+            z-index: 10;
+        }
+        .player-avatar {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(145deg, #333, #111);
+            border: 3px solid #DAA520;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #FFD700;
+            box-shadow: inset 0 3px 6px rgba(0,0,0,0.6), 0 2px 4px rgba(0,0,0,0.4);
+        }
+        .player-avatar svg {
+            width: 32px;
+            height: 32px;
+        }
+        .player-name-display {
+            color: white;
+            font-weight: bold;
+            text-shadow: 2px 2px 3px #000;
+            background: rgba(0,0,0,0.5);
+            padding: 0.2rem 0.8rem;
+            border-radius: 8px;
+        }
+        .player-slot.active-turn .player-area-container {
+            transform: scale(1.1);
+            background-color: rgba(255, 215, 0, 0.1);
+            box-shadow: 0 0 25px rgba(255, 215, 0, 0.8), 0 0 10px rgba(255, 255, 255, 0.5);
+        }
+         .player-slot.active-turn .player-name-display {
+             color: #FFD700;
+        }
+
         .player-slot .player-hand {
             display: flex;
             perspective: 800px; /* Adds depth to card arrangements */
         }
-        .player-slot.active-turn .player-name-display {
-            box-shadow: 0 0 15px #FFD700, 0 0 5px #FFF;
-            color: #FFD700;
-            transform: scale(1.1);
-            transition: all 0.3s ease;
-        }
-        .player-name-display {
-            transition: all 0.3s ease;
-        }
+
         /* Styles for playing cards */
         .card {
             width: 70px;
@@ -758,6 +805,7 @@
         /* My hand cards (bottom player) */
         #player-slot-bottom .player-hand {
              gap: -35px; /* Overlap cards */
+             margin-top: -30px; /* Pull cards up slightly over the table edge */
         }
         #player-slot-bottom .card:not(.back) {
             cursor: pointer;
@@ -767,23 +815,30 @@
             z-index: 100; /* Bring hovered card to front */
             box-shadow: 0 12px 24px rgba(0,0,0,0.5);
         }
-
-        /* Side players' hands */
+        
+        /* Side players' hands & info pods */
         #player-slot-left, #player-slot-right {
-             gap: -80px; /* Overlap vertical cards */
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+        #player-slot-right {
+             flex-direction: row-reverse;
         }
         #player-slot-left .player-hand, #player-slot-right .player-hand {
             flex-direction: column;
+            gap: -80px; /* Overlap vertical cards */
         }
 
-        /* Top player's hand */
+        /* Top player's hand & info pod */
+        #player-slot-top .player-area-container {
+             flex-direction: column-reverse;
+        }
         #player-slot-top .player-hand {
              gap: -35px; /* Overlap cards */
+             margin-bottom: -30px;
         }
-        #player-slot-top .card {
-            transform: rotate(180deg);
-        }
-
+        
         /* Cards in the play area */
         #play-area {
             transform-style: preserve-3d;
@@ -793,6 +848,7 @@
             position: absolute;
             transform: none; /* Reset hover transforms */
             box-shadow: 0 8px 16px rgba(0,0,0,0.5);
+            transition: transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
         }
         /* Positioning and rotation for played cards */
         #play-area .played-card-bottom {
@@ -815,20 +871,22 @@
         }
 
         /* General player slot positioning */
-        #player-slot-bottom { bottom: 20px; left: 50%; transform: translateX(-50%); }
-        #player-slot-top { top: 20px; left: 50%; transform: translateX(-50%); }
-        #player-slot-left { left: 20px; top: 50%; transform: translateY(-50%); }
-        #player-slot-right { right: 20px; top: 50%; transform: translateY(-50%); }
+        #player-slot-bottom { bottom: 20px; left: 50%; transform: translateX(-50%); flex-direction: column; align-items: center; }
+        #player-slot-top { top: 20px; left: 50%; transform: translateX(-50%); flex-direction: column; align-items: center;}
+        #player-slot-left { left: 40px; top: 50%; transform: translateY(-50%); }
+        #player-slot-right { right: 40px; top: 50%; transform: translateY(-50%); }
 
         @media (max-width: 768px) {
             .card { width: 50px; height: 75px; font-size: 18px; border-radius: 4px; }
             .card-suit { font-size: 16px; }
             #player-slot-bottom .player-hand, #player-slot-top .player-hand { gap: -25px; }
-            #player-slot-left, #player-slot-right { gap: -60px; }
+            #player-slot-left .player-hand, #player-slot-right .player-hand { gap: -60px; }
              #player-slot-bottom { bottom: 10px; }
             #player-slot-top { top: 10px; }
             #player-slot-left { left: 10px; }
             #player-slot-right { right: 10px; }
+            .player-avatar { width: 50px; height: 50px; }
+            .player-avatar svg { width: 24px; height: 24px; }
         }
     </style>
 </head>
@@ -1113,8 +1171,8 @@
                                 لیست اخراجی‌ها
                             </button>
                         </div>
-                        <button id="leave-lobby-btn" class="classic-btn btn-red-classic text-sm py-2 px-4">
-                            ترک لابی
+                        <button id="leave-lobby-btn" class="classic-btn btn-red-classic text-sm py-2 px-4 hidden">
+                            بستن لابی
                         </button>
                     </div>
                 </div>
@@ -1122,7 +1180,7 @@
             </div>
         </div>
 
-        <!-- 9. Game Screen (NEW) -->
+        <!-- 9. Game Screen (REDESIGNED) -->
         <div id="game-screen" class="hidden absolute inset-0 z-30 page-transition-active page-transition-hidden flex flex-col items-center justify-center p-2" tabindex="-1">
             <!-- Game Header: Score, Hokm, etc. -->
             <div class="absolute top-0 left-0 right-0 h-20 bg-black bg-opacity-40 flex justify-between items-center px-4 z-20">
@@ -1138,7 +1196,7 @@
             </div>
 
             <!-- Main Game Table -->
-            <div id="game-table" class="relative w-[98vw] h-[85vh] max-w-[1200px] max-h-[800px] rounded-[75px] border-4 border-yellow-900 shadow-2xl flex items-center justify-center">
+            <div id="game-table" class="relative w-[98vw] h-[85vh] max-w-[1200px] max-h-[800px] flex items-center justify-center">
                 <!-- Center play area -->
                 <div id="play-area" class="absolute w-80 h-48 flex items-center justify-center">
                     <!-- Cards played in the current trick will appear here -->
@@ -1146,26 +1204,35 @@
 
                 <!-- Player Slots -->
                 <div id="player-slot-bottom" class="player-slot absolute">
-                    <div class="player-info text-center mb-2">
-                        <span class="player-name-display text-white font-bold bg-black bg-opacity-60 px-4 py-1 rounded-lg">شما</span>
+                    <div class="player-area-container">
+                        <div class="player-avatar">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-user-round"><circle cx="12" cy="8" r="5"/><path d="M20 21a8 8 0 0 0-16 0"/></svg>
+                        </div>
+                        <span class="player-name-display">شما</span>
                     </div>
                     <div class="player-hand flex justify-center">
-                        <!-- Player's cards -->
+                        <!-- Player's cards generated by JS -->
                     </div>
                 </div>
 
                 <div id="player-slot-left" class="player-slot absolute">
-                     <div class="player-info text-center">
-                        <span class="player-name-display text-white font-bold bg-black bg-opacity-60 px-4 py-1 rounded-lg">بازیکن ۲</span>
-                    </div>
                     <div class="player-hand flex justify-center">
-                        <!-- Opponent's cards (face down) -->
+                         <!-- Opponent's cards (face down) -->
+                    </div>
+                    <div class="player-area-container">
+                        <div class="player-avatar">
+                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-user-round"><circle cx="12" cy="8" r="5"/><path d="M20 21a8 8 0 0 0-16 0"/></svg>
+                        </div>
+                        <span class="player-name-display">بازیکن ۲</span>
                     </div>
                 </div>
 
                 <div id="player-slot-top" class="player-slot absolute">
-                     <div class="player-info text-center mt-2">
-                        <span class="player-name-display text-white font-bold bg-black bg-opacity-60 px-4 py-1 rounded-lg">یار شما</span>
+                     <div class="player-area-container">
+                        <div class="player-avatar">
+                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-user-round"><circle cx="12" cy="8" r="5"/><path d="M20 21a8 8 0 0 0-16 0"/></svg>
+                        </div>
+                        <span class="player-name-display">یار شما</span>
                     </div>
                     <div class="player-hand flex justify-center">
                         <!-- Partner's cards (face down) -->
@@ -1173,11 +1240,14 @@
                 </div>
 
                 <div id="player-slot-right" class="player-slot absolute">
-                     <div class="player-info text-center">
-                        <span class="player-name-display text-white font-bold bg-black bg-opacity-60 px-4 py-1 rounded-lg">بازیکن ۴</span>
-                    </div>
                     <div class="player-hand flex justify-center">
                         <!-- Opponent's cards (face down) -->
+                    </div>
+                    <div class="player-area-container">
+                        <div class="player-avatar">
+                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-user-round"><circle cx="12" cy="8" r="5"/><path d="M20 21a8 8 0 0 0-16 0"/></svg>
+                        </div>
+                        <span class="player-name-display">بازیکن ۴</span>
                     </div>
                 </div>
             </div>
@@ -2051,6 +2121,16 @@
                         });
                     });
 
+                    // === LOGIC CHANGE: Manage "Leave/Close Lobby" Button Visibility ===
+                    if (isCurrentUserHost) {
+                        leaveLobbyBtn.classList.remove('hidden');
+                        leaveLobbyBtn.textContent = 'بستن لابی'; // Host closes the lobby
+                    } else {
+                        // Per instructions, the leave button is hidden for non-hosts.
+                        // They must use the back button in the header (if available) or restart to leave.
+                        leaveLobbyBtn.classList.add('hidden');
+                    }
+
                     // Manage Host Actions
                     if (isCurrentUserHost) {
                         hostActionsContainer.style.display = 'flex';
@@ -2100,10 +2180,16 @@
                     return;
                 }
                 const isHost = lobbySnap.data().hostId === userId;
+                // The button is now only visible to the host, so this check is redundant but safe.
                 if (isHost) {
-                    const confirmed = await showCustomConfirm("شما سازنده لابی هستید. خروج شما باعث بسته شدن لابی برای همه می‌شود. آیا مطمئن هستید؟");
-                    if (confirmed) await deleteDoc(lobbyRef);
+                    const confirmed = await showCustomConfirm("شما سازنده لابی هستید. خروج شما باعث بسته شدن لابی برای همه می‌شود. آیا مطمئن هستید؟", "بستن لابی");
+                    if (confirmed) {
+                        await deleteDoc(lobbyRef);
+                        // The onSnapshot listener will handle screen transition for all players.
+                    }
                 } else {
+                    // This block is now unreachable via the UI as per the new requirement, but the logic is kept for safety.
+                    console.warn("A non-host tried to leave the lobby. This path should not be reachable.");
                     await updateDoc(lobbyRef, {
                         [`players.${userId}`]: deleteField()
                     });
@@ -2349,10 +2435,12 @@
                 const slotElement = playerSlots[slotName];
                 const nameDisplay = slotElement.querySelector('.player-name-display');
                 nameDisplay.textContent = gameState.playerNames[uid];
+
+                // Clear previous active turns before setting the new one
+                Object.values(playerSlots).forEach(slot => slot.classList.remove('active-turn'));
+
                 if (uid === gameState.currentTurn) {
                     slotElement.classList.add('active-turn');
-                } else {
-                    slotElement.classList.remove('active-turn');
                 }
             }
 
