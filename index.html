@@ -4,298 +4,1091 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>بازی حکم کلاسیک</title>
-    <!-- Tailwind CSS CDN -->
+    <!-- Tailwind CSS CDN for styling -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Google Fonts -->
+    <!-- Google Fonts for Classic Look -->
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Merriweather:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        /* ======================================================================== */
-        /*                          پایه و تم کلی                                  */
-        /* ======================================================================== */
-        html, body, #app { height: 100%; margin: 0; padding: 0; overflow: hidden; }
+        /* General Classic Theme Background and Fonts */
+        html, body, #app { /* Ensure these take full viewport height */
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            overflow: hidden; /* Prevent body scrollbars, including horizontal */
+        }
         body {
-            font-family: 'Merriweather', serif;
-            background: radial-gradient(ellipse at bottom, #100C08 0%, #000000 100%);
-            color: #E0E0E0;
+            font-family: 'Merriweather', serif; /* Default body font for readability */
+            /* Deep, rich, slightly textured background for classic feel */
+            background: radial-gradient(ellipse at bottom, #100C08 0%, #000000 100%); /* Darker, more intense background */
+            color: #E0E0E0; /* Softer white text for elegance */
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
         }
 
-        h1, h2, h3 { font-family: 'Playfair Display', serif; color: #FFD700; text-shadow: 2px 2px 4px rgba(0,0,0,0.5); }
-        .page-transition-active { transition: opacity 0.6s ease-in-out; }
-        .page-transition-hidden { opacity: 0; }
-        .page-transition-visible { opacity: 1; }
+        h1, h2 {
+            font-family: 'Playfair Display', serif; /* Elegant headings */
+            color: #FFD700; /* Gold color for titles */
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5); /* Subtle text shadow for depth */
+        }
 
-        /* ======================================================================== */
-        /*                      کارت‌ها و مودال‌های کلاسیک                            */
-        /* ======================================================================== */
+        /* Custom spinner for loading screen - Gold themed */
+        .spinner {
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-top: 4px solid #DAA520; /* Gold spinner */
+            border-radius: 50%;
+            width: 50px; /* Slightly larger spinner */
+            height: 50px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* NEW: Animation for refresh button icon */
+        @keyframes spin-refresh {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        .is-refreshing {
+            animation: spin-refresh 0.8s ease-in-out;
+        }
+
+        /* Page transition animation */
+        .page-transition-active {
+            transition: opacity 0.6s ease-in-out; /* Slightly slower transition */
+        }
+        .page-transition-hidden {
+            opacity: 0;
+        }
+        .page-transition-visible {
+            opacity: 1;
+        }
+
+        /* Classic Card/Modal Styling - More detailed */
         .classic-card {
-            background: linear-gradient(145deg, #4B0000 0%, #660000 60%, #800000 100%);
-            border: 4px solid #DAA520;
-            border-radius: 20px;
-            box-shadow: 0 15px 30px rgba(0,0,0,0.6), inset 0 0 15px rgba(255,255,255,0.1);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            position: relative;
-            max-height: 95vh; /* کمی بیشتر فضا */
-            overflow-y: auto;
-            overflow-x: hidden;
+            background: linear-gradient(145deg, #4B0000 0%, #660000 60%, #800000 100%); /* Deeper ruby red velvet effect */
+            border: 4px solid #DAA520; /* Goldenrod border */
+            border-radius: 20px; /* Slightly larger radius */
+            box-shadow: 0 15px 30px rgba(0,0,0,0.6), inset 0 0 15px rgba(255,255,255,0.1); /* Deeper outer shadow, subtle inner light */
+            backdrop-filter: blur(10px); /* Stronger blur for more prominent glass effect */
+            -webkit-backdrop-filter: blur(10px); /* For Safari */
+            position: relative; /* For pseudo-elements */
+            max-height: 90vh; /* Ensure card doesn't overflow viewport */
+            overflow-y: hidden; /* Removed vertical scrollbars */
+            overflow-x: hidden; /* Ensure horizontal scrollbar is hidden for cards */
         }
-        .classic-card::before, .classic-card::after { content: ''; position: absolute; width: 30px; height: 30px; box-shadow: 0 0 10px rgba(255,215,0,0.5); }
-        .classic-card::before { top: -10px; left: -10px; border-top: 5px solid #FFD700; border-left: 5px solid #FFD700; border-radius: 5px 0 0 0; }
-        .classic-card::after { bottom: -10px; right: -10px; border-bottom: 5px solid #FFD700; border-right: 5px solid #FFD700; border-radius: 0 0 5px 0; }
+        .classic-card::before { /* Top left ornamental corner */
+            content: '';
+            position: absolute;
+            top: -10px;
+            left: -10px;
+            width: 30px;
+            height: 30px;
+            border-top: 5px solid #FFD700;
+            border-left: 5px solid #FFD700;
+            border-radius: 5px 0 0 0;
+            box-shadow: 0 0 10px rgba(255,215,0,0.5);
+        }
+        .classic-card::after { /* Bottom right ornamental corner */
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            right: -10px;
+            width: 30px;
+            height: 30px;
+            border-bottom: 5px solid #FFD700;
+            border-right: 5px solid #FFD700;
+            border-radius: 0 0 5px 0;
+            box-shadow: 0 0 10px rgba(255,215,0,0.5);
+        }
 
-        /* ======================================================================== */
-        /*                           دکمه‌ها و ورودی‌ها                                */
-        /* ======================================================================== */
-        .classic-btn { border: 2px solid #DAA520; border-radius: 15px; font-weight: 700; text-shadow: 1px 1px 2px rgba(0,0,0,0.6); transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1); box-shadow: 0 8px 16px rgba(0,0,0,0.4), inset 0 0 8px rgba(255,255,255,0.1); color: #FFFFFF; padding: 0.875rem 1.5rem; font-size: 1.125rem; position: relative; overflow: hidden; }
-        .classic-btn::before { content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: rgba(255,255,255,0.1); transform: skewX(-30deg); transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1); }
-        .classic-btn:hover::before { left: 100%; }
-        .classic-btn:hover { transform: translateY(-5px) scale(1.03); box-shadow: 0 12px 24px rgba(0,0,0,0.6), inset 0 0 10px rgba(255,255,255,0.2); }
-        .classic-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: none; background: #555 !important; border-color: #777 !important; }
 
-        .btn-purple-classic { background: linear-gradient(145deg, #8A2BE2 0%, #6A0DAD 100%); }
-        .btn-blue-classic { background: linear-gradient(145deg, #4682B4 0%, #2A52BE 100%); }
-        .btn-green-classic { background: linear-gradient(145deg, #228B22 0%, #006400 100%); }
-        .btn-red-classic { background: linear-gradient(145deg, #CD5C5C 0%, #B22222 100%); }
-        .btn-gray-classic { background: linear-gradient(145deg, #A9A9A9 0%, #808080 100%); }
+        /* Button Base Styles - More polished Classic Look */
+        .classic-btn {
+            border: 2px solid #DAA520; /* Golden border for all buttons */
+            border-radius: 15px; /* Slightly rounded corners */
+            font-weight: 700; /* Bold text */
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.6); /* Text shadow for elegance */
+            transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1); /* Smoother transition */
+            box-shadow: 0 8px 16px rgba(0,0,0,0.4), inset 0 0 8px rgba(255,255,255,0.1); /* Deeper outer shadow, subtle inner light */
+            color: #FFFFFF; /* White text on buttons */
+            padding: 0.875rem 1.5rem; /* Equivalent to py-3.5 px-6 */
+            font-size: 1.125rem; /* Equivalent to text-lg */
+            position: relative; /* For pseudo-elements */
+            overflow: hidden; /* To contain the hover overlay */
+        }
+        .classic-btn::before { /* Subtle light effect on hover */
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: rgba(255,255,255,0.1);
+            transform: skewX(-30deg);
+            transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+        .classic-btn:hover::before {
+            left: 100%;
+        }
+        .classic-btn:hover {
+            transform: translateY(-5px) scale(1.03); /* More pronounced lift and scale */
+            box-shadow: 0 12px 24px rgba(0,0,0,0.6), inset 0 0 10px rgba(255,255,255,0.2); /* Stronger shadow on hover */
+        }
+        .classic-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.4), inset 0 0 8px rgba(255,255,255,0.1);
+        }
 
-        input { background-color: #202020; border: 2px solid #5A5A5A; color: #E0E0E0; padding: 0.875rem; border-radius: 0.75rem; box-shadow: inset 0 2px 4px rgba(0,0,0,0.5); }
-        input:focus { border-color: #DAA520 !important; box-shadow: 0 0 0 4px rgba(218, 165, 32, 0.5) !important, inset 0 2px 4px rgba(0,0,0,0.5) !important; }
+        /* Specific Button Colors - Classic Pallette */
+        .btn-purple-classic {
+            background: linear-gradient(145deg, #8A2BE2 0%, #6A0DAD 100%); /* Amethyst */
+        }
+        .btn-blue-classic {
+            background: linear-gradient(145deg, #4682B4 0%, #2A52BE 100%); /* Steel Blue / Royal Blue */
+        }
+        .btn-green-classic {
+            background: linear-gradient(145deg, #228B22 0%, #006400 100%); /* Forest Green */
+        }
+        .btn-red-classic {
+            background: linear-gradient(145deg, #CD5C5C 0%, #B22222 100%); /* Indian Red / Firebrick */
+        }
+        .btn-gray-classic {
+            background: linear-gradient(145deg, #A9A9A9 0%, #808080 100%); /* Dark Gray */
+        }
+        .btn-brown-classic { /* New for Profile/Shop */
+            background: linear-gradient(145deg, #8B4513 0%, #69320E 100%); /* Saddle Brown / Dark Sienna */
+        }
+        .btn-gold-classic { /* For footer icons */
+            background: linear-gradient(145deg, #FFD700 0%, #DAA520 100%); /* Gold */
+            border: none; /* No border for these small buttons */
+            padding: 0.5rem;
+            border-radius: 10px;
+        }
+        .btn-gold-classic:hover {
+            transform: translateY(-2px) scale(1.05);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.5), inset 0 0 5px rgba(255,255,255,0.3);
+        }
 
-        /* ======================================================================== */
-        /*                           هدر، فوتر و محتوا اصلی                          */
-        /* ======================================================================== */
-        .app-header, .lobby-header { background: linear-gradient(to right, #4A2B00 0%, #7A4C00 50%, #4A2B00 100%); border-bottom: 3px solid #FFD700; box-shadow: 0 8px 20px rgba(0,0,0,0.7); height: 70px; position: fixed; top: 0; left: 0; right: 0; z-index: 40; padding: 0.75rem 1rem; display: flex; align-items: center; justify-content: space-between; }
-        .app-footer, .lobby-footer { background: linear-gradient(to left, #4A2B00 0%, #7A4C00 50%, #4A2B00 100%); border-top: 3px solid #FFD700; box-shadow: 0 -8px 20px rgba(0,0,0,0.7); height: 90px; position: fixed; bottom: 0; left: 0; right: 0; z-index: 40; padding: 1rem; display: flex; justify-content: space-around; align-items: center; }
-        .main-content-area { padding-top: 70px; padding-bottom: 90px; flex-grow: 1; overflow-y: auto; overflow-x: hidden; width: 100%; display: flex; flex-direction: column; align-items: center; }
 
-        /* ======================================================================== */
-        /*                   استایل‌های اختصاصی قابلیت‌های جدید                      */
-        /* ======================================================================== */
+        /* Input Field Styles - More refined Classic Look */
+        input {
+            background-color: #202020; /* Even darker input background */
+            border: 2px solid #5A5A5A; /* Dark gray border */
+            color: #E0E0E0; /* Light text color */
+            padding: 0.875rem; /* Equivalent to p-3.5 */
+            border-radius: 0.75rem; /* Equivalent to rounded-xl */
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.5); /* Inner shadow for depth */
+        }
+        input::placeholder {
+            color: #A0A0A0; /* Lighter placeholder text */
+        }
+        input:focus {
+            border-color: #DAA520 !important; /* Gold border on focus */
+            box-shadow: 0 0 0 4px rgba(218, 165, 32, 0.5) !important, inset 0 2px 4px rgba(0,0,0,0.5) !important; /* Gold focus ring with inner shadow */
+        }
 
-        /* --- مودال پروفایل پیشرفته --- */
-        #profile-xp-bar-container { background-color: #333; border: 2px solid #555; border-radius: 9999px; padding: 2px; }
-        #profile-xp-bar { background: linear-gradient(90deg, #DAA520, #FFD700); border-radius: 9999px; transition: width 0.5s ease-in-out; }
-        .stat-card { background: rgba(0,0,0,0.4); border: 1px solid #444; border-radius: 12px; padding: 1rem; }
-        .stat-card-value { font-family: 'Playfair Display', serif; font-size: 1.75rem; color: #fff; }
-        .stat-card-label { font-size: 0.9rem; color: #aaa; }
+        /* Header specific styles - Richer Gold/Brown */
+        .app-header {
+            background: linear-gradient(to right, #4A2B00 0%, #7A4C00 50%, #4A2B00 100%); /* Richer gold/brown gradient */
+            border-bottom: 3px solid #FFD700; /* Thicker gold border */
+            box-shadow: 0 8px 20px rgba(0,0,0,0.7); /* Deeper shadow */
+            height: 70px; /* Fixed height for header */
+            position: fixed; /* Explicitly fixed */
+            top: 0; left: 0; right: 0;
+            z-index: 40;
+            padding: 0.75rem 1rem; /* Adjust padding */
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        /* Lobby Screen Specific Header */
+        .lobby-header {
+            background: linear-gradient(to right, #4A2B00 0%, #7A4C00 50%, #4A2B00 100%);
+            border-bottom: 3px solid #FFD700;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.7);
+            height: 70px;
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            z-index: 40;
+            padding: 0.75rem 1rem;
+            display: flex;
+            align-items: center; /* Align items vertically */
+            justify-content: center; /* Center horizontally by default */
+        }
+        .lobby-header .search-container {
+            display: flex;
+            flex-grow: 1; /* Allow search container to take available space */
+            max-width: 600px; /* Limit max width on larger screens */
+            margin: 0 auto; /* Center the search container */
+            align-items: center;
+            background-color: #303030; /* Darker background for search bar */
+            border-radius: 15px; /* Rounded corners for search bar */
+            border: 2px solid #5A5A5A;
+            padding: 0.5rem 1rem; /* Adjust padding */
+        }
+        .lobby-header .search-container input {
+            flex-grow: 1;
+            background-color: transparent; /* Transparent background */
+            border: none; /* No border for input inside search bar */
+            padding: 0.25rem 0.5rem;
+            outline: none; /* No outline on focus */
+            text-align: right; /* Align text to right for RTL */
+        }
+        .lobby-header .search-container input::placeholder {
+            color: #A0A0A0;
+        }
+        .lobby-header .search-container svg {
+            color: #DAA520; /* Gold color for icons */
+            min-width: 24px; /* Ensure icons don't shrink */
+            min-height: 24px;
+        }
+        .lobby-header .search-container button {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 0 0.5rem;
+        }
+        .lobby-header .back-btn-wrapper {
+            margin-left: 10px; /* Space between back button and search bar (for RTL) */
+        }
+        .lobby-header .search-icon-wrapper {
+            margin-right: 10px; /* Space between search icon and search input (RTL) */
+        }
 
-        /* --- صفحه جزئیات لابی (انتخاب تیم) --- */
+
+        .app-footer {
+            background: linear-gradient(to left, #4A2B00 0%, #7A4C00 50%, #4A2B00 100%); /* Richer gold/brown gradient */
+            border-top: 3px solid #FFD700; /* Thicker gold border */
+            box-shadow: 0 -8px 20px rgba(0,0,0,0.7); /* Deeper shadow */
+            height: 90px; /* Fixed height for footer */
+            position: fixed; /* Explicitly fixed */
+            bottom: 0; left: 0; right: 0;
+            z-index: 40;
+            padding: 1rem; /* Adjust padding */
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+        }
+        /* Lobby Screen Specific Footer */
+        .lobby-footer {
+            background: linear-gradient(to left, #4A2B00 0%, #7A4C00 50%, #4A2B00 100%);
+            border-top: 3px solid #FFD700;
+            box-shadow: 0 -8px 20px rgba(0,0,0,0.7);
+            height: 90px;
+            position: fixed;
+            bottom: 0; left: 0; right: 0;
+            z-index: 40;
+            padding: 1rem;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+        }
+        .lobby-footer .icon-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: #FFD700; /* Gold color for icons */
+            font-size: 0.8rem;
+            text-align: center;
+            cursor: pointer;
+            transition: transform 0.2s ease-in-out;
+        }
+        .lobby-footer .icon-btn:hover {
+            transform: translateY(-5px);
+        }
+        .lobby-footer .icon-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .lobby-footer .icon-btn svg {
+            width: 30px;
+            height: 30px;
+            margin-bottom: 5px;
+            transition: transform 0.8s ease-in-out;
+        }
+        .lobby-footer .games-running-text {
+            color: #E0E0E0;
+            font-size: 1.1rem;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        /* Main content area padding to avoid overlap with fixed header/footer */
+        .main-content-area {
+            padding-top: 70px; /* Header height */
+            padding-bottom: 90px; /* Footer height */
+            flex-grow: 1; /* Allow content to fill available space */
+            overflow-y: hidden; /* Removed vertical scrollbars */
+            overflow-x: hidden; /* Ensure horizontal scrollbar is hidden for main content */
+            width: 100%; /* Ensure it takes full width */
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start; /* Align content to start for scrollable lists */
+            align-items: center; /* Center content horizontally */
+            background: linear-gradient(180deg, #2C2C2C 0%, #1A1A1A 100%); /* Subtle dark grey gradient for main area */
+            position: relative; /* For any absolute positioned elements inside */
+        }
+        
+        /* Profile Modal specific styles */
+        .profile-modal-overlay {
+            background-color: rgba(0,0,0,0.7); /* Darker overlay */
+            transition: opacity 0.3s ease-in-out;
+        }
+        .profile-modal-content {
+            transform: translateY(-20px); /* Initial slightly elevated */
+            transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+        .profile-modal-enter-active .profile-modal-content {
+            transform: translateY(0);
+        }
+        .profile-modal-leave-active .profile-modal-content {
+            transform: translateY(-20px);
+            opacity: 0;
+        }
+
+        /* Create Lobby Modal Specific Styles */
+        #create-lobby-modal {
+            background-color: rgba(0,0,0,0.7);
+            transition: opacity 0.3s ease-in-out;
+        }
+
+        /* Confirmation Modal Styles */
+        #confirmation-modal {
+            background-color: rgba(0,0,0,0.7);
+            transition: opacity 0.3s ease-in-out;
+        }
+
+        /* Animation for lobby items when closing */
+        .lobby-item.fade-out {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.5s ease-out, transform 0.5s ease-out;
+        }
+
+        /* Enhanced Lobby Item Styling */
+        .lobby-item {
+            background: linear-gradient(145deg, #2A2A2A 0%, #1A1A1A 100%); /* Deep gradient background */
+            border: 2px solid #DAA520; /* Gold border */
+            border-radius: 15px; /* Rounded corners */
+            box-shadow: 0 8px 16px rgba(0,0,0,0.5), inset 0 0 10px rgba(255,215,0,0.1); /* Deep outer shadow, subtle inner glow */
+            transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1); /* Smooth transitions for hover effects */
+            position: relative; /* For overflow hidden and pseudo-elements */
+            overflow: hidden; /* Ensures internal elements stay within rounded corners */
+            padding: 1.25rem 1.5rem; /* More generous padding */
+            display: flex;
+            flex-direction: column; /* Default to column for small screens */
+            justify-content: space-between;
+            align-items: center;
+            text-align: center;
+        }
+
+        .lobby-item::before { /* Subtle light overlay on hover */
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: rgba(255,255,255,0.05);
+            transform: skewX(-30deg);
+            transition: all 0.3s ease-in-out;
+        }
+
+        .lobby-item:hover::before {
+            left: 100%;
+        }
+
+        .lobby-item:hover {
+            transform: translateY(-8px) scale(1.02); /* More pronounced lift and slight scale */
+            box-shadow: 0 15px 25px rgba(0,0,0,0.6), inset 0 0 12px rgba(255,215,0,0.2); /* Stronger shadow, more glow */
+        }
+
+        .lobby-item h3 {
+            color: #FFD700; /* Gold for lobby names */
+            font-size: 1.75rem; /* Larger font for name */
+            font-family: 'Playfair Display', serif;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.7);
+        }
+
+        .lobby-item p {
+            color: #C0C0C0; /* Silver for details */
+            font-size: 1rem;
+            margin-top: 0.25rem;
+        }
+        
+        .lobby-item .lobby-actions { /* Container for buttons in lobby item */
+            margin-top: 1rem; /* Space between text and buttons */
+            display: flex;
+            flex-direction: column; /* Stack buttons on mobile */
+            width: 100%; /* Take full width on mobile */
+            gap: 0.75rem; /* Space between stacked buttons */
+        }
+
+        /* Ensure buttons within lobby-item are full width on mobile */
+        .lobby-item .join-lobby-btn,
+        .lobby-item .close-lobby-btn {
+            width: 100%; /* Take full width on small screens */
+            padding: 0.75rem 1rem; /* Consistent padding */
+            font-size: 1rem; /* Consistent font size */
+        }
+
+        /* Responsive adjustments for lobby-item buttons on larger screens */
+        @media (min-width: 640px) { /* sm breakpoint */
+            .lobby-item {
+                flex-direction: row; /* Align items in a row */
+                text-align: right; /* Text aligned right in RTL */
+            }
+            .lobby-item .lobby-actions {
+                flex-direction: row; /* Buttons side-by-side */
+                width: auto; /* Buttons take their natural width */
+                margin-top: 0; /* No top margin when side-by-side */
+                gap: 0.5rem; /* Small gap between buttons */
+            }
+            /* Add margin-left to close button for spacing from join button */
+            .lobby-item .close-lobby-btn {
+                margin-right: 0.5rem; /* Space from join button in RTL */
+            }
+            .lobby-item .join-lobby-btn,
+            .lobby-item .close-lobby-btn {
+                width: auto; /* Allow buttons to size naturally */
+                font-size: 0.9rem; /* Slightly smaller for compactness */
+                padding: 0.6rem 1.2rem; /* Adjusted padding */
+            }
+        }
+
+        /* === Lobby Detail Screen Styles (Major Redesign) === */
+        .lobby-detail-screen-full {
+            padding-top: 0; /* No padding, the content will manage it */
+            padding-bottom: 0;
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(180deg, #2C2C2C 0%, #1A1A1A 100%);
+        }
+
         .lobby-detail-content {
-            display: flex; flex-direction: row; gap: 1.5rem; width: 95%; max-width: 1400px; /* Wider for new layout */
-            margin: auto; padding: 1.5rem; height: calc(100vh - 40px);
-            background: linear-gradient(145deg, #1A1A1A 0%, #0D0D0D 100%); border-radius: 20px;
+            background: linear-gradient(145deg, #1A1A1A 0%, #0D0D0D 100%);
+            border: 3px solid #DAA520;
+            border-radius: 20px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.7);
+            padding: 1.5rem;
+            width: 95%;
+            max-width: 1200px;
+            height: calc(100% - 100px); /* Fill available space minus header/margins */
+            display: flex;
+            flex-direction: row; /* Side-by-side layout on desktop */
+            gap: 1.5rem;
+            margin: 50px auto; /* Centered with margin top/bottom */
+            overflow: hidden; /* Prevent content from spilling */
         }
-        .team-container {
-            border-radius: 15px; padding: 1rem; flex-grow: 1;
-            display: flex; flex-direction: column; transition: box-shadow 0.3s ease;
-        }
-        .team-container:hover { box-shadow: 0 0 25px rgba(255, 215, 0, 0.3); }
-        .team-a { border: 2px solid #3B82F6; background: rgba(59, 130, 246, 0.1); }
-        .team-b { border: 2px solid #EF4444; background: rgba(239, 68, 68, 0.1); }
 
-        .player-slot {
-            background: rgba(255,255,255,0.05); border: 1px solid #444;
-            border-radius: 10px; padding: 0.75rem 1rem; margin-bottom: 0.75rem;
-            display: flex; align-items: center; justify-content: space-between;
+        /* Sidebar for player info */
+        .lobby-sidebar {
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+            width: 300px;
+            background-color: rgba(0,0,0,0.3);
+            border-radius: 15px;
+            padding: 1rem;
+            border: 1px solid #444;
+            overflow-y: auto;
+        }
+
+        /* Main panel for chat and actions */
+        .lobby-main-panel {
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+            min-width: 0; /* Flexbox fix for overflow */
+        }
+        
+        #player-list-container {
+            margin-top: 1rem;
+            flex-grow: 1; /* Allow list to take space */
+            overflow-y: auto; /* Scroll if many players */
+        }
+        .player-list-item {
+            background-color: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            padding: 0.75rem;
+            margin-bottom: 0.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid transparent;
             transition: all 0.2s ease-in-out;
         }
-        .player-slot.is-host { border-left: 5px solid #FFD700; }
-        .player-name { font-weight: bold; }
-        .ready-status {
-            width: 20px; height: 20px; border-radius: 50%; background-color: #EF4444;
-            display: flex; align-items: center; justify-content: center;
-            border: 2px solid #444; transition: all 0.3s ease;
+        .player-list-item.is-host {
+            border-color: #FFD700;
         }
-        .ready-status.ready { background-color: #22C55E; border-color: #fff; }
-        .ready-status.ready svg { display: block; }
-        .ready-status svg { display: none; color: white; }
+        .player-list-item .player-name {
+            font-weight: bold;
+            color: #E0E0E0;
+        }
+        .player-list-item .host-label {
+            color: #FFD700;
+            font-size: 0.8rem;
+            margin-right: 0.5rem;
+        }
+        /* NEW: Container for host action buttons next to player name */
+        .player-action-buttons {
+            display: flex;
+            gap: 0.5rem;
+        }
+        .kick-player-btn {
+            background: none;
+            border: 1px solid #B22222;
+            color: #B22222;
+            border-radius: 5px;
+            padding: 0.2rem 0.5rem;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .kick-player-btn:hover {
+            background: #B22222;
+            color: white;
+        }
+        /* NEW: Style for Make Host button */
+        .make-host-btn {
+            background: none;
+            border: 1px solid #DAA520;
+            color: #DAA520;
+            border-radius: 5px;
+            padding: 0.2rem 0.5rem;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .make-host-btn:hover {
+            background: #DAA520;
+            color: #1A1A1A;
+        }
 
-        .lobby-sidebar { flex-shrink: 0; width: 350px; overflow-y: auto; padding: 1rem; background: rgba(0,0,0,0.2); border-radius: 15px; border: 1px solid #333; }
-        .lobby-main-panel { flex-grow: 1; display: flex; flex-direction: column; gap: 1rem; min-width: 0; }
-        .teams-grid { flex-grow: 1; display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
-        .detail-actions-footer { display: flex; justify-content: space-between; align-items: center; gap: 1rem; flex-shrink: 0; }
-        select { color: black; padding: 4px 8px; border-radius: 5px; background: #ddd; } /* For settings dropdown */
+        .lobby-chat-container {
+            background-color: rgba(0,0,0,0.4);
+            border: 2px solid #5A5A5A;
+            border-radius: 10px;
+            padding: 0.75rem;
+            flex-grow: 1; /* Key change: makes chat take all vertical space */
+            display: flex;
+            flex-direction: column;
+            overflow: hidden; /* CRITICAL: This contains the scrolling child */
+        }
+        .lobby-chat-messages {
+            flex-grow: 1; /* CRITICAL: This element grows to fill the parent */
+            overflow-y: auto; /* CRITICAL: This element gets the scrollbar */
+            padding-right: 0.5rem;
+            display: flex;
+            flex-direction: column;
+        }
+        .chat-message {
+            background-color: #333;
+            padding: 0.5rem 0.75rem;
+            border-radius: 10px;
+            margin-bottom: 0.5rem;
+            max-width: 80%;
+            word-wrap: break-word;
+            align-self: flex-start;
+            display: flex; /* NEW: Flex layout for message content and delete button */
+            align-items: center; /* NEW: Vertically align content and button */
+            gap: 0.5rem; /* NEW: Space between message and button */
+        }
+        .chat-message.current-user {
+            background-color: #4682B4;
+            align-self: flex-end;
+            flex-direction: row-reverse; /* NEW: Puts delete button on the left for RTL */
+        }
+        .chat-message-content {
+             flex-grow: 1; /* NEW: Allows text content to take up available space */
+        }
+        .chat-message .sender-name {
+            font-weight: bold;
+            color: #FFD700;
+            display: block;
+            font-size: 0.9em;
+            margin-bottom: 0.2rem;
+        }
+        .chat-message .message-text-deleted { /* NEW STYLE */
+            font-style: italic;
+            color: #999;
+        }
+        .delete-message-btn { /* NEW STYLE */
+            background: none;
+            border: none;
+            color: #aaa;
+            cursor: pointer;
+            padding: 0.25rem;
+            opacity: 0.5;
+            transition: all 0.2s ease;
+            flex-shrink: 0; /* Prevent button from shrinking */
+        }
+        .chat-message:hover .delete-message-btn { /* NEW STYLE */
+            opacity: 1;
+        }
+        .delete-message-btn:hover { /* NEW STYLE */
+            color: #ff6b6b;
+            transform: scale(1.1);
+        }
+
+        .lobby-chat-input-form {
+            margin-top: 0.75rem;
+            display: flex;
+            gap: 0.5rem;
+            flex-shrink: 0; /* CRITICAL: Prevents the input form from shrinking */
+        }
+
+        .lobby-actions-footer {
+            flex-shrink: 0; /* Prevent shrinking */
+            margin-top: 1rem;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+        }
+        .start-game-btn {
+            background: linear-gradient(145deg, #228B22 0%, #006400 100%);
+            border: 2px solid #DAA520;
+            font-size: 1.1rem;
+            padding: 0.6rem 1.2rem;
+        }
+        #host-actions-container {
+             display: flex;
+             flex-wrap: wrap;
+             gap: 1rem;
+        }
+
+        /* Custom Scrollbars */
+        .lobby-sidebar::-webkit-scrollbar,
+        #player-list-container::-webkit-scrollbar,
+        .lobby-chat-messages::-webkit-scrollbar { width: 8px; }
+        .lobby-sidebar::-webkit-scrollbar-track,
+        #player-list-container::-webkit-scrollbar-track,
+        .lobby-chat-messages::-webkit-scrollbar-track { background: #202020; border-radius: 4px; }
+        .lobby-sidebar::-webkit-scrollbar-thumb,
+        #player-list-container::-webkit-scrollbar-thumb,
+        .lobby-chat-messages::-webkit-scrollbar-thumb { background: #DAA520; border-radius: 4px; }
+        .lobby-sidebar::-webkit-scrollbar-thumb:hover,
+        #player-list-container::-webkit-scrollbar-thumb:hover,
+        .lobby-chat-messages::-webkit-scrollbar-thumb:hover { background: #FFD700; }
         
-        @media (max-width: 1024px) {
-            .lobby-detail-content { flex-direction: column; height: auto; max-height: 95vh; }
-            .lobby-sidebar { width: 100%; max-height: 300px; }
+        /* ===== CORRECTED RESPONSIVE STYLES ===== */
+        @media (max-width: 860px) {
+            .lobby-detail-content {
+                flex-direction: column; /* Stack panels on smaller screens */
+                height: calc(100% - 80px); /* Adjust height */
+                margin: 40px auto;
+                padding: 1rem;
+                overflow: hidden; /* ** THE MAIN FIX **: Prevent the whole card from scrolling */
+            }
+            .lobby-sidebar {
+                width: 100%; /* Sidebar takes full width */
+                flex-shrink: 0; /* ** FIX **: Prevent sidebar from shrinking when keyboard opens */
+                max-height: 250px; /* Limit sidebar height */
+            }
+            .lobby-main-panel {
+                flex-grow: 1; /* ** FIX **: Allow panel to fill remaining vertical space */
+                min-height: 0; /* ** FIX **: Flexbox fix to allow shrinking properly */
+            }
         }
+        /* General Responsive */
         @media (max-width: 640px) {
-            .teams-grid { grid-template-columns: 1fr; }
-            .detail-actions-footer { flex-direction: column; align-items: stretch; }
-            .classic-btn { font-size: 1rem; padding: 0.75rem 1rem; }
+            .max-w-md { max-width: 95%; }
+            .p-6, .p-8 { padding: 1.5rem; }
+            .text-3xl { font-size: 2rem; }
+            .classic-btn { padding: 0.75rem 1.25rem; font-size: 1rem; }
+            .app-header, .lobby-header, .app-footer, .lobby-footer { padding: 0.5rem; }
+            .app-header, .lobby-header { height: 60px; }
+            .app-footer, .lobby-footer { height: 80px; }
+            .main-content-area { padding-top: 60px; padding-bottom: 80px; }
+            .lobby-detail-content { margin: 20px auto; height: calc(100% - 40px); }
         }
-
-        /* --- Scrollbar --- */
-        ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-track { background: #202020; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb { background: #DAA520; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: #FFD700; }
+        
+        /* Lobby Type Toggle Styles */
+        .lobby-type-btn { padding: 0.5rem 1.5rem; border: 2px solid #DAA520; border-radius: 10px; transition: all 0.2s ease-in-out; background-color: transparent; color: #DAA520; font-weight: bold; }
+        .lobby-type-btn.active { background-color: #DAA520; color: #1A1A1A; box-shadow: 0 0 10px rgba(255,215,0,0.5); }
+        .lobby-lock-icon { width: 1.2rem; height: 1.2rem; margin-left: 0.5rem; color: #FFD700; display: inline-block; vertical-align: middle; }
     </style>
 </head>
 <body>
 
+    <!-- Main container for all screens -->
     <div id="app" class="relative w-full h-full flex justify-center items-center">
 
-        <!-- ===== 1. Loading Screen ===== -->
-        <div id="loading-screen" class="absolute inset-0 flex flex-col justify-center items-center bg-black z-50">
-            <!-- Spinner and text will be the same as original -->
-            <p>در حال بارگذاری...</p>
+        <!-- All Modals and other screens remain the same... -->
+        <!-- 1. Loading Screen -->
+        <div id="loading-screen" class="absolute inset-0 flex flex-col justify-center items-center bg-gray-900 z-50 page-transition-active page-transition-visible" tabindex="-1">
+            <div class="spinner mb-4"></div>
+            <p class="text-xl md:text-2xl font-semibold text-blue-400">در حال بارگذاری...</p>
         </div>
 
-        <!-- ===== 2. Authentication Screen ===== -->
-        <div id="auth-screen" class="hidden absolute inset-0 flex justify-center items-center bg-gray-900 bg-opacity-90 z-40 page-transition-active page-transition-hidden">
-             <!-- Same as original file -->
-        </div>
-
-        <!-- ===== 3. Main Screen ===== -->
-        <div id="main-screen" class="hidden absolute inset-0 flex flex-col z-30 page-transition-active page-transition-hidden">
-             <!-- Same as original file, header/footer logic will remain -->
-        </div>
-
-        <!-- ===== 4. Lobby List Screen ===== -->
-        <div id="lobby-screen" class="hidden absolute inset-0 flex flex-col z-30 page-transition-active page-transition-hidden">
-            <!-- Same as original file, logic remains the same -->
-        </div>
-
-        <!-- ===== 5. Profile Modal (UPGRADED) ===== -->
-        <div id="profile-modal" class="hidden fixed inset-0 flex justify-center items-center z-50">
-            <div class="classic-card p-6 sm:p-8 w-11/12 max-w-lg text-center relative">
-                <button id="close-profile-modal-btn" class="absolute top-4 left-4 text-white hover:text-gray-300 transition-colors duration-200">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 6 6 18m0-12 12 12"/></svg>
-                </button>
-                <h2 class="text-2xl sm:text-3xl font-bold mb-4">پروفایل کاربری</h2>
-                
-                <div class="flex flex-col sm:flex-row items-center justify-center sm:justify-start gap-4 mb-6 text-right w-full">
-                    <div class="w-24 h-24 bg-gray-800 rounded-full flex items-center justify-center border-2 border-yellow-400 flex-shrink-0">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24"><path fill="none" stroke="#FFD700" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8m-2 9a2 2 0 0 0-2 2v1h8v-1a2 2 0 0 0-2-2z"/></svg>
+        <!-- 2. Authentication Screen (Login/Register) -->
+        <div id="auth-screen" class="hidden absolute inset-0 flex justify-center items-center bg-gray-900 bg-opacity-90 z-40 page-transition-active page-transition-hidden" tabindex="-1">
+            <div class="classic-card p-6 sm:p-8 w-11/12 max-w-md text-center">
+                <h2 class="text-2xl sm:text-3xl font-bold mb-6">ورود / ثبت نام</h2>
+                <form id="auth-form" class="space-y-5">
+                    <div>
+                        <input type="email" id="email" placeholder="ایمیل شما"
+                               class="w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
+                               required>
+                    </div>
+                    <div id="display-name-field" class="hidden">
+                         <input type="text" id="display-name" placeholder="نام نمایشی (در بازی)"
+                               class="w-full focus:outline-none focus:ring-2 focus:ring-green-500">
                     </div>
                     <div>
-                        <p class="text-xl font-bold" id="profile-display-name">---</p>
-                        <p id="profile-email" class="text-gray-300">---</p>
-                        <p id="profile-uid" class="text-xs text-gray-500 break-all">---</p>
+                        <input type="password" id="password" placeholder="رمز عبور (حداقل ۶ کاراکتر)"
+                               class="w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
+                               required>
                     </div>
-                </div>
-
-                <div class="mb-6 px-2">
-                    <div class="flex justify-between items-center mb-1 text-yellow-300">
-                        <span class="font-bold">سطح <span id="profile-level">1</span></span>
-                        <span class="text-sm"><span id="profile-current-xp">0</span> / <span id="profile-next-level-xp">1000</span> XP</span>
+                    <!-- Toggle buttons for Auth mode -->
+                    <div class="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4 sm:space-x-reverse mt-6">
+                        <button type="button" id="login-toggle-btn"
+                                class="w-full sm:w-1/2 classic-btn btn-blue-classic text-xl sm:text-2xl">
+                            ورود
+                        </button>
+                        <button type="button" id="register-toggle-btn"
+                                class="w-full sm:w-1/2 classic-btn btn-green-classic text-xl sm:text-2xl">
+                            ثبت نام
+                        </button>
                     </div>
-                    <div id="profile-xp-bar-container" class="w-full h-4">
-                        <div id="profile-xp-bar" class="h-full" style="width: 0%;"></div>
-                    </div>
-                </div>
-
-                <div class="grid grid-cols-3 gap-4 text-white mb-8">
-                    <div class="stat-card">
-                        <p class="stat-card-value" id="profile-wins">0</p>
-                        <p class="stat-card-label">برد</p>
-                    </div>
-                    <div class="stat-card">
-                        <p class="stat-card-value" id="profile-losses">0</p>
-                        <p class="stat-card-label">باخت</p>
-                    </div>
-                    <div class="stat-card">
-                        <p class="stat-card-value" id="profile-win-rate">0%</p>
-                        <p class="stat-card-label">درصد پیروزی</p>
-                    </div>
-                </div>
-
-                <button id="profile-logout-btn" class="w-full classic-btn btn-red-classic text-lg">خروج از حساب</button>
+                    <!-- Main submit button, text changes based on authMode -->
+                    <button type="submit" id="submit-auth-btn"
+                            class="w-full mt-4 classic-btn btn-purple-classic text-xl sm:text-2xl hidden">
+                        ادامه
+                    </button>
+                </form>
+                <!-- Message box for user feedback -->
+                <div id="message-box" class="mt-5 p-3.5 rounded-xl text-base text-center hidden" role="alert"></div>
             </div>
         </div>
 
-        <!-- ===== 6. Lobby Detail Screen (COMPLETELY REDESIGNED) ===== -->
-        <div id="lobby-detail-screen" class="hidden absolute inset-0 z-30 page-transition-active page-transition-hidden p-2 sm:p-5 flex items-center justify-center">
+        <!-- 3. Main Screen -->
+        <div id="main-screen" class="hidden absolute inset-0 flex flex-col z-30 page-transition-active page-transition-hidden" tabindex="-1">
+            <!-- Header for Main Screen - Fixed at top -->
+            <header class="app-header">
+                <!-- User Info and ID - Aligned Right (for RTL) -->
+                <div id="profile-summary" class="flex items-center space-x-2 space-x-reverse cursor-pointer p-2 rounded-lg hover:bg-gray-700 transition-colors duration-200" title="مشاهده پروفایل">
+                     <!-- User icon SVG -->
+                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-user-circle">
+                        <circle cx="12" cy="12" r="10"/><circle cx="12" cy="10" r="3"/><path d="M7 20.662V19a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v1.662"/>
+                    </svg>
+                    <div class="flex flex-col text-right">
+                        <span id="header-display-name" class="font-bold text-lg text-white">نام کاربری</span>
+                        <span id="header-user-id" class="text-xs text-gray-300 break-all">ID: ---</span>
+                    </div>
+                </div>
+                <!-- Hamburger Menu Icon - Aligned Left (for RTL) -->
+                <button id="menu-btn" class="text-white text-3xl p-2 rounded-full hover:bg-gray-700 transition-colors duration-200">
+                    <!-- Hamburger icon SVG -->
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-menu">
+                        <line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/>
+                    </svg>
+                </button>
+            </header>
+
+            <!-- Main Content Area - Scrollable between fixed header and footer -->
+            <div class="main-content-area">
+                <!-- This area is now empty, ready for future game visuals/elements -->
+                <h1 class="text-4xl text-yellow-300 font-bold mb-8">به بازی حکم خوش آمدید!</h1>
+                <p class="text-lg text-gray-300">لطفاً یکی از گزینه‌های زیر را انتخاب کنید.</p>
+            </div>
+
+            <!-- Footer Navigation - Fixed at bottom -->
+            <footer class="app-footer">
+                <button id="friendly-game-btn"
+                        class="classic-btn btn-purple-classic text-base sm:text-lg w-1/2 mx-2 py-3.5 px-4">
+                    بازی دوستانه
+                </button>
+                <!-- Placeholder for other main buttons like 'Rated Game' -->
+                <button id="rated-game-btn"
+                        class="classic-btn btn-brown-classic text-base sm:text-lg w-1/2 mx-2 py-3.5 px-4">
+                    بازی امتیازی
+                </button>
+            </footer>
+        </div>
+
+        <!-- 4. Lobby Screen (صفحه جدید برای لابی‌ها) -->
+        <div id="lobby-screen" class="hidden absolute inset-0 flex flex-col z-30 page-transition-active page-transition-hidden" tabindex="-1">
+            <!-- Header for Lobby Screen -->
+            <header class="lobby-header">
+                <div class="search-container">
+                    <button id="back-to-main-btn" class="p-1">
+                        <!-- Right arrow icon for back (in RTL, it points left visually) -->
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-right">
+                            <path d="M5 12h14"/><path d="m12 5 7 7-7 7"/>
+                        </svg>
+                    </button>
+                    <input type="text" id="lobby-search-input" placeholder="جستجو بر اساس نام لابی، سازنده یا سناریو" class="flex-grow text-sm">
+                    <button id="search-lobbies-btn" class="p-1">
+                        <!-- Search icon -->
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-search">
+                            <circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>
+                        </svg>
+                    </button>
+                </div>
+            </header>
+
+            <!-- Main Content Area for Lobby Screen -->
+            <div class="main-content-area p-4 sm:p-6 text-center">
+                <div class="max-w-xl mx-auto space-y-6 w-full">
+                    <h2 class="text-xl sm:text-2xl font-bold text-white mb-4">لیست لابی‌های فعال</h2>
+                    <div id="lobbies-list" class="space-y-3 w-full">
+                        <!-- Lobby items will be dynamically loaded here by JavaScript -->
+                        <p class="text-gray-400">در حال بارگذاری لابی‌ها...</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer for Lobby Screen -->
+            <footer class="lobby-footer">
+                <button id="add-icon-btn" class="icon-btn">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-plus-square">
+                        <rect width="18" height="18" x="3" y="3" rx="2"/><path d="M12 8v8"/><path d="M8 12h8"/>
+                    </svg>
+                    <span>ایجاد</span>
+                </button>
+                <button id="refresh-lobbies-btn" class="icon-btn">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-rotate-cw">
+                        <path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/>
+                    </svg>
+                    <span>بروزرسانی</span>
+                </button>
+                <!-- MODIFIED: "My Lobbies" button is now "Quick Join" -->
+                <button id="quick-join-btn" class="icon-btn">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-zap">
+                        <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+                    </svg>
+                    <span>ورود سریع</span>
+                </button>
+                <div class="games-running-text">
+                    <span id="active-games-count">0</span>
+                    <span>بازی در حال اجرا</span>
+                </div>
+            </footer>
+        </div>
+
+        <!-- 5. Profile Modal (Hidden by default) -->
+        <div id="profile-modal" class="hidden fixed inset-0 flex justify-center items-center z-50 profile-modal-overlay">
+            <div class="classic-card profile-modal-content p-6 sm:p-8 w-11/12 max-w-md text-center relative">
+                <h2 class="text-2xl sm:text-3xl font-bold mb-6">پروفایل کاربری</h2>
+                <button id="close-profile-modal-btn" class="absolute top-4 left-4 text-white hover:text-gray-300 transition-colors duration-200">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-x">
+                        <path d="M18 6 6 18"/><path d="m6 6 12 12"/>
+                    </svg>
+                </button>
+                <div class="text-lg space-y-4 mb-8 text-white">
+                    <p><strong>نام نمایشی:</strong> <span id="profile-display-name">---</span></p>
+                    <p><strong>ایمیل:</strong> <span id="profile-email">---</span></p>
+                    <p><strong>شناسه کاربر (UID):</strong> <span id="profile-uid" class="break-all text-sm text-gray-400">---</span></p>
+                    <!-- Add more profile stats here later (e.g., wins, losses) -->
+                </div>
+                <button id="profile-logout-btn"
+                        class="w-full classic-btn btn-red-classic text-lg sm:text-xl">
+                    خروج از حساب
+                </button>
+            </div>
+        </div>
+
+        <!-- 6. Create Lobby Input Modal (NEW) -->
+        <div id="create-lobby-modal" class="hidden fixed inset-0 flex justify-center items-center z-50 profile-modal-overlay">
+            <div class="classic-card profile-modal-content p-6 sm:p-8 w-11/12 max-w-md text-center relative">
+                <h2 class="text-2xl sm:text-3xl font-bold mb-6">ساخت لابی جدید</h2>
+                <button id="close-create-lobby-modal-btn" class="absolute top-4 left-4 text-white hover:text-gray-300 transition-colors duration-200">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-x">
+                        <path d="M18 6 6 18"/><path d="m6 6 12 12"/>
+                    </svg>
+                </button>
+                <form id="create-lobby-form" class="space-y-5">
+                    <div>
+                        <input type="text" id="new-lobby-name-input" placeholder="نام لابی شما"
+                               class="w-full focus:outline-none focus:ring-2 focus:ring-green-500"
+                               required>
+                    </div>
+        
+                    <!-- NEW: Lobby Type Toggle (Public/Private) -->
+                    <div class="flex justify-center space-x-2 space-x-reverse my-4" id="lobby-type-toggle">
+                        <label class="cursor-pointer">
+                            <input type="radio" name="lobby-type" value="public" class="sr-only" checked>
+                            <span class="lobby-type-btn active">عمومی</span>
+                        </label>
+                        <label class="cursor-pointer">
+                            <input type="radio" name="lobby-type" value="private" class="sr-only">
+                            <span class="lobby-type-btn">خصوصی</span>
+                        </label>
+                    </div>
+        
+                    <!-- NEW: Password field for private lobbies (initially hidden) -->
+                    <div id="new-lobby-password-field" class="hidden relative">
+                        <input type="password" id="new-lobby-password-input" placeholder="رمز عبور لابی (حداقل ۴ کاراکتر)"
+                               class="w-full focus:outline-none focus:ring-2 focus:ring-green-500 pr-10">
+                        <button type="button" id="toggle-password-visibility" class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white">
+                            <svg id="eye-icon-open" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-eye"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+                            <svg id="eye-icon-closed" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-eye-off" style="display: none;"><path d="M9.88 9.88a3 3 0 1 0 4.24 4.24"/><path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"/><path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61"/><line x1="2" x2="22" y1="2" y2="22"/></svg>
+                        </button>
+                    </div>
+        
+                    <button type="submit" id="submit-create-lobby-btn"
+                            class="w-full mt-4 classic-btn btn-green-classic text-xl sm:text-2xl">
+                        ساخت لابی
+                    </button>
+                </form>
+                <div id="create-lobby-message-box" class="mt-5 p-3.5 rounded-xl text-base text-center hidden" role="alert"></div>
+            </div>
+        </div>
+
+        <!-- 7. Custom Confirmation Modal -->
+        <div id="custom-confirm-modal" class="hidden fixed inset-0 flex justify-center items-center z-50 profile-modal-overlay">
+            <div class="classic-card profile-modal-content p-6 sm:p-8 w-11/12 max-w-md text-center relative">
+                <h2 id="confirm-title" class="text-2xl sm:text-3xl font-bold mb-6 text-yellow-300">تایید عملیات</h2>
+                <p id="confirm-message" class="text-lg mb-8 text-white">آیا از انجام این عمل مطمئن هستید؟</p>
+                <div class="flex justify-around space-x-4 space-x-reverse">
+                    <button id="confirm-yes-btn" class="w-1/2 classic-btn btn-red-classic">بله</button>
+                    <button id="confirm-no-btn" class="w-1/2 classic-btn btn-gray-classic">خیر</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 8. Lobby Detail Screen (REDESIGNED) -->
+        <div id="lobby-detail-screen" class="hidden absolute inset-0 z-30 page-transition-active page-transition-hidden lobby-detail-screen-full" tabindex="-1">
             <div class="lobby-detail-content">
                 
-                <!-- Sidebar: Info, Settings, Chat -->
-                <aside class="lobby-sidebar">
-                    <h2 id="detail-lobby-name" class="text-2xl font-bold truncate">نام لابی</h2>
-                    <p id="detail-host-name" class="text-md text-gray-300 mt-1">سازنده: ---</p>
+                <!-- Sidebar: Lobby Info & Players -->
+                <div class="lobby-sidebar">
+                    <h2 id="detail-lobby-name" class="text-2xl sm:text-3xl font-bold text-yellow-300 truncate">نام لابی</h2>
+                    <p id="detail-host-name" class="text-md text-gray-300 mt-2">سازنده: ---</p>
                     <p id="detail-player-count" class="text-sm font-semibold text-white mb-4">بازیکنان: 0/4</p>
                     
-                    <div class="w-full h-px bg-yellow-600 my-4"></div>
+                    <div class="w-full h-px bg-yellow-600 mb-4"></div>
 
-                    <!-- NEW: Game Settings -->
-                    <h3 class="text-xl font-bold mb-3">تنظیمات بازی</h3>
-                    <div class="space-y-3 mb-4">
-                        <div class="flex justify-between items-center bg-black bg-opacity-25 p-2 rounded-lg">
-                            <label for="rounds-to-win-select" class="text-gray-300">امتیاز نهایی:</label>
-                            <select id="rounds-to-win-select" class="bg-gray-700 border border-gray-500 rounded px-2 py-1" disabled>
-                                <option value="5">5 امتیاز</option>
-                                <option value="7">7 امتیاز</option>
-                                <option value="9">9 امتیاز</option>
-                            </select>
-                        </div>
+                    <div id="player-list-container">
+                        <!-- Player list items will be dynamically loaded here -->
                     </div>
+                </div>
 
-                    <div class="w-full h-px bg-yellow-600 my-4"></div>
-
+                <!-- Main Panel: Chat & Actions -->
+                <div class="lobby-main-panel">
                     <!-- Chat Container -->
-                    <div class="lobby-chat-container flex flex-col flex-grow min-h-0">
-                         <h3 class="text-xl font-bold mb-3">چت لابی</h3>
-                        <div id="lobby-chat-messages" class="flex-grow overflow-y-auto mb-2 bg-black bg-opacity-25 p-2 rounded-lg">
-                            <!-- Chat messages -->
+                    <div class="lobby-chat-container">
+                        <div id="lobby-chat-messages" class="lobby-chat-messages">
+                            <!-- Chat messages will appear here -->
                         </div>
-                        <form id="lobby-chat-form" class="flex gap-2">
-                            <input type="text" id="lobby-chat-input" class="w-full" placeholder="پیام شما...">
-                            <button type="submit" id="lobby-chat-send-btn" class="classic-btn btn-blue-classic !p-2 !text-sm">ارسال</button>
+                        <form id="lobby-chat-form" class="lobby-chat-input-form">
+                            <input type="text" id="lobby-chat-input" placeholder="پیام خود را بنویسید..." autocomplete="off">
+                            <button type="submit" id="lobby-chat-send-btn" class="classic-btn btn-blue-classic text-sm py-2 px-4">ارسال</button>
                         </form>
                     </div>
-                </aside>
 
-                <!-- Main Panel: Teams & Actions -->
-                <main class="lobby-main-panel">
-                    <!-- Teams -->
-                    <div class="teams-grid">
-                        <!-- Team A -->
-                        <div id="team-a-container" class="team-container team-a">
-                            <h3 class="text-2xl text-center text-blue-300 mb-4">تیم آبی</h3>
-                            <div id="team-a-players" class="flex-grow space-y-3">
-                                <!-- Player slots for team A -->
-                            </div>
-                            <button id="join-team-a-btn" class="classic-btn btn-blue-classic w-full mt-4 !text-base !py-2">پیوستن به تیم آبی</button>
+                    <!-- Action Buttons Footer -->
+                    <div class="lobby-actions-footer">
+                        <div id="host-actions-container" style="display: none;">
+                            <button id="start-game-btn" class="classic-btn start-game-btn" disabled>
+                                شروع بازی
+                            </button>
+                             <button id="toggle-chat-lock-btn" class="classic-btn btn-gray-classic text-sm py-2 px-4">
+                                قفل کردن چت
+                            </button>
+                            <button id="view-kicked-players-btn" class="classic-btn btn-brown-classic text-sm py-2 px-4">
+                                لیست اخراجی‌ها
+                            </button>
                         </div>
-                        <!-- Team B -->
-                        <div id="team-b-container" class="team-container team-b">
-                            <h3 class="text-2xl text-center text-red-300 mb-4">تیم قرمز</h3>
-                            <div id="team-b-players" class="flex-grow space-y-3">
-                               <!-- Player slots for team B -->
-                            </div>
-                             <button id="join-team-b-btn" class="classic-btn btn-red-classic w-full mt-4 !text-base !py-2">پیوستن به تیم قرمز</button>
-                        </div>
+                        <button id="leave-lobby-btn" class="classic-btn btn-red-classic text-sm py-2 px-4">
+                            ترک لابی
+                        </button>
                     </div>
+                </div>
 
-                    <!-- Action Buttons -->
-                    <div class="detail-actions-footer pt-4 mt-auto">
-                        <button id="leave-lobby-btn" class="classic-btn btn-red-classic w-full sm:w-auto">ترک لابی</button>
-                        <button id="ready-btn" class="classic-btn btn-gray-classic w-full sm:w-auto text-xl">آماده نیستم</button>
-                        <button id="start-game-btn" class="classic-btn start-game-btn w-full sm:w-auto text-xl" disabled>شروع بازی</button>
-                    </div>
-                    <!-- Simulate game over button for testing stats -->
-                    <button id="simulate-game-over-btn" style="display: none;" class="classic-btn btn-purple-classic">Test GameOver</button>
-                </main>
             </div>
         </div>
 
-        <!-- All other modals (create, confirm, kick, password, etc.) remain here -->
-        <!-- Their HTML does not need to change -->
+        <!-- ... All other modals (kick, kicked message, etc.) remain the same ... -->
+        <!-- NEW: Kick Player Confirmation Modal -->
+        <div id="kick-player-confirm-modal" class="hidden fixed inset-0 flex justify-center items-center z-50 profile-modal-overlay">
+            <div class="classic-card profile-modal-content p-6 sm:p-8 w-11/12 max-w-md text-center relative">
+                <h2 class="text-2xl sm:text-3xl font-bold mb-6 text-yellow-300">اخراج بازیکن</h2>
+                <button id="close-kick-player-confirm-modal-btn" class="absolute top-4 left-4 text-white hover:text-gray-300 transition-colors duration-200">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-x">
+                        <path d="M18 6 6 18"/><path d="m6 6 12 12"/>
+                    </svg>
+                </button>
+                <p class="text-lg mb-8 text-white">آیا مطمئن هستید که می‌خواهید <span id="kick-player-confirm-name" class="font-bold"></span> را از لابی اخراج کنید؟</p>
+                <div class="flex justify-around space-x-4 space-x-reverse">
+                    <button id="kick-player-confirm-btn" class="w-1/2 classic-btn btn-red-classic">اخراج کردن</button>
+                    <button id="cancel-kick-player-btn" class="w-1/2 classic-btn btn-gray-classic">انصراف</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- NEW: Kicked Message Modal -->
+        <div id="kicked-message-modal" class="hidden fixed inset-0 flex justify-center items-center z-50 profile-modal-overlay">
+            <div class="classic-card profile-modal-content p-6 sm:p-8 w-11/12 max-w-md text-center relative">
+                <h2 class="text-2xl sm:text-3xl font-bold mb-6 text-red-400">شما اخراج شدید!</h2>
+                <p id="kicked-message-text" class="text-lg mb-8 text-white">شما از لابی <span class="font-bold" id="kicked-lobby-name"></span> اخراج شده‌اید و نمی‌توانید به آن بازگردید.</p>
+                <button id="kicked-message-ok-btn" class="w-full classic-btn btn-blue-classic">متوجه شدم</button>
+            </div>
+        </div>
+
+        <!-- NEW: Kicked Players List Modal -->
+        <div id="kicked-players-list-modal" class="hidden fixed inset-0 flex justify-center items-center z-50 profile-modal-overlay">
+            <div class="classic-card profile-modal-content p-6 sm:p-8 w-11/12 max-w-md text-center relative">
+                <h2 class="text-2xl sm:text-3xl font-bold mb-6 text-yellow-300">لیست بازیکنان اخراج شده</h2>
+                <button id="close-kicked-players-list-modal-btn" class="absolute top-4 left-4 text-white hover:text-gray-300 transition-colors duration-200">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-x">
+                        <path d="M18 6 6 18"/><path d="m6 6 12 12"/>
+                    </svg>
+                </button>
+                <div id="kicked-players-list-content" class="space-y-4 mb-8 text-white text-left max-h-60 overflow-y-auto custom-scrollbar">
+                    <!-- Kicked players will be dynamically loaded here -->
+                    <p class="text-gray-400 text-center">هیچ بازیکنی اخراج نشده است.</p>
+                </div>
+                <button id="kicked-list-ok-btn" class="w-full classic-btn btn-gray-classic">بستن</button>
+            </div>
+        </div>
+        
+        <!-- 9. Enter Password Modal (for private lobbies) -->
+        <div id="enter-password-modal" class="hidden fixed inset-0 flex justify-center items-center z-50 profile-modal-overlay">
+            <div class="classic-card profile-modal-content p-6 sm:p-8 w-11/12 max-w-md text-center relative">
+                <h2 class="text-2xl sm:text-3xl font-bold mb-4">ورود به لابی خصوصی</h2>
+                <p class="text-lg mb-6 text-white">لابی <span id="password-prompt-lobby-name" class="font-bold text-yellow-300"></span> نیاز به رمز عبور دارد.</p>
+                <form id="enter-password-form" class="space-y-5">
+                    <div>
+                        <input type="password" id="join-lobby-password-input" placeholder="رمز عبور را وارد کنید"
+                               class="w-full focus:outline-none focus:ring-2 focus:ring-blue-500 text-center"
+                               required>
+                    </div>
+                    <div class="flex justify-around space-x-4 space-x-reverse">
+                        <button type="submit" id="submit-join-password-btn" class="w-1/2 classic-btn btn-green-classic">ورود</button>
+                        <button type="button" id="cancel-join-password-btn" class="w-1/2 classic-btn btn-gray-classic">انصراف</button>
+                    </div>
+                </form>
+                <div id="password-prompt-message-box" class="mt-5 p-3.5 rounded-xl text-base text-center hidden" role="alert"></div>
+            </div>
+        </div>
 
     </div>
 
     <!-- Firebase SDKs -->
     <script type="module">
+        // Import the functions you need from the SDKs you need
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, setDoc, getDoc, collection, addDoc, serverTimestamp, query, where, onSnapshot, updateDoc, deleteDoc, getDocs, deleteField, writeBatch } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        // REVISED: Imported deleteField for updating player maps
+        import { getFirestore, doc, setDoc, getDoc, collection, addDoc, serverTimestamp, query, where, onSnapshot, updateDoc, arrayUnion, arrayRemove, deleteDoc, getDocs, orderBy, deleteField } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js"; 
 
-        // --- Firebase Config (Replace with yours) ---
+        // Firebase Configuration (from user's input)
+        // **IMPORTANT**: You should replace these with your actual Firebase project configuration.
         const firebaseConfig = {
             apiKey: "AIzaSyBpVHnjF5gdTm3vJiHEoAZCowsRkTapj_4",
             authDomain: "hokm-d6911.firebaseapp.com",
@@ -305,401 +1098,1307 @@
             appId: "1:128133280011:web:c9fe28f5201eef7a3a320e",
             measurementId: "G-LN0S9W86MK"
         };
-        
-        // --- Initialize ---
+
+        // Initialize Firebase
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        // --- Global State ---
-        let currentUserData = null; // Full profile data including stats
-        let currentLobbyId = null;
-        let unsubscribeLobbyDetail = null;
-        let unsubscribeLobbies = null;
+        // Global variables for Firebase context (as per environment instructions)
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
 
-        // --- DOM Elements (Simplified for brevity) ---
-        // Profile Modal
+        // DOM Elements
+        const loadingScreen = document.getElementById('loading-screen');
+        const authScreen = document.getElementById('auth-screen');
+        const mainScreen = document.getElementById('main-screen');
+        const authForm = document.getElementById('auth-form');
+        const emailInput = document.getElementById('email');
+        const displayNameInput = document.getElementById('display-name');
+        const displayNameField = document.getElementById('display-name-field');
+        const passwordInput = document.getElementById('password');
+        const loginToggleBtn = document.getElementById('login-toggle-btn');
+        const registerToggleBtn = document.getElementById('register-toggle-btn');
+        const submitAuthBtn = document.getElementById('submit-auth-btn');
+        const messageBox = document.getElementById('message-box'); 
+
+        // Main Screen UI Elements
+        const menuBtn = document.getElementById('menu-btn');
+        const profileSummary = document.getElementById('profile-summary');
+        const headerDisplayName = document.getElementById('header-display-name');
+        const headerUserId = document.getElementById('header-user-id');
+        const friendlyGameBtn = document.getElementById('friendly-game-btn');
+        const ratedGameBtn = document.getElementById('rated-game-btn');
+
+        // Lobby Screen UI Elements
+        const lobbyScreen = document.getElementById('lobby-screen');
+        const backToMainBtn = document.getElementById('back-to-main-btn'); // Inside Lobby Header Search Bar
+        const lobbySearchInput = document.getElementById('lobby-search-input');
+        const searchLobbiesBtn = document.getElementById('search-lobbies-btn');
+        const lobbiesList = document.getElementById('lobbies-list');
+        const addIconBtn = document.getElementById('add-icon-btn'); // Footer icon
+        const refreshLobbiesBtn = document.getElementById('refresh-lobbies-btn'); // Footer icon
+        const quickJoinBtn = document.getElementById('quick-join-btn'); // MODIFIED: Was myLobbiesBtn
+        const activeGamesCount = document.getElementById('active-games-count');
+
+        // Profile Modal Elements
         const profileModal = document.getElementById('profile-modal');
+        const closeProfileModalBtn = document.getElementById('close-profile-modal-btn');
         const profileDisplayName = document.getElementById('profile-display-name');
         const profileEmail = document.getElementById('profile-email');
         const profileUid = document.getElementById('profile-uid');
-        const profileLevel = document.getElementById('profile-level');
-        const profileCurrentXp = document.getElementById('profile-current-xp');
-        const profileNextLevelXp = document.getElementById('profile-next-level-xp');
-        const profileXpBar = document.getElementById('profile-xp-bar');
-        const profileWins = document.getElementById('profile-wins');
-        const profileLosses = document.getElementById('profile-losses');
-        const profileWinRate = document.getElementById('profile-win-rate');
+        const profileLogoutBtn = document.getElementById('profile-logout-btn');
 
-        // Lobby Detail Screen
+        // Create Lobby Modal Elements
+        const createLobbyModal = document.getElementById('create-lobby-modal');
+        const closeCreateLobbyModalBtn = document.getElementById('close-create-lobby-modal-btn'); 
+        const createLobbyForm = document.getElementById('create-lobby-form');
+        const newLobbyNameInput = document.getElementById('new-lobby-name-input');
+        const submitCreateLobbyBtn = document.getElementById('submit-create-lobby-btn');
+        const createLobbyMessageBox = document.getElementById('create-lobby-message-box');
+        const lobbyTypeToggle = document.getElementById('lobby-type-toggle');
+        const newLobbyPasswordField = document.getElementById('new-lobby-password-field');
+        const newLobbyPasswordInput = document.getElementById('new-lobby-password-input');
+        const togglePasswordVisibilityBtn = document.getElementById('toggle-password-visibility');
+        const eyeIconOpen = document.getElementById('eye-icon-open');
+        const eyeIconClosed = document.getElementById('eye-icon-closed');
+
+        // Custom Confirmation Modal Elements
+        const customConfirmModal = document.getElementById('custom-confirm-modal');
+        const confirmTitle = document.getElementById('confirm-title');
+        const confirmMessage = document.getElementById('confirm-message');
+        const confirmYesBtn = document.getElementById('confirm-yes-btn');
+        const confirmNoBtn = document.getElementById('confirm-no-btn');
+
+        // Lobby Detail Screen Elements (UPDATED)
         const lobbyDetailScreen = document.getElementById('lobby-detail-screen');
         const detailLobbyName = document.getElementById('detail-lobby-name');
         const detailHostName = document.getElementById('detail-host-name');
+        const playerListContainer = document.getElementById('player-list-container');
         const detailPlayerCount = document.getElementById('detail-player-count');
-        const roundsToWinSelect = document.getElementById('rounds-to-win-select');
-        const teamAPlayersContainer = document.getElementById('team-a-players');
-        const teamBPlayersContainer = document.getElementById('team-b-players');
-        const joinTeamABtn = document.getElementById('join-team-a-btn');
-        const joinTeamBBtn = document.getElementById('join-team-b-btn');
-        const readyBtn = document.getElementById('ready-btn');
+        const hostActionsContainer = document.getElementById('host-actions-container');
         const startGameBtn = document.getElementById('start-game-btn');
+        const toggleChatLockBtn = document.getElementById('toggle-chat-lock-btn'); // NEW
+        const viewKickedPlayersBtn = document.getElementById('view-kicked-players-btn');
         const leaveLobbyBtn = document.getElementById('leave-lobby-btn');
-        const simulateGameOverBtn = document.getElementById('simulate-game-over-btn'); // for testing
-        
-        // Chat
         const lobbyChatMessages = document.getElementById('lobby-chat-messages');
         const lobbyChatForm = document.getElementById('lobby-chat-form');
         const lobbyChatInput = document.getElementById('lobby-chat-input');
-        
-        /* 
-        ======================================================================
-        ========= ALL OTHER ORIGINAL DOM ELEMENTS AND FUNCTIONS ==============
-        ========= (showCustomMessage, setActiveScreen, Modals, etc) ==========
-        ========= ARE ASSUMED TO BE HERE, UNCHANGED, FOR BREVITY      =========
-        ======================================================================
-        */
-       
-        // --- Core Authentication and Profile Logic (UPGRADED) ---
-        
-        onAuthStateChanged(auth, async (user) => {
-            if (user) {
-                // Fetch full user profile, including new stats
-                const userDocRef = doc(db, `users/${user.uid}`);
-                const userDocSnap = await getDoc(userDocRef);
+        const lobbyChatSendBtn = document.getElementById('lobby-chat-send-btn');
 
-                if (userDocSnap.exists()) {
-                    currentUserData = { uid: user.uid, ...userDocSnap.data() };
-                } else {
-                    // Create a new profile for a new user
-                    const newUserProfile = {
-                        displayName: user.email.split('@')[0],
-                        email: user.email,
-                        level: 1,
-                        xp: 0,
-                        stats: { wins: 0, losses: 0, gamesPlayed: 0 },
-                        createdAt: serverTimestamp()
-                    };
-                    await setDoc(userDocRef, newUserProfile);
-                    currentUserData = { uid: user.uid, ...newUserProfile };
-                }
-                
-                // Assuming setActiveScreen etc. are defined elsewhere
-                // setActiveScreen(mainScreen);
+        // Kick Player Confirmation Modal Elements
+        const kickPlayerConfirmModal = document.getElementById('kick-player-confirm-modal');
+        const closeKickPlayerConfirmModalBtn = document.getElementById('close-kick-player-confirm-modal-btn');
+        const kickPlayerConfirmName = document.getElementById('kick-player-confirm-name');
+        const kickPlayerConfirmBtn = document.getElementById('kick-player-confirm-btn');
+        const cancelKickPlayerBtn = document.getElementById('cancel-kick-player-btn');
 
+        // Kicked Message Modal Elements
+        const kickedMessageModal = document.getElementById('kicked-message-modal');
+        const kickedMessageText = document.getElementById('kicked-message-text');
+        const kickedLobbyName = document.getElementById('kicked-lobby-name');
+        const kickedMessageOkBtn = document.getElementById('kicked-message-ok-btn');
+
+        // Kicked Players List Modal Elements
+        const kickedPlayersListModal = document.getElementById('kicked-players-list-modal');
+        const closeKickedPlayersListModalBtn = document.getElementById('close-kicked-players-list-modal-btn');
+        const kickedPlayersListContent = document.getElementById('kicked-players-list-content');
+        const kickedListOkBtn = document.getElementById('kicked-list-ok-btn');
+        
+        // New Enter Password Modal Elements
+        const enterPasswordModal = document.getElementById('enter-password-modal');
+        const passwordPromptLobbyName = document.getElementById('password-prompt-lobby-name');
+        const enterPasswordForm = document.getElementById('enter-password-form');
+        const joinLobbyPasswordInput = document.getElementById('join-lobby-password-input');
+        const submitJoinPasswordBtn = document.getElementById('submit-join-password-btn');
+        const cancelJoinPasswordBtn = document.getElementById('cancel-join-password-btn');
+        const passwordPromptMessageBox = document.getElementById('password-prompt-message-box');
+
+        // State variables
+        let authMode = 'login'; // Default mode is login
+        let currentActiveScreen = loadingScreen;
+        let currentUserData = null; // To store user's profile data
+        let unsubscribeLobbies = null; // Global variable to store the unsubscribe function for lobby list listener
+        let unsubscribeLobbyDetail = null; // Global variable for single lobby detail listener
+        let unsubscribeKickedPlayers = null; // Listener for kicked players list
+        let unsubscribeLobbyChat = null; // NEW: Listener for lobby chat messages
+        let isAuthResolved = false; // Flag to indicate if onAuthStateChanged has run at least once
+        let userHasActiveLobby = false; // Track if the current user has an active lobby (created or joined)
+        let currentLobbyId = null; // Stores the ID of the lobby the current user is in
+        let kickedPlayerToProcess = null; // Stores UID/name of player selected for kicking
+        let lobbyToJoin = null; // To store data of private lobby user wants to join
+        let isRefreshing = false; // NEW: State for refresh button
+
+        // Promise resolver for custom confirmation modal
+        let resolveCustomConfirm;
+
+
+        // Function to show custom message box (re-used for auth and create lobby modals)
+        function showCustomMessage(element, message, type = 'info') {
+            element.textContent = message;
+            element.className = 'mt-5 p-3.5 rounded-xl text-base text-center';
+            if (type === 'error') {
+                element.classList.add('bg-red-500', 'text-white');
+            } else if (type === 'success') {
+                element.classList.add('bg-green-500', 'text-white');
             } else {
-                currentUserData = null;
-                // Cleanup listeners and go to auth screen
-                if(unsubscribeLobbies) unsubscribeLobbies();
-                if(unsubscribeLobbyDetail) unsubscribeLobbyDetail();
-                // setActiveScreen(authScreen);
+                element.classList.add('bg-blue-500', 'text-white');
             }
-        });
-        
-        function openProfileModal() {
-            if (!currentUserData) return;
-            // Populate basic info
-            profileDisplayName.textContent = currentUserData.displayName;
-            profileEmail.textContent = currentUserData.email;
-            profileUid.textContent = currentUserData.uid;
+            element.classList.remove('hidden');
+            console.log(`پیام نمایش داده شد (${type}): ${message}`);
+            setTimeout(() => {
+                element.classList.add('hidden');
+            }, 5000);
+        }
+        // Wrapper for main message box
+        const showMessageBox = (msg, type) => showCustomMessage(messageBox, msg, type);
+        // Wrapper for create lobby message box
+        const showCreateLobbyMessageBox = (msg, type) => showCustomMessage(createLobbyMessageBox, msg, type);
 
-            // Populate stats
-            const stats = currentUserData.stats || { wins: 0, losses: 0, gamesPlayed: 0 };
-            profileWins.textContent = stats.wins;
-            profileLosses.textContent = stats.losses;
-            const winRate = (stats.gamesPlayed > 0) ? Math.round((stats.wins / stats.gamesPlayed) * 100) : 0;
-            profileWinRate.textContent = `${winRate}%`;
-            
-            // Populate level and XP
-            const level = currentUserData.level || 1;
-            const xp = currentUserData.xp || 0;
-            const xpForNextLevel = level * 1000; // Example formula
-            profileLevel.textContent = level;
-            profileCurrentXp.textContent = xp;
-            profileNextLevelXp.textContent = xpForNextLevel;
-            const xpPercentage = (xp / xpForNextLevel) * 100;
-            profileXpBar.style.width = `${xpPercentage}%`;
-            
-            profileModal.classList.remove('hidden');
+
+        // Function to show custom confirmation modal
+        function showCustomConfirm(message, title = 'تایید عملیات') {
+            return new Promise((resolve) => {
+                confirmTitle.textContent = title;
+                confirmMessage.textContent = message;
+                customConfirmModal.classList.remove('hidden');
+                void customConfirmModal.offsetWidth; // Trigger reflow for transition
+                customConfirmModal.classList.add('profile-modal-enter-active');
+
+                resolveCustomConfirm = resolve; // Store the resolve function
+
+                // Event listeners for Yes/No buttons
+                confirmYesBtn.onclick = () => {
+                    closeCustomConfirm();
+                    resolveCustomConfirm(true);
+                };
+                confirmNoBtn.onclick = () => {
+                    closeCustomConfirm();
+                    resolveCustomConfirm(false);
+                };
+            });
+        }
+
+        // Function to close the custom confirmation modal
+        function closeCustomConfirm() {
+            customConfirmModal.classList.remove('profile-modal-enter-active');
+            customConfirmModal.classList.add('profile-modal-leave-active');
+            setTimeout(() => {
+                customConfirmModal.classList.add('hidden');
+                customConfirmModal.classList.remove('profile-modal-leave-active');
+            }, 300); // Match modal transition duration
         }
 
 
-        // --- Core Lobby Logic (COMPLETELY REWRITTEN) ---
+        // Function to transition between screens
+        function setActiveScreen(newScreen) {
+            console.log(`درخواست تغییر صفحه به: ${newScreen.id}. صفحه فعلی: ${currentActiveScreen.id}`);
+
+            if (currentActiveScreen === newScreen) return;
+
+            // Hide the current screen with transition
+            currentActiveScreen.classList.remove('page-transition-visible');
+            currentActiveScreen.classList.add('page-transition-hidden');
+            currentActiveScreen.setAttribute('tabindex', '-1'); // Remove focus capability
+            if (document.activeElement instanceof HTMLElement) {
+                document.activeElement.blur();
+            }
+
+            setTimeout(() => {
+                currentActiveScreen.classList.add('hidden');
+                currentActiveScreen.classList.remove('page-transition-hidden');
+
+                // Show the new screen with transition
+                newScreen.classList.remove('hidden');
+                void newScreen.offsetWidth;
+                newScreen.classList.add('page-transition-visible');
+                newScreen.removeAttribute('tabindex');
+                console.log(`صفحه ${newScreen.id} اکنون قابل مشاهده است.`);
+
+                if (newScreen === authScreen) emailInput.focus();
+                else if (newScreen === lobbyScreen) lobbySearchInput.focus();
+
+                currentActiveScreen = newScreen;
+
+            }, 600); // Matches CSS transition duration
+        }
+
+        // Functions to open/close modals
+        function openProfileModal() {
+            profileModal.classList.remove('hidden');
+            void profileModal.offsetWidth;
+            profileModal.classList.add('profile-modal-enter-active');
+            if (currentUserData) {
+                profileDisplayName.textContent = currentUserData.displayName || 'ناشناس';
+                profileEmail.textContent = currentUserData.email || 'ناشناس';
+                profileUid.textContent = currentUserData.uid || 'ناشناس';
+            }
+        }
+
+        function closeProfileModal() {
+            profileModal.classList.remove('profile-modal-enter-active');
+            profileModal.classList.add('profile-modal-leave-active');
+            setTimeout(() => {
+                profileModal.classList.add('hidden');
+                profileModal.classList.remove('profile-modal-leave-active');
+            }, 300);
+        }
+
+        function openCreateLobbyModal() {
+            createLobbyModal.classList.remove('hidden');
+            void createLobbyModal.offsetWidth;
+            createLobbyModal.classList.add('profile-modal-enter-active');
+            newLobbyNameInput.focus();
+            createLobbyMessageBox.classList.add('hidden');
+        }
+
+        function closeCreateLobbyModal() {
+            createLobbyModal.classList.remove('profile-modal-enter-active');
+            createLobbyModal.classList.add('profile-modal-leave-active');
+            setTimeout(() => {
+                createLobbyModal.classList.add('hidden');
+                createLobbyModal.classList.remove('profile-modal-leave-active');
+                createLobbyForm.reset();
+                // Reset toggle buttons to default
+                newLobbyPasswordField.classList.add('hidden');
+                document.querySelectorAll('.lobby-type-btn').forEach(btn => btn.classList.remove('active'));
+                document.querySelector('input[value="public"]').nextElementSibling.classList.add('active');
+            }, 300);
+        }
+        
+        function openKickPlayerConfirmModal(playerName, playerUid) {
+            kickPlayerConfirmName.textContent = playerName;
+            kickPlayerConfirmModal.classList.remove('hidden');
+            void kickPlayerConfirmModal.offsetWidth;
+            kickPlayerConfirmModal.classList.add('profile-modal-enter-active');
+            kickedPlayerToProcess = { uid: playerUid, displayName: playerName };
+        }
+
+        function closeKickPlayerConfirmModal() {
+            kickPlayerConfirmModal.classList.remove('profile-modal-enter-active');
+            kickPlayerConfirmModal.classList.add('profile-modal-leave-active');
+            setTimeout(() => {
+                kickPlayerConfirmModal.classList.add('hidden');
+                kickPlayerConfirmModal.classList.remove('profile-modal-leave-active');
+                kickedPlayerToProcess = null;
+            }, 300);
+        }
+
+        function showKickedMessageModal(lobbyName) {
+            kickedLobbyName.textContent = lobbyName;
+            kickedMessageModal.classList.remove('hidden');
+            void kickedMessageModal.offsetWidth;
+            kickedMessageModal.classList.add('profile-modal-enter-active');
+        }
+
+        function closeKickedMessageModal() {
+            kickedMessageModal.classList.remove('profile-modal-enter-active');
+            kickedMessageModal.classList.add('profile-modal-leave-active');
+            setTimeout(() => {
+                kickedMessageModal.classList.add('hidden');
+                kickedMessageModal.classList.remove('profile-modal-leave-active');
+                setActiveScreen(lobbyScreen);
+                unsubscribeLobbies = setupLobbyListener('');
+            }, 300);
+        }
+
+        function openKickedPlayersListModal() {
+            kickedPlayersListModal.classList.remove('hidden');
+            void kickedPlayersListModal.offsetWidth;
+            kickedPlayersListModal.classList.add('profile-modal-enter-active');
+            if (currentLobbyId) {
+                unsubscribeKickedPlayers = setupKickedPlayersListListener(currentLobbyId);
+            } else {
+                kickedPlayersListContent.innerHTML = '<p class="text-gray-400 text-center">خطا: لابی فعال یافت نشد.</p>';
+            }
+        }
+
+        function closeKickedPlayersListModal() {
+            kickedPlayersListModal.classList.remove('profile-modal-enter-active');
+            kickedPlayersListModal.classList.add('profile-modal-leave-active');
+            setTimeout(() => {
+                kickedPlayersListModal.classList.add('hidden');
+                kickedPlayersListModal.classList.remove('profile-modal-leave-active');
+                if (unsubscribeKickedPlayers) {
+                    unsubscribeKickedPlayers();
+                    unsubscribeKickedPlayers = null;
+                }
+            }, 300);
+        }
+
 
         /**
-         * The new lobby data model in Firestore:
-         * collection: `global_lobbies`
-         * document: {lobbyId}
-         * {
-         *   name: "Lobby Name",
-         *   hostId: "uid_of_host",
-         *   status: "waiting" | "playing" | "finished",
-         *   createdAt: timestamp,
-         *   players: { // This is now a MAP of objects
-         *     "player_uid_1": {
-         *       displayName: "Player 1",
-         *       teamId: "team_a" | "team_b" | null,
-         *       isReady: false,
-         *       joinedAt: timestamp // CRUCIAL for host migration
-         *     },
-         *     "player_uid_2": { ... }
-         *   },
-         *   gameSettings: {
-         *     roundsToWin: 7,
-         *     maxPlayers: 4
-         *   },
-         *   teams: { // For quick counts and team data
-         *      team_a: { playerCount: 1 },
-         *      team_b: { playerCount: 0 }
-         *   }
-         * }
-        */
+         * Calls a simulated AI content moderation API to check if the lobby name is appropriate.
+         * @param {string} lobbyName - The name of the lobby to check.
+         * @returns {Promise<{is_appropriate: boolean, reason: string}>} - The moderation result.
+         */
+        async function checkLobbyNameWithAI(lobbyName) {
+            const prompt = `As a highly rigorous and professional content moderation AI, meticulously analyze the following lobby name for compliance with the strictest community guidelines across *all* languages. You must absolutely identify and disallow any political, racist, sexual, offensive, vulgar, violent, or otherwise inappropriate content, including but not limited to terms like "fuck", "asshole", "shit", "bitch", and their equivalents in Persian such as "کیر", "کون", "کس", "کسکش", "جنده", "حرومزاده", "بیناموس" etc., regardless of how they are spelled (e.g., phonetic or deliberate misspellings to evade detection). Your analysis should consider the context and intent where possible. Your response *must* be a JSON object: {"is_appropriate": boolean, "reason": string}. If 'is_appropriate' is false, provide a *brief, objective, and precise* reason identifying the specific type of violation (e.g., "Contains offensive language", "Political reference detected", "Violates decency standards"). If appropriate, 'reason' should be an empty string. Lobby name to analyze: "${lobbyName}"`;
+            let chatHistory = [{ role: "user", parts: [{ text: prompt }] }];
+            const payload = { contents: chatHistory, generationConfig: { responseMimeType: "application/json", responseSchema: { type: "OBJECT", properties: { "is_appropriate": { "type": "BOOLEAN" }, "reason": { "type": "STRING" } }, "propertyOrdering": ["is_appropriate", "reason"] } } };
+            const apiKey = "AIzaSyDfMZwyWNnRFUDLHKR1t_hZ5cWv2c_KvvE"; 
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+            try {
+                const response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+                if (!response.ok) { const errorText = await response.text(); console.error("AI API HTTP Error:", response.status, response.statusText, errorText); return { is_appropriate: false, reason: `خطا در ارتباط با سرور اعتدال: ${response.statusText}.` }; }
+                const result = await response.json();
+                if (result && result.candidates?.[0]?.content?.parts?.[0]) {
+                    const jsonString = result.candidates[0].content.parts[0].text;
+                    try { const parsedJson = JSON.parse(jsonString); if (typeof parsedJson.is_appropriate === 'boolean' && typeof parsedJson.reason === 'string') { return parsedJson; } else { console.warn("AI response has unexpected structure:", parsedJson); return { is_appropriate: false, reason: "پاسخ سیستم اعتدال نامفهوم است." }; } } catch (parseError) { console.error("Error parsing AI response JSON:", parseError, "Raw:", jsonString); return { is_appropriate: false, reason: "خطا در پردازش پاسخ اعتدال." }; }
+                } else { console.warn("AI response missing content structure:", result); return { is_appropriate: false, reason: "عدم دریافت پاسخ معتبر از سیستم اعتدال." }; }
+            } catch (error) { console.error("Error calling AI moderation API:", error); return { is_appropriate: false, reason: `خطا در ارتباط با سیستم اعتدال: ${error.message}.` }; }
+        }
 
-        function setupLobbyDetailListener(lobbyId) {
-            console.log(`Listening to upgraded lobby details for ID: ${lobbyId}`);
-            if (unsubscribeLobbies) unsubscribeLobbies();
+        // Firebase Authentication State Listener
+        onAuthStateChanged(auth, async (user) => {
+            console.log("onAuthStateChanged triggered. User:", user ? user.uid : "logged out");
+            isAuthResolved = true;
+            if (user) {
+                try {
+                    const userDocRef = doc(db, `artifacts/${appId}/users/${user.uid}/profile/data`); 
+                    const userDocSnap = await getDoc(userDocRef);
+                    currentUserData = {
+                        uid: user.uid,
+                        email: user.email,
+                        displayName: (userDocSnap.exists() && userDocSnap.data().displayName) ? userDocSnap.data().displayName : (user.displayName || (user.email ? user.email.split('@')[0] : 'کاربر ناشناس'))
+                    };
+                    if (!userDocSnap.exists() && authMode === 'register' && displayNameInput.value.trim() !== '') {
+                        await setDoc(userDocRef, { displayName: displayNameInput.value.trim(), email: user.email }, { merge: true });
+                        currentUserData.displayName = displayNameInput.value.trim();
+                    }
+                    headerDisplayName.textContent = currentUserData.displayName;
+                    headerUserId.textContent = `شناسه: ${currentUserData.uid.substring(0, 8)}...`;
+                    setActiveScreen(mainScreen);
+                } catch (firestoreError) {
+                    console.error("Firestore profile error:", firestoreError);
+                    currentUserData = { uid: user.uid, email: user.email, displayName: user.displayName || (user.email ? user.email.split('@')[0] : 'کاربر ناشناس') };
+                    headerDisplayName.textContent = currentUserData.displayName;
+                    headerUserId.textContent = `شناسه: ${currentUserData.uid.substring(0, 8)}...`;
+                    setActiveScreen(mainScreen);
+                    showMessageBox("مشکل در بارگذاری پروفایل.", "error");
+                }
+            } else {
+                setActiveScreen(authScreen);
+                authForm.reset();
+                displayNameField.classList.add('hidden');
+                submitAuthBtn.classList.add('hidden');
+                loginToggleBtn.classList.remove('hidden');
+                registerToggleBtn.classList.remove('hidden');
+                authMode = 'login';
+                currentUserData = null;
+                if (unsubscribeLobbies) unsubscribeLobbies();
+                if (unsubscribeLobbyDetail) unsubscribeLobbyDetail();
+                if (unsubscribeKickedPlayers) unsubscribeKickedPlayers();
+                if (unsubscribeLobbyChat) unsubscribeLobbyChat(); // NEW: Cleanup chat listener
+                unsubscribeLobbies = unsubscribeLobbyDetail = unsubscribeKickedPlayers = unsubscribeLobbyChat = null;
+                currentLobbyId = null;
+            }
+        });
 
-            const lobbyRef = doc(db, 'global_lobbies', lobbyId);
-            unsubscribeLobbyDetail = onSnapshot(lobbyRef, (docSnap) => {
-                if (!docSnap.exists()) {
-                    // Lobby was deleted, probably by the host
-                    // showMessageBox("لابی که در آن بودید بسته شد.", "info");
-                    // setActiveScreen(lobbyScreen);
-                    return;
+        // Initial Firebase Initialization
+        async function initializeFirebaseAndAuth() {
+            console.log("Initializing Firebase Auth state listener...");
+        }
+
+        // Maps Firebase auth error codes to user-friendly Persian messages.
+        function getFirebaseErrorMessage(errorCode) {
+            const messages = {
+                'auth/invalid-email': "فرمت ایمیل نامعتبر است.",
+                'auth/user-disabled': "حساب کاربری شما غیرفعال شده است.",
+                'auth/user-not-found': "کاربری با این ایمیل یافت نشد.",
+                'auth/wrong-password': "ایمیل یا رمز عبور اشتباه است.",
+                'auth/invalid-credential': "ایمیل یا رمز عبور اشتباه است.",
+                'auth/email-already-in-use': "این ایمیل قبلاً ثبت نام شده است.",
+                'auth/weak-password': "رمز عبور باید حداقل ۶ کاراکتر باشد.",
+                'auth/operation-not-allowed': "این نوع ورود فعال نیست.",
+                'auth/network-request-failed': "مشکل در اتصال به اینترنت.",
+                'auth/too-many-requests': "تعداد تلاش‌های ناموفق بیش از حد مجاز.",
+            };
+            return messages[errorCode] || "خطایی ناشناخته رخ داده است.";
+        }
+
+        // --- Firebase Lobby Functions ---
+        async function createLobby(lobbyName, userId, displayName, lobbyType, password) {
+            try {
+                const creatorDisplayName = displayName && displayName.trim() !== '' ? displayName : 'ناشناس';
+        
+                const userLobbiesQuery = query(
+                    collection(db, `global_lobbies`),
+                    where("hostId", "==", userId),
+                    where("status", "in", ["waiting", "playing"])
+                );
+                const userLobbiesSnapshot = await getDocs(userLobbiesQuery);
+                if (!userLobbiesSnapshot.empty) {
+                    throw new Error("شما از قبل یک لابی فعال ساخته‌اید. لطفاً ابتدا لابی قبلی خود را ببندید.");
+                }
+        
+                const lobbiesRef = collection(db, `global_lobbies`);
+                
+                const newLobbyData = {
+                    name: lobbyName,
+                    hostId: userId,
+                    status: "waiting",
+                    type: lobbyType,
+                    players: {
+                        [userId]: creatorDisplayName // Using a map: { "uid": "displayName" }
+                    },
+                    kickedPlayers: [], // Still an array of objects
+                    createdAt: serverTimestamp(),
+                    isChatLocked: false, 
+                    gameSettings: { maxPlayers: 4, roundsToWin: 7 }
+                };
+        
+                if (lobbyType === 'private') {
+                    newLobbyData.password = password;
+                }
+        
+                const newLobbyRef = await addDoc(lobbiesRef, newLobbyData);
+                
+                console.log(`لابی ${lobbyType} با ID ساخته شد: `, newLobbyRef.id);
+                userHasActiveLobby = true;
+                return newLobbyRef.id;
+            } catch (e) {
+                console.error("خطا در ساخت لابی: ", e);
+                throw e;
+            }
+        }
+        
+        async function closeLobby(lobbyId, userId) {
+            const lobbyRef = doc(db, `global_lobbies`, lobbyId);
+            try {
+                const lobbySnap = await getDoc(lobbyRef);
+                if (!lobbySnap.exists()) { showMessageBox("لابی مورد نظر یافت نشد.", "error"); return; }
+                const lobbyData = lobbySnap.data();
+                if (lobbyData.hostId !== userId) { showMessageBox("شما اجازه بستن این لابی را ندارید.", "error"); return; }
+
+                const lobbyElement = document.querySelector(`[data-lobby-id="${lobbyId}"]`);
+                if (lobbyElement) {
+                    lobbyElement.classList.add('fade-out');
+                    await new Promise(resolve => setTimeout(resolve, 500));
                 }
 
-                const lobbyData = docSnap.data();
+                await deleteDoc(lobbyRef);
+                showMessageBox(`لابی "${lobbyData.name}" با موفقیت بسته شد.`, "success");
+                userHasActiveLobby = false;
+                if (currentLobbyId === lobbyId) currentLobbyId = null;
+            } catch (e) {
+                console.error("خطا در بستن لابی: ", e);
+                showMessageBox(`خطا در بستن لابی: ${e.message}`, "error");
+            }
+        }
+        
+        function setupLobbyListener(searchTerm = '') {
+            console.log(`شروع راه‌اندازی Listener لابی‌ها با عبارت جستجو: "${searchTerm}"`);
+            if (unsubscribeLobbyDetail) {
+                unsubscribeLobbyDetail();
+                unsubscribeLobbyDetail = null;
+                currentLobbyId = null;
+            }
+            if (unsubscribeKickedPlayers) {
+                unsubscribeKickedPlayers();
+                unsubscribeKickedPlayers = null;
+            }
+            if (unsubscribeLobbyChat) {
+                unsubscribeLobbyChat();
+                unsubscribeLobbyChat = null;
+            }
+        
+            lobbiesList.innerHTML = '<p class="text-gray-400">در حال بارگذاری لابی‌ها...</p>';
+            userHasActiveLobby = false;
+        
+            const normalizedSearchTerm = searchTerm.toLowerCase();
+            const q = query(
+                collection(db, `global_lobbies`), 
+                where("status", "==", "waiting")
+            );
+        
+            const unsubscribe = onSnapshot(q, (snapshot) => {
+                lobbiesList.innerHTML = '';
+        
+                let activeGamesCountNum = 0;
+                let lobbiesToDisplay = [];
+                let currentUserIsInAnyLobby = false;
+        
+                snapshot.forEach((doc) => {
+                    const lobby = { id: doc.id, ...doc.data() };
+                    const playersMap = lobby.players || {};
+                    
+                    const hostDisplayName = (playersMap[lobby.hostId] || 'ناشناس').toLowerCase();
+                    const lobbyName = (lobby.name || '').toLowerCase();
+                    
+                    if (auth.currentUser && playersMap[auth.currentUser.uid]) {
+                        currentUserIsInAnyLobby = true;
+                    }
+        
+                    if (normalizedSearchTerm === '' || lobbyName.includes(normalizedSearchTerm) || hostDisplayName.includes(normalizedSearchTerm)) {
+                        lobbiesToDisplay.push(lobby);
+                    }
+        
+                    if (lobby.status === "playing") {
+                        activeGamesCountNum++;
+                    }
+                });
+        
+                userHasActiveLobby = currentUserIsInAnyLobby;
+                
+                lobbiesToDisplay.sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
+        
+                if (lobbiesToDisplay.length === 0) {
+                    lobbiesList.innerHTML = '<p class="text-gray-400">لابی با این مشخصات یافت نشد.</p>';
+                } else {
+                    lobbiesToDisplay.forEach((lobby) => {
+                        const playersMap = lobby.players || {};
+                        const playerCount = Object.keys(playersMap).length;
+                        const maxPlayers = lobby.gameSettings?.maxPlayers || 4;
+                        const hostDisplayName = playersMap[lobby.hostId] || 'ناشناس';
+                        const isCurrentUserHostOfThisLobby = auth.currentUser && lobby.hostId === auth.currentUser.uid;
+                        const isCurrentUserKicked = auth.currentUser && lobby.kickedPlayers?.some(p => p.uid === auth.currentUser.uid);
+                        const canJoinThisLobby = auth.currentUser && !currentUserIsInAnyLobby && playerCount < maxPlayers && !isCurrentUserKicked;
+        
+                        const lockIconHtml = lobby.type === 'private' 
+                            ? `<svg xmlns="http://www.w3.org/2000/svg" class="lobby-lock-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>` 
+                            : '';
+        
+                        let joinButtonHtml = '';
+                        if (isCurrentUserKicked) {
+                             joinButtonHtml = `<button class="join-lobby-btn classic-btn btn-red-classic opacity-50 cursor-not-allowed" disabled>اخراج شده‌اید</button>`;
+                        } else if (isCurrentUserHostOfThisLobby) {
+                            joinButtonHtml = `<button data-lobby-id="${lobby.id}" class="view-my-lobby-btn classic-btn btn-blue-classic">ورود به لابی من</button>`;
+                        } else if (canJoinThisLobby) {
+                            joinButtonHtml = `<button data-lobby-id="${lobby.id}" data-lobby-type="${lobby.type || 'public'}" data-lobby-name="${lobby.name}" class="join-lobby-btn classic-btn btn-blue-classic">ورود به لابی</button>`;
+                        } else {
+                            joinButtonHtml = `<button class="join-lobby-btn classic-btn btn-blue-classic opacity-50 cursor-not-allowed" disabled>ورود به لابی</button>`;
+                        }
+                        
+                        const closeButtonHtml = isCurrentUserHostOfThisLobby 
+                            ? `<button data-lobby-id="${lobby.id}" class="close-lobby-btn classic-btn btn-red-classic">بستن لابی</button>` : '';
+        
+                        const lobbyItem = document.createElement('div');
+                        lobbyItem.className = 'lobby-item mb-3 w-full';
+                        lobbyItem.dataset.lobbyId = lobby.id;
+                        lobbyItem.innerHTML = `
+                            <div class="mb-2 sm:mb-0 text-center sm:text-right">
+                                <h3 class="text-xl font-bold">${lockIconHtml}${lobby.name}</h3>
+                                <p class="text-sm">سازنده: ${hostDisplayName}</p>
+                                <p class="text-sm">بازیکنان: ${playerCount}/${maxPlayers}</p>
+                            </div>
+                            <div class="lobby-actions">
+                                ${closeButtonHtml}
+                                ${joinButtonHtml}
+                            </div>
+                        `;
+                        lobbiesList.appendChild(lobbyItem);
+                    });
+                }
+                
+                activeGamesCount.textContent = activeGamesCountNum;
+        
+                lobbiesList.querySelectorAll('.join-lobby-btn:not([disabled])').forEach(button => {
+                    button.addEventListener('click', async (e) => {
+                        const lobbyId = e.currentTarget.dataset.lobbyId;
+                        const lobbyType = e.currentTarget.dataset.lobbyType;
+                        const lobbyName = e.currentTarget.dataset.lobbyName;
+                        
+                        if (lobbyType === 'private') {
+                            openEnterPasswordModal(lobbyId, lobbyName);
+                        } else {
+                            try {
+                                await joinLobby(lobbyId, auth.currentUser.uid, currentUserData.displayName);
+                            } catch (error) {
+                                console.error("Error joining public lobby:", error);
+                                showMessageBox(`خطا در ورود به لابی: ${error.message}`, "error");
+                            }
+                        }
+                    });
+                });
+        
+                lobbiesList.querySelectorAll('.view-my-lobby-btn').forEach(button => {
+                    button.addEventListener('click', (e) => {
+                        const lobbyId = e.target.dataset.lobbyId;
+                        if (lobbyId && auth.currentUser) {
+                            currentLobbyId = lobbyId;
+                            setActiveScreen(lobbyDetailScreen);
+                            unsubscribeLobbyDetail = setupLobbyDetailListener(lobbyId);
+                        }
+                    });
+                });
+        
+                lobbiesList.querySelectorAll('.close-lobby-btn').forEach(button => {
+                    button.addEventListener('click', async (e) => {
+                        const lobbyId = e.target.dataset.lobbyId;
+                        if (lobbyId && auth.currentUser) {
+                            const lobbyName = e.target.closest('.lobby-item').querySelector('h3').textContent;
+                            const confirmed = await showCustomConfirm(`آیا مطمئن هستید که می‌خواهید لابی "${lobbyName}" را ببندید؟`);
+                            if (confirmed) {
+                                await closeLobby(lobbyId, auth.currentUser.uid);
+                            }
+                        }
+                    });
+                });
+        
+            }, (error) => {
+                console.error("خطا در گوش دادن به لابی‌ها: ", error);
+                lobbiesList.innerHTML = `<p class="text-red-400">خطا در بارگذاری لیست لابی‌ها. (${error.message})</p>`;
+            });
+        
+            return unsubscribe;
+        }
+
+        async function joinLobby(lobbyId, userId, displayName) {
+            const lobbyRef = doc(db, `global_lobbies`, lobbyId);
+            try {
+                const lobbySnap = await getDoc(lobbyRef);
+                if (!lobbySnap.exists()) { throw new Error("لابی یافت نشد."); }
+                
+                const lobbyData = lobbySnap.data();
                 const playersMap = lobbyData.players || {};
-                const playerList = Object.entries(playersMap);
-                const isCurrentUserHost = auth.currentUser.uid === lobbyData.hostId;
-                const currentUserLobbyData = playersMap[auth.currentUser.uid];
+                const maxPlayers = lobbyData.gameSettings?.maxPlayers || 4;
+                const kickedPlayers = lobbyData.kickedPlayers || [];
 
-                // Clear UI before repopulating
-                teamAPlayersContainer.innerHTML = '';
-                teamBPlayersContainer.innerHTML = '';
+                if (kickedPlayers.some(p => p.uid === userId)) {
+                    throw new Error("شما از این لابی اخراج شده‌اید.");
+                }
+                if (playersMap[userId]) { // Player is already in
+                    currentLobbyId = lobbyId;
+                    setActiveScreen(lobbyDetailScreen);
+                    unsubscribeLobbyDetail = setupLobbyDetailListener(lobbyId);
+                    return;
+                }
+                if (Object.keys(playersMap).length >= maxPlayers) { throw new Error("لابی پر است."); }
+                
+                // Add player to map using dot notation for the key
+                await updateDoc(lobbyRef, {
+                    [`players.${userId}`]: displayName
+                });
+                
+                showMessageBox(`شما به لابی "${lobbyData.name}" وارد شدید.`, "success");
+                
+                currentLobbyId = lobbyId;
+                userHasActiveLobby = true;
+                setActiveScreen(lobbyDetailScreen);
+                unsubscribeLobbyDetail = setupLobbyDetailListener(lobbyId);
+            } catch (e) {
+                console.error("خطا در ورود به لابی: ", e);
+                throw e; // Re-throw to be caught by the caller
+            }
+        }
+        
+        function setupLobbyDetailListener(lobbyId) {
+            console.log(`Listening to lobby details for ID: ${lobbyId}`);
+            if (unsubscribeLobbies) { unsubscribeLobbies(); unsubscribeLobbies = null; }
+            if (unsubscribeKickedPlayers) { unsubscribeKickedPlayers(); unsubscribeKickedPlayers = null; }
+            if (unsubscribeLobbyChat) { unsubscribeLobbyChat(); unsubscribeLobbyChat = null; }
+            
+            const lobbyRef = doc(db, `global_lobbies`, lobbyId);
+            const unsubscribe = onSnapshot(lobbyRef, async (docSnap) => {
+                if (docSnap.exists()) {
+                    const lobbyData = docSnap.data();
+                    const playersMap = lobbyData.players || {};
+                    const playerCount = Object.keys(playersMap).length;
+                    const maxPlayers = lobbyData.gameSettings?.maxPlayers || 4;
+                    const isCurrentUserHost = auth.currentUser && lobbyData.hostId === auth.currentUser.uid;
+                    const isChatLocked = lobbyData.isChatLocked || false;
 
-                // --- 1. Populate UI Header ---
-                detailLobbyName.textContent = lobbyData.name;
-                detailHostName.textContent = `سازنده: ${playersMap[lobbyData.hostId]?.displayName || 'نامشخص'}`;
-                detailPlayerCount.textContent = `بازیکنان: ${playerList.length}/${lobbyData.gameSettings.maxPlayers}`;
+                    // Unsubscribe previous chat listener if host changes
+                    if (unsubscribeLobbyChat) unsubscribeLobbyChat();
+                    unsubscribeLobbyChat = setupLobbyChatListener(lobbyId, lobbyData.hostId);
 
-                // --- 2. Populate Teams ---
-                playerList.forEach(([uid, playerData]) => {
-                    const playerElement = createPlayerSlotElement(uid, playerData, lobbyData.hostId);
-                    if (playerData.teamId === 'team_a') {
-                        teamAPlayersContainer.appendChild(playerElement);
-                    } else if (playerData.teamId === 'team_b') {
-                        teamBPlayersContainer.appendChild(playerElement);
+                    detailLobbyName.textContent = lobbyData.name;
+                    detailHostName.textContent = `سازنده: ${playersMap[lobbyData.hostId] || 'ناشناس'}`;
+                    detailPlayerCount.textContent = `بازیکنان: ${playerCount}/${maxPlayers}`;
+
+                    if (auth.currentUser && lobbyData.kickedPlayers?.some(p => p.uid === auth.currentUser.uid)) {
+                        showKickedMessageModal(lobbyData.name);
+                        return;
+                    }
+
+                    playerListContainer.innerHTML = '';
+                    const playerList = Object.entries(playersMap).map(([uid, displayName]) => ({ uid, displayName }));
+
+                    for (const player of playerList) {
+                        const isHost = player.uid === lobbyData.hostId;
+                        const playerItem = document.createElement('div');
+                        playerItem.className = 'player-list-item';
+                        if (isHost) playerItem.classList.add('is-host');
+                        
+                        const hostLabelHtml = isHost ? '<span class="host-label">(سازنده)</span>' : '';
+                        
+                        // NEW: Conditionally create host action buttons
+                        let actionButtonsHtml = '';
+                        if (isCurrentUserHost && !isHost) {
+                            const kickButtonHtml = `<button class="kick-player-btn" data-player-uid="${player.uid}" data-player-name="${player.displayName}">اخراج</button>`;
+                            const makeHostButtonHtml = `<button class="make-host-btn" data-player-uid="${player.uid}" data-player-name="${player.displayName}">واگذاری مالکیت</button>`;
+                            actionButtonsHtml = `<div class="player-action-buttons">${makeHostButtonHtml}${kickButtonHtml}</div>`;
+                        }
+
+                        playerItem.innerHTML = `
+                            <div class="flex items-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="mr-2 lucide lucide-user"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                                <span class="player-name">${player.displayName}</span>
+                                ${hostLabelHtml}
+                            </div>
+                            ${actionButtonsHtml}
+                        `;
+                        playerListContainer.appendChild(playerItem);
+                    }
+
+                    // Manage Host Actions
+                    if (isCurrentUserHost) {
+                        hostActionsContainer.style.display = 'flex';
+                        startGameBtn.disabled = playerCount !== maxPlayers;
+                        startGameBtn.textContent = `شروع بازی (${playerCount}/${maxPlayers})`;
+                        
+                        // Manage chat lock button
+                        toggleChatLockBtn.textContent = isChatLocked ? 'باز کردن چت' : 'قفل کردن چت';
+
                     } else {
-                        // Player hasn't joined a team yet. For this design, we force team selection.
-                        // We could add an "unassigned" area if needed.
+                        hostActionsContainer.style.display = 'none';
+                    }
+
+                    // Manage Chat Input for ALL users based on lock state
+                    if (isChatLocked && !isCurrentUserHost) {
+                        lobbyChatInput.disabled = true;
+                        lobbyChatSendBtn.disabled = true;
+                        lobbyChatInput.placeholder = "چت توسط سازنده قفل شده است";
+                    } else {
+                        lobbyChatInput.disabled = false;
+                        lobbyChatSendBtn.disabled = false;
+                        lobbyChatInput.placeholder = "پیام خود را بنویسید...";
+                    }
+
+
+                } else {
+                    showMessageBox("لابی که در آن بودید بسته شد.", "info");
+                    setActiveScreen(lobbyScreen);
+                    unsubscribeLobbies = setupLobbyListener('');
+                }
+            }, (error) => {
+                console.error("Lobby detail listener error:", error);
+                showMessageBox("خطا در بارگذاری جزئیات لابی.", "error");
+                setActiveScreen(lobbyScreen);
+                unsubscribeLobbies = setupLobbyListener('');
+            });
+            return unsubscribe;
+        }
+
+        async function leaveLobby() {
+            if (!currentLobbyId || !auth.currentUser) return;
+            const lobbyRef = doc(db, `global_lobbies`, currentLobbyId);
+            const userId = auth.currentUser.uid;
+            try {
+                const lobbySnap = await getDoc(lobbyRef);
+                if (!lobbySnap.exists()) {
+                    setActiveScreen(lobbyScreen);
+                    unsubscribeLobbies = setupLobbyListener('');
+                    return;
+                }
+                const isHost = lobbySnap.data().hostId === userId;
+                if (isHost) {
+                    const confirmed = await showCustomConfirm("شما سازنده لابی هستید. خروج شما باعث بسته شدن لابی برای همه می‌شود. آیا مطمئن هستید؟");
+                    if (confirmed) await deleteDoc(lobbyRef);
+                } else {
+                    await updateDoc(lobbyRef, {
+                        [`players.${userId}`]: deleteField()
+                    });
+                    setActiveScreen(lobbyScreen);
+                    unsubscribeLobbies = setupLobbyListener('');
+                }
+            } catch (e) { console.error("Error leaving lobby:", e); showMessageBox("خطا در ترک لابی.", "error"); }
+        }
+
+        async function kickPlayer(lobbyId, playerToKickUid, playerToKickDisplayName) {
+            const lobbyRef = doc(db, `global_lobbies`, lobbyId);
+            try {
+                await updateDoc(lobbyRef, {
+                    [`players.${playerToKickUid}`]: deleteField(),
+                    kickedPlayers: arrayUnion({ uid: playerToKickUid, displayName: playerToKickDisplayName })
+                });
+                showMessageBox(`بازیکن "${playerToKickDisplayName}" اخراج شد.`, "success");
+                closeKickPlayerConfirmModal();
+            } catch (e) { console.error("Error kicking player:", e); showMessageBox("خطا در اخراج بازیکن.", "error"); }
+        }
+
+        // NEW: Function to transfer lobby ownership
+        async function transferLobbyOwnership(lobbyId, newHostUid) {
+            if (!lobbyId || !newHostUid) return;
+            const lobbyRef = doc(db, 'global_lobbies', lobbyId);
+            try {
+                await updateDoc(lobbyRef, {
+                    hostId: newHostUid
+                });
+                showMessageBox("مالکیت لابی با موفقیت منتقل شد.", "success");
+            } catch (e) {
+                console.error("Error transferring ownership:", e);
+                showMessageBox("خطا در انتقال مالکیت لابی.", "error");
+            }
+        }
+
+        async function unkickPlayer(lobbyId, playerToUnkickUid) {
+            const lobbyRef = doc(db, `global_lobbies`, lobbyId);
+            try {
+                const lobbySnap = await getDoc(lobbyRef);
+                if (lobbySnap.exists()) {
+                    const kickedPlayers = lobbySnap.data().kickedPlayers || [];
+                    const playerToUnkick = kickedPlayers.find(p => p.uid === playerToUnkickUid);
+                    if (playerToUnkick) {
+                        await updateDoc(lobbyRef, { kickedPlayers: arrayRemove(playerToUnkick) });
+                        showMessageBox(`بازیکن "${playerToUnkick.displayName}" می‌تواند دوباره وارد شود.`, "success");
+                    }
+                }
+            } catch (e) { console.error("Error unkicking player:", e); showMessageBox("خطا در بازگرداندن بازیکن.", "error"); }
+        }
+
+        function setupKickedPlayersListListener(lobbyId) {
+            const lobbyRef = doc(db, `global_lobbies`, lobbyId);
+            return onSnapshot(lobbyRef, (docSnap) => {
+                kickedPlayersListContent.innerHTML = '';
+                if (docSnap.exists()) {
+                    const kickedPlayers = docSnap.data().kickedPlayers || [];
+                    if (kickedPlayers.length === 0) {
+                        kickedPlayersListContent.innerHTML = '<p class="text-gray-400 text-center">هیچ بازیکنی اخراج نشده است.</p>';
+                    } else {
+                        kickedPlayers.forEach(player => {
+                            const playerDiv = document.createElement('div');
+                            playerDiv.className = 'flex items-center justify-between bg-gray-700 p-3 rounded-lg mb-2';
+                            playerDiv.innerHTML = `<span>${player.displayName}</span><button data-player-uid="${player.uid}" class="unkick-player-btn classic-btn btn-green-classic text-sm py-1 px-3">بازگرداندن</button>`;
+                            kickedPlayersListContent.appendChild(playerDiv);
+                        });
+                        kickedPlayersListContent.querySelectorAll('.unkick-player-btn').forEach(button => {
+                            button.addEventListener('click', (e) => unkickPlayer(currentLobbyId, e.target.dataset.playerUid));
+                        });
+                    }
+                }
+            });
+        }
+        
+        async function sendLobbyMessage(lobbyId, text) {
+            if (!text.trim() || !auth.currentUser || !currentUserData) return;
+            const messagesRef = collection(db, `global_lobbies/${lobbyId}/messages`);
+            try {
+                await addDoc(messagesRef, {
+                    text: text.trim(),
+                    senderUid: auth.currentUser.uid,
+                    senderName: currentUserData.displayName,
+                    timestamp: serverTimestamp(),
+                    isDeleted: false // NEW
+                });
+                lobbyChatInput.value = ''; // Clear input after sending
+            } catch (error) {
+                console.error("Error sending chat message:", error);
+                showMessageBox("خطا در ارسال پیام.", "error");
+            }
+        }
+        
+        // NEW: Soft-deletes a message
+        async function deleteLobbyMessage(lobbyId, messageId) {
+            const messageRef = doc(db, `global_lobbies/${lobbyId}/messages`, messageId);
+            try {
+                await updateDoc(messageRef, {
+                    text: "[این پیام حذف شده است]",
+                    isDeleted: true
+                });
+            } catch (error) {
+                console.error("Error deleting message:", error);
+                showMessageBox("خطا در حذف پیام.", "error");
+            }
+        }
+
+        function setupLobbyChatListener(lobbyId, hostId) {
+            const messagesRef = collection(db, `global_lobbies/${lobbyId}/messages`);
+            const q = query(messagesRef, orderBy("timestamp", "asc"));
+
+            return onSnapshot(q, (snapshot) => {
+                lobbyChatMessages.innerHTML = '';
+                snapshot.forEach(doc => {
+                    const messageData = doc.data();
+                    const messageId = doc.id;
+                    const isCurrentUserMsg = messageData.senderUid === auth.currentUser.uid;
+                    const isCurrentUserHost = auth.currentUser.uid === hostId;
+
+                    const canDelete = !messageData.isDeleted && (isCurrentUserMsg || isCurrentUserHost);
+
+                    const messageDiv = document.createElement('div');
+                    messageDiv.classList.add('chat-message');
+                    if (isCurrentUserMsg) {
+                        messageDiv.classList.add('current-user');
+                    }
+                    
+                    const deleteButtonHtml = canDelete ? `
+                        <button class="delete-message-btn" data-message-id="${messageId}" title="حذف پیام">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-trash-2"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg>
+                        </button>
+                    ` : '';
+
+                    const messageContentHtml = messageData.isDeleted ? `
+                        <p class="message-text-deleted">${messageData.text}</p>
+                    ` : `
+                        <span class="sender-name">${messageData.senderName}</span>
+                        <p class="message-text">${messageData.text}</p>
+                    `;
+
+                    messageDiv.innerHTML = `
+                        <div class="chat-message-content">
+                            ${messageContentHtml}
+                        </div>
+                        ${deleteButtonHtml}
+                    `;
+                    lobbyChatMessages.appendChild(messageDiv);
+                });
+                // Auto-scroll to the bottom
+                lobbyChatMessages.scrollTop = lobbyChatMessages.scrollHeight;
+            }, (error) => {
+                console.error("Lobby chat listener error:", error);
+                console.warn("Could not load chat messages:", error.message);
+            });
+        }
+
+
+        // --- Event Listeners ---
+        // Auth, Profile, Modals, Lobby List
+        loginToggleBtn.addEventListener('click', () => {
+            authMode = 'login';
+            displayNameField.classList.add('hidden');
+            submitAuthBtn.textContent = 'ورود';
+            submitAuthBtn.classList.remove('hidden');
+            loginToggleBtn.classList.add('hidden');
+            registerToggleBtn.classList.remove('hidden');
+            emailInput.focus();
+            authForm.reset();
+        });
+
+        registerToggleBtn.addEventListener('click', () => {
+            authMode = 'register';
+            displayNameField.classList.remove('hidden');
+            submitAuthBtn.textContent = 'ثبت نام';
+            submitAuthBtn.classList.remove('hidden');
+            registerToggleBtn.classList.add('hidden');
+            loginToggleBtn.classList.remove('hidden');
+            emailInput.focus();
+            authForm.reset();
+        });
+
+        authForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = emailInput.value.trim();
+            const password = passwordInput.value.trim();
+            const displayName = displayNameInput.value.trim();
+
+            if (!email || !password) { showMessageBox("لطفاً ایمیل و رمز عبور را وارد کنید.", 'error'); return; }
+            if (authMode === 'register' && !displayName) { showMessageBox("لطفاً نام نمایشی را وارد کنید.", 'error'); return; }
+            if (authMode === 'register' && password.length < 6) { showMessageBox("رمز عبور باید حداقل ۶ کاراکتر باشد.", "error"); return; }
+
+            try {
+                if (authMode === 'login') {
+                    await signInWithEmailAndPassword(auth, email, password);
+                } else {
+                    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                    const userDocRef = doc(db, `artifacts/${appId}/users/${userCredential.user.uid}/profile/data`);
+                    await setDoc(userDocRef, { displayName: displayName, email: email }, { merge: true });
+                }
+            } catch (error) { showMessageBox(getFirebaseErrorMessage(error.code), 'error'); }
+        });
+
+        menuBtn.addEventListener('click', openProfileModal);
+        profileSummary.addEventListener('click', openProfileModal);
+        closeProfileModalBtn.addEventListener('click', closeProfileModal);
+        profileModal.addEventListener('click', (e) => e.target === profileModal && closeProfileModal());
+        
+        profileLogoutBtn.addEventListener('click', async () => {
+            try { await signOut(auth); closeProfileModal(); } catch (error) { showMessageBox(getFirebaseErrorMessage(error.code), 'error'); }
+        });
+
+        friendlyGameBtn.addEventListener('click', () => {
+            if (!auth.currentUser) { showMessageBox("برای مشاهده لابی‌ها، ابتدا وارد شوید.", "error"); return; }
+            setActiveScreen(lobbyScreen);
+            unsubscribeLobbies = setupLobbyListener('');
+        });
+        
+        ratedGameBtn.addEventListener('click', () => showMessageBox("بازی امتیازی به زودی!", "info"));
+
+        backToMainBtn.addEventListener('click', () => {
+            setActiveScreen(mainScreen);
+            if (unsubscribeLobbies) unsubscribeLobbies();
+            if (unsubscribeLobbyDetail) unsubscribeLobbyDetail();
+            if (unsubscribeLobbyChat) unsubscribeLobbyChat();
+            unsubscribeLobbies = unsubscribeLobbyDetail = unsubscribeLobbyChat = null;
+        });
+
+        addIconBtn.addEventListener('click', () => {
+            if (!auth.currentUser) { showMessageBox("برای ساخت لابی، ابتدا وارد شوید.", "error"); return; }
+            if (userHasActiveLobby) { showMessageBox("شما از قبل در یک لابی فعال هستید.", "info"); return; }
+            openCreateLobbyModal();
+        });
+        
+        createLobbyForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const lobbyName = newLobbyNameInput.value.trim();
+            const lobbyType = document.querySelector('input[name="lobby-type"]:checked').value;
+            const password = newLobbyPasswordInput.value;
+        
+            if (!lobbyName) { showCreateLobbyMessageBox("لطفاً نام لابی را وارد کنید.", "error"); return; }
+            if (lobbyType === 'private' && password.length < 4) { showCreateLobbyMessageBox("رمز عبور برای لابی خصوصی باید حداقل ۴ کاراکتر باشد.", "error"); return; }
+            if (!auth.currentUser || !currentUserData?.displayName) { showCreateLobbyMessageBox("مشکلی در اطلاعات کاربری شما وجود دارد.", "error"); return; }
+            if (userHasActiveLobby) { showCreateLobbyMessageBox("شما از قبل در یک لابی فعال هستید.", "info"); closeCreateLobbyModal(); return; }
+        
+            showCreateLobbyMessageBox("در حال بررسی نام لابی...", "info");
+            try {
+                const moderationResult = await checkLobbyNameWithAI(lobbyName);
+                if (!moderationResult.is_appropriate) { showCreateLobbyMessageBox(`نام لابی نامناسب: ${moderationResult.reason}`, "error");  return; }
+            } catch (aiError) { console.error("خطا در بررسی AI نام لابی:", aiError); showCreateLobbyMessageBox("خطایی در بررسی نام لابی پیش آمد.", "error"); return; }
+        
+            try {
+                const newLobbyId = await createLobby(lobbyName, auth.currentUser.uid, currentUserData.displayName, lobbyType, password);
+                showCreateLobbyMessageBox("لابی شما با موفقیت ساخته شد!", "success");
+                
+                setTimeout(() => {
+                    closeCreateLobbyModal();
+                    currentLobbyId = newLobbyId;
+                    setActiveScreen(lobbyDetailScreen);
+                    unsubscribeLobbyDetail = setupLobbyDetailListener(newLobbyId);
+                }, 1500);
+                
+            } catch (error) {
+                console.error("خطا در ساخت لابی از مودال:", error);
+                showCreateLobbyMessageBox(error.message.includes("شما از قبل یک لابی فعال ساخته‌اید.") ? error.message : `خطا در ساخت لابی: ${error.message}`, "error");
+            }
+        });
+
+        closeCreateLobbyModalBtn.addEventListener('click', closeCreateLobbyModal);
+        createLobbyModal.addEventListener('click', (e) => e.target === createLobbyModal && closeCreateLobbyModal());
+        
+        refreshLobbiesBtn.addEventListener('click', () => {
+            if (isRefreshing) return;
+            if (!auth.currentUser) { showMessageBox("برای بروزرسانی لابی‌ها، ابتدا وارد شوید.", "info"); return; }
+            isRefreshing = true;
+            refreshLobbiesBtn.disabled = true;
+            const refreshIconSvg = refreshLobbiesBtn.querySelector('svg');
+            refreshIconSvg.classList.add('is-refreshing');
+            lobbiesList.innerHTML = '<p class="text-gray-400">در حال بروزرسانی لیست...</p>';
+            if (unsubscribeLobbies) { unsubscribeLobbies(); unsubscribeLobbies = null; }
+            unsubscribeLobbies = setupLobbyListener(lobbySearchInput.value.trim().toLowerCase());
+            setTimeout(() => {
+                isRefreshing = false;
+                refreshLobbiesBtn.disabled = false;
+                refreshIconSvg.classList.remove('is-refreshing');
+                showMessageBox("لیست لابی‌ها بروزرسانی شد.", "info");
+            }, 1000);
+        });
+
+        // MODIFIED: Replaced myLobbiesBtn with quickJoinBtn
+        quickJoinBtn.addEventListener('click', async () => {
+            if (!auth.currentUser) { showMessageBox("برای ورود، ابتدا وارد شوید.", "info"); return; }
+            if (userHasActiveLobby) { showMessageBox("شما از قبل در یک لابی فعال هستید.", "info"); return; }
+
+            quickJoinBtn.disabled = true;
+            showMessageBox("در حال جستجوی لابی برای ورود سریع...", "info");
+
+            try {
+                const q = query(
+                    collection(db, "global_lobbies"),
+                    where("status", "==", "waiting"),
+                    where("type", "==", "public")
+                );
+                const querySnapshot = await getDocs(q);
+                
+                let availableLobbies = [];
+                querySnapshot.forEach(doc => {
+                    const lobby = { id: doc.id, ...doc.data() };
+                    const playerCount = Object.keys(lobby.players || {}).length;
+                    const maxPlayers = lobby.gameSettings?.maxPlayers || 4;
+                    const isKicked = lobby.kickedPlayers?.some(p => p.uid === auth.currentUser.uid);
+                    if (playerCount < maxPlayers && !isKicked) {
+                        availableLobbies.push(lobby);
                     }
                 });
 
-                // --- 3. Manage Button States ---
-                const isTeamAFull = lobbyData.teams.team_a.playerCount >= lobbyData.gameSettings.maxPlayers / 2;
-                const isTeamBFull = lobbyData.teams.team_b.playerCount >= lobbyData.gameSettings.maxPlayers / 2;
-                
-                joinTeamABtn.disabled = isTeamAFull;
-                joinTeamBBtn.disabled = isTeamBFull;
-                
-                // --- 4. Manage Ready/Start State ---
-                if (currentUserLobbyData) {
-                    readyBtn.textContent = currentUserLobbyData.isReady ? "آماده!" : "آماده نیستم";
-                    readyBtn.classList.toggle('btn-green-classic', currentUserLobbyData.isReady);
-                    readyBtn.classList.toggle('btn-gray-classic', !currentUserLobbyData.isReady);
+                if (availableLobbies.length > 0) {
+                    const randomLobby = availableLobbies[Math.floor(Math.random() * availableLobbies.length)];
+                    await joinLobby(randomLobby.id, auth.currentUser.uid, currentUserData.displayName);
+                } else {
+                    showMessageBox("هیچ لابی عمومی برای ورود سریع یافت نشد.", "error");
                 }
-                
-                const allPlayersReady = playerList.length === lobbyData.gameSettings.maxPlayers && playerList.every(([_, p]) => p.isReady);
-                startGameBtn.style.display = isCurrentUserHost ? 'block' : 'none';
-                startGameBtn.disabled = !allPlayersReady;
-
-                // --- 5. Manage Game Settings ---
-                roundsToWinSelect.value = lobbyData.gameSettings.roundsToWin;
-                roundsToWinSelect.disabled = !isCurrentUserHost;
-            });
-
-            // Add other listeners (chat, etc.) here
-        }
+            } catch (error) {
+                console.error("Error during Quick Join:", error);
+                showMessageBox("خطا در عملیات ورود سریع.", "error");
+            } finally {
+                quickJoinBtn.disabled = false;
+            }
+        });
         
-        function createPlayerSlotElement(uid, playerData, hostId) {
-            const isHost = uid === hostId;
-            const isReady = playerData.isReady;
-
-            const div = document.createElement('div');
-            div.className = `player-slot ${isHost ? 'is-host' : ''}`;
-            div.innerHTML = `
-                <div class="flex items-center gap-3">
-                    <div class="ready-status ${isReady ? 'ready' : ''}">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
-                    </div>
-                    <span class="player-name">${playerData.displayName}</span>
-                    ${isHost ? '<span class="text-xs text-yellow-400">(سازنده)</span>' : ''}
-                </div>
-                <!-- Maybe add a kick button for the host here -->
-            `;
-            return div;
-        }
-
-        async function leaveLobbyLogic() {
-            if (!currentLobbyId || !auth.currentUser) return;
-            
-            const lobbyRef = doc(db, 'global_lobbies', currentLobbyId);
-            const lobbySnap = await getDoc(lobbyRef);
-            if (!lobbySnap.exists()) return;
-            
-            const lobbyData = lobbySnap.data();
-            const myUid = auth.currentUser.uid;
-            const iAmHost = lobbyData.hostId === myUid;
-            const remainingPlayers = Object.keys(lobbyData.players).filter(uid => uid !== myUid);
-
-            if (iAmHost && remainingPlayers.length > 0) {
-                // Host Migration!
-                const playersArray = Object.entries(lobbyData.players)
-                    .filter(([uid, _]) => uid !== myUid)
-                    .sort((a, b) => a[1].joinedAt.seconds - b[1].joinedAt.seconds);
-                
-                const newHostUid = playersArray[0][0]; // Oldest player becomes new host
-                
-                await updateDoc(lobbyRef, {
-                    hostId: newHostUid,
-                    [`players.${myUid}`]: deleteField() // Atomically remove self
-                });
-            } else if (iAmHost && remainingPlayers.length === 0) {
-                // I am host and last one out. Delete lobby.
-                await deleteDoc(lobbyRef);
-            } else {
-                // I am not host. Just remove me.
-                await updateDoc(lobbyRef, {
-                    [`players.${myUid}`]: deleteField(),
-                    [`teams.${lobbyData.players[myUid].teamId}.playerCount`]: (lobbyData.teams[lobbyData.players[myUid].teamId].playerCount - 1)
-                });
-            }
-
-            currentLobbyId = null;
-            // setActiveScreen(lobbyScreen);
-        }
-
-        async function joinTeam(teamId) {
-            if (!currentLobbyId || !auth.currentUser) return;
-            const lobbyRef = doc(db, 'global_lobbies', currentLobbyId);
-
-            // A transaction would be better here, but for simplicity:
-            const lobbySnap = await getDoc(lobbyRef);
-            const lobbyData = lobbySnap.data();
-            const myUid = auth.currentUser.uid;
-            const me = lobbyData.players[myUid];
-
-            // If I am already on a team, do nothing
-            if(me.teamId === teamId) return;
-
-            // Update my data
-            const updates = {};
-            updates[`players.${myUid}.teamId`] = teamId;
-            updates[`players.${myUid}.isReady`] = false; // Un-ready on team switch
-            
-            // Decrement old team count if I was on a team
-            if(me.teamId){
-                 updates[`teams.${me.teamId}.playerCount`] = lobbyData.teams[me.teamId].playerCount - 1;
-            }
-            // Increment new team count
-            updates[`teams.${teamId}.playerCount`] = lobbyData.teams[teamId].playerCount + 1;
-            
-            await updateDoc(lobbyRef, updates);
-        }
-
-        async function toggleReady() {
-            if (!currentLobbyId || !auth.currentUser) return;
-            const lobbyRef = doc(db, 'global_lobbies', currentLobbyId);
-            
-            const lobbySnap = await getDoc(lobbyRef);
-            const amIReady = lobbySnap.data().players[auth.currentUser.uid].isReady;
-
-            await updateDoc(lobbyRef, {
-                [`players.${auth.currentUser.uid}.isReady`]: !amIReady
-            });
-        }
-        
-        async function updateGameSettings(newRoundsToWin) {
-            if (!currentLobbyId) return;
-            const lobbyRef = doc(db, 'global_lobbies', currentLobbyId);
-            await updateDoc(lobbyRef, { 'gameSettings.roundsToWin': parseInt(newRoundsToWin) });
-        }
-
-
-        // --- New Logic for post-game stats update (Example) ---
-        async function handleGameOver(winningTeamId) {
-             if (!currentLobbyId || !auth.currentUser) return;
-            
-            const lobbyRef = doc(db, 'global_lobbies', currentLobbyId);
-            const lobbySnap = await getDoc(lobbyRef);
-            if (!lobbySnap.exists()) return;
-            const lobbyData = lobbySnap.data();
-            const playersMap = lobbyData.players;
-
-            const batch = writeBatch(db);
-
-            for (const uid in playersMap) {
-                const player = playersMap[uid];
-                const playerRef = doc(db, 'users', uid);
-
-                // Determine win/loss
-                const xpGained = (player.teamId === winningTeamId) ? 150 : 50;
-                
-                // Get current stats to update them
-                const userSnap = await getDoc(playerRef);
-                const userData = userSnap.data();
-                
-                const newWins = (player.teamId === winningTeamId) ? (userData.stats.wins + 1) : userData.stats.wins;
-                const newLosses = (player.teamId !== winningTeamId) ? (userData.stats.losses + 1) : userData.stats.losses;
-                
-                const currentXp = userData.xp;
-                const newXp = currentXp + xpGained;
-                const xpForNextLevel = userData.level * 1000;
-                
-                let newLevel = userData.level;
-                let finalXp = newXp;
-                
-                if(newXp >= xpForNextLevel) {
-                    newLevel++;
-                    finalXp = newXp - xpForNextLevel; // Reset XP for new level
-                }
-
-                batch.update(playerRef, {
-                    'stats.wins': newWins,
-                    'stats.losses': newLosses,
-                    'stats.gamesPlayed': (userData.stats.gamesPlayed + 1),
-                    'xp': finalXp,
-                    'level': newLevel
-                });
-            }
-
-            // Mark lobby as finished and commit all user updates
-            batch.update(lobbyRef, { status: "finished" });
-            await batch.commit();
-            console.log("Game over! Stats have been updated for all players.");
-        }
-
-
-        // --- Event Listeners for New Features ---
-        joinTeamABtn.addEventListener('click', () => joinTeam('team_a'));
-        joinTeamBBtn.addEventListener('click', () => joinTeam('team_b'));
-        readyBtn.addEventListener('click', toggleReady);
-        leaveLobbyBtn.addEventListener('click', leaveLobbyLogic);
-        roundsToWinSelect.addEventListener('change', (e) => updateGameSettings(e.target.value));
-
-        // For testing purpose only
-        simulateGameOverBtn.addEventListener('click', () => {
-            // Assume team A wins for testing
-            handleGameOver('team_a'); 
+        lobbySearchInput.addEventListener('input', (e) => {
+            if (unsubscribeLobbies) unsubscribeLobbies();
+            unsubscribeLobbies = setupLobbyListener(e.target.value.trim().toLowerCase());
+        });
+        lobbySearchInput.addEventListener('keypress', (e) => e.key === 'Enter' && searchLobbiesBtn.click());
+        searchLobbiesBtn.addEventListener('click', () => {
+            if (unsubscribeLobbies) unsubscribeLobbies();
+            unsubscribeLobbies = setupLobbyListener(lobbySearchInput.value.trim().toLowerCase());
         });
 
+        // --- Lobby Detail Screen Event Listeners ---
+        leaveLobbyBtn.addEventListener('click', leaveLobby);
+        startGameBtn.addEventListener('click', async () => {
+            if (currentLobbyId && auth.currentUser) {
+                const lobbyRef = doc(db, `global_lobbies`, currentLobbyId);
+                await updateDoc(lobbyRef, { status: "playing" });
+                // Future: Transition to game board
+            }
+        });
+        
+        toggleChatLockBtn.addEventListener('click', async () => {
+            if (!currentLobbyId || !auth.currentUser) return;
+            const lobbyRef = doc(db, 'global_lobbies', currentLobbyId);
+            try {
+                const lobbySnap = await getDoc(lobbyRef);
+                if (lobbySnap.exists() && lobbySnap.data().hostId === auth.currentUser.uid) {
+                    const currentLockState = lobbySnap.data().isChatLocked || false;
+                    await updateDoc(lobbyRef, { isChatLocked: !currentLockState });
+                }
+            } catch (error) {
+                console.error("Error toggling chat lock:", error);
+                showMessageBox("خطا در تغییر وضعیت چت.", "error");
+            }
+        });
 
-        // Initialize App on Load
-        // window.onload = () => { /* original logic */ };
+        // Event delegation for player list actions (Kick, Make Host)
+        playerListContainer.addEventListener('click', async (e) => {
+            const kickButton = e.target.closest('.kick-player-btn');
+            const makeHostButton = e.target.closest('.make-host-btn');
 
-        // Dummy call to simulate opening profile after login
-        // setTimeout(openProfileModal, 2000); 
+            if (kickButton) {
+                const playerName = kickButton.dataset.playerName;
+                const playerUid = kickButton.dataset.playerUid;
+                openKickPlayerConfirmModal(playerName, playerUid);
+            }
 
+            if (makeHostButton) {
+                const playerName = makeHostButton.dataset.playerName;
+                const playerUid = makeHostButton.dataset.playerUid;
+                const confirmed = await showCustomConfirm(`آیا مطمئن هستید که می‌خواهید مالکیت لابی را به "${playerName}" منتقل کنید؟ شما تمام اختیارات سازندگی را از دست خواهید داد.`, 'واگذاری مالکیت');
+                if (confirmed) {
+                    await transferLobbyOwnership(currentLobbyId, playerUid);
+                }
+            }
+        });
+
+        // Kick/Unkick related
+        kickPlayerConfirmBtn.addEventListener('click', () => kickedPlayerToProcess && kickPlayer(currentLobbyId, kickedPlayerToProcess.uid, kickedPlayerToProcess.displayName));
+        cancelKickPlayerBtn.addEventListener('click', closeKickPlayerConfirmModal);
+        closeKickPlayerConfirmModalBtn.addEventListener('click', closeKickPlayerConfirmModal);
+        kickPlayerConfirmModal.addEventListener('click', (e) => e.target === kickPlayerConfirmModal && closeKickPlayerConfirmModal());
+        kickedMessageOkBtn.addEventListener('click', closeKickedMessageModal);
+        viewKickedPlayersBtn.addEventListener('click', openKickedPlayersListModal);
+        closeKickedPlayersListModalBtn.addEventListener('click', closeKickedPlayersListModal);
+        kickedListOkBtn.addEventListener('click', closeKickedPlayersListModal);
+        kickedPlayersListModal.addEventListener('click', (e) => e.target === kickedPlayersListModal && closeKickedPlayersListModal());
+        
+        // Private lobby password related
+        function showPasswordPromptMessage(message, type = 'error') {
+            passwordPromptMessageBox.textContent = message;
+            passwordPromptMessageBox.className = 'mt-5 p-3.5 rounded-xl text-base text-center';
+            passwordPromptMessageBox.classList.add(type === 'error' ? 'bg-red-500' : 'bg-blue-500', 'text-white');
+            passwordPromptMessageBox.classList.remove('hidden');
+            setTimeout(() => passwordPromptMessageBox.classList.add('hidden'), 4000);
+        }
+
+        function openEnterPasswordModal(lobbyId, lobbyName) {
+            lobbyToJoin = { id: lobbyId, name: lobbyName };
+            passwordPromptLobbyName.textContent = lobbyName;
+            enterPasswordForm.reset();
+            passwordPromptMessageBox.classList.add('hidden');
+            enterPasswordModal.classList.remove('hidden');
+            void enterPasswordModal.offsetWidth;
+            enterPasswordModal.classList.add('profile-modal-enter-active');
+            joinLobbyPasswordInput.focus();
+        }
+
+        function closeEnterPasswordModal() {
+            enterPasswordModal.classList.remove('profile-modal-enter-active');
+            enterPasswordModal.classList.add('profile-modal-leave-active');
+            setTimeout(() => {
+                enterPasswordModal.classList.add('hidden');
+                enterPasswordModal.classList.remove('profile-modal-leave-active');
+                lobbyToJoin = null;
+            }, 300);
+        }
+
+        lobbyTypeToggle.addEventListener('change', (e) => {
+            document.querySelectorAll('.lobby-type-btn').forEach(btn => btn.classList.remove('active'));
+            e.target.nextElementSibling.classList.add('active');
+            if (e.target.value === 'private') {
+                newLobbyPasswordField.classList.remove('hidden');
+            } else {
+                newLobbyPasswordField.classList.add('hidden');
+            }
+        });
+
+        togglePasswordVisibilityBtn.addEventListener('click', () => {
+            const isPassword = newLobbyPasswordInput.type === 'password';
+            newLobbyPasswordInput.type = isPassword ? 'text' : 'password';
+            eyeIconOpen.style.display = isPassword ? 'none' : 'block';
+            eyeIconClosed.style.display = isPassword ? 'block' : 'none';
+        });
+
+        cancelJoinPasswordBtn.addEventListener('click', closeEnterPasswordModal);
+        enterPasswordModal.addEventListener('click', (e) => e.target === enterPasswordModal && closeEnterPasswordModal());
+
+        enterPasswordForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            if (!lobbyToJoin) return;
+            const enteredPassword = joinLobbyPasswordInput.value;
+            if (!enteredPassword) { showPasswordPromptMessage('لطفاً رمز عبور را وارد کنید.'); return; }
+
+            submitJoinPasswordBtn.disabled = true;
+            submitJoinPasswordBtn.textContent = 'در حال بررسی...';
+            try {
+                const lobbyRef = doc(db, 'global_lobbies', lobbyToJoin.id);
+                const lobbySnap = await getDoc(lobbyRef);
+                if (!lobbySnap.exists() || lobbySnap.data().type !== 'private') {
+                    showPasswordPromptMessage('این لابی دیگر خصوصی نیست یا وجود ندارد.');
+                    closeEnterPasswordModal();
+                    return;
+                }
+                if (enteredPassword === lobbySnap.data().password) {
+                    closeEnterPasswordModal();
+                    await joinLobby(lobbyToJoin.id, auth.currentUser.uid, currentUserData.displayName);
+                } else {
+                    showPasswordPromptMessage('رمز عبور اشتباه است.');
+                    joinLobbyPasswordInput.value = '';
+                    joinLobbyPasswordInput.focus();
+                }
+            } catch (error) {
+                console.error("Error verifying lobby password:", error);
+                showPasswordPromptMessage('خطا در بررسی رمز عبور.');
+            } finally {
+                submitJoinPasswordBtn.disabled = false;
+                submitJoinPasswordBtn.textContent = 'ورود';
+            }
+        });
+        
+        // Chat Form Submission
+        lobbyChatForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            if (currentLobbyId) {
+                sendLobbyMessage(currentLobbyId, lobbyChatInput.value);
+            }
+        });
+
+        // Event Delegation for Message Deletion
+        lobbyChatMessages.addEventListener('click', (e) => {
+            const deleteButton = e.target.closest('.delete-message-btn');
+            if (deleteButton) {
+                const messageId = deleteButton.dataset.messageId;
+                if (currentLobbyId && messageId) {
+                    // Optional: Add a confirmation dialog here if you want
+                    // const confirmed = await showCustomConfirm("آیا از حذف این پیام مطمئن هستید؟");
+                    // if (confirmed) {
+                        deleteLobbyMessage(currentLobbyId, messageId);
+                    // }
+                }
+            }
+        });
+
+        window.onload = initializeFirebaseAndAuth;
     </script>
 </body>
 </html>
