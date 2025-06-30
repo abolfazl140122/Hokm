@@ -701,135 +701,158 @@
         .lobby-type-btn.active { background-color: #DAA520; color: #1A1A1A; box-shadow: 0 0 10px rgba(255,215,0,0.5); }
         .lobby-lock-icon { width: 1.2rem; height: 1.2rem; margin-left: 0.5rem; color: #FFD700; display: inline-block; vertical-align: middle; }
 
-        /* === Game Screen Styles (NEW) === */
+        /* === GAME SCREEN REDESIGN (START) === */
         #game-screen {
             background: linear-gradient(180deg, #2C2C2C 0%, #1A1A1A 100%);
+            display: flex; /* Use flexbox for overall layout */
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 1rem; /* Padding around the entire screen */
+            box-sizing: border-box;
+            width: 100%;
+            height: 100%;
         }
-        #game-table {
-            background: radial-gradient(ellipse at center, #004d00 0%, #002900 100%); /* Dark green felt */
-            transform-style: preserve-3d;
-        }
-        .player-slot {
-            transform-style: preserve-3d; /* Allows child transforms to work correctly */
-        }
-        .player-slot .player-hand {
+        /* Game Header: Score, Hokm, etc. */
+        #game-header {
+            width: 100%;
+            max-width: 1200px; /* Match table width */
+            background: linear-gradient(to right, #4A2B00 0%, #7A4C00 50%, #4A2B00 100%);
+            border: 2px solid #FFD700;
+            border-bottom: none; /* Border is now part of the rounded top */
+            border-radius: 20px 20px 0 0;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            padding: 0.5rem 1.5rem;
             display: flex;
-            perspective: 800px; /* Adds depth to card arrangements */
+            justify-content: space-between;
+            align-items: center;
+            z-index: 20;
         }
-        .player-slot.active-turn .player-name-display {
-            box-shadow: 0 0 15px #FFD700, 0 0 5px #FFF;
+        #game-team-scores {
+            color: #FFFFFF;
+            font-size: 1.1rem;
+            font-weight: bold;
+        }
+        #our-team-score { color: #86efac; font-size: 1.3rem; } /* Brighter green */
+        #their-team-score { color: #f87171; font-size: 1.3rem; } /* Brighter red */
+        
+        #game-hokm-indicator {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        #game-hokm-indicator .hokm-label {
+            font-size: 1.2rem;
+            font-weight: bold;
             color: #FFD700;
-            transform: scale(1.1);
+        }
+        #hokm-suit-icon { font-size: 2.5rem; text-shadow: 0 0 10px #FFD700; }
+        #leave-game-btn-container {
+            min-width: 120px; /* Reserve space for the button */
+        }
+        #leave-game-btn {
+            padding: 0.5rem 1rem;
+            font-size: 0.9rem;
+        }
+        /* Main Game Table */
+        #game-table {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            max-width: 1200px;
+            max-height: 700px; /* Adjusted max height */
+            background: radial-gradient(ellipse at center, #004d00 0%, #002900 100%);
+            border: 4px solid #4A2B00; /* Wood-like border */
+            border-top: none; /* Top border is on header */
+            border-radius: 0 0 20px 20px; /* Match header rounding */
+            box-shadow: 0 10px 30px rgba(0,0,0,0.6), inset 0 0 20px rgba(0,0,0,0.4);
+            display: grid; /* Use grid for layout */
+            grid-template-columns: 150px 1fr 150px;
+            grid-template-rows: 120px 1fr 120px;
+            padding: 1rem;
+            gap: 1rem;
+        }
+        /* Center play area */
+        #play-area {
+            grid-column: 2 / 3;
+            grid-row: 2 / 3;
+            background-color: rgba(0, 0, 0, 0.2);
+            border: 2px dashed rgba(255, 255, 255, 0.2);
+            border-radius: 50%; /* Make it a circular centerpiece */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: inset 0 0 25px rgba(0,0,0,0.5);
+        }
+        /* A decorative element for the play area */
+        #play-area::before {
+            content: '♣';
+            font-size: 8rem;
+            color: rgba(255, 215, 0, 0.1);
+            font-family: 'Playfair Display', serif;
+        }
+        /* Player Slots - General Styling */
+        .player-slot {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+        .player-info {
+            background-color: rgba(0, 0, 0, 0.6);
+            padding: 0.5rem 1rem;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.5);
+            text-align: center;
             transition: all 0.3s ease;
         }
         .player-name-display {
-            transition: all 0.3s ease;
-        }
-        /* Styles for playing cards */
-        .card {
-            width: 70px;
-            height: 100px;
-            background-color: white;
-            border: 1px solid #333;
-            border-radius: 6px;
-            box-shadow: 2px 2px 5px rgba(0,0,0,0.4);
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            align-items: center;
-            padding: 5px;
-            font-size: 24px;
+            color: #E0E0E0;
             font-weight: bold;
-            user-select: none;
-            transition: all 0.2s ease-out;
-            position: relative;
+            font-size: 1rem;
         }
-        .card.back {
-            background-image: linear-gradient(135deg, #4B0000, #800000); /* Rich red back */
-            border: 2px solid #DAA520;
+        .player-slot.active-turn .player-info {
+            transform: scale(1.1);
+            background-color: rgba(255, 215, 0, 0.2);
+            border-color: #FFD700;
+            box-shadow: 0 0 15px #FFD700;
         }
-        .card.red { color: #DC2626; } /* Tailwind Red-600 */
-        .card.black { color: #111827; } /* Tailwind Gray-900 */
-        .card-rank { font-family: 'Playfair Display', serif; }
-        .card-suit { font-size: 20px; }
-        .card-suit.top { transform: rotate(0deg); }
-        .card-suit.bottom { transform: rotate(180deg); }
-
-        /* My hand cards (bottom player) */
-        #player-slot-bottom .player-hand {
-             gap: -35px; /* Overlap cards */
+        .player-slot.active-turn .player-name-display {
+            color: #FFD700;
         }
-        #player-slot-bottom .card:not(.back) {
-            cursor: pointer;
+        .player-hand {
+             /* Empty for now, as cards are removed */
+            height: 50px; /* Give it some space */
+            margin-top: 0.5rem;
         }
-        #player-slot-bottom .card:not(.back):hover {
-            transform: translateY(-20px) scale(1.05);
-            z-index: 100; /* Bring hovered card to front */
-            box-shadow: 0 12px 24px rgba(0,0,0,0.5);
-        }
-
-        /* Side players' hands */
-        #player-slot-left, #player-slot-right {
-             gap: -80px; /* Overlap vertical cards */
-        }
-        #player-slot-left .player-hand, #player-slot-right .player-hand {
-            flex-direction: column;
-        }
-
-        /* Top player's hand */
-        #player-slot-top .player-hand {
-             gap: -35px; /* Overlap cards */
-        }
-        #player-slot-top .card {
-            transform: rotate(180deg);
-        }
-
-        /* Cards in the play area */
-        #play-area {
-            transform-style: preserve-3d;
-            perspective: 1000px;
-        }
-        #play-area .card {
-            position: absolute;
-            transform: none; /* Reset hover transforms */
-            box-shadow: 0 8px 16px rgba(0,0,0,0.5);
-        }
-        /* Positioning and rotation for played cards */
-        #play-area .played-card-bottom {
-            bottom: -50px;
-            transform: translateY(0);
-        }
-        #play-area .played-card-left {
-            left: -50px;
-            transform: rotate(90deg) translateX(-50%) translateY(50%);
-            transform-origin: center;
-        }
-        #play-area .played-card-top {
-            top: -50px;
-            transform: rotate(180deg);
-        }
-        #play-area .played-card-right {
-            right: -50px;
-            transform: rotate(-90deg) translateX(50%) translateY(50%);
-            transform-origin: center;
-        }
-
-        /* General player slot positioning */
-        #player-slot-bottom { bottom: 20px; left: 50%; transform: translateX(-50%); }
-        #player-slot-top { top: 20px; left: 50%; transform: translateX(-50%); }
-        #player-slot-left { left: 20px; top: 50%; transform: translateY(-50%); }
-        #player-slot-right { right: 20px; top: 50%; transform: translateY(-50%); }
-
+        /* Specific Player Slot Positioning with Grid */
+        #player-slot-bottom { grid-column: 2 / 3; grid-row: 3 / 4; }
+        #player-slot-top { grid-column: 2 / 3; grid-row: 1 / 2; flex-direction: column-reverse; }
+        #player-slot-left { grid-column: 1 / 2; grid-row: 2 / 3; }
+        #player-slot-right { grid-column: 3 / 4; grid-row: 2 / 3; }
+        
         @media (max-width: 768px) {
-            .card { width: 50px; height: 75px; font-size: 18px; border-radius: 4px; }
-            .card-suit { font-size: 16px; }
-            #player-slot-bottom .player-hand, #player-slot-top .player-hand { gap: -25px; }
-            #player-slot-left, #player-slot-right { gap: -60px; }
-             #player-slot-bottom { bottom: 10px; }
-            #player-slot-top { top: 10px; }
-            #player-slot-left { left: 10px; }
-            #player-slot-right { right: 10px; }
+            #game-table {
+                grid-template-columns: 100px 1fr 100px;
+                grid-template-rows: 100px 1fr 100px;
+                padding: 0.5rem;
+                gap: 0.5rem;
+            }
+            #game-header {
+                padding: 0.5rem 1rem;
+                border-radius: 15px 15px 0 0;
+            }
+            .player-name-display { font-size: 0.8rem; }
+            .player-info { padding: 0.3rem 0.6rem; }
+            #game-team-scores { font-size: 0.9rem; }
+            #our-team-score, #their-team-score { font-size: 1.1rem; }
+            #game-hokm-indicator .hokm-label { font-size: 1rem; }
+            #hokm-suit-icon { font-size: 2rem; }
+            #play-area::before { font-size: 5rem; }
         }
+        /* === GAME SCREEN REDESIGN (END) === */
     </style>
 </head>
 <body>
@@ -1122,66 +1145,69 @@
             </div>
         </div>
 
-        <!-- 9. Game Screen (NEW) -->
-        <div id="game-screen" class="hidden absolute inset-0 z-30 page-transition-active page-transition-hidden flex flex-col items-center justify-center p-2" tabindex="-1">
-            <!-- Game Header: Score, Hokm, etc. -->
-            <div class="absolute top-0 left-0 right-0 h-20 bg-black bg-opacity-40 flex justify-between items-center px-4 z-20">
-                <div id="game-team-scores" class="text-white text-lg font-bold">
-                    <span>تیم ما: <span id="our-team-score" class="text-xl text-green-300">0</span></span> |
-                    <span>تیم حریف: <span id="their-team-score" class="text-xl text-red-300">0</span></span>
+        <!-- 9. Game Screen (REDESIGNED) -->
+        <div id="game-screen" class="hidden absolute inset-0 z-30 page-transition-active page-transition-hidden" tabindex="-1">
+            <!-- Game Header -->
+            <header id="game-header">
+                <div id="game-team-scores">
+                    <span>تیم ما: <span id="our-team-score">0</span></span> |
+                    <span>تیم حریف: <span id="their-team-score">0</span></span>
                 </div>
-                <div id="game-hokm-indicator" class="flex items-center space-x-2 space-x-reverse">
-                    <span class="text-xl font-bold text-yellow-300">حکم:</span>
-                    <span id="hokm-suit-icon" class="text-4xl">❓</span>
+                <div id="game-hokm-indicator">
+                    <span class="hokm-label">حکم:</span>
+                    <span id="hokm-suit-icon">❓</span>
                 </div>
-                <button id="leave-game-btn" class="classic-btn btn-red-classic text-sm py-2 px-4">ترک بازی</button>
-            </div>
+                <div id="leave-game-btn-container">
+                    <button id="leave-game-btn" class="classic-btn btn-red-classic">ترک بازی</button>
+                </div>
+            </header>
 
             <!-- Main Game Table -->
-            <div id="game-table" class="relative w-[98vw] h-[85vh] max-w-[1200px] max-h-[800px] rounded-[75px] border-4 border-yellow-900 shadow-2xl flex items-center justify-center">
+            <div id="game-table">
                 <!-- Center play area -->
-                <div id="play-area" class="absolute w-80 h-48 flex items-center justify-center">
-                    <!-- Cards played in the current trick will appear here -->
+                <div id="play-area">
+                    <!-- This area is now a decorative centerpiece -->
                 </div>
 
                 <!-- Player Slots -->
-                <div id="player-slot-bottom" class="player-slot absolute">
-                    <div class="player-info text-center mb-2">
-                        <span class="player-name-display text-white font-bold bg-black bg-opacity-60 px-4 py-1 rounded-lg">شما</span>
+                <div id="player-slot-top" class="player-slot">
+                    <div class="player-info">
+                        <span class="player-name-display">یار شما</span>
                     </div>
-                    <div class="player-hand flex justify-center">
-                        <!-- Player's cards -->
+                    <div class="player-hand">
+                        <!-- Cards removed as requested -->
+                    </div>
+                </div>
+                
+                <div id="player-slot-left" class="player-slot">
+                    <div class="player-info">
+                        <span class="player-name-display">بازیکن ۲</span>
+                    </div>
+                    <div class="player-hand">
+                        <!-- Cards removed as requested -->
+                    </div>
+                </div>
+                
+                <div id="player-slot-right" class="player-slot">
+                     <div class="player-info">
+                        <span class="player-name-display">بازیکن ۴</span>
+                    </div>
+                    <div class="player-hand">
+                        <!-- Cards removed as requested -->
                     </div>
                 </div>
 
-                <div id="player-slot-left" class="player-slot absolute">
-                     <div class="player-info text-center">
-                        <span class="player-name-display text-white font-bold bg-black bg-opacity-60 px-4 py-1 rounded-lg">بازیکن ۲</span>
+                <div id="player-slot-bottom" class="player-slot">
+                    <div class="player-hand">
+                         <!-- Cards removed as requested -->
                     </div>
-                    <div class="player-hand flex justify-center">
-                        <!-- Opponent's cards (face down) -->
-                    </div>
-                </div>
-
-                <div id="player-slot-top" class="player-slot absolute">
-                     <div class="player-info text-center mt-2">
-                        <span class="player-name-display text-white font-bold bg-black bg-opacity-60 px-4 py-1 rounded-lg">یار شما</span>
-                    </div>
-                    <div class="player-hand flex justify-center">
-                        <!-- Partner's cards (face down) -->
-                    </div>
-                </div>
-
-                <div id="player-slot-right" class="player-slot absolute">
-                     <div class="player-info text-center">
-                        <span class="player-name-display text-white font-bold bg-black bg-opacity-60 px-4 py-1 rounded-lg">بازیکن ۴</span>
-                    </div>
-                    <div class="player-hand flex justify-center">
-                        <!-- Opponent's cards (face down) -->
+                    <div class="player-info">
+                        <span class="player-name-display">شما</span>
                     </div>
                 </div>
             </div>
         </div>
+
 
         <!-- ... All other modals (kick, kicked message, etc.) remain the same ... -->
         <!-- 10. Kick Player Confirmation Modal -->
@@ -1356,9 +1382,10 @@
         const lobbyChatInput = document.getElementById('lobby-chat-input');
         const lobbyChatSendBtn = document.getElementById('lobby-chat-send-btn');
 
-        // Game Screen Elements (NEW)
+        // Game Screen Elements (REDESIGNED)
         const gameScreen = document.getElementById('game-screen');
         const leaveGameBtn = document.getElementById('leave-game-btn');
+        const leaveGameBtnContainer = document.getElementById('leave-game-btn-container'); // Container for visibility control
         const hokmSuitIcon = document.getElementById('hokm-suit-icon');
         const ourTeamScoreEl = document.getElementById('our-team-score');
         const theirTeamScoreEl = document.getElementById('their-team-score');
@@ -1991,7 +2018,7 @@
                     const isCurrentUserHost = auth.currentUser && lobbyData.hostId === auth.currentUser.uid;
 
                     // NEW: Check if game has started
-                    if (lobbyData.status === 'playing') {
+                    if (lobbyData.status === 'playing' && lobbyData.gameState) {
                         if (currentActiveScreen !== gameScreen) {
                             setActiveScreen(gameScreen);
                         }
@@ -2244,7 +2271,7 @@
             });
         }
         
-        // --- Game Logic Functions (NEW) ---
+        // --- Game Logic Functions (REDESIGNED) ---
 
         function createShuffledDeck() {
             const suits = ['H', 'D', 'C', 'S']; // Hearts, Diamonds, Clubs, Spades
@@ -2279,9 +2306,9 @@
                 playerNames: lobbyData.players, // Map of uid -> displayName
                 hakem: hakem,
                 currentTurn: hakem,
-                phase: 'CHOOSE_HOKM',
+                phase: 'CHOOSE_HOKM', // Game starts with choosing the trump suit
                 hokmSuit: null,
-                hands: hands,
+                hands: hands, // Hands are dealt but not yet visible in detail to others
                 currentTrick: [],
                 scores: { team1: 0, team2: 0 },
                 roundPoints: { team1: 0, team2: 0 },
@@ -2305,11 +2332,14 @@
             console.log(`Listening to game state for lobby ID: ${lobbyId}`);
             if (unsubscribeLobbyDetail) { unsubscribeLobbyDetail(); unsubscribeLobbyDetail = null; }
             const lobbyRef = doc(db, `global_lobbies`, lobbyId);
+            // This listener is crucial. It provides the "instantaneous" connection to the server you mentioned.
+            // Any change in the game data on the server will trigger this function automatically.
             return onSnapshot(lobbyRef, (docSnap) => {
                 if (docSnap.exists() && docSnap.data().gameState) {
                     const lobbyData = docSnap.data();
-                    renderGameScreen(lobbyData);
+                    renderGameScreen(lobbyData); // Re-render the entire game screen with new data
                 } else {
+                    // This happens if the game ends (e.g., host leaves and lobby is deleted)
                     showMessageBox("بازی مورد نظر پایان یافت یا با خطا مواجه شد.", "info");
                     setActiveScreen(lobbyScreen);
                     unsubscribeLobbies = setupLobbyListener('');
@@ -2322,33 +2352,37 @@
             });
         }
 
+        // This function now handles all visual updates on the game screen based on server data.
         function renderGameScreen(lobbyData) {
             const gameState = lobbyData.gameState;
             const myUid = auth.currentUser.uid;
             
-            // Find my position in the game
+            // 1. Check if user is still in the game
             const myIndex = gameState.players.indexOf(myUid);
             if (myIndex === -1) {
                 console.error("Current user not found in game players list!");
-                // Possibly kicked during game start transition, or an error occurred.
-                leaveGameBtn.click(); // Force leave
+                leaveGameBtn.click(); // Force leave if something is wrong
                 return;
             }
 
-            // Define positions relative to me
+            // 2. Determine player positions relative to the current user (you are always at the bottom)
             const positions = ['bottom', 'left', 'top', 'right'];
-            const slotMap = {}; // Maps UID to slot name ('bottom', 'left', etc.)
+            const slotMap = {}; // Maps UID to a slot name like 'bottom'
             gameState.players.forEach((uid, index) => {
                 const relativeIndex = (index - myIndex + 4) % 4;
                 slotMap[uid] = positions[relativeIndex];
             });
 
-            // Render player names and turn indicator
+            // 3. Update player names and turn indicators in their respective slots
             for (const uid in slotMap) {
                 const slotName = slotMap[uid];
                 const slotElement = playerSlots[slotName];
                 const nameDisplay = slotElement.querySelector('.player-name-display');
-                nameDisplay.textContent = gameState.playerNames[uid];
+                const playerInfo = slotElement.querySelector('.player-info');
+
+                nameDisplay.textContent = gameState.playerNames[uid] || 'بازیکن';
+                
+                // Highlight the player whose turn it is
                 if (uid === gameState.currentTurn) {
                     slotElement.classList.add('active-turn');
                 } else {
@@ -2356,57 +2390,33 @@
                 }
             }
 
-            // Render hands
-            for (const uid in gameState.hands) {
-                const hand = gameState.hands[uid];
-                const slotName = slotMap[uid];
-                if (!slotName) continue; // Skip if player not in slot map (e.g., left game)
-
-                const handContainer = playerSlots[slotName].querySelector('.player-hand');
-                handContainer.innerHTML = ''; // Clear old cards
-
-                if (uid === myUid) {
-                    // My hand - face up
-                    hand.sort(); // Sort my hand for better view
-                    hand.forEach(cardStr => {
-                        handContainer.appendChild(createCardElement(cardStr, false));
-                    });
-                } else {
-                    // Others' hands - face down
-                    hand.forEach(() => {
-                        handContainer.appendChild(createCardElement(null, true));
-                    });
-                }
-            }
-             // TODO: Render scores, hokm, and play area later
-        }
-
-        function createCardElement(cardStr, isBack) {
-            const cardDiv = document.createElement('div');
-            cardDiv.className = 'card';
-            
-            if (isBack) {
-                cardDiv.classList.add('back');
-                return cardDiv;
-            }
-
+            // 4. Update Header Information (Scores, Hokm)
             const suitMap = { 'S': '♠', 'H': '♥', 'D': '♦', 'C': '♣' };
-            const colorMap = { 'S': 'black', 'H': 'red', 'D': 'red', 'C': 'black' };
+            ourTeamScoreEl.textContent = gameState.scores.team1 || 0;
+            theirTeamScoreEl.textContent = gameState.scores.team2 || 0;
+            hokmSuitIcon.textContent = gameState.hokmSuit ? suitMap[gameState.hokmSuit] : '❓';
+            if (gameState.hokmSuit) {
+                 hokmSuitIcon.style.color = (gameState.hokmSuit === 'H' || gameState.hokmSuit === 'D') ? '#DC2626' : '#111827';
+            } else {
+                hokmSuitIcon.style.color = '#FFD700';
+            }
 
-            const rank = cardStr.substring(0, cardStr.length - 1);
-            const suitChar = cardStr.slice(-1);
-            const suitSymbol = suitMap[suitChar];
-            const color = colorMap[suitChar];
+            // 5. CARDS ARE REMOVED: The section for rendering cards is now gone.
+            // The .player-hand divs are now just empty placeholders as requested.
+            Object.values(playerSlots).forEach(slot => {
+                const handContainer = slot.querySelector('.player-hand');
+                handContainer.innerHTML = ''; // Ensure it's empty
+            });
 
-            cardDiv.classList.add(color);
-            cardDiv.dataset.card = cardStr;
+            // 6. PLAY AREA IS NOW DECORATIVE: The logic for rendering played cards is removed.
 
-            cardDiv.innerHTML = `
-                <div class="card-suit top">${suitSymbol}</div>
-                <div class="card-rank">${rank}</div>
-                <div class="card-suit bottom">${suitSymbol}</div>
-            `;
-            return cardDiv;
+            // 7. **IMPORTANT**: Control visibility of the "Leave Game" button based on Host status
+            const isCurrentUserHost = lobbyData.hostId === myUid;
+            if (isCurrentUserHost) {
+                leaveGameBtnContainer.style.display = 'block';
+            } else {
+                leaveGameBtnContainer.style.display = 'none';
+            }
         }
 
 
@@ -2700,26 +2710,29 @@
             }
         });
 
-        // NEW: Game Screen Event Listeners
+        // Game Screen Event Listener
         leaveGameBtn.addEventListener('click', async () => {
             if (!currentLobbyId || !auth.currentUser) return;
 
-            const confirmed = await showCustomConfirm("آیا مطمئن هستید که می‌خواهید بازی را ترک کنید؟ اگر شما سازنده باشید، بازی برای همه تمام می‌شود.");
+            // The logic assumes only the host can see this button.
+            // The confirmation message is for the host.
+            const confirmed = await showCustomConfirm("شما سازنده بازی هستید. ترک کردن شما باعث پایان بازی برای همه می‌شود. آیا مطمئن هستید؟", "پایان دادن به بازی");
             if (!confirmed) return;
 
             const lobbyRef = doc(db, `global_lobbies`, currentLobbyId);
             const lobbySnap = await getDoc(lobbyRef);
 
+            // Double check that the user is indeed the host before deleting.
             if (lobbySnap.exists() && lobbySnap.data().hostId === auth.currentUser.uid) {
-                // Host leaves, delete the entire lobby/game
+                // Host leaves, delete the entire lobby/game document from Firestore.
                 await deleteDoc(lobbyRef);
+                // All other players' `onSnapshot` listeners will detect the deletion and
+                // automatically kick them back to the lobby screen.
             } else {
-                // A player leaves. For now, we'll just delete the lobby as well.
-                // A more advanced implementation would replace the player with a bot or end the game.
-                await deleteDoc(lobbyRef);
+                 // This case should not happen if the button visibility logic is correct,
+                 // but it's a good safeguard.
+                showMessageBox("شما سازنده نیستید و نمی‌توانید بازی را تمام کنید.", "error");
             }
-
-            // All players will be kicked back to lobby screen by their listeners
         });
 
         window.onload = initializeFirebaseAndAuth;
