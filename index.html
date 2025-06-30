@@ -541,11 +541,6 @@
             font-size: 0.8rem;
             margin-right: 0.5rem;
         }
-        /* NEW: Container for host action buttons next to player name */
-        .player-action-buttons {
-            display: flex;
-            gap: 0.5rem;
-        }
         .kick-player-btn {
             background: none;
             border: 1px solid #B22222;
@@ -559,21 +554,6 @@
         .kick-player-btn:hover {
             background: #B22222;
             color: white;
-        }
-        /* NEW: Style for Make Host button */
-        .make-host-btn {
-            background: none;
-            border: 1px solid #DAA520;
-            color: #DAA520;
-            border-radius: 5px;
-            padding: 0.2rem 0.5rem;
-            font-size: 0.8rem;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-        .make-host-btn:hover {
-            background: #DAA520;
-            color: #1A1A1A;
         }
 
         .lobby-chat-container {
@@ -720,6 +700,136 @@
         .lobby-type-btn { padding: 0.5rem 1.5rem; border: 2px solid #DAA520; border-radius: 10px; transition: all 0.2s ease-in-out; background-color: transparent; color: #DAA520; font-weight: bold; }
         .lobby-type-btn.active { background-color: #DAA520; color: #1A1A1A; box-shadow: 0 0 10px rgba(255,215,0,0.5); }
         .lobby-lock-icon { width: 1.2rem; height: 1.2rem; margin-left: 0.5rem; color: #FFD700; display: inline-block; vertical-align: middle; }
+
+        /* === Game Screen Styles (NEW) === */
+        #game-screen {
+            background: linear-gradient(180deg, #2C2C2C 0%, #1A1A1A 100%);
+        }
+        #game-table {
+            background: radial-gradient(ellipse at center, #004d00 0%, #002900 100%); /* Dark green felt */
+            transform-style: preserve-3d;
+        }
+        .player-slot {
+            transform-style: preserve-3d; /* Allows child transforms to work correctly */
+        }
+        .player-slot .player-hand {
+            display: flex;
+            perspective: 800px; /* Adds depth to card arrangements */
+        }
+        .player-slot.active-turn .player-name-display {
+            box-shadow: 0 0 15px #FFD700, 0 0 5px #FFF;
+            color: #FFD700;
+            transform: scale(1.1);
+            transition: all 0.3s ease;
+        }
+        .player-name-display {
+            transition: all 0.3s ease;
+        }
+        /* Styles for playing cards */
+        .card {
+            width: 70px;
+            height: 100px;
+            background-color: white;
+            border: 1px solid #333;
+            border-radius: 6px;
+            box-shadow: 2px 2px 5px rgba(0,0,0,0.4);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            padding: 5px;
+            font-size: 24px;
+            font-weight: bold;
+            user-select: none;
+            transition: all 0.2s ease-out;
+            position: relative;
+        }
+        .card.back {
+            background-image: linear-gradient(135deg, #4B0000, #800000); /* Rich red back */
+            border: 2px solid #DAA520;
+        }
+        .card.red { color: #DC2626; } /* Tailwind Red-600 */
+        .card.black { color: #111827; } /* Tailwind Gray-900 */
+        .card-rank { font-family: 'Playfair Display', serif; }
+        .card-suit { font-size: 20px; }
+        .card-suit.top { transform: rotate(0deg); }
+        .card-suit.bottom { transform: rotate(180deg); }
+
+        /* My hand cards (bottom player) */
+        #player-slot-bottom .player-hand {
+             gap: -35px; /* Overlap cards */
+        }
+        #player-slot-bottom .card:not(.back) {
+            cursor: pointer;
+        }
+        #player-slot-bottom .card:not(.back):hover {
+            transform: translateY(-20px) scale(1.05);
+            z-index: 100; /* Bring hovered card to front */
+            box-shadow: 0 12px 24px rgba(0,0,0,0.5);
+        }
+
+        /* Side players' hands */
+        #player-slot-left, #player-slot-right {
+             gap: -80px; /* Overlap vertical cards */
+        }
+        #player-slot-left .player-hand, #player-slot-right .player-hand {
+            flex-direction: column;
+        }
+
+        /* Top player's hand */
+        #player-slot-top .player-hand {
+             gap: -35px; /* Overlap cards */
+        }
+        #player-slot-top .card {
+            transform: rotate(180deg);
+        }
+
+        /* Cards in the play area */
+        #play-area {
+            transform-style: preserve-3d;
+            perspective: 1000px;
+        }
+        #play-area .card {
+            position: absolute;
+            transform: none; /* Reset hover transforms */
+            box-shadow: 0 8px 16px rgba(0,0,0,0.5);
+        }
+        /* Positioning and rotation for played cards */
+        #play-area .played-card-bottom {
+            bottom: -50px;
+            transform: translateY(0);
+        }
+        #play-area .played-card-left {
+            left: -50px;
+            transform: rotate(90deg) translateX(-50%) translateY(50%);
+            transform-origin: center;
+        }
+        #play-area .played-card-top {
+            top: -50px;
+            transform: rotate(180deg);
+        }
+        #play-area .played-card-right {
+            right: -50px;
+            transform: rotate(-90deg) translateX(50%) translateY(50%);
+            transform-origin: center;
+        }
+
+        /* General player slot positioning */
+        #player-slot-bottom { bottom: 20px; left: 50%; transform: translateX(-50%); }
+        #player-slot-top { top: 20px; left: 50%; transform: translateX(-50%); }
+        #player-slot-left { left: 20px; top: 50%; transform: translateY(-50%); }
+        #player-slot-right { right: 20px; top: 50%; transform: translateY(-50%); }
+
+        @media (max-width: 768px) {
+            .card { width: 50px; height: 75px; font-size: 18px; border-radius: 4px; }
+            .card-suit { font-size: 16px; }
+            #player-slot-bottom .player-hand, #player-slot-top .player-hand { gap: -25px; }
+            #player-slot-left, #player-slot-right { gap: -60px; }
+             #player-slot-bottom { bottom: 10px; }
+            #player-slot-top { top: 10px; }
+            #player-slot-left { left: 10px; }
+            #player-slot-right { right: 10px; }
+        }
     </style>
 </head>
 <body>
@@ -866,12 +976,11 @@
                     </svg>
                     <span>بروزرسانی</span>
                 </button>
-                <!-- MODIFIED: "My Lobbies" button is now "Quick Join" -->
-                <button id="quick-join-btn" class="icon-btn">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-zap">
-                        <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+                <button id="my-lobbies-btn" class="icon-btn">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-users">
+                        <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
                     </svg>
-                    <span>ورود سریع</span>
+                    <span>لابی‌های من</span>
                 </button>
                 <div class="games-running-text">
                     <span id="active-games-count">0</span>
@@ -1013,8 +1122,69 @@
             </div>
         </div>
 
+        <!-- 9. Game Screen (NEW) -->
+        <div id="game-screen" class="hidden absolute inset-0 z-30 page-transition-active page-transition-hidden flex flex-col items-center justify-center p-2" tabindex="-1">
+            <!-- Game Header: Score, Hokm, etc. -->
+            <div class="absolute top-0 left-0 right-0 h-20 bg-black bg-opacity-40 flex justify-between items-center px-4 z-20">
+                <div id="game-team-scores" class="text-white text-lg font-bold">
+                    <span>تیم ما: <span id="our-team-score" class="text-xl text-green-300">0</span></span> |
+                    <span>تیم حریف: <span id="their-team-score" class="text-xl text-red-300">0</span></span>
+                </div>
+                <div id="game-hokm-indicator" class="flex items-center space-x-2 space-x-reverse">
+                    <span class="text-xl font-bold text-yellow-300">حکم:</span>
+                    <span id="hokm-suit-icon" class="text-4xl">❓</span>
+                </div>
+                <button id="leave-game-btn" class="classic-btn btn-red-classic text-sm py-2 px-4">ترک بازی</button>
+            </div>
+
+            <!-- Main Game Table -->
+            <div id="game-table" class="relative w-[98vw] h-[85vh] max-w-[1200px] max-h-[800px] rounded-[75px] border-4 border-yellow-900 shadow-2xl flex items-center justify-center">
+                <!-- Center play area -->
+                <div id="play-area" class="absolute w-80 h-48 flex items-center justify-center">
+                    <!-- Cards played in the current trick will appear here -->
+                </div>
+
+                <!-- Player Slots -->
+                <div id="player-slot-bottom" class="player-slot absolute">
+                    <div class="player-info text-center mb-2">
+                        <span class="player-name-display text-white font-bold bg-black bg-opacity-60 px-4 py-1 rounded-lg">شما</span>
+                    </div>
+                    <div class="player-hand flex justify-center">
+                        <!-- Player's cards -->
+                    </div>
+                </div>
+
+                <div id="player-slot-left" class="player-slot absolute">
+                     <div class="player-info text-center">
+                        <span class="player-name-display text-white font-bold bg-black bg-opacity-60 px-4 py-1 rounded-lg">بازیکن ۲</span>
+                    </div>
+                    <div class="player-hand flex justify-center">
+                        <!-- Opponent's cards (face down) -->
+                    </div>
+                </div>
+
+                <div id="player-slot-top" class="player-slot absolute">
+                     <div class="player-info text-center mt-2">
+                        <span class="player-name-display text-white font-bold bg-black bg-opacity-60 px-4 py-1 rounded-lg">یار شما</span>
+                    </div>
+                    <div class="player-hand flex justify-center">
+                        <!-- Partner's cards (face down) -->
+                    </div>
+                </div>
+
+                <div id="player-slot-right" class="player-slot absolute">
+                     <div class="player-info text-center">
+                        <span class="player-name-display text-white font-bold bg-black bg-opacity-60 px-4 py-1 rounded-lg">بازیکن ۴</span>
+                    </div>
+                    <div class="player-hand flex justify-center">
+                        <!-- Opponent's cards (face down) -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- ... All other modals (kick, kicked message, etc.) remain the same ... -->
-        <!-- NEW: Kick Player Confirmation Modal -->
+        <!-- 10. Kick Player Confirmation Modal -->
         <div id="kick-player-confirm-modal" class="hidden fixed inset-0 flex justify-center items-center z-50 profile-modal-overlay">
             <div class="classic-card profile-modal-content p-6 sm:p-8 w-11/12 max-w-md text-center relative">
                 <h2 class="text-2xl sm:text-3xl font-bold mb-6 text-yellow-300">اخراج بازیکن</h2>
@@ -1031,7 +1201,7 @@
             </div>
         </div>
 
-        <!-- NEW: Kicked Message Modal -->
+        <!-- 11. Kicked Message Modal -->
         <div id="kicked-message-modal" class="hidden fixed inset-0 flex justify-center items-center z-50 profile-modal-overlay">
             <div class="classic-card profile-modal-content p-6 sm:p-8 w-11/12 max-w-md text-center relative">
                 <h2 class="text-2xl sm:text-3xl font-bold mb-6 text-red-400">شما اخراج شدید!</h2>
@@ -1040,7 +1210,7 @@
             </div>
         </div>
 
-        <!-- NEW: Kicked Players List Modal -->
+        <!-- 12. Kicked Players List Modal -->
         <div id="kicked-players-list-modal" class="hidden fixed inset-0 flex justify-center items-center z-50 profile-modal-overlay">
             <div class="classic-card profile-modal-content p-6 sm:p-8 w-11/12 max-w-md text-center relative">
                 <h2 class="text-2xl sm:text-3xl font-bold mb-6 text-yellow-300">لیست بازیکنان اخراج شده</h2>
@@ -1057,7 +1227,7 @@
             </div>
         </div>
         
-        <!-- 9. Enter Password Modal (for private lobbies) -->
+        <!-- 13. Enter Password Modal (for private lobbies) -->
         <div id="enter-password-modal" class="hidden fixed inset-0 flex justify-center items-center z-50 profile-modal-overlay">
             <div class="classic-card profile-modal-content p-6 sm:p-8 w-11/12 max-w-md text-center relative">
                 <h2 class="text-2xl sm:text-3xl font-bold mb-4">ورود به لابی خصوصی</h2>
@@ -1138,7 +1308,7 @@
         const lobbiesList = document.getElementById('lobbies-list');
         const addIconBtn = document.getElementById('add-icon-btn'); // Footer icon
         const refreshLobbiesBtn = document.getElementById('refresh-lobbies-btn'); // Footer icon
-        const quickJoinBtn = document.getElementById('quick-join-btn'); // MODIFIED: Was myLobbiesBtn
+        const myLobbiesBtn = document.getElementById('my-lobbies-btn'); // Footer icon
         const activeGamesCount = document.getElementById('active-games-count');
 
         // Profile Modal Elements
@@ -1186,6 +1356,20 @@
         const lobbyChatInput = document.getElementById('lobby-chat-input');
         const lobbyChatSendBtn = document.getElementById('lobby-chat-send-btn');
 
+        // Game Screen Elements (NEW)
+        const gameScreen = document.getElementById('game-screen');
+        const leaveGameBtn = document.getElementById('leave-game-btn');
+        const hokmSuitIcon = document.getElementById('hokm-suit-icon');
+        const ourTeamScoreEl = document.getElementById('our-team-score');
+        const theirTeamScoreEl = document.getElementById('their-team-score');
+        const playArea = document.getElementById('play-area');
+        const playerSlots = {
+            bottom: document.getElementById('player-slot-bottom'),
+            left: document.getElementById('player-slot-left'),
+            top: document.getElementById('player-slot-top'),
+            right: document.getElementById('player-slot-right'),
+        };
+
         // Kick Player Confirmation Modal Elements
         const kickPlayerConfirmModal = document.getElementById('kick-player-confirm-modal');
         const closeKickPlayerConfirmModalBtn = document.getElementById('close-kick-player-confirm-modal-btn');
@@ -1220,6 +1404,7 @@
         let currentUserData = null; // To store user's profile data
         let unsubscribeLobbies = null; // Global variable to store the unsubscribe function for lobby list listener
         let unsubscribeLobbyDetail = null; // Global variable for single lobby detail listener
+        let unsubscribeGame = null; // NEW: Listener for the active game state
         let unsubscribeKickedPlayers = null; // Listener for kicked players list
         let unsubscribeLobbyChat = null; // NEW: Listener for lobby chat messages
         let isAuthResolved = false; // Flag to indicate if onAuthStateChanged has run at least once
@@ -1295,6 +1480,11 @@
             console.log(`درخواست تغییر صفحه به: ${newScreen.id}. صفحه فعلی: ${currentActiveScreen.id}`);
 
             if (currentActiveScreen === newScreen) return;
+            
+            // Cleanup old listeners when changing screens
+            if (unsubscribeLobbyDetail) { unsubscribeLobbyDetail(); unsubscribeLobbyDetail = null; }
+            if (unsubscribeGame) { unsubscribeGame(); unsubscribeGame = null; }
+
 
             // Hide the current screen with transition
             currentActiveScreen.classList.remove('page-transition-visible');
@@ -1490,7 +1680,8 @@
                 if (unsubscribeLobbyDetail) unsubscribeLobbyDetail();
                 if (unsubscribeKickedPlayers) unsubscribeKickedPlayers();
                 if (unsubscribeLobbyChat) unsubscribeLobbyChat(); // NEW: Cleanup chat listener
-                unsubscribeLobbies = unsubscribeLobbyDetail = unsubscribeKickedPlayers = unsubscribeLobbyChat = null;
+                if (unsubscribeGame) unsubscribeGame(); // NEW: Cleanup game listener
+                unsubscribeLobbies = unsubscribeLobbyDetail = unsubscribeKickedPlayers = unsubscribeLobbyChat = unsubscribeGame = null;
                 currentLobbyId = null;
             }
         });
@@ -1544,7 +1735,7 @@
                     },
                     kickedPlayers: [], // Still an array of objects
                     createdAt: serverTimestamp(),
-                    isChatLocked: false, 
+                    isChatLocked: false, // NEW: Chat is open by default
                     gameSettings: { maxPlayers: 4, roundsToWin: 7 }
                 };
         
@@ -1602,6 +1793,10 @@
                 unsubscribeLobbyChat();
                 unsubscribeLobbyChat = null;
             }
+            if (unsubscribeGame) { // NEW: Clear game listener too
+                unsubscribeGame();
+                unsubscribeGame = null;
+            }
         
             lobbiesList.innerHTML = '<p class="text-gray-400">در حال بارگذاری لابی‌ها...</p>';
             userHasActiveLobby = false;
@@ -1609,13 +1804,12 @@
             const normalizedSearchTerm = searchTerm.toLowerCase();
             const q = query(
                 collection(db, `global_lobbies`), 
-                where("status", "==", "waiting")
+                where("status", "==", "waiting") // This is key: only shows 'waiting' lobbies.
             );
         
             const unsubscribe = onSnapshot(q, (snapshot) => {
                 lobbiesList.innerHTML = '';
         
-                let activeGamesCountNum = 0;
                 let lobbiesToDisplay = [];
                 let currentUserIsInAnyLobby = false;
         
@@ -1633,13 +1827,15 @@
                     if (normalizedSearchTerm === '' || lobbyName.includes(normalizedSearchTerm) || hostDisplayName.includes(normalizedSearchTerm)) {
                         lobbiesToDisplay.push(lobby);
                     }
-        
-                    if (lobby.status === "playing") {
-                        activeGamesCountNum++;
-                    }
                 });
         
                 userHasActiveLobby = currentUserIsInAnyLobby;
+                
+                // Count active games separately by another query or accept this might be slightly off
+                // For now, we will update the active games count less frequently or assume it's decorative.
+                getDocs(query(collection(db, `global_lobbies`), where("status", "==", "playing"))).then(playingSnapshot => {
+                    activeGamesCount.textContent = playingSnapshot.size;
+                });
                 
                 lobbiesToDisplay.sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
         
@@ -1691,8 +1887,6 @@
                     });
                 }
                 
-                activeGamesCount.textContent = activeGamesCountNum;
-        
                 lobbiesList.querySelectorAll('.join-lobby-btn:not([disabled])').forEach(button => {
                     button.addEventListener('click', async (e) => {
                         const lobbyId = e.currentTarget.dataset.lobbyId;
@@ -1788,18 +1982,31 @@
             if (unsubscribeLobbies) { unsubscribeLobbies(); unsubscribeLobbies = null; }
             if (unsubscribeKickedPlayers) { unsubscribeKickedPlayers(); unsubscribeKickedPlayers = null; }
             if (unsubscribeLobbyChat) { unsubscribeLobbyChat(); unsubscribeLobbyChat = null; }
+            if (unsubscribeGame) { unsubscribeGame(); unsubscribeGame = null; }
             
             const lobbyRef = doc(db, `global_lobbies`, lobbyId);
             const unsubscribe = onSnapshot(lobbyRef, async (docSnap) => {
                 if (docSnap.exists()) {
                     const lobbyData = docSnap.data();
+                    const isCurrentUserHost = auth.currentUser && lobbyData.hostId === auth.currentUser.uid;
+
+                    // NEW: Check if game has started
+                    if (lobbyData.status === 'playing') {
+                        if (currentActiveScreen !== gameScreen) {
+                            setActiveScreen(gameScreen);
+                        }
+                        // Start the game listener if it's not already running
+                        if (!unsubscribeGame) {
+                            unsubscribeGame = setupGameListener(lobbyId);
+                        }
+                        return; // Stop processing lobby details, let game listener take over
+                    }
+
                     const playersMap = lobbyData.players || {};
                     const playerCount = Object.keys(playersMap).length;
                     const maxPlayers = lobbyData.gameSettings?.maxPlayers || 4;
-                    const isCurrentUserHost = auth.currentUser && lobbyData.hostId === auth.currentUser.uid;
                     const isChatLocked = lobbyData.isChatLocked || false;
 
-                    // Unsubscribe previous chat listener if host changes
                     if (unsubscribeLobbyChat) unsubscribeLobbyChat();
                     unsubscribeLobbyChat = setupLobbyChatListener(lobbyId, lobbyData.hostId);
 
@@ -1820,16 +2027,12 @@
                         const playerItem = document.createElement('div');
                         playerItem.className = 'player-list-item';
                         if (isHost) playerItem.classList.add('is-host');
+
+                        const kickButtonHtml = (isCurrentUserHost && !isHost) 
+                            ? `<button class="kick-player-btn" data-player-uid="${player.uid}" data-player-name="${player.displayName}">اخراج</button>` 
+                            : '';
                         
                         const hostLabelHtml = isHost ? '<span class="host-label">(سازنده)</span>' : '';
-                        
-                        // NEW: Conditionally create host action buttons
-                        let actionButtonsHtml = '';
-                        if (isCurrentUserHost && !isHost) {
-                            const kickButtonHtml = `<button class="kick-player-btn" data-player-uid="${player.uid}" data-player-name="${player.displayName}">اخراج</button>`;
-                            const makeHostButtonHtml = `<button class="make-host-btn" data-player-uid="${player.uid}" data-player-name="${player.displayName}">واگذاری مالکیت</button>`;
-                            actionButtonsHtml = `<div class="player-action-buttons">${makeHostButtonHtml}${kickButtonHtml}</div>`;
-                        }
 
                         playerItem.innerHTML = `
                             <div class="flex items-center">
@@ -1837,10 +2040,16 @@
                                 <span class="player-name">${player.displayName}</span>
                                 ${hostLabelHtml}
                             </div>
-                            ${actionButtonsHtml}
+                            ${kickButtonHtml}
                         `;
                         playerListContainer.appendChild(playerItem);
                     }
+
+                    playerListContainer.querySelectorAll('.kick-player-btn').forEach(button => {
+                        button.addEventListener('click', (e) => {
+                           openKickPlayerConfirmModal(e.currentTarget.dataset.playerName, e.currentTarget.dataset.playerUid);
+                        });
+                    });
 
                     // Manage Host Actions
                     if (isCurrentUserHost) {
@@ -1848,14 +2057,12 @@
                         startGameBtn.disabled = playerCount !== maxPlayers;
                         startGameBtn.textContent = `شروع بازی (${playerCount}/${maxPlayers})`;
                         
-                        // Manage chat lock button
                         toggleChatLockBtn.textContent = isChatLocked ? 'باز کردن چت' : 'قفل کردن چت';
 
                     } else {
                         hostActionsContainer.style.display = 'none';
                     }
 
-                    // Manage Chat Input for ALL users based on lock state
                     if (isChatLocked && !isCurrentUserHost) {
                         lobbyChatInput.disabled = true;
                         lobbyChatSendBtn.disabled = true;
@@ -1868,7 +2075,7 @@
 
 
                 } else {
-                    showMessageBox("لابی که در آن بودید بسته شد.", "info");
+                    showMessageBox("لابی که در آن بودید بسته شد یا بازی شروع شد.", "info");
                     setActiveScreen(lobbyScreen);
                     unsubscribeLobbies = setupLobbyListener('');
                 }
@@ -1916,21 +2123,6 @@
                 showMessageBox(`بازیکن "${playerToKickDisplayName}" اخراج شد.`, "success");
                 closeKickPlayerConfirmModal();
             } catch (e) { console.error("Error kicking player:", e); showMessageBox("خطا در اخراج بازیکن.", "error"); }
-        }
-
-        // NEW: Function to transfer lobby ownership
-        async function transferLobbyOwnership(lobbyId, newHostUid) {
-            if (!lobbyId || !newHostUid) return;
-            const lobbyRef = doc(db, 'global_lobbies', lobbyId);
-            try {
-                await updateDoc(lobbyRef, {
-                    hostId: newHostUid
-                });
-                showMessageBox("مالکیت لابی با موفقیت منتقل شد.", "success");
-            } catch (e) {
-                console.error("Error transferring ownership:", e);
-                showMessageBox("خطا در انتقال مالکیت لابی.", "error");
-            }
         }
 
         async function unkickPlayer(lobbyId, playerToUnkickUid) {
@@ -2051,6 +2243,171 @@
                 console.warn("Could not load chat messages:", error.message);
             });
         }
+        
+        // --- Game Logic Functions (NEW) ---
+
+        function createShuffledDeck() {
+            const suits = ['H', 'D', 'C', 'S']; // Hearts, Diamonds, Clubs, Spades
+            const ranks = ['2', '3', '4', '5', '6', '7', '8', '9', 'T', 'J', 'Q', 'K', 'A'];
+            const deck = [];
+            for (const suit of suits) {
+                for (const rank of ranks) {
+                    deck.push(rank + suit); // Swapped to Rank+Suit for easier parsing
+                }
+            }
+            // Fisher-Yates Shuffle
+            for (let i = deck.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [deck[i], deck[j]] = [deck[j], deck[i]];
+            }
+            return deck;
+        }
+
+        async function initializeGameInFirestore(lobbyId, lobbyData) {
+            const deck = createShuffledDeck();
+            const playerUIDs = Object.keys(lobbyData.players);
+            
+            const hands = {};
+            playerUIDs.forEach((uid, index) => {
+                hands[uid] = deck.slice(index * 13, (index + 1) * 13);
+            });
+
+            const hakem = lobbyData.hostId;
+
+            const initialGameState = {
+                players: playerUIDs,
+                playerNames: lobbyData.players, // Map of uid -> displayName
+                hakem: hakem,
+                currentTurn: hakem,
+                phase: 'CHOOSE_HOKM',
+                hokmSuit: null,
+                hands: hands,
+                currentTrick: [],
+                scores: { team1: 0, team2: 0 },
+                roundPoints: { team1: 0, team2: 0 },
+            };
+
+            const lobbyRef = doc(db, 'global_lobbies', lobbyId);
+            try {
+                await updateDoc(lobbyRef, {
+                    gameState: initialGameState,
+                    status: "playing"
+                });
+                console.log(`Game state initialized for lobby ${lobbyId}`);
+            } catch (error) {
+                console.error("Error initializing game state:", error);
+                await updateDoc(lobbyRef, { status: "waiting" }); // Revert on failure
+                throw new Error("Failed to initialize game.");
+            }
+        }
+        
+        function setupGameListener(lobbyId) {
+            console.log(`Listening to game state for lobby ID: ${lobbyId}`);
+            if (unsubscribeLobbyDetail) { unsubscribeLobbyDetail(); unsubscribeLobbyDetail = null; }
+            const lobbyRef = doc(db, `global_lobbies`, lobbyId);
+            return onSnapshot(lobbyRef, (docSnap) => {
+                if (docSnap.exists() && docSnap.data().gameState) {
+                    const lobbyData = docSnap.data();
+                    renderGameScreen(lobbyData);
+                } else {
+                    showMessageBox("بازی مورد نظر پایان یافت یا با خطا مواجه شد.", "info");
+                    setActiveScreen(lobbyScreen);
+                    unsubscribeLobbies = setupLobbyListener('');
+                }
+            }, (error) => {
+                console.error("Game state listener error:", error);
+                showMessageBox("ارتباط با بازی قطع شد.", "error");
+                setActiveScreen(lobbyScreen);
+                unsubscribeLobbies = setupLobbyListener('');
+            });
+        }
+
+        function renderGameScreen(lobbyData) {
+            const gameState = lobbyData.gameState;
+            const myUid = auth.currentUser.uid;
+            
+            // Find my position in the game
+            const myIndex = gameState.players.indexOf(myUid);
+            if (myIndex === -1) {
+                console.error("Current user not found in game players list!");
+                // Possibly kicked during game start transition, or an error occurred.
+                leaveGameBtn.click(); // Force leave
+                return;
+            }
+
+            // Define positions relative to me
+            const positions = ['bottom', 'left', 'top', 'right'];
+            const slotMap = {}; // Maps UID to slot name ('bottom', 'left', etc.)
+            gameState.players.forEach((uid, index) => {
+                const relativeIndex = (index - myIndex + 4) % 4;
+                slotMap[uid] = positions[relativeIndex];
+            });
+
+            // Render player names and turn indicator
+            for (const uid in slotMap) {
+                const slotName = slotMap[uid];
+                const slotElement = playerSlots[slotName];
+                const nameDisplay = slotElement.querySelector('.player-name-display');
+                nameDisplay.textContent = gameState.playerNames[uid];
+                if (uid === gameState.currentTurn) {
+                    slotElement.classList.add('active-turn');
+                } else {
+                    slotElement.classList.remove('active-turn');
+                }
+            }
+
+            // Render hands
+            for (const uid in gameState.hands) {
+                const hand = gameState.hands[uid];
+                const slotName = slotMap[uid];
+                if (!slotName) continue; // Skip if player not in slot map (e.g., left game)
+
+                const handContainer = playerSlots[slotName].querySelector('.player-hand');
+                handContainer.innerHTML = ''; // Clear old cards
+
+                if (uid === myUid) {
+                    // My hand - face up
+                    hand.sort(); // Sort my hand for better view
+                    hand.forEach(cardStr => {
+                        handContainer.appendChild(createCardElement(cardStr, false));
+                    });
+                } else {
+                    // Others' hands - face down
+                    hand.forEach(() => {
+                        handContainer.appendChild(createCardElement(null, true));
+                    });
+                }
+            }
+             // TODO: Render scores, hokm, and play area later
+        }
+
+        function createCardElement(cardStr, isBack) {
+            const cardDiv = document.createElement('div');
+            cardDiv.className = 'card';
+            
+            if (isBack) {
+                cardDiv.classList.add('back');
+                return cardDiv;
+            }
+
+            const suitMap = { 'S': '♠', 'H': '♥', 'D': '♦', 'C': '♣' };
+            const colorMap = { 'S': 'black', 'H': 'red', 'D': 'red', 'C': 'black' };
+
+            const rank = cardStr.substring(0, cardStr.length - 1);
+            const suitChar = cardStr.slice(-1);
+            const suitSymbol = suitMap[suitChar];
+            const color = colorMap[suitChar];
+
+            cardDiv.classList.add(color);
+            cardDiv.dataset.card = cardStr;
+
+            cardDiv.innerHTML = `
+                <div class="card-suit top">${suitSymbol}</div>
+                <div class="card-rank">${rank}</div>
+                <div class="card-suit bottom">${suitSymbol}</div>
+            `;
+            return cardDiv;
+        }
 
 
         // --- Event Listeners ---
@@ -2120,7 +2477,8 @@
             if (unsubscribeLobbies) unsubscribeLobbies();
             if (unsubscribeLobbyDetail) unsubscribeLobbyDetail();
             if (unsubscribeLobbyChat) unsubscribeLobbyChat();
-            unsubscribeLobbies = unsubscribeLobbyDetail = unsubscribeLobbyChat = null;
+            if (unsubscribeGame) unsubscribeGame();
+            unsubscribeLobbies = unsubscribeLobbyDetail = unsubscribeLobbyChat = unsubscribeGame = null;
         });
 
         addIconBtn.addEventListener('click', () => {
@@ -2184,47 +2542,7 @@
             }, 1000);
         });
 
-        // MODIFIED: Replaced myLobbiesBtn with quickJoinBtn
-        quickJoinBtn.addEventListener('click', async () => {
-            if (!auth.currentUser) { showMessageBox("برای ورود، ابتدا وارد شوید.", "info"); return; }
-            if (userHasActiveLobby) { showMessageBox("شما از قبل در یک لابی فعال هستید.", "info"); return; }
-
-            quickJoinBtn.disabled = true;
-            showMessageBox("در حال جستجوی لابی برای ورود سریع...", "info");
-
-            try {
-                const q = query(
-                    collection(db, "global_lobbies"),
-                    where("status", "==", "waiting"),
-                    where("type", "==", "public")
-                );
-                const querySnapshot = await getDocs(q);
-                
-                let availableLobbies = [];
-                querySnapshot.forEach(doc => {
-                    const lobby = { id: doc.id, ...doc.data() };
-                    const playerCount = Object.keys(lobby.players || {}).length;
-                    const maxPlayers = lobby.gameSettings?.maxPlayers || 4;
-                    const isKicked = lobby.kickedPlayers?.some(p => p.uid === auth.currentUser.uid);
-                    if (playerCount < maxPlayers && !isKicked) {
-                        availableLobbies.push(lobby);
-                    }
-                });
-
-                if (availableLobbies.length > 0) {
-                    const randomLobby = availableLobbies[Math.floor(Math.random() * availableLobbies.length)];
-                    await joinLobby(randomLobby.id, auth.currentUser.uid, currentUserData.displayName);
-                } else {
-                    showMessageBox("هیچ لابی عمومی برای ورود سریع یافت نشد.", "error");
-                }
-            } catch (error) {
-                console.error("Error during Quick Join:", error);
-                showMessageBox("خطا در عملیات ورود سریع.", "error");
-            } finally {
-                quickJoinBtn.disabled = false;
-            }
-        });
-        
+        myLobbiesBtn.addEventListener('click', () => showMessageBox("لابی‌های من به زودی!", "info"));
         lobbySearchInput.addEventListener('input', (e) => {
             if (unsubscribeLobbies) unsubscribeLobbies();
             unsubscribeLobbies = setupLobbyListener(e.target.value.trim().toLowerCase());
@@ -2237,14 +2555,23 @@
 
         // --- Lobby Detail Screen Event Listeners ---
         leaveLobbyBtn.addEventListener('click', leaveLobby);
+
         startGameBtn.addEventListener('click', async () => {
             if (currentLobbyId && auth.currentUser) {
-                const lobbyRef = doc(db, `global_lobbies`, currentLobbyId);
-                await updateDoc(lobbyRef, { status: "playing" });
-                // Future: Transition to game board
+                try {
+                    const lobbyRef = doc(db, 'global_lobbies', currentLobbyId);
+                    const lobbySnap = await getDoc(lobbyRef);
+                    if (lobbySnap.exists()) {
+                        await initializeGameInFirestore(currentLobbyId, lobbySnap.data());
+                    }
+                } catch (error) {
+                    console.error("Error starting game:", error);
+                    showMessageBox(`خطا در شروع بازی: ${error.message}`, "error");
+                }
             }
         });
         
+        // NEW: Toggle Chat Lock Listener
         toggleChatLockBtn.addEventListener('click', async () => {
             if (!currentLobbyId || !auth.currentUser) return;
             const lobbyRef = doc(db, 'global_lobbies', currentLobbyId);
@@ -2257,27 +2584,6 @@
             } catch (error) {
                 console.error("Error toggling chat lock:", error);
                 showMessageBox("خطا در تغییر وضعیت چت.", "error");
-            }
-        });
-
-        // Event delegation for player list actions (Kick, Make Host)
-        playerListContainer.addEventListener('click', async (e) => {
-            const kickButton = e.target.closest('.kick-player-btn');
-            const makeHostButton = e.target.closest('.make-host-btn');
-
-            if (kickButton) {
-                const playerName = kickButton.dataset.playerName;
-                const playerUid = kickButton.dataset.playerUid;
-                openKickPlayerConfirmModal(playerName, playerUid);
-            }
-
-            if (makeHostButton) {
-                const playerName = makeHostButton.dataset.playerName;
-                const playerUid = makeHostButton.dataset.playerUid;
-                const confirmed = await showCustomConfirm(`آیا مطمئن هستید که می‌خواهید مالکیت لابی را به "${playerName}" منتقل کنید؟ شما تمام اختیارات سازندگی را از دست خواهید داد.`, 'واگذاری مالکیت');
-                if (confirmed) {
-                    await transferLobbyOwnership(currentLobbyId, playerUid);
-                }
             }
         });
 
@@ -2383,19 +2689,37 @@
             }
         });
 
-        // Event Delegation for Message Deletion
+        // NEW: Event Delegation for Message Deletion
         lobbyChatMessages.addEventListener('click', (e) => {
             const deleteButton = e.target.closest('.delete-message-btn');
             if (deleteButton) {
                 const messageId = deleteButton.dataset.messageId;
                 if (currentLobbyId && messageId) {
-                    // Optional: Add a confirmation dialog here if you want
-                    // const confirmed = await showCustomConfirm("آیا از حذف این پیام مطمئن هستید؟");
-                    // if (confirmed) {
-                        deleteLobbyMessage(currentLobbyId, messageId);
-                    // }
+                    deleteLobbyMessage(currentLobbyId, messageId);
                 }
             }
+        });
+
+        // NEW: Game Screen Event Listeners
+        leaveGameBtn.addEventListener('click', async () => {
+            if (!currentLobbyId || !auth.currentUser) return;
+
+            const confirmed = await showCustomConfirm("آیا مطمئن هستید که می‌خواهید بازی را ترک کنید؟ اگر شما سازنده باشید، بازی برای همه تمام می‌شود.");
+            if (!confirmed) return;
+
+            const lobbyRef = doc(db, `global_lobbies`, currentLobbyId);
+            const lobbySnap = await getDoc(lobbyRef);
+
+            if (lobbySnap.exists() && lobbySnap.data().hostId === auth.currentUser.uid) {
+                // Host leaves, delete the entire lobby/game
+                await deleteDoc(lobbyRef);
+            } else {
+                // A player leaves. For now, we'll just delete the lobby as well.
+                // A more advanced implementation would replace the player with a bot or end the game.
+                await deleteDoc(lobbyRef);
+            }
+
+            // All players will be kicked back to lobby screen by their listeners
         });
 
         window.onload = initializeFirebaseAndAuth;
