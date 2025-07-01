@@ -704,8 +704,6 @@
         /* === Game Screen Styles (REDESIGNED) === */
         #game-screen {
             background: radial-gradient(ellipse at bottom, #100C08 0%, #000000 100%);
-            transform-style: preserve-3d;
-            perspective: 2000px;
         }
         #game-table {
             background: #6B4F35; /* Fallback color for the wooden table */
@@ -716,11 +714,7 @@
             border-image-slice: 1;
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.85), inset 0 0 40px rgba(0,0,0,0.7);
             border-radius: 100px;
-            transform-style: preserve-3d;
             position: relative;
-        }
-        .player-slot {
-            transform-style: preserve-3d; /* Allows child transforms to work correctly */
         }
 
         /* NEW: Player Info Pod Styling */
@@ -769,54 +763,9 @@
 
         .player-slot .player-hand {
             display: flex;
-            perspective: 800px; /* Adds depth to card arrangements */
         }
 
-        /* Styles for playing cards */
-        .card {
-            width: 70px;
-            height: 100px;
-            background-color: white;
-            border: 1px solid #333;
-            border-radius: 6px;
-            box-shadow: 2px 2px 5px rgba(0,0,0,0.4);
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            align-items: center;
-            padding: 5px;
-            font-size: 24px;
-            font-weight: bold;
-            user-select: none;
-            transition: all 0.2s ease-out;
-            position: relative;
-        }
-        .card.back {
-            background-image: linear-gradient(135deg, #4B0000, #800000); /* Rich red back */
-            border: 2px solid #DAA520;
-        }
-        .card.red { color: #DC2626; } /* Tailwind Red-600 */
-        .card.black { color: #111827; } /* Tailwind Gray-900 */
-        .card-rank { font-family: 'Playfair Display', serif; }
-        .card-suit { font-size: 20px; }
-        .card-suit.top { transform: rotate(0deg); }
-        .card-suit.bottom { transform: rotate(180deg); }
-
-        /* My hand cards (bottom player) */
-        #player-slot-bottom .player-hand {
-             gap: -35px; /* Overlap cards */
-             margin-top: -30px; /* Pull cards up slightly over the table edge */
-        }
-        #player-slot-bottom .card:not(.back) {
-            cursor: pointer;
-        }
-        #player-slot-bottom .card:not(.back):hover {
-            transform: translateY(-20px) scale(1.05);
-            z-index: 100; /* Bring hovered card to front */
-            box-shadow: 0 12px 24px rgba(0,0,0,0.5);
-        }
-        
-        /* Side players' hands & info pods */
+        /* Side players' pods and (empty) hands */
         #player-slot-left, #player-slot-right {
             display: flex;
             align-items: center;
@@ -825,68 +774,32 @@
         #player-slot-right {
              flex-direction: row-reverse;
         }
-        #player-slot-left .player-hand, #player-slot-right .player-hand {
-            flex-direction: column;
-            gap: -80px; /* Overlap vertical cards */
-        }
 
-        /* Top player's hand & info pod */
+        /* Top player's pod and (empty) hand arrangement */
         #player-slot-top .player-area-container {
              flex-direction: column-reverse;
         }
-        #player-slot-top .player-hand {
-             gap: -35px; /* Overlap cards */
-             margin-bottom: -30px;
+        
+        /* Cards in the play area (Kept for future use) */
+        #play-area {
+            position: absolute;
+            width: 250px;
+            height: 150px;
         }
         
-        /* Cards in the play area */
-        #play-area {
-            transform-style: preserve-3d;
-            perspective: 1000px;
-        }
-        #play-area .card {
-            position: absolute;
-            transform: none; /* Reset hover transforms */
-            box-shadow: 0 8px 16px rgba(0,0,0,0.5);
-            transition: transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
-        }
-        /* Positioning and rotation for played cards */
-        #play-area .played-card-bottom {
-            bottom: -50px;
-            transform: translateY(0);
-        }
-        #play-area .played-card-left {
-            left: -50px;
-            transform: rotate(90deg) translateX(-50%) translateY(50%);
-            transform-origin: center;
-        }
-        #play-area .played-card-top {
-            top: -50px;
-            transform: rotate(180deg);
-        }
-        #play-area .played-card-right {
-            right: -50px;
-            transform: rotate(-90deg) translateX(50%) translateY(50%);
-            transform-origin: center;
-        }
-
         /* General player slot positioning */
-        #player-slot-bottom { bottom: 20px; left: 50%; transform: translateX(-50%); flex-direction: column; align-items: center; }
-        #player-slot-top { top: 20px; left: 50%; transform: translateX(-50%); flex-direction: column; align-items: center;}
+        #player-slot-bottom { bottom: 20px; left: 50%; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; }
+        #player-slot-top { top: 20px; left: 50%; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; }
         #player-slot-left { left: 40px; top: 50%; transform: translateY(-50%); }
         #player-slot-right { right: 40px; top: 50%; transform: translateY(-50%); }
 
         @media (max-width: 768px) {
-            .card { width: 50px; height: 75px; font-size: 18px; border-radius: 4px; }
-            .card-suit { font-size: 16px; }
-            #player-slot-bottom .player-hand, #player-slot-top .player-hand { gap: -25px; }
-            #player-slot-left .player-hand, #player-slot-right .player-hand { gap: -60px; }
-             #player-slot-bottom { bottom: 10px; }
-            #player-slot-top { top: 10px; }
-            #player-slot-left { left: 10px; }
-            #player-slot-right { right: 10px; }
             .player-avatar { width: 50px; height: 50px; }
             .player-avatar svg { width: 24px; height: 24px; }
+            #player-slot-bottom { bottom: 10px; }
+            #player-slot-top { top: 10px; }
+            #player-slot-left { left: 10px; gap: 0.5rem; }
+            #player-slot-right { right: 10px; gap: 0.5rem; }
         }
     </style>
 </head>
@@ -1192,13 +1105,12 @@
                     <span class="text-xl font-bold text-yellow-300">حکم:</span>
                     <span id="hokm-suit-icon" class="text-4xl">❓</span>
                 </div>
-                <!-- Leave Game Button Removed As Per Request -->
             </div>
 
             <!-- Main Game Table -->
             <div id="game-table" class="relative w-[98vw] h-[85vh] max-w-[1200px] max-h-[800px] flex items-center justify-center">
                 <!-- Center play area -->
-                <div id="play-area" class="absolute w-80 h-48 flex items-center justify-center">
+                <div id="play-area">
                     <!-- Cards played in the current trick will appear here -->
                 </div>
 
@@ -1211,19 +1123,19 @@
                         <span class="player-name-display">شما</span>
                     </div>
                     <div class="player-hand flex justify-center">
-                        <!-- Player's cards generated by JS -->
+                        <!-- This container is now empty as requested -->
                     </div>
                 </div>
 
                 <div id="player-slot-left" class="player-slot absolute">
-                    <div class="player-hand flex justify-center">
-                         <!-- Opponent's cards (face down) -->
-                    </div>
-                    <div class="player-area-container">
+                     <div class="player-area-container">
                         <div class="player-avatar">
                              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-user-round"><circle cx="12" cy="8" r="5"/><path d="M20 21a8 8 0 0 0-16 0"/></svg>
                         </div>
                         <span class="player-name-display">بازیکن ۲</span>
+                    </div>
+                    <div class="player-hand flex justify-center">
+                         <!-- This container is now empty as requested -->
                     </div>
                 </div>
 
@@ -1235,19 +1147,19 @@
                         <span class="player-name-display">یار شما</span>
                     </div>
                     <div class="player-hand flex justify-center">
-                        <!-- Partner's cards (face down) -->
+                        <!-- This container is now empty as requested -->
                     </div>
                 </div>
 
                 <div id="player-slot-right" class="player-slot absolute">
-                    <div class="player-hand flex justify-center">
-                        <!-- Opponent's cards (face down) -->
-                    </div>
-                    <div class="player-area-container">
+                     <div class="player-area-container">
                         <div class="player-avatar">
                              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-user-round"><circle cx="12" cy="8" r="5"/><path d="M20 21a8 8 0 0 0-16 0"/></svg>
                         </div>
                         <span class="player-name-display">بازیکن ۴</span>
+                    </div>
+                    <div class="player-hand flex justify-center">
+                        <!-- This container is now empty as requested -->
                     </div>
                 </div>
             </div>
@@ -1428,7 +1340,6 @@
 
         // Game Screen Elements (NEW)
         const gameScreen = document.getElementById('game-screen');
-        // const leaveGameBtn = document.getElementById('leave-game-btn'); // REMOVED
         const hokmSuitIcon = document.getElementById('hokm-suit-icon');
         const ourTeamScoreEl = document.getElementById('our-team-score');
         const theirTeamScoreEl = document.getElementById('their-team-score');
@@ -2416,12 +2327,9 @@
             const gameState = lobbyData.gameState;
             const myUid = auth.currentUser.uid;
             
-            // Find my position in the game
             const myIndex = gameState.players.indexOf(myUid);
             if (myIndex === -1) {
                 console.error("Current user not found in game players list!");
-                // This can happen if the user was kicked right as the game started.
-                // The listener should eventually redirect them.
                 return;
             }
 
@@ -2448,64 +2356,31 @@
                 else nameDisplay.textContent = gameState.playerNames[uid];
                 
                 if (uid === gameState.currentTurn) {
-                    slotElement.classList.add('active-turn');
+                    slotElement.querySelector('.player-area-container').parentElement.classList.add('active-turn');
                 }
             }
 
-            // Render hands
+            // Render hands (empty containers as requested)
             for (const uid in gameState.hands) {
-                const hand = gameState.hands[uid];
                 const slotName = slotMap[uid];
-                if (!slotName) continue; // Skip if player not in slot map (e.g., left game)
+                if (!slotName) continue;
 
                 const handContainer = playerSlots[slotName].querySelector('.player-hand');
-                handContainer.innerHTML = ''; // Clear old cards
-
-                if (uid === myUid) {
-                    // My hand - face up and sorted
-                    hand.sort(); 
-                    hand.forEach(cardStr => {
-                        handContainer.appendChild(createCardElement(cardStr, false));
-                    });
-                } else {
-                    // Others' hands - face down
-                    hand.forEach(() => {
-                        handContainer.appendChild(createCardElement(null, true));
-                    });
-                }
+                handContainer.innerHTML = ''; // Clear and leave empty
             }
-             // TODO: Render scores, hokm, and play area later
-        }
-
-        function createCardElement(cardStr, isBack) {
-            const cardDiv = document.createElement('div');
-            cardDiv.className = 'card';
             
-            if (isBack) {
-                cardDiv.classList.add('back');
-                return cardDiv;
-            }
+            // Render scores, hokm, and play area
+            // (These will be implemented in more detail later)
+            const myTeamIsTeam1 = myIndex === 0 || myIndex === 2;
+            ourTeamScoreEl.textContent = myTeamIsTeam1 ? gameState.scores.team1 : gameState.scores.team2;
+            theirTeamScoreEl.textContent = myTeamIsTeam1 ? gameState.scores.team2 : gameState.scores.team1;
 
-            const suitMap = { 'S': '♠', 'H': '♥', 'D': '♦', 'C': '♣' };
-            const colorMap = { 'S': 'black', 'H': 'red', 'D': 'red', 'C': 'black' };
-
-            const rank = cardStr.substring(0, cardStr.length - 1);
-            const suitChar = cardStr.slice(-1);
-            const suitSymbol = suitMap[suitChar];
-            const color = colorMap[suitChar];
-
-            cardDiv.classList.add(color);
-            cardDiv.dataset.card = cardStr;
-
-            cardDiv.innerHTML = `
-                <div class="card-suit top">${suitSymbol}</div>
-                <div class="card-rank">${rank}</div>
-                <div class="card-suit bottom">${suitSymbol}</div>
-            `;
-            return cardDiv;
+            const suitSymbolMap = { 'S': '♠', 'H': '♥', 'D': '♦', 'C': '♣', null: '❓' };
+            hokmSuitIcon.textContent = suitSymbolMap[gameState.hokmSuit];
+            
+            playArea.innerHTML = ''; // Clear played cards for now
         }
-
-
+        
         // --- Event Listeners ---
         // Auth, Profile, Modals, Lobby List
         loginToggleBtn.addEventListener('click', () => {
@@ -2796,8 +2671,6 @@
             }
         });
         
-        // REMOVED: leaveGameBtn event listener as the button is gone.
-
         window.onload = initializeFirebaseAndAuth;
     </script>
 </body>
