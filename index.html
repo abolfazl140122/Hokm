@@ -670,16 +670,20 @@
         /* Custom Scrollbars */
         .lobby-sidebar::-webkit-scrollbar,
         #player-list-container::-webkit-scrollbar,
-        .lobby-chat-messages::-webkit-scrollbar { width: 8px; }
+        .lobby-chat-messages::-webkit-scrollbar,
+        #kicked-players-list-content::-webkit-scrollbar { width: 8px; }
         .lobby-sidebar::-webkit-scrollbar-track,
         #player-list-container::-webkit-scrollbar-track,
-        .lobby-chat-messages::-webkit-scrollbar-track { background: #202020; border-radius: 4px; }
+        .lobby-chat-messages::-webkit-scrollbar-track,
+        #kicked-players-list-content::-webkit-scrollbar-track { background: #202020; border-radius: 4px; }
         .lobby-sidebar::-webkit-scrollbar-thumb,
         #player-list-container::-webkit-scrollbar-thumb,
-        .lobby-chat-messages::-webkit-scrollbar-thumb { background: #DAA520; border-radius: 4px; }
+        .lobby-chat-messages::-webkit-scrollbar-thumb,
+        #kicked-players-list-content::-webkit-scrollbar-thumb { background: #DAA520; border-radius: 4px; }
         .lobby-sidebar::-webkit-scrollbar-thumb:hover,
         #player-list-container::-webkit-scrollbar-thumb:hover,
-        .lobby-chat-messages::-webkit-scrollbar-thumb:hover { background: #FFD700; }
+        .lobby-chat-messages::-webkit-scrollbar-thumb:hover,
+        #kicked-players-list-content::-webkit-scrollbar-thumb:hover { background: #FFD700; }
         
         /* ===== CORRECTED RESPONSIVE STYLES ===== */
         @media (max-width: 860px) {
@@ -825,7 +829,6 @@
     <!-- Main container for all screens -->
     <div id="app" class="relative w-full h-full flex justify-center items-center">
 
-        <!-- All Modals and other screens remain the same... -->
         <!-- 1. Loading Screen -->
         <div id="loading-screen" class="absolute inset-0 flex flex-col justify-center items-center bg-gray-900 z-50 page-transition-active page-transition-visible" tabindex="-1">
             <div class="spinner mb-4"></div>
@@ -1185,7 +1188,10 @@
             </div>
         </div>
 
-        <!-- ... All other modals (kick, kicked message, etc.) remain the same ... -->
+        <!-- ============================================= -->
+        <!-- == NEW MODALS FOR KICKING AND HOST CONTROLS == -->
+        <!-- ============================================= -->
+
         <!-- 10. Kick Player Confirmation Modal -->
         <div id="kick-player-confirm-modal" class="hidden fixed inset-0 flex justify-center items-center z-50 profile-modal-overlay">
             <div class="classic-card profile-modal-content p-6 sm:p-8 w-11/12 max-w-md text-center relative">
@@ -1221,7 +1227,7 @@
                         <path d="M18 6 6 18"/><path d="m6 6 12 12"/>
                     </svg>
                 </button>
-                <div id="kicked-players-list-content" class="space-y-4 mb-8 text-white text-left max-h-60 overflow-y-auto custom-scrollbar">
+                <div id="kicked-players-list-content" class="space-y-4 mb-8 text-white text-right max-h-60 overflow-y-auto pr-4">
                     <!-- Kicked players will be dynamically loaded here -->
                     <p class="text-gray-400 text-center">هیچ بازیکنی اخراج نشده است.</p>
                 </div>
@@ -1374,14 +1380,14 @@
         const startGameBtn = document.getElementById('start-game-btn');
         const toggleChatLockBtn = document.getElementById('toggle-chat-lock-btn');
         const viewKickedPlayersBtn = document.getElementById('view-kicked-players-btn');
-        const addBotBtn = document.getElementById('add-bot-btn'); // NEW
+        const addBotBtn = document.getElementById('add-bot-btn'); 
         const leaveLobbyBtn = document.getElementById('leave-lobby-btn');
         const lobbyChatMessages = document.getElementById('lobby-chat-messages');
         const lobbyChatForm = document.getElementById('lobby-chat-form');
         const lobbyChatInput = document.getElementById('lobby-chat-input');
         const lobbyChatSendBtn = document.getElementById('lobby-chat-send-btn');
 
-        // Game Screen Elements (NEW)
+        // Game Screen Elements
         const gameScreen = document.getElementById('game-screen');
         const hokmSuitIcon = document.getElementById('hokm-suit-icon');
         const ourTeamScoreEl = document.getElementById('our-team-score');
@@ -1403,7 +1409,6 @@
 
         // Kicked Message Modal Elements
         const kickedMessageModal = document.getElementById('kicked-message-modal');
-        const kickedMessageText = document.getElementById('kicked-message-text');
         const kickedLobbyName = document.getElementById('kicked-lobby-name');
         const kickedMessageOkBtn = document.getElementById('kicked-message-ok-btn');
 
@@ -1413,7 +1418,7 @@
         const kickedPlayersListContent = document.getElementById('kicked-players-list-content');
         const kickedListOkBtn = document.getElementById('kicked-list-ok-btn');
         
-        // New Enter Password Modal Elements
+        // Enter Password Modal Elements
         const enterPasswordModal = document.getElementById('enter-password-modal');
         const passwordPromptLobbyName = document.getElementById('password-prompt-lobby-name');
         const enterPasswordForm = document.getElementById('enter-password-form');
@@ -1422,7 +1427,7 @@
         const cancelJoinPasswordBtn = document.getElementById('cancel-join-password-btn');
         const passwordPromptMessageBox = document.getElementById('password-prompt-message-box');
         
-        // NEW: Add Bot Modal Elements
+        // Add Bot Modal Elements
         const addBotModal = document.getElementById('add-bot-modal');
         const closeAddBotModalBtn = document.getElementById('close-add-bot-modal-btn');
         const addBotForm = document.getElementById('add-bot-form');
@@ -1437,15 +1442,15 @@
         let currentUserData = null; // To store user's profile data
         let unsubscribeLobbies = null; // Global variable to store the unsubscribe function for lobby list listener
         let unsubscribeLobbyDetail = null; // Global variable for single lobby detail listener
-        let unsubscribeGame = null; // NEW: Listener for the active game state
+        let unsubscribeGame = null; // Listener for the active game state
         let unsubscribeKickedPlayers = null; // Listener for kicked players list
-        let unsubscribeLobbyChat = null; // NEW: Listener for lobby chat messages
+        let unsubscribeLobbyChat = null; // Listener for lobby chat messages
         let isAuthResolved = false; // Flag to indicate if onAuthStateChanged has run at least once
         let userHasActiveLobby = false; // Track if the current user has an active lobby (created or joined)
         let currentLobbyId = null; // Stores the ID of the lobby the current user is in
         let kickedPlayerToProcess = null; // Stores UID/name of player selected for kicking
         let lobbyToJoin = null; // To store data of private lobby user wants to join
-        let isRefreshing = false; // NEW: State for refresh button
+        let isRefreshing = false; // State for refresh button
 
         // Promise resolver for custom confirmation modal
         let resolveCustomConfirm;
@@ -1472,7 +1477,7 @@
         const showMessageBox = (msg, type) => showCustomMessage(messageBox, msg, type);
         // Wrapper for create lobby message box
         const showCreateLobbyMessageBox = (msg, type) => showCustomMessage(createLobbyMessageBox, msg, type);
-        // NEW: Wrapper for add bot message box
+        // Wrapper for add bot message box
         const showAddBotMessageBox = (msg, type) => showCustomMessage(addBotMessageBox, msg, type);
 
 
@@ -1623,6 +1628,7 @@
                 kickedMessageModal.classList.add('hidden');
                 kickedMessageModal.classList.remove('profile-modal-leave-active');
                 setActiveScreen(lobbyScreen);
+                if (unsubscribeLobbies) unsubscribeLobbies();
                 unsubscribeLobbies = setupLobbyListener('');
             }, 300);
         }
@@ -1651,7 +1657,7 @@
             }, 300);
         }
         
-        // NEW: Functions to open/close Add Bot Modal
+        // Functions to open/close Add Bot Modal
         function openAddBotModal() {
             addBotModal.classList.remove('hidden');
             void addBotModal.offsetWidth;
@@ -1762,7 +1768,7 @@
             return messages[errorCode] || "خطایی ناشناخته رخ داده است.";
         }
         
-        // NEW: Helper to generate random password for bot
+        // Helper to generate random password for bot
         function generateRandomPassword(length = 6) {
             const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
             let password = '';
@@ -1797,10 +1803,10 @@
                     players: {
                         [userId]: creatorDisplayName // Using a map: { "uid": "displayName" }
                     },
-                    kickedPlayers: [], // Still an array of objects
+                    kickedPlayers: [], // NEW: Initialize kicked players list
                     createdAt: serverTimestamp(),
                     isChatLocked: false, 
-                    botPassword: generateRandomPassword(), // NEW: Add bot password
+                    botPassword: generateRandomPassword(), // Add bot password
                     gameSettings: { maxPlayers: 4, roundsToWin: 7 }
                 };
         
@@ -1858,7 +1864,7 @@
                 unsubscribeLobbyChat();
                 unsubscribeLobbyChat = null;
             }
-            if (unsubscribeGame) { // NEW: Clear game listener too
+            if (unsubscribeGame) { 
                 unsubscribeGame();
                 unsubscribeGame = null;
             }
@@ -1896,8 +1902,6 @@
         
                 userHasActiveLobby = currentUserIsInAnyLobby;
                 
-                // Count active games separately by another query or accept this might be slightly off
-                // For now, we will update the active games count less frequently or assume it's decorative.
                 getDocs(query(collection(db, `global_lobbies`), where("status", "==", "playing"))).then(playingSnapshot => {
                     activeGamesCount.textContent = playingSnapshot.size;
                 });
@@ -1913,6 +1917,7 @@
                         const maxPlayers = lobby.gameSettings?.maxPlayers || 4;
                         const hostDisplayName = playersMap[lobby.hostId] || 'ناشناس';
                         const isCurrentUserHostOfThisLobby = auth.currentUser && lobby.hostId === auth.currentUser.uid;
+                        // NEW: Check if current user has been kicked from this lobby
                         const isCurrentUserKicked = auth.currentUser && lobby.kickedPlayers?.some(p => p.uid === auth.currentUser.uid);
                         const canJoinThisLobby = auth.currentUser && !currentUserIsInAnyLobby && playerCount < maxPlayers && !isCurrentUserKicked;
         
@@ -1921,14 +1926,15 @@
                             : '';
         
                         let joinButtonHtml = '';
+                        // UPDATED: Logic to display correct button state
                         if (isCurrentUserKicked) {
-                             joinButtonHtml = `<button class="join-lobby-btn classic-btn btn-red-classic opacity-50 cursor-not-allowed" disabled>اخراج شده‌اید</button>`;
+                             joinButtonHtml = `<button class="classic-btn btn-red-classic opacity-50 cursor-not-allowed" disabled>اخراج شده‌اید</button>`;
                         } else if (isCurrentUserHostOfThisLobby) {
                             joinButtonHtml = `<button data-lobby-id="${lobby.id}" class="view-my-lobby-btn classic-btn btn-blue-classic">ورود به لابی من</button>`;
                         } else if (canJoinThisLobby) {
                             joinButtonHtml = `<button data-lobby-id="${lobby.id}" data-lobby-type="${lobby.type || 'public'}" data-lobby-name="${lobby.name}" class="join-lobby-btn classic-btn btn-blue-classic">ورود به لابی</button>`;
                         } else {
-                            joinButtonHtml = `<button class="join-lobby-btn classic-btn btn-blue-classic opacity-50 cursor-not-allowed" disabled>ورود به لابی</button>`;
+                            joinButtonHtml = `<button class="classic-btn btn-blue-classic opacity-50 cursor-not-allowed" disabled>ورود به لابی</button>`;
                         }
                         
                         const closeButtonHtml = isCurrentUserHostOfThisLobby 
@@ -1986,7 +1992,7 @@
                     button.addEventListener('click', async (e) => {
                         const lobbyId = e.target.dataset.lobbyId;
                         if (lobbyId && auth.currentUser) {
-                            const lobbyName = e.target.closest('.lobby-item').querySelector('h3').textContent;
+                            const lobbyName = e.target.closest('.lobby-item').querySelector('h3').textContent.trim();
                             const confirmed = await showCustomConfirm(`آیا مطمئن هستید که می‌خواهید لابی "${lobbyName}" را ببندید؟`);
                             if (confirmed) {
                                 await closeLobby(lobbyId, auth.currentUser.uid);
@@ -2014,6 +2020,7 @@
                 const maxPlayers = lobbyData.gameSettings?.maxPlayers || 4;
                 const kickedPlayers = lobbyData.kickedPlayers || [];
 
+                // NEW: Prevent kicked players from joining
                 if (kickedPlayers.some(p => p.uid === userId)) {
                     throw new Error("شما از این لابی اخراج شده‌اید.");
                 }
@@ -2054,6 +2061,12 @@
                 if (docSnap.exists()) {
                     const lobbyData = docSnap.data();
                     const isCurrentUserHost = auth.currentUser && lobbyData.hostId === auth.currentUser.uid;
+                    
+                    // NEW: Check if the current user has been kicked
+                    if (auth.currentUser && lobbyData.kickedPlayers?.some(p => p.uid === auth.currentUser.uid)) {
+                        showKickedMessageModal(lobbyData.name);
+                        return; // Stop further processing for this user
+                    }
 
                     if (lobbyData.status === 'playing' || lobbyData.gameState) {
                         if (currentActiveScreen !== gameScreen) setActiveScreen(gameScreen);
@@ -2070,13 +2083,8 @@
                     unsubscribeLobbyChat = setupLobbyChatListener(lobbyId, lobbyData.hostId);
 
                     detailLobbyName.textContent = lobbyData.name;
-                    detailHostName.textContent = `سازنده: ${playersMap[lobbyData.hostId] || 'ناشناس'}`;
+                    detailHostName.textContent = `سازنده: ${playersMap[lobbyData.hostId] || 'ناشناс'}`;
                     detailPlayerCount.textContent = `بازیکنان: ${playerCount}/${maxPlayers}`;
-
-                    if (auth.currentUser && lobbyData.kickedPlayers?.some(p => p.uid === auth.currentUser.uid)) {
-                        showKickedMessageModal(lobbyData.name);
-                        return;
-                    }
 
                     playerListContainer.innerHTML = '';
                     Object.entries(playersMap).forEach(([uid, displayName]) => {
@@ -2105,7 +2113,8 @@
                             <div class="player-actions">${transferHostButtonHtml}${kickButtonHtml}</div>`;
                         playerListContainer.appendChild(playerItem);
                     });
-
+                    
+                    // Add event listeners for new buttons
                     playerListContainer.querySelectorAll('.kick-player-btn').forEach(button => {
                         button.addEventListener('click', (e) => {
                            const target = e.currentTarget;
@@ -2114,6 +2123,7 @@
                            const isBot = target.dataset.isBot === 'true';
 
                            if (isBot) {
+                               // No confirmation for kicking a bot
                                kickBot(currentLobbyId, playerUid, playerName);
                            } else {
                                openKickPlayerConfirmModal(playerName, playerUid);
@@ -2160,12 +2170,14 @@
                 } else {
                     showMessageBox("لابی که در آن بودید بسته شد یا بازی شروع شد.", "info");
                     setActiveScreen(lobbyScreen);
+                    if (unsubscribeLobbies) unsubscribeLobbies();
                     unsubscribeLobbies = setupLobbyListener('');
                 }
             }, (error) => {
                 console.error("Lobby detail listener error:", error);
                 showMessageBox("خطا در بارگذاری جزئیات لابی.", "error");
                 setActiveScreen(lobbyScreen);
+                if (unsubscribeLobbies) unsubscribeLobbies();
                 unsubscribeLobbies = setupLobbyListener('');
             });
             return unsubscribe;
@@ -2179,6 +2191,7 @@
                 const lobbySnap = await getDoc(lobbyRef);
                 if (!lobbySnap.exists()) {
                     setActiveScreen(lobbyScreen);
+                    if (unsubscribeLobbies) unsubscribeLobbies();
                     unsubscribeLobbies = setupLobbyListener('');
                     return;
                 }
@@ -2187,14 +2200,16 @@
                     const confirmed = await showCustomConfirm("شما سازنده لابی هستید. خروج شما باعث بسته شدن لابی برای همه می‌شود. آیا مطمئن هستید؟", "بستن لابی");
                     if (confirmed) await deleteDoc(lobbyRef);
                 } else {
+                    // Use deleteField to remove the player from the map
                     await updateDoc(lobbyRef, { [`players.${userId}`]: deleteField() });
                     setActiveScreen(lobbyScreen);
+                    if (unsubscribeLobbies) unsubscribeLobbies();
                     unsubscribeLobbies = setupLobbyListener('');
                 }
             } catch (e) { console.error("Error leaving lobby:", e); showMessageBox("خطا در ترک لابی.", "error"); }
         }
 
-        // UPDATED: Kicks a HUMAN player and adds them to the kicked list
+        // Kicks a HUMAN player and adds them to the kicked list
         async function kickPlayer(lobbyId, playerToKickUid, playerToKickDisplayName) {
             const lobbyRef = doc(db, `global_lobbies`, lobbyId);
             try {
@@ -2207,7 +2222,7 @@
             finally { closeKickPlayerConfirmModal(); }
         }
         
-        // NEW: Kicks a BOT player without adding to the kicked list
+        // Kicks a BOT player without adding to the kicked list
         async function kickBot(lobbyId, botUid, botName) {
             const lobbyRef = doc(db, `global_lobbies`, lobbyId);
             try {
@@ -2221,6 +2236,7 @@
             }
         }
         
+        // Transfers host ownership to another player
         async function transferHost(lobbyId, newHostUid) {
             if (!lobbyId || !newHostUid || !auth.currentUser) return;
             const lobbyRef = doc(db, 'global_lobbies', lobbyId);
@@ -2264,7 +2280,8 @@
                 showAddBotMessageBox(`خطا در افزودن ربات: ${error.message}`, "error");
             }
         }
-
+        
+        // Allows the host to un-kick a player
         async function unkickPlayer(lobbyId, playerToUnkickUid) {
             const lobbyRef = doc(db, `global_lobbies`, lobbyId);
             try {
@@ -2280,6 +2297,7 @@
             } catch (e) { console.error("Error unkicking player:", e); showMessageBox("خطا در بازگرداندن بازیکن.", "error"); }
         }
 
+        // Sets up a listener for the kicked players list modal
         function setupKickedPlayersListListener(lobbyId) {
             const lobbyRef = doc(db, `global_lobbies`, lobbyId);
             return onSnapshot(lobbyRef, (docSnap) => {
@@ -2370,7 +2388,7 @@
             });
         }
         
-        // --- Game Logic Functions (NEW) ---
+        // --- Game Logic Functions ---
 
         function createShuffledDeck() {
             const suits = ['H', 'D', 'C', 'S']; // Hearts, Diamonds, Clubs, Spades
@@ -2499,7 +2517,6 @@
             }
             
             // Render scores, hokm, and play area
-            // (These will be implemented in more detail later)
             const myTeamIsTeam1 = myIndex === 0 || myIndex === 2;
             ourTeamScoreEl.textContent = myTeamIsTeam1 ? gameState.scores.team1 : gameState.scores.team2;
             theirTeamScoreEl.textContent = myTeamIsTeam1 ? gameState.scores.team2 : gameState.scores.team1;
@@ -2653,7 +2670,7 @@
             unsubscribeLobbies = setupLobbyListener(lobbySearchInput.value.trim().toLowerCase());
         });
 
-        // --- Lobby Detail Screen Event Listeners ---
+        // --- Lobby Detail Screen Event Listeners (with NEW additions) ---
         leaveLobbyBtn.addEventListener('click', leaveLobby);
 
         startGameBtn.addEventListener('click', async () => {
@@ -2688,13 +2705,16 @@
         
         addBotBtn.addEventListener('click', openAddBotModal);
 
+        // NEW Event listeners for kick/kicked functionality
         kickPlayerConfirmBtn.addEventListener('click', () => {
             if(kickedPlayerToProcess) kickPlayer(currentLobbyId, kickedPlayerToProcess.uid, kickedPlayerToProcess.displayName)
         });
         cancelKickPlayerBtn.addEventListener('click', closeKickPlayerConfirmModal);
         closeKickPlayerConfirmModalBtn.addEventListener('click', closeKickPlayerConfirmModal);
         kickPlayerConfirmModal.addEventListener('click', (e) => e.target === kickPlayerConfirmModal && closeKickPlayerConfirmModal());
+        
         kickedMessageOkBtn.addEventListener('click', closeKickedMessageModal);
+        
         viewKickedPlayersBtn.addEventListener('click', openKickedPlayersListModal);
         closeKickedPlayersListModalBtn.addEventListener('click', closeKickedPlayersListModal);
         kickedListOkBtn.addEventListener('click', closeKickedPlayersListModal);
@@ -2796,7 +2816,7 @@
             }
         });
         
-        // UPDATED: Add Bot Modal Listeners with password regeneration
+        // Add Bot Modal Listeners with password regeneration
         closeAddBotModalBtn.addEventListener('click', closeAddBotModal);
         cancelAddBotBtn.addEventListener('click', closeAddBotModal);
         addBotModal.addEventListener('click', (e) => e.target === addBotModal && closeAddBotModal());
