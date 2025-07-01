@@ -541,7 +541,7 @@
             font-size: 0.8rem;
             margin-right: 0.5rem;
         }
-        /* NEW: Container for host buttons */
+        /* UPDATED: Container for host buttons */
         .player-actions {
             display: flex;
             align-items: center;
@@ -1592,11 +1592,11 @@
         }
         
         function openKickPlayerConfirmModal(playerName, playerUid) {
+            kickPlayerToProcess = { uid: playerUid, displayName: playerName };
             kickPlayerConfirmName.textContent = playerName;
             kickPlayerConfirmModal.classList.remove('hidden');
             void kickPlayerConfirmModal.offsetWidth;
             kickPlayerConfirmModal.classList.add('profile-modal-enter-active');
-            kickedPlayerToProcess = { uid: playerUid, displayName: playerName };
         }
 
         function closeKickPlayerConfirmModal() {
@@ -1733,8 +1733,8 @@
                 if (unsubscribeLobbies) unsubscribeLobbies();
                 if (unsubscribeLobbyDetail) unsubscribeLobbyDetail();
                 if (unsubscribeKickedPlayers) unsubscribeKickedPlayers();
-                if (unsubscribeLobbyChat) unsubscribeLobbyChat(); // NEW: Cleanup chat listener
-                if (unsubscribeGame) unsubscribeGame(); // NEW: Cleanup game listener
+                if (unsubscribeLobbyChat) unsubscribeLobbyChat();
+                if (unsubscribeGame) unsubscribeGame();
                 unsubscribeLobbies = unsubscribeLobbyDetail = unsubscribeKickedPlayers = unsubscribeLobbyChat = unsubscribeGame = null;
                 currentLobbyId = null;
             }
@@ -2055,16 +2055,10 @@
                     const lobbyData = docSnap.data();
                     const isCurrentUserHost = auth.currentUser && lobbyData.hostId === auth.currentUser.uid;
 
-                    // NEW: Check if game has started
                     if (lobbyData.status === 'playing' || lobbyData.gameState) {
-                        if (currentActiveScreen !== gameScreen) {
-                            setActiveScreen(gameScreen);
-                        }
-                        // Start the game listener if it's not already running
-                        if (!unsubscribeGame) {
-                            unsubscribeGame = setupGameListener(lobbyId);
-                        }
-                        return; // Stop processing lobby details, let game listener take over
+                        if (currentActiveScreen !== gameScreen) setActiveScreen(gameScreen);
+                        if (!unsubscribeGame) unsubscribeGame = setupGameListener(lobbyId);
+                        return;
                     }
 
                     const playersMap = lobbyData.players || {};
@@ -2085,47 +2079,45 @@
                     }
 
                     playerListContainer.innerHTML = '';
-                    const playerList = Object.entries(playersMap).map(([uid, displayName]) => ({ uid, displayName }));
-
-                    for (const player of playerList) {
-                        const isHost = player.uid === lobbyData.hostId;
-                        const isBot = player.uid.startsWith('bot_');
+                    Object.entries(playersMap).forEach(([uid, displayName]) => {
+                        const isHost = uid === lobbyData.hostId;
+                        const isBot = uid.startsWith('bot_');
                         const playerItem = document.createElement('div');
                         playerItem.className = 'player-list-item';
                         if (isHost) playerItem.classList.add('is-host');
 
-                        const canPerformActions = isCurrentUserHost && !isHost && !isBot;
+                        const canKick = isCurrentUserHost && !isHost;
+                        const canTransfer = isCurrentUserHost && !isHost && !isBot;
 
-                        const kickButtonHtml = canPerformActions
-                            ? `<button class="kick-player-btn" data-player-uid="${player.uid}" data-player-name="${player.displayName}" title="اخراج">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-                               </button>` 
+                        const kickButtonHtml = canKick
+                            ? `<button class="kick-player-btn" data-player-uid="${uid}" data-player-name="${displayName}" data-is-bot="${isBot}" title="اخراج"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button>` 
                             : '';
-                        const transferHostButtonHtml = canPerformActions
-                            ? `<button class="transfer-host-btn" data-player-uid="${player.uid}" data-player-name="${player.displayName}" title="واگذاری مالکیت">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></svg>
-                               </button>`
+                        const transferHostButtonHtml = canTransfer
+                            ? `<button class="transfer-host-btn" data-player-uid="${uid}" data-player-name="${displayName}" title="واگذاری مالکیت"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></svg></button>`
                             : '';
-                        
                         const hostLabelHtml = isHost ? '<span class="host-label">(سازنده)</span>' : (isBot ? '<span class="host-label text-blue-400">(ربات)</span>' : '');
 
                         playerItem.innerHTML = `
                             <div class="flex items-center">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="mr-2 lucide lucide-user"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-                                <span class="player-name">${player.displayName}</span>
-                                ${hostLabelHtml}
+                                <span class="player-name">${displayName}</span> ${hostLabelHtml}
                             </div>
-                            <div class="player-actions">
-                                ${transferHostButtonHtml}
-                                ${kickButtonHtml}
-                            </div>
-                        `;
+                            <div class="player-actions">${transferHostButtonHtml}${kickButtonHtml}</div>`;
                         playerListContainer.appendChild(playerItem);
-                    }
+                    });
 
                     playerListContainer.querySelectorAll('.kick-player-btn').forEach(button => {
                         button.addEventListener('click', (e) => {
-                           openKickPlayerConfirmModal(e.currentTarget.dataset.playerName, e.currentTarget.dataset.playerUid);
+                           const target = e.currentTarget;
+                           const playerUid = target.dataset.playerUid;
+                           const playerName = target.dataset.playerName;
+                           const isBot = target.dataset.isBot === 'true';
+
+                           if (isBot) {
+                               kickBot(currentLobbyId, playerUid, playerName);
+                           } else {
+                               openKickPlayerConfirmModal(playerName, playerUid);
+                           }
                         });
                     });
                     
@@ -2134,30 +2126,24 @@
                            const playerUid = e.currentTarget.dataset.playerUid;
                            const playerName = e.currentTarget.dataset.playerName;
                            const confirmed = await showCustomConfirm(`آیا مطمئن هستید که می‌خواهید مالکیت لابی را به "${playerName}" واگذار کنید؟`, "واگذاری مالکیت");
-                           if (confirmed) {
-                               await transferHost(currentLobbyId, playerUid);
-                           }
+                           if (confirmed) await transferHost(currentLobbyId, playerUid);
                         });
                     });
 
-                    // === LOGIC CHANGE: Manage "Leave/Close Lobby" Button Visibility ===
                     if (isCurrentUserHost) {
                         leaveLobbyBtn.classList.remove('hidden');
-                        leaveLobbyBtn.textContent = 'بستن لابی'; // Host closes the lobby
+                        leaveLobbyBtn.textContent = 'بستن لابی';
                     } else {
                         leaveLobbyBtn.classList.remove('hidden');
                         leaveLobbyBtn.textContent = 'خروج از لابی';
                     }
 
-                    // Manage Host Actions
                     if (isCurrentUserHost) {
                         hostActionsContainer.style.display = 'flex';
                         startGameBtn.disabled = playerCount !== maxPlayers;
                         startGameBtn.textContent = `شروع بازی (${playerCount}/${maxPlayers})`;
                         addBotBtn.disabled = playerCount >= maxPlayers;
-                        
                         toggleChatLockBtn.textContent = isChatLocked ? 'باز کردن چت' : 'قفل کردن چت';
-
                     } else {
                         hostActionsContainer.style.display = 'none';
                     }
@@ -2171,8 +2157,6 @@
                         lobbyChatSendBtn.disabled = false;
                         lobbyChatInput.placeholder = "پیام خود را بنویسید...";
                     }
-
-
                 } else {
                     showMessageBox("لابی که در آن بودید بسته شد یا بازی شروع شد.", "info");
                     setActiveScreen(lobbyScreen);
@@ -2201,21 +2185,16 @@
                 const isHost = lobbySnap.data().hostId === userId;
                 if (isHost) {
                     const confirmed = await showCustomConfirm("شما سازنده لابی هستید. خروج شما باعث بسته شدن لابی برای همه می‌شود. آیا مطمئن هستید؟", "بستن لابی");
-                    if (confirmed) {
-                        await deleteDoc(lobbyRef);
-                        // The onSnapshot listener will handle screen transition for all players.
-                    }
+                    if (confirmed) await deleteDoc(lobbyRef);
                 } else {
-                    // Non-host leaving
-                    await updateDoc(lobbyRef, {
-                        [`players.${userId}`]: deleteField()
-                    });
+                    await updateDoc(lobbyRef, { [`players.${userId}`]: deleteField() });
                     setActiveScreen(lobbyScreen);
                     unsubscribeLobbies = setupLobbyListener('');
                 }
             } catch (e) { console.error("Error leaving lobby:", e); showMessageBox("خطا در ترک لابی.", "error"); }
         }
 
+        // UPDATED: Kicks a HUMAN player and adds them to the kicked list
         async function kickPlayer(lobbyId, playerToKickUid, playerToKickDisplayName) {
             const lobbyRef = doc(db, `global_lobbies`, lobbyId);
             try {
@@ -2224,20 +2203,32 @@
                     kickedPlayers: arrayUnion({ uid: playerToKickUid, displayName: playerToKickDisplayName })
                 });
                 showMessageBox(`بازیکن "${playerToKickDisplayName}" اخراج شد.`, "success");
-                closeKickPlayerConfirmModal();
             } catch (e) { console.error("Error kicking player:", e); showMessageBox("خطا در اخراج بازیکن.", "error"); }
+            finally { closeKickPlayerConfirmModal(); }
         }
         
-        // NEW: Function to transfer host
+        // NEW: Kicks a BOT player without adding to the kicked list
+        async function kickBot(lobbyId, botUid, botName) {
+            const lobbyRef = doc(db, `global_lobbies`, lobbyId);
+            try {
+                await updateDoc(lobbyRef, {
+                    [`players.${botUid}`]: deleteField()
+                });
+                showMessageBox(`ربات "${botName}" با موفقیت حذف شد.`, "success");
+            } catch (e) {
+                console.error("Error kicking bot:", e);
+                showMessageBox("خطا در حذف ربات.", "error");
+            }
+        }
+        
         async function transferHost(lobbyId, newHostUid) {
             if (!lobbyId || !newHostUid || !auth.currentUser) return;
             const lobbyRef = doc(db, 'global_lobbies', lobbyId);
             try {
                 const lobbySnap = await getDoc(lobbyRef);
-                if (!lobbySnap.exists()) { throw new Error("لابی یافت نشد."); }
-                if (lobbySnap.data().hostId !== auth.currentUser.uid) {
-                    throw new Error("فقط سازنده فعلی می‌تواند مالکیت را واگذار کند.");
-                }
+                if (!lobbySnap.exists()) throw new Error("لابی یافت نشد.");
+                if (lobbySnap.data().hostId !== auth.currentUser.uid) throw new Error("فقط سازنده فعلی می‌تواند مالکیت را واگذار کند.");
+                
                 await updateDoc(lobbyRef, { hostId: newHostUid });
                 showMessageBox("مالکیت با موفقیت واگذار شد.", "success");
             } catch (error) {
@@ -2246,7 +2237,6 @@
             }
         }
         
-        // NEW: Function to add a bot to the lobby
         async function addBotToLobby(lobbyId) {
             const lobbyRef = doc(db, 'global_lobbies', lobbyId);
             try {
@@ -2257,24 +2247,17 @@
                 const playersMap = lobbyData.players || {};
                 const maxPlayers = lobbyData.gameSettings?.maxPlayers || 4;
 
-                if (Object.keys(playersMap).length >= maxPlayers) {
-                    throw new Error("لابی پر است.");
-                }
+                if (Object.keys(playersMap).length >= maxPlayers) throw new Error("لابی پر است.");
 
-                // Find the next available bot number
                 let botNumber = 1;
-                while (playersMap[`bot_${botNumber}`]) {
-                    botNumber++;
-                }
+                while (playersMap[`bot_${botNumber}`]) botNumber++;
+                
                 const botId = `bot_${botNumber}`;
                 const botNames = ["آلفا", "بتا", "گاما", "دلتا"];
                 const botName = `ربات ${botNames[botNumber - 1] || botNumber}`;
 
-                await updateDoc(lobbyRef, {
-                    [`players.${botId}`]: botName
-                });
+                await updateDoc(lobbyRef, { [`players.${botId}`]: botName });
                 
-                closeAddBotModal();
                 showMessageBox(`${botName} با موفقیت به لابی اضافه شد.`, "success");
             } catch (error) {
                 console.error("Error adding bot:", error);
@@ -2329,16 +2312,15 @@
                     senderUid: auth.currentUser.uid,
                     senderName: currentUserData.displayName,
                     timestamp: serverTimestamp(),
-                    isDeleted: false // NEW
+                    isDeleted: false
                 });
-                lobbyChatInput.value = ''; // Clear input after sending
+                lobbyChatInput.value = '';
             } catch (error) {
                 console.error("Error sending chat message:", error);
                 showMessageBox("خطا در ارسال پیام.", "error");
             }
         }
         
-        // NEW: Soft-deletes a message
         async function deleteLobbyMessage(lobbyId, messageId) {
             const messageRef = doc(db, `global_lobbies/${lobbyId}/messages`, messageId);
             try {
@@ -2368,36 +2350,23 @@
 
                     const messageDiv = document.createElement('div');
                     messageDiv.classList.add('chat-message');
-                    if (isCurrentUserMsg) {
-                        messageDiv.classList.add('current-user');
-                    }
+                    if (isCurrentUserMsg) messageDiv.classList.add('current-user');
                     
                     const deleteButtonHtml = canDelete ? `
                         <button class="delete-message-btn" data-message-id="${messageId}" title="حذف پیام">
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-trash-2"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg>
-                        </button>
-                    ` : '';
+                        </button>` : '';
 
-                    const messageContentHtml = messageData.isDeleted ? `
-                        <p class="message-text-deleted">${messageData.text}</p>
-                    ` : `
-                        <span class="sender-name">${messageData.senderName}</span>
-                        <p class="message-text">${messageData.text}</p>
-                    `;
+                    const messageContentHtml = messageData.isDeleted 
+                        ? `<p class="message-text-deleted">${messageData.text}</p>` 
+                        : `<span class="sender-name">${messageData.senderName}</span><p class="message-text">${messageData.text}</p>`;
 
-                    messageDiv.innerHTML = `
-                        <div class="chat-message-content">
-                            ${messageContentHtml}
-                        </div>
-                        ${deleteButtonHtml}
-                    `;
+                    messageDiv.innerHTML = `<div class="chat-message-content">${messageContentHtml}</div>${deleteButtonHtml}`;
                     lobbyChatMessages.appendChild(messageDiv);
                 });
-                // Auto-scroll to the bottom
                 lobbyChatMessages.scrollTop = lobbyChatMessages.scrollHeight;
             }, (error) => {
                 console.error("Lobby chat listener error:", error);
-                console.warn("Could not load chat messages:", error.message);
             });
         }
         
@@ -2702,7 +2671,6 @@
             }
         });
         
-        // NEW: Toggle Chat Lock Listener
         toggleChatLockBtn.addEventListener('click', async () => {
             if (!currentLobbyId || !auth.currentUser) return;
             const lobbyRef = doc(db, 'global_lobbies', currentLobbyId);
@@ -2718,11 +2686,11 @@
             }
         });
         
-        // NEW: Add Bot listener
         addBotBtn.addEventListener('click', openAddBotModal);
 
-        // Kick/Unkick related
-        kickPlayerConfirmBtn.addEventListener('click', () => kickedPlayerToProcess && kickPlayer(currentLobbyId, kickedPlayerToProcess.uid, kickedPlayerToProcess.displayName));
+        kickPlayerConfirmBtn.addEventListener('click', () => {
+            if(kickedPlayerToProcess) kickPlayer(currentLobbyId, kickedPlayerToProcess.uid, kickedPlayerToProcess.displayName)
+        });
         cancelKickPlayerBtn.addEventListener('click', closeKickPlayerConfirmModal);
         closeKickPlayerConfirmModalBtn.addEventListener('click', closeKickPlayerConfirmModal);
         kickPlayerConfirmModal.addEventListener('click', (e) => e.target === kickPlayerConfirmModal && closeKickPlayerConfirmModal());
@@ -2815,26 +2783,20 @@
             }
         });
         
-        // Chat Form Submission
         lobbyChatForm.addEventListener('submit', (e) => {
             e.preventDefault();
-            if (currentLobbyId) {
-                sendLobbyMessage(currentLobbyId, lobbyChatInput.value);
-            }
+            if (currentLobbyId) sendLobbyMessage(currentLobbyId, lobbyChatInput.value);
         });
 
-        // NEW: Event Delegation for Message Deletion
         lobbyChatMessages.addEventListener('click', (e) => {
             const deleteButton = e.target.closest('.delete-message-btn');
             if (deleteButton) {
                 const messageId = deleteButton.dataset.messageId;
-                if (currentLobbyId && messageId) {
-                    deleteLobbyMessage(currentLobbyId, messageId);
-                }
+                if (currentLobbyId && messageId) deleteLobbyMessage(currentLobbyId, messageId);
             }
         });
         
-        // NEW: Add Bot Modal Listeners
+        // UPDATED: Add Bot Modal Listeners with password regeneration
         closeAddBotModalBtn.addEventListener('click', closeAddBotModal);
         cancelAddBotBtn.addEventListener('click', closeAddBotModal);
         addBotModal.addEventListener('click', (e) => e.target === addBotModal && closeAddBotModal());
@@ -2847,23 +2809,30 @@
             
             submitAddBotBtn.disabled = true;
             submitAddBotBtn.textContent = "در حال بررسی...";
+            const lobbyRef = doc(db, 'global_lobbies', currentLobbyId);
 
             try {
-                const lobbyRef = doc(db, 'global_lobbies', currentLobbyId);
                 const lobbySnap = await getDoc(lobbyRef);
-                if (!lobbySnap.exists()) {
-                    throw new Error("Lobby not found");
-                }
+                if (!lobbySnap.exists()) throw new Error("لابی یافت نشد.");
+                
                 const lobbyData = lobbySnap.data();
                 if (lobbyData.botPassword === enteredPassword) {
+                    // Bot is added first
                     await addBotToLobby(currentLobbyId);
+                    
+                    // Then password is regenerated for security
+                    await updateDoc(lobbyRef, {
+                        botPassword: generateRandomPassword()
+                    });
+                    console.log('رمز عبور ربات برای استفاده بعدی با موفقیت بازتولید شد.');
+                    closeAddBotModal(); // Close modal on success
                 } else {
                     showAddBotMessageBox("رمز عبور ربات اشتباه است.", "error");
                     botPasswordInput.value = '';
                     botPasswordInput.focus();
                 }
             } catch (error) {
-                console.error("Error verifying bot password:", error);
+                console.error("Error verifying bot password or adding bot:", error);
                 showAddBotMessageBox(`خطا: ${error.message}`, "error");
             } finally {
                 submitAddBotBtn.disabled = false;
