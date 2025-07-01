@@ -1192,7 +1192,7 @@
                     <span class="text-xl font-bold text-yellow-300">حکم:</span>
                     <span id="hokm-suit-icon" class="text-4xl">❓</span>
                 </div>
-                <button id="leave-game-btn" class="classic-btn btn-red-classic text-sm py-2 px-4">ترک بازی</button>
+                <!-- Leave Game Button Removed As Per Request -->
             </div>
 
             <!-- Main Game Table -->
@@ -1428,7 +1428,7 @@
 
         // Game Screen Elements (NEW)
         const gameScreen = document.getElementById('game-screen');
-        const leaveGameBtn = document.getElementById('leave-game-btn');
+        // const leaveGameBtn = document.getElementById('leave-game-btn'); // REMOVED
         const hokmSuitIcon = document.getElementById('hokm-suit-icon');
         const ourTeamScoreEl = document.getElementById('our-team-score');
         const theirTeamScoreEl = document.getElementById('their-team-score');
@@ -2061,7 +2061,7 @@
                     const isCurrentUserHost = auth.currentUser && lobbyData.hostId === auth.currentUser.uid;
 
                     // NEW: Check if game has started
-                    if (lobbyData.status === 'playing') {
+                    if (lobbyData.status === 'playing' || lobbyData.gameState) {
                         if (currentActiveScreen !== gameScreen) {
                             setActiveScreen(gameScreen);
                         }
@@ -2398,13 +2398,17 @@
                 } else {
                     showMessageBox("بازی مورد نظر پایان یافت یا با خطا مواجه شد.", "info");
                     setActiveScreen(lobbyScreen);
-                    unsubscribeLobbies = setupLobbyListener('');
+                    if(unsubscribeLobbies === null) {
+                        unsubscribeLobbies = setupLobbyListener('');
+                    }
                 }
             }, (error) => {
                 console.error("Game state listener error:", error);
                 showMessageBox("ارتباط با بازی قطع شد.", "error");
                 setActiveScreen(lobbyScreen);
-                unsubscribeLobbies = setupLobbyListener('');
+                if(unsubscribeLobbies === null) {
+                    unsubscribeLobbies = setupLobbyListener('');
+                }
             });
         }
 
@@ -2416,8 +2420,8 @@
             const myIndex = gameState.players.indexOf(myUid);
             if (myIndex === -1) {
                 console.error("Current user not found in game players list!");
-                // Possibly kicked during game start transition, or an error occurred.
-                leaveGameBtn.click(); // Force leave
+                // This can happen if the user was kicked right as the game started.
+                // The listener should eventually redirect them.
                 return;
             }
 
@@ -2429,16 +2433,20 @@
                 slotMap[uid] = positions[relativeIndex];
             });
 
+            // Clear previous active turns before setting the new one
+            Object.values(playerSlots).forEach(slot => slot.classList.remove('active-turn'));
+
             // Render player names and turn indicator
             for (const uid in slotMap) {
                 const slotName = slotMap[uid];
                 const slotElement = playerSlots[slotName];
                 const nameDisplay = slotElement.querySelector('.player-name-display');
-                nameDisplay.textContent = gameState.playerNames[uid];
-
-                // Clear previous active turns before setting the new one
-                Object.values(playerSlots).forEach(slot => slot.classList.remove('active-turn'));
-
+                
+                // Set default/teammate names
+                if(slotName === 'bottom') nameDisplay.textContent = 'شما';
+                else if(slotName === 'top') nameDisplay.textContent = gameState.playerNames[uid] + ' (یار شما)';
+                else nameDisplay.textContent = gameState.playerNames[uid];
+                
                 if (uid === gameState.currentTurn) {
                     slotElement.classList.add('active-turn');
                 }
@@ -2453,11 +2461,9 @@
                 const handContainer = playerSlots[slotName].querySelector('.player-hand');
                 handContainer.innerHTML = ''; // Clear old cards
 
-                /*
-                // --- CARD RENDERING LOGIC DISABLED AS PER INSTRUCTIONS ---
                 if (uid === myUid) {
-                    // My hand - face up
-                    hand.sort(); // Sort my hand for better view
+                    // My hand - face up and sorted
+                    hand.sort(); 
                     hand.forEach(cardStr => {
                         handContainer.appendChild(createCardElement(cardStr, false));
                     });
@@ -2467,7 +2473,6 @@
                         handContainer.appendChild(createCardElement(null, true));
                     });
                 }
-                */
             }
              // TODO: Render scores, hokm, and play area later
         }
@@ -2790,28 +2795,8 @@
                 }
             }
         });
-
-        // NEW: Game Screen Event Listeners
-        leaveGameBtn.addEventListener('click', async () => {
-            if (!currentLobbyId || !auth.currentUser) return;
-
-            const confirmed = await showCustomConfirm("آیا مطمئن هستید که می‌خواهید بازی را ترک کنید؟ اگر شما سازنده باشید، بازی برای همه تمام می‌شود.");
-            if (!confirmed) return;
-
-            const lobbyRef = doc(db, `global_lobbies`, currentLobbyId);
-            const lobbySnap = await getDoc(lobbyRef);
-
-            if (lobbySnap.exists() && lobbySnap.data().hostId === auth.currentUser.uid) {
-                // Host leaves, delete the entire lobby/game
-                await deleteDoc(lobbyRef);
-            } else {
-                // A player leaves. For now, we'll just delete the lobby as well.
-                // A more advanced implementation would replace the player with a bot or end the game.
-                await deleteDoc(lobbyRef);
-            }
-
-            // All players will be kicked back to lobby screen by their listeners
-        });
+        
+        // REMOVED: leaveGameBtn event listener as the button is gone.
 
         window.onload = initializeFirebaseAndAuth;
     </script>
