@@ -541,20 +541,37 @@
             font-size: 0.8rem;
             margin-right: 0.5rem;
         }
-        .kick-player-btn {
+        /* NEW: Container for host buttons */
+        .player-actions {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .kick-player-btn, .transfer-host-btn {
             background: none;
-            border: 1px solid #B22222;
-            color: #B22222;
             border-radius: 5px;
             padding: 0.2rem 0.5rem;
             font-size: 0.8rem;
             cursor: pointer;
             transition: all 0.2s ease;
         }
+        .kick-player-btn {
+            border: 1px solid #B22222;
+            color: #B22222;
+        }
         .kick-player-btn:hover {
             background: #B22222;
             color: white;
         }
+        .transfer-host-btn {
+            border: 1px solid #DAA520;
+            color: #DAA520;
+        }
+        .transfer-host-btn:hover {
+            background: #DAA520;
+            color: black;
+        }
+
 
         .lobby-chat-container {
             background-color: rgba(0,0,0,0.4);
@@ -701,7 +718,7 @@
         .lobby-type-btn.active { background-color: #DAA520; color: #1A1A1A; box-shadow: 0 0 10px rgba(255,215,0,0.5); }
         .lobby-lock-icon { width: 1.2rem; height: 1.2rem; margin-left: 0.5rem; color: #FFD700; display: inline-block; vertical-align: middle; }
 
-        /* === Game Screen Styles (REDESIGNED) === */
+        /* === Game Screen Styles (REDESIGNED & CORRECTED) === */
         #game-screen {
             background: radial-gradient(ellipse at bottom, #100C08 0%, #000000 100%);
         }
@@ -787,19 +804,19 @@
             height: 150px;
         }
         
-        /* General player slot positioning */
-        #player-slot-bottom { bottom: 20px; left: 50%; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; }
-        #player-slot-top { top: 20px; left: 50%; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; }
-        #player-slot-left { left: 40px; top: 50%; transform: translateY(-50%); }
-        #player-slot-right { right: 40px; top: 50%; transform: translateY(-50%); }
+        /* General player slot positioning (CORRECTED) */
+        #player-slot-bottom { bottom: 30px; left: 50%; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; }
+        #player-slot-top { top: 30px; left: 50%; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; }
+        #player-slot-left { left: 30px; top: 50%; transform: translateY(-50%); }
+        #player-slot-right { right: 30px; top: 50%; transform: translateY(-50%); }
 
         @media (max-width: 768px) {
             .player-avatar { width: 50px; height: 50px; }
             .player-avatar svg { width: 24px; height: 24px; }
-            #player-slot-bottom { bottom: 10px; }
-            #player-slot-top { top: 10px; }
-            #player-slot-left { left: 10px; gap: 0.5rem; }
-            #player-slot-right { right: 10px; gap: 0.5rem; }
+            #player-slot-bottom { bottom: 15px; }
+            #player-slot-top { top: 15px; }
+            #player-slot-left { left: 15px; gap: 0.5rem; }
+            #player-slot-right { right: 15px; gap: 0.5rem; }
         }
     </style>
 </head>
@@ -1083,6 +1100,9 @@
                             <button id="view-kicked-players-btn" class="classic-btn btn-brown-classic text-sm py-2 px-4">
                                 لیست اخراجی‌ها
                             </button>
+                             <button id="add-bot-btn" class="classic-btn btn-purple-classic text-sm py-2 px-4">
+                                افزودن ربات
+                            </button>
                         </div>
                         <button id="leave-lobby-btn" class="classic-btn btn-red-classic text-sm py-2 px-4 hidden">
                             بستن لابی
@@ -1229,6 +1249,28 @@
             </div>
         </div>
 
+        <!-- 14. Add Bot Modal (NEW) -->
+        <div id="add-bot-modal" class="hidden fixed inset-0 flex justify-center items-center z-50 profile-modal-overlay">
+            <div class="classic-card profile-modal-content p-6 sm:p-8 w-11/12 max-w-md text-center relative">
+                <h2 class="text-2xl sm:text-3xl font-bold mb-4">افزودن ربات</h2>
+                <button id="close-add-bot-modal-btn" class="absolute top-4 left-4 text-white hover:text-gray-300 transition-colors duration-200">
+                     <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-x"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+                </button>
+                <p class="text-lg mb-6 text-white">برای افزودن ربات به بازی، لطفاً رمز عبور مخفی ربات را وارد کنید.</p>
+                <form id="add-bot-form" class="space-y-5">
+                    <div>
+                        <input type="password" id="bot-password-input" placeholder="رمز عبور ربات"
+                               class="w-full focus:outline-none focus:ring-2 focus:ring-blue-500 text-center" required>
+                    </div>
+                    <div class="flex justify-around space-x-4 space-x-reverse">
+                        <button type="submit" id="submit-add-bot-btn" class="w-1/2 classic-btn btn-green-classic">افزودن</button>
+                        <button type="button" id="cancel-add-bot-btn" class="w-1/2 classic-btn btn-gray-classic">انصراف</button>
+                    </div>
+                </form>
+                <div id="add-bot-message-box" class="mt-5 p-3.5 rounded-xl text-base text-center hidden" role="alert"></div>
+            </div>
+        </div>
+
     </div>
 
     <!-- Firebase SDKs -->
@@ -1330,8 +1372,9 @@
         const detailPlayerCount = document.getElementById('detail-player-count');
         const hostActionsContainer = document.getElementById('host-actions-container');
         const startGameBtn = document.getElementById('start-game-btn');
-        const toggleChatLockBtn = document.getElementById('toggle-chat-lock-btn'); // NEW
+        const toggleChatLockBtn = document.getElementById('toggle-chat-lock-btn');
         const viewKickedPlayersBtn = document.getElementById('view-kicked-players-btn');
+        const addBotBtn = document.getElementById('add-bot-btn'); // NEW
         const leaveLobbyBtn = document.getElementById('leave-lobby-btn');
         const lobbyChatMessages = document.getElementById('lobby-chat-messages');
         const lobbyChatForm = document.getElementById('lobby-chat-form');
@@ -1378,6 +1421,15 @@
         const submitJoinPasswordBtn = document.getElementById('submit-join-password-btn');
         const cancelJoinPasswordBtn = document.getElementById('cancel-join-password-btn');
         const passwordPromptMessageBox = document.getElementById('password-prompt-message-box');
+        
+        // NEW: Add Bot Modal Elements
+        const addBotModal = document.getElementById('add-bot-modal');
+        const closeAddBotModalBtn = document.getElementById('close-add-bot-modal-btn');
+        const addBotForm = document.getElementById('add-bot-form');
+        const botPasswordInput = document.getElementById('bot-password-input');
+        const submitAddBotBtn = document.getElementById('submit-add-bot-btn');
+        const cancelAddBotBtn = document.getElementById('cancel-add-bot-btn');
+        const addBotMessageBox = document.getElementById('add-bot-message-box');
 
         // State variables
         let authMode = 'login'; // Default mode is login
@@ -1420,6 +1472,8 @@
         const showMessageBox = (msg, type) => showCustomMessage(messageBox, msg, type);
         // Wrapper for create lobby message box
         const showCreateLobbyMessageBox = (msg, type) => showCustomMessage(createLobbyMessageBox, msg, type);
+        // NEW: Wrapper for add bot message box
+        const showAddBotMessageBox = (msg, type) => showCustomMessage(addBotMessageBox, msg, type);
 
 
         // Function to show custom confirmation modal
@@ -1596,6 +1650,25 @@
                 }
             }, 300);
         }
+        
+        // NEW: Functions to open/close Add Bot Modal
+        function openAddBotModal() {
+            addBotModal.classList.remove('hidden');
+            void addBotModal.offsetWidth;
+            addBotModal.classList.add('profile-modal-enter-active');
+            botPasswordInput.focus();
+            addBotMessageBox.classList.add('hidden');
+        }
+
+        function closeAddBotModal() {
+            addBotModal.classList.remove('profile-modal-enter-active');
+            addBotModal.classList.add('profile-modal-leave-active');
+            setTimeout(() => {
+                addBotModal.classList.add('hidden');
+                addBotModal.classList.remove('profile-modal-leave-active');
+                addBotForm.reset();
+            }, 300);
+        }
 
 
         /**
@@ -1688,6 +1761,16 @@
             };
             return messages[errorCode] || "خطایی ناشناخته رخ داده است.";
         }
+        
+        // NEW: Helper to generate random password for bot
+        function generateRandomPassword(length = 6) {
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+            let password = '';
+            for (let i = 0; i < length; i++) {
+                password += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            return password;
+        }
 
         // --- Firebase Lobby Functions ---
         async function createLobby(lobbyName, userId, displayName, lobbyType, password) {
@@ -1716,7 +1799,8 @@
                     },
                     kickedPlayers: [], // Still an array of objects
                     createdAt: serverTimestamp(),
-                    isChatLocked: false, // NEW: Chat is open by default
+                    isChatLocked: false, 
+                    botPassword: generateRandomPassword(), // NEW: Add bot password
                     gameSettings: { maxPlayers: 4, roundsToWin: 7 }
                 };
         
@@ -2005,15 +2089,25 @@
 
                     for (const player of playerList) {
                         const isHost = player.uid === lobbyData.hostId;
+                        const isBot = player.uid.startsWith('bot_');
                         const playerItem = document.createElement('div');
                         playerItem.className = 'player-list-item';
                         if (isHost) playerItem.classList.add('is-host');
 
-                        const kickButtonHtml = (isCurrentUserHost && !isHost) 
-                            ? `<button class="kick-player-btn" data-player-uid="${player.uid}" data-player-name="${player.displayName}">اخراج</button>` 
+                        const canPerformActions = isCurrentUserHost && !isHost && !isBot;
+
+                        const kickButtonHtml = canPerformActions
+                            ? `<button class="kick-player-btn" data-player-uid="${player.uid}" data-player-name="${player.displayName}" title="اخراج">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                               </button>` 
+                            : '';
+                        const transferHostButtonHtml = canPerformActions
+                            ? `<button class="transfer-host-btn" data-player-uid="${player.uid}" data-player-name="${player.displayName}" title="واگذاری مالکیت">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></svg>
+                               </button>`
                             : '';
                         
-                        const hostLabelHtml = isHost ? '<span class="host-label">(سازنده)</span>' : '';
+                        const hostLabelHtml = isHost ? '<span class="host-label">(سازنده)</span>' : (isBot ? '<span class="host-label text-blue-400">(ربات)</span>' : '');
 
                         playerItem.innerHTML = `
                             <div class="flex items-center">
@@ -2021,7 +2115,10 @@
                                 <span class="player-name">${player.displayName}</span>
                                 ${hostLabelHtml}
                             </div>
-                            ${kickButtonHtml}
+                            <div class="player-actions">
+                                ${transferHostButtonHtml}
+                                ${kickButtonHtml}
+                            </div>
                         `;
                         playerListContainer.appendChild(playerItem);
                     }
@@ -2031,15 +2128,25 @@
                            openKickPlayerConfirmModal(e.currentTarget.dataset.playerName, e.currentTarget.dataset.playerUid);
                         });
                     });
+                    
+                    playerListContainer.querySelectorAll('.transfer-host-btn').forEach(button => {
+                        button.addEventListener('click', async (e) => {
+                           const playerUid = e.currentTarget.dataset.playerUid;
+                           const playerName = e.currentTarget.dataset.playerName;
+                           const confirmed = await showCustomConfirm(`آیا مطمئن هستید که می‌خواهید مالکیت لابی را به "${playerName}" واگذار کنید؟`, "واگذاری مالکیت");
+                           if (confirmed) {
+                               await transferHost(currentLobbyId, playerUid);
+                           }
+                        });
+                    });
 
                     // === LOGIC CHANGE: Manage "Leave/Close Lobby" Button Visibility ===
                     if (isCurrentUserHost) {
                         leaveLobbyBtn.classList.remove('hidden');
                         leaveLobbyBtn.textContent = 'بستن لابی'; // Host closes the lobby
                     } else {
-                        // Per instructions, the leave button is hidden for non-hosts.
-                        // They must use the back button in the header (if available) or restart to leave.
-                        leaveLobbyBtn.classList.add('hidden');
+                        leaveLobbyBtn.classList.remove('hidden');
+                        leaveLobbyBtn.textContent = 'خروج از لابی';
                     }
 
                     // Manage Host Actions
@@ -2047,6 +2154,7 @@
                         hostActionsContainer.style.display = 'flex';
                         startGameBtn.disabled = playerCount !== maxPlayers;
                         startGameBtn.textContent = `شروع بازی (${playerCount}/${maxPlayers})`;
+                        addBotBtn.disabled = playerCount >= maxPlayers;
                         
                         toggleChatLockBtn.textContent = isChatLocked ? 'باز کردن چت' : 'قفل کردن چت';
 
@@ -2091,7 +2199,6 @@
                     return;
                 }
                 const isHost = lobbySnap.data().hostId === userId;
-                // The button is now only visible to the host, so this check is redundant but safe.
                 if (isHost) {
                     const confirmed = await showCustomConfirm("شما سازنده لابی هستید. خروج شما باعث بسته شدن لابی برای همه می‌شود. آیا مطمئن هستید؟", "بستن لابی");
                     if (confirmed) {
@@ -2099,8 +2206,7 @@
                         // The onSnapshot listener will handle screen transition for all players.
                     }
                 } else {
-                    // This block is now unreachable via the UI as per the new requirement, but the logic is kept for safety.
-                    console.warn("A non-host tried to leave the lobby. This path should not be reachable.");
+                    // Non-host leaving
                     await updateDoc(lobbyRef, {
                         [`players.${userId}`]: deleteField()
                     });
@@ -2120,6 +2226,60 @@
                 showMessageBox(`بازیکن "${playerToKickDisplayName}" اخراج شد.`, "success");
                 closeKickPlayerConfirmModal();
             } catch (e) { console.error("Error kicking player:", e); showMessageBox("خطا در اخراج بازیکن.", "error"); }
+        }
+        
+        // NEW: Function to transfer host
+        async function transferHost(lobbyId, newHostUid) {
+            if (!lobbyId || !newHostUid || !auth.currentUser) return;
+            const lobbyRef = doc(db, 'global_lobbies', lobbyId);
+            try {
+                const lobbySnap = await getDoc(lobbyRef);
+                if (!lobbySnap.exists()) { throw new Error("لابی یافت نشد."); }
+                if (lobbySnap.data().hostId !== auth.currentUser.uid) {
+                    throw new Error("فقط سازنده فعلی می‌تواند مالکیت را واگذار کند.");
+                }
+                await updateDoc(lobbyRef, { hostId: newHostUid });
+                showMessageBox("مالکیت با موفقیت واگذار شد.", "success");
+            } catch (error) {
+                console.error("Error transferring host:", error);
+                showMessageBox(`خطا در واگذاری مالکیت: ${error.message}`, "error");
+            }
+        }
+        
+        // NEW: Function to add a bot to the lobby
+        async function addBotToLobby(lobbyId) {
+            const lobbyRef = doc(db, 'global_lobbies', lobbyId);
+            try {
+                const lobbySnap = await getDoc(lobbyRef);
+                if (!lobbySnap.exists()) throw new Error("لابی یافت نشد.");
+
+                const lobbyData = lobbySnap.data();
+                const playersMap = lobbyData.players || {};
+                const maxPlayers = lobbyData.gameSettings?.maxPlayers || 4;
+
+                if (Object.keys(playersMap).length >= maxPlayers) {
+                    throw new Error("لابی پر است.");
+                }
+
+                // Find the next available bot number
+                let botNumber = 1;
+                while (playersMap[`bot_${botNumber}`]) {
+                    botNumber++;
+                }
+                const botId = `bot_${botNumber}`;
+                const botNames = ["آلفا", "بتا", "گاما", "دلتا"];
+                const botName = `ربات ${botNames[botNumber - 1] || botNumber}`;
+
+                await updateDoc(lobbyRef, {
+                    [`players.${botId}`]: botName
+                });
+                
+                closeAddBotModal();
+                showMessageBox(`${botName} با موفقیت به لابی اضافه شد.`, "success");
+            } catch (error) {
+                console.error("Error adding bot:", error);
+                showAddBotMessageBox(`خطا در افزودن ربات: ${error.message}`, "error");
+            }
         }
 
         async function unkickPlayer(lobbyId, playerToUnkickUid) {
@@ -2557,6 +2717,9 @@
                 showMessageBox("خطا در تغییر وضعیت چت.", "error");
             }
         });
+        
+        // NEW: Add Bot listener
+        addBotBtn.addEventListener('click', openAddBotModal);
 
         // Kick/Unkick related
         kickPlayerConfirmBtn.addEventListener('click', () => kickedPlayerToProcess && kickPlayer(currentLobbyId, kickedPlayerToProcess.uid, kickedPlayerToProcess.displayName));
@@ -2670,6 +2833,44 @@
                 }
             }
         });
+        
+        // NEW: Add Bot Modal Listeners
+        closeAddBotModalBtn.addEventListener('click', closeAddBotModal);
+        cancelAddBotBtn.addEventListener('click', closeAddBotModal);
+        addBotModal.addEventListener('click', (e) => e.target === addBotModal && closeAddBotModal());
+        
+        addBotForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            if (!currentLobbyId) return;
+            const enteredPassword = botPasswordInput.value;
+            if (!enteredPassword) { showAddBotMessageBox("لطفاً رمز عبور ربات را وارد کنید.", "error"); return; }
+            
+            submitAddBotBtn.disabled = true;
+            submitAddBotBtn.textContent = "در حال بررسی...";
+
+            try {
+                const lobbyRef = doc(db, 'global_lobbies', currentLobbyId);
+                const lobbySnap = await getDoc(lobbyRef);
+                if (!lobbySnap.exists()) {
+                    throw new Error("Lobby not found");
+                }
+                const lobbyData = lobbySnap.data();
+                if (lobbyData.botPassword === enteredPassword) {
+                    await addBotToLobby(currentLobbyId);
+                } else {
+                    showAddBotMessageBox("رمز عبور ربات اشتباه است.", "error");
+                    botPasswordInput.value = '';
+                    botPasswordInput.focus();
+                }
+            } catch (error) {
+                console.error("Error verifying bot password:", error);
+                showAddBotMessageBox(`خطا: ${error.message}`, "error");
+            } finally {
+                submitAddBotBtn.disabled = false;
+                submitAddBotBtn.textContent = "افزودن";
+            }
+        });
+
         
         window.onload = initializeFirebaseAndAuth;
     </script>
