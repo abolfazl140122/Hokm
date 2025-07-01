@@ -1712,7 +1712,13 @@
         // Firebase Authentication State Listener
         onAuthStateChanged(auth, async (user) => {
             console.log("onAuthStateChanged triggered. User:", user ? user.uid : "logged out");
-            isAuthResolved = true;
+            
+            // This is the first time the auth state has been determined.
+            // We can now safely transition away from the loading screen.
+            if (!isAuthResolved) {
+                isAuthResolved = true;
+            }
+
             if (user) {
                 try {
                     const userDocRef = doc(db, `artifacts/${appId}/users/${user.uid}/profile/data`); 
@@ -1728,7 +1734,12 @@
                     }
                     headerDisplayName.textContent = currentUserData.displayName;
                     headerUserId.textContent = `شناسه: ${currentUserData.uid.substring(0, 8)}...`;
-                    setActiveScreen(mainScreen);
+                    
+                    // Only transition if we are coming from loading or auth screen
+                    if(currentActiveScreen === loadingScreen || currentActiveScreen === authScreen) {
+                        setActiveScreen(mainScreen);
+                    }
+
                 } catch (firestoreError) {
                     console.error("Firestore profile error:", firestoreError);
                     currentUserData = { uid: user.uid, email: user.email, displayName: user.displayName || (user.email ? user.email.split('@')[0] : 'کاربر ناشناس') };
@@ -1738,6 +1749,7 @@
                     showMessageBox("مشکل در بارگذاری پروفایل.", "error");
                 }
             } else {
+                // User is logged out
                 setActiveScreen(authScreen);
                 authForm.reset();
                 displayNameField.classList.add('hidden');
@@ -1746,20 +1758,47 @@
                 registerToggleBtn.classList.remove('hidden');
                 authMode = 'login';
                 currentUserData = null;
+                // Clean up all listeners
                 if (unsubscribeLobbies) unsubscribeLobbies();
                 if (unsubscribeLobbyDetail) unsubscribeLobbyDetail();
                 if (unsubscribeKickedPlayers) unsubscribeKickedPlayers();
-                if (unsubscribeLobbyChat) unsubscribeLobbyChat(); // NEW: Cleanup chat listener
-                if (unsubscribeGame) unsubscribeGame(); // NEW: Cleanup game listener
+                if (unsubscribeLobbyChat) unsubscribeLobbyChat();
+                if (unsubscribeGame) unsubscribeGame();
                 unsubscribeLobbies = unsubscribeLobbyDetail = unsubscribeKickedPlayers = unsubscribeLobbyChat = unsubscribeGame = null;
                 currentLobbyId = null;
             }
         });
 
-        // Initial Firebase Initialization
+        // --- FIX START: Corrected Initial Firebase Authentication Flow ---
+        // This function now correctly handles the initial sign-in logic,
+        // preventing the auth screen from showing unnecessarily.
         async function initializeFirebaseAndAuth() {
-            console.log("Initializing Firebase Auth state listener...");
+            console.log("Initializing Firebase Auth...");
+            
+            // The onAuthStateChanged listener is already set up globally.
+            // We just need to trigger the sign-in process if a token is available.
+            // If no token is available, onAuthStateChanged will still fire with `null` or
+            // with a user from a cached session, which is the correct behavior.
+            
+            if (initialAuthToken) {
+                console.log("Initial auth token found. Attempting to sign in...");
+                try {
+                    // Signing in with the custom token will trigger onAuthStateChanged.
+                    // We don't need to do anything else here. The listener will handle the screen transition.
+                    await signInWithCustomToken(auth, initialAuthToken);
+                    console.log("Sign in with custom token successful.");
+                } catch (error) {
+                    // If the token is invalid, log the error.
+                    // onAuthStateChanged will fire with a `null` user, taking them to the auth screen.
+                    console.error("Error signing in with initial custom token:", error);
+                }
+            } else {
+                console.log("No initial auth token. Waiting for onAuthStateChanged to resolve session.");
+                // No token, so Firebase will check for a cached user.
+                // onAuthStateChanged will handle the result automatically.
+            }
         }
+        // --- FIX END ---
 
         // Maps Firebase auth error codes to user-friendly Persian messages.
         function getFirebaseErrorMessage(errorCode) {
@@ -2813,6 +2852,7 @@
             // All players will be kicked back to lobby screen by their listeners
         });
 
+        // Initialize the app when the window loads
         window.onload = initializeFirebaseAndAuth;
     </script>
 </body>
