@@ -1389,17 +1389,23 @@
         // REVISED: Imported deleteField for updating player maps
         import { getFirestore, doc, setDoc, getDoc, collection, addDoc, serverTimestamp, query, where, onSnapshot, updateDoc, arrayUnion, arrayRemove, deleteDoc, getDocs, orderBy, deleteField } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js"; 
 
-        // Firebase Configuration (from user's input)
-        // **IMPORTANT**: You should replace these with your actual Firebase project configuration.
+        // =================================================================================
+        // ============================ اطلاعات پروژه فایربیس شما ============================
+        // =================================================================================
+        // این بخش را با اطلاعاتی که از پنل فایربیس خود کپی کرده‌اید، جایگزین کنید
+        // مسیر در فایربیس: Project Settings > General > Your apps > Web app > Config
         const firebaseConfig = {
-            apiKey: "AIzaSyBpVHnjF5gdTm3vJiHEoAZCowsRkTapj_4",
-            authDomain: "hokm-d6911.firebaseapp.com",
-            projectId: "hokm-d6911",
-            storageBucket: "hokm-d6911.appspot.com",
-            messagingSenderId: "128133280011",
-            appId: "1:128133280011:web:c9fe28f5201eef7a3a320e",
-            measurementId: "G-LN0S9W86MK"
+          apiKey: "API_KEY_شما_اینجا_قرار_میگیرد",
+          authDomain: "PROJECT_ID_شما.firebaseapp.com",
+          projectId: "PROJECT_ID_شما",
+          storageBucket: "PROJECT_ID_شما.appspot.com",
+          messagingSenderId: "SENDER_ID_شما",
+          appId: "APP_ID_شما"
+          // measurementId: "اختیاری"
         };
+        // =================================================================================
+        // ============================ پایان بخش ویرایش ===================================
+        // =================================================================================
 
         // Initialize Firebase
         const app = initializeApp(firebaseConfig);
