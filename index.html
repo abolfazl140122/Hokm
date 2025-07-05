@@ -1180,7 +1180,7 @@
             </div>
         </div>
 
-        <!-- 9. Game Screen (REDESIGNED) -->
+        <!-- 9. Game Screen (REDESIGNED BUT INACTIVE) -->
         <div id="game-screen" class="hidden absolute inset-0 z-30 page-transition-active page-transition-hidden flex flex-col items-center justify-center p-2" tabindex="-1">
             <!-- Game Header: Score, Hokm, etc. -->
             <div class="absolute top-0 left-0 right-0 h-20 bg-black bg-opacity-40 flex justify-between items-center px-4 z-20">
@@ -1426,20 +1426,6 @@
         const lobbyChatInput = document.getElementById('lobby-chat-input');
         const lobbyChatSendBtn = document.getElementById('lobby-chat-send-btn');
 
-        // Game Screen Elements (NEW)
-        const gameScreen = document.getElementById('game-screen');
-        const leaveGameBtn = document.getElementById('leave-game-btn');
-        const hokmSuitIcon = document.getElementById('hokm-suit-icon');
-        const ourTeamScoreEl = document.getElementById('our-team-score');
-        const theirTeamScoreEl = document.getElementById('their-team-score');
-        const playArea = document.getElementById('play-area');
-        const playerSlots = {
-            bottom: document.getElementById('player-slot-bottom'),
-            left: document.getElementById('player-slot-left'),
-            top: document.getElementById('player-slot-top'),
-            right: document.getElementById('player-slot-right'),
-        };
-
         // Kick Player Confirmation Modal Elements
         const kickPlayerConfirmModal = document.getElementById('kick-player-confirm-modal');
         const closeKickPlayerConfirmModalBtn = document.getElementById('close-kick-player-confirm-modal-btn');
@@ -1474,7 +1460,6 @@
         let currentUserData = null; // To store user's profile data
         let unsubscribeLobbies = null; // Global variable to store the unsubscribe function for lobby list listener
         let unsubscribeLobbyDetail = null; // Global variable for single lobby detail listener
-        let unsubscribeGame = null; // NEW: Listener for the active game state
         let unsubscribeKickedPlayers = null; // Listener for kicked players list
         let unsubscribeLobbyChat = null; // NEW: Listener for lobby chat messages
         let isAuthResolved = false; // Flag to indicate if onAuthStateChanged has run at least once
@@ -1553,8 +1538,6 @@
             
             // Cleanup old listeners when changing screens
             if (unsubscribeLobbyDetail) { unsubscribeLobbyDetail(); unsubscribeLobbyDetail = null; }
-            if (unsubscribeGame) { unsubscribeGame(); unsubscribeGame = null; }
-
 
             // Hide the current screen with transition
             currentActiveScreen.classList.remove('page-transition-visible');
@@ -1763,8 +1746,7 @@
                 if (unsubscribeLobbyDetail) unsubscribeLobbyDetail();
                 if (unsubscribeKickedPlayers) unsubscribeKickedPlayers();
                 if (unsubscribeLobbyChat) unsubscribeLobbyChat();
-                if (unsubscribeGame) unsubscribeGame();
-                unsubscribeLobbies = unsubscribeLobbyDetail = unsubscribeKickedPlayers = unsubscribeLobbyChat = unsubscribeGame = null;
+                unsubscribeLobbies = unsubscribeLobbyDetail = unsubscribeKickedPlayers = unsubscribeLobbyChat = null;
                 currentLobbyId = null;
             }
         });
@@ -1842,7 +1824,7 @@
                     players: {
                         [userId]: creatorDisplayName // Using a map: { "uid": "displayName" }
                     },
-                    kickedPlayers: [], // Still an array of objects
+                    kickedPlayers: [], // Still array of objects
                     createdAt: serverTimestamp(),
                     isChatLocked: false, // NEW: Chat is open by default
                     gameSettings: { maxPlayers: 4, roundsToWin: 7 }
@@ -1901,10 +1883,6 @@
             if (unsubscribeLobbyChat) {
                 unsubscribeLobbyChat();
                 unsubscribeLobbyChat = null;
-            }
-            if (unsubscribeGame) { // NEW: Clear game listener too
-                unsubscribeGame();
-                unsubscribeGame = null;
             }
         
             lobbiesList.innerHTML = '<p class="text-gray-400">در حال بارگذاری لابی‌ها...</p>';
@@ -2091,7 +2069,6 @@
             if (unsubscribeLobbies) { unsubscribeLobbies(); unsubscribeLobbies = null; }
             if (unsubscribeKickedPlayers) { unsubscribeKickedPlayers(); unsubscribeKickedPlayers = null; }
             if (unsubscribeLobbyChat) { unsubscribeLobbyChat(); unsubscribeLobbyChat = null; }
-            if (unsubscribeGame) { unsubscribeGame(); unsubscribeGame = null; }
             
             const lobbyRef = doc(db, `global_lobbies`, lobbyId);
             const unsubscribe = onSnapshot(lobbyRef, async (docSnap) => {
@@ -2099,16 +2076,16 @@
                     const lobbyData = docSnap.data();
                     const isCurrentUserHost = auth.currentUser && lobbyData.hostId === auth.currentUser.uid;
 
-                    // NEW: Check if game has started
+                    // Check if game has started (or status changed)
                     if (lobbyData.status === 'playing') {
-                        if (currentActiveScreen !== gameScreen) {
-                            setActiveScreen(gameScreen);
-                        }
-                        // Start the game listener if it's not already running
-                        if (!unsubscribeGame) {
-                            unsubscribeGame = setupGameListener(lobbyId);
-                        }
-                        return; // Stop processing lobby details, let game listener take over
+                        // This block is now a placeholder. In a full implementation,
+                        // it would transition to the game screen.
+                        console.log("Game has started for this lobby, but game screen is disabled.");
+                        showMessageBox("بازی شروع شد! (قابلیت بازی در نسخه‌های بعدی)", "info");
+                        // For now, we kick the user back to the lobby list.
+                        setActiveScreen(lobbyScreen);
+                        unsubscribeLobbies = setupLobbyListener('');
+                        return; 
                     }
 
                     const playersMap = lobbyData.players || {};
@@ -2369,177 +2346,6 @@
             });
         }
         
-        // --- Game Logic Functions (NEW) ---
-
-        function createShuffledDeck() {
-            const suits = ['H', 'D', 'C', 'S']; // Hearts, Diamonds, Clubs, Spades
-            const ranks = ['2', '3', '4', '5', '6', '7', '8', '9', 'T', 'J', 'Q', 'K', 'A'];
-            const deck = [];
-            for (const suit of suits) {
-                for (const rank of ranks) {
-                    deck.push(rank + suit); // Swapped to Rank+Suit for easier parsing
-                }
-            }
-            // Fisher-Yates Shuffle
-            for (let i = deck.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [deck[i], deck[j]] = [deck[j], deck[i]];
-            }
-            return deck;
-        }
-
-        async function initializeGameInFirestore(lobbyId, lobbyData) {
-            const deck = createShuffledDeck();
-            const playerUIDs = Object.keys(lobbyData.players);
-            
-            const hands = {};
-            playerUIDs.forEach((uid, index) => {
-                hands[uid] = deck.slice(index * 13, (index + 1) * 13);
-            });
-
-            const hakem = lobbyData.hostId;
-
-            const initialGameState = {
-                players: playerUIDs,
-                playerNames: lobbyData.players, // Map of uid -> displayName
-                hakem: hakem,
-                currentTurn: hakem,
-                phase: 'CHOOSE_HOKM',
-                hokmSuit: null,
-                hands: hands,
-                currentTrick: [],
-                scores: { team1: 0, team2: 0 },
-                roundPoints: { team1: 0, team2: 0 },
-            };
-
-            const lobbyRef = doc(db, 'global_lobbies', lobbyId);
-            try {
-                await updateDoc(lobbyRef, {
-                    gameState: initialGameState,
-                    status: "playing"
-                });
-                console.log(`Game state initialized for lobby ${lobbyId}`);
-            } catch (error) {
-                console.error("Error initializing game state:", error);
-                await updateDoc(lobbyRef, { status: "waiting" }); // Revert on failure
-                throw new Error("Failed to initialize game.");
-            }
-        }
-        
-        function setupGameListener(lobbyId) {
-            console.log(`Listening to game state for lobby ID: ${lobbyId}`);
-            if (unsubscribeLobbyDetail) { unsubscribeLobbyDetail(); unsubscribeLobbyDetail = null; }
-            const lobbyRef = doc(db, `global_lobbies`, lobbyId);
-            return onSnapshot(lobbyRef, (docSnap) => {
-                if (docSnap.exists() && docSnap.data().gameState) {
-                    const lobbyData = docSnap.data();
-                    renderGameScreen(lobbyData);
-                } else {
-                    showMessageBox("بازی مورد نظر پایان یافت یا با خطا مواجه شد.", "info");
-                    setActiveScreen(lobbyScreen);
-                    unsubscribeLobbies = setupLobbyListener('');
-                }
-            }, (error) => {
-                console.error("Game state listener error:", error);
-                showMessageBox("ارتباط با بازی قطع شد.", "error");
-                setActiveScreen(lobbyScreen);
-                unsubscribeLobbies = setupLobbyListener('');
-            });
-        }
-
-        function renderGameScreen(lobbyData) {
-            const gameState = lobbyData.gameState;
-            const myUid = auth.currentUser.uid;
-            
-            // Find my position in the game
-            const myIndex = gameState.players.indexOf(myUid);
-            if (myIndex === -1) {
-                console.error("Current user not found in game players list!");
-                // Possibly kicked during game start transition, or an error occurred.
-                leaveGameBtn.click(); // Force leave
-                return;
-            }
-
-            // Define positions relative to me
-            const positions = ['bottom', 'left', 'top', 'right'];
-            const slotMap = {}; // Maps UID to slot name ('bottom', 'left', etc.)
-            gameState.players.forEach((uid, index) => {
-                const relativeIndex = (index - myIndex + 4) % 4;
-                slotMap[uid] = positions[relativeIndex];
-            });
-
-            // Render player names and turn indicator
-            for (const uid in slotMap) {
-                const slotName = slotMap[uid];
-                const slotElement = playerSlots[slotName];
-                const nameDisplay = slotElement.querySelector('.player-name-display');
-                nameDisplay.textContent = gameState.playerNames[uid];
-
-                // Clear previous active turns before setting the new one
-                Object.values(playerSlots).forEach(slot => slot.classList.remove('active-turn'));
-
-                if (uid === gameState.currentTurn) {
-                    slotElement.classList.add('active-turn');
-                }
-            }
-
-            // Render hands
-            for (const uid in gameState.hands) {
-                const hand = gameState.hands[uid];
-                const slotName = slotMap[uid];
-                if (!slotName) continue; // Skip if player not in slot map (e.g., left game)
-
-                const handContainer = playerSlots[slotName].querySelector('.player-hand');
-                handContainer.innerHTML = ''; // Clear old cards
-
-                /*
-                // --- CARD RENDERING LOGIC DISABLED AS PER INSTRUCTIONS ---
-                if (uid === myUid) {
-                    // My hand - face up
-                    hand.sort(); // Sort my hand for better view
-                    hand.forEach(cardStr => {
-                        handContainer.appendChild(createCardElement(cardStr, false));
-                    });
-                } else {
-                    // Others' hands - face down
-                    hand.forEach(() => {
-                        handContainer.appendChild(createCardElement(null, true));
-                    });
-                }
-                */
-            }
-             // TODO: Render scores, hokm, and play area later
-        }
-
-        function createCardElement(cardStr, isBack) {
-            const cardDiv = document.createElement('div');
-            cardDiv.className = 'card';
-            
-            if (isBack) {
-                cardDiv.classList.add('back');
-                return cardDiv;
-            }
-
-            const suitMap = { 'S': '♠', 'H': '♥', 'D': '♦', 'C': '♣' };
-            const colorMap = { 'S': 'black', 'H': 'red', 'D': 'red', 'C': 'black' };
-
-            const rank = cardStr.substring(0, cardStr.length - 1);
-            const suitChar = cardStr.slice(-1);
-            const suitSymbol = suitMap[suitChar];
-            const color = colorMap[suitChar];
-
-            cardDiv.classList.add(color);
-            cardDiv.dataset.card = cardStr;
-
-            cardDiv.innerHTML = `
-                <div class="card-suit top">${suitSymbol}</div>
-                <div class="card-rank">${rank}</div>
-                <div class="card-suit bottom">${suitSymbol}</div>
-            `;
-            return cardDiv;
-        }
-
-
         // --- Event Listeners ---
         // Auth, Profile, Modals, Lobby List
         loginToggleBtn.addEventListener('click', () => {
@@ -2607,8 +2413,7 @@
             if (unsubscribeLobbies) unsubscribeLobbies();
             if (unsubscribeLobbyDetail) unsubscribeLobbyDetail();
             if (unsubscribeLobbyChat) unsubscribeLobbyChat();
-            if (unsubscribeGame) unsubscribeGame();
-            unsubscribeLobbies = unsubscribeLobbyDetail = unsubscribeLobbyChat = unsubscribeGame = null;
+            unsubscribeLobbies = unsubscribeLobbyDetail = unsubscribeLobbyChat = null;
         });
 
         addIconBtn.addEventListener('click', () => {
@@ -2686,19 +2491,9 @@
         // --- Lobby Detail Screen Event Listeners ---
         leaveLobbyBtn.addEventListener('click', leaveLobby);
 
-        startGameBtn.addEventListener('click', async () => {
-            if (currentLobbyId && auth.currentUser) {
-                try {
-                    const lobbyRef = doc(db, 'global_lobbies', currentLobbyId);
-                    const lobbySnap = await getDoc(lobbyRef);
-                    if (lobbySnap.exists()) {
-                        await initializeGameInFirestore(currentLobbyId, lobbySnap.data());
-                    }
-                } catch (error) {
-                    console.error("Error starting game:", error);
-                    showMessageBox(`خطا در شروع بازی: ${error.message}`, "error");
-                }
-            }
+        startGameBtn.addEventListener('click', () => {
+            if (startGameBtn.disabled) return;
+            showMessageBox("شروع بازی در حال حاضر غیرفعال است. این قابلیت به زودی اضافه خواهد شد.", "info");
         });
         
         // NEW: Toggle Chat Lock Listener
@@ -2828,28 +2623,6 @@
                     deleteLobbyMessage(currentLobbyId, messageId);
                 }
             }
-        });
-
-        // NEW: Game Screen Event Listeners
-        leaveGameBtn.addEventListener('click', async () => {
-            if (!currentLobbyId || !auth.currentUser) return;
-
-            const confirmed = await showCustomConfirm("آیا مطمئن هستید که می‌خواهید بازی را ترک کنید؟ اگر شما سازنده باشید، بازی برای همه تمام می‌شود.");
-            if (!confirmed) return;
-
-            const lobbyRef = doc(db, `global_lobbies`, currentLobbyId);
-            const lobbySnap = await getDoc(lobbyRef);
-
-            if (lobbySnap.exists() && lobbySnap.data().hostId === auth.currentUser.uid) {
-                // Host leaves, delete the entire lobby/game
-                await deleteDoc(lobbyRef);
-            } else {
-                // A player leaves. For now, we'll just delete the lobby as well.
-                // A more advanced implementation would replace the player with a bot or end the game.
-                await deleteDoc(lobbyRef);
-            }
-
-            // All players will be kicked back to lobby screen by their listeners
         });
 
         // Initialize the app when the window loads
