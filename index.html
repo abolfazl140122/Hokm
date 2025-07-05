@@ -105,44 +105,6 @@
             box-shadow: 0 0 10px rgba(255,215,0,0.5);
         }
 
-        /* [MAINTENANCE MODE] Styles for Maintenance Screen */
-        #maintenance-overlay {
-            position: fixed;
-            inset: 0;
-            background: radial-gradient(ellipse at bottom, #100C08 0%, #000000 100%);
-            z-index: 1000; /* Must be on top of everything */
-            transition: opacity 0.5s ease-in-out;
-        }
-
-        /* [MAINTENANCE MODE] Styles for Admin Tester Panel */
-        #admin-tester-panel {
-            position: fixed;
-            bottom: 100px;
-            right: 20px;
-            background-color: rgba(0, 0, 0, 0.7);
-            border: 2px solid #FFD700;
-            border-radius: 10px;
-            padding: 1rem;
-            color: white;
-            z-index: 999; /* High z-index, but below modals */
-            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
-            backdrop-filter: blur(5px);
-            transition: opacity 0.3s ease-in-out;
-        }
-        #admin-tester-panel p {
-            font-size: 0.9rem;
-            margin: 0;
-            padding: 0;
-        }
-         #admin-tester-panel span {
-            font-size: 1.1rem;
-            font-weight: bold;
-            color: #FFD700;
-            display: block;
-            margin-top: 0.5rem;
-            text-align: center;
-        }
-
 
         /* Button Base Styles - More polished Classic Look */
         .classic-btn {
@@ -933,31 +895,7 @@
     <!-- Main container for all screens -->
     <div id="app" class="relative w-full h-full flex justify-center items-center">
 
-        <!-- [MAINTENANCE MODE] Maintenance Overlay Screen -->
-        <div id="maintenance-overlay" class="hidden flex-col justify-center items-center p-4 text-center">
-            <div class="classic-card p-8 w-11/12 max-w-lg">
-                <h1 class="text-4xl mb-4">به‌روزرسانی سرور</h1>
-                <div class="spinner my-6"></div>
-                <p id="maintenance-message" class="text-lg text-gray-200 mb-6">
-                    ما در حال انجام به‌روزرسانی‌های مهمی برای بهبود تجربه شما هستیم. بازی به زودی در دسترس خواهد بود.
-                </p>
-                <div class="text-center mt-4">
-                    <p class="text-base text-gray-300 mb-2">زمان تقریبی باقی‌مانده:</p>
-                    <p id="maintenance-countdown" class="text-3xl font-bold text-yellow-300 tracking-widest">
-                        --:--:--
-                    </p>
-                </div>
-            </div>
-        </div>
-        
-        <!-- [MAINTENANCE MODE] Admin/Tester Panel -->
-        <div id="admin-tester-panel" class="hidden">
-            <p><strong>حالت تست فعال است</strong></p>
-            <p>زمان پایان تعمیرات:</p>
-            <span id="admin-countdown">--:--:--</span>
-        </div>
-
-        <!-- All other screens remain the same... -->
+        <!-- All Modals and other screens remain the same... -->
         <!-- 1. Loading Screen -->
         <div id="loading-screen" class="absolute inset-0 flex flex-col justify-center items-center bg-gray-900 z-50 page-transition-active page-transition-visible" tabindex="-1">
             <div class="spinner mb-4"></div>
@@ -1389,23 +1327,17 @@
         // REVISED: Imported deleteField for updating player maps
         import { getFirestore, doc, setDoc, getDoc, collection, addDoc, serverTimestamp, query, where, onSnapshot, updateDoc, arrayUnion, arrayRemove, deleteDoc, getDocs, orderBy, deleteField } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js"; 
 
-        // =================================================================================
-        // ============================ اطلاعات پروژه فایربیس شما ============================
-        // =================================================================================
-        // این بخش را با اطلاعاتی که از پنل فایربیس خود کپی کرده‌اید، جایگزین کنید
-        // مسیر در فایربیس: Project Settings > General > Your apps > Web app > Config
+        // Firebase Configuration (from user's input)
+        // **IMPORTANT**: You should replace these with your actual Firebase project configuration.
         const firebaseConfig = {
-          apiKey: "API_KEY_شما_اینجا_قرار_میگیرد",
-          authDomain: "PROJECT_ID_شما.firebaseapp.com",
-          projectId: "PROJECT_ID_شما",
-          storageBucket: "PROJECT_ID_شما.appspot.com",
-          messagingSenderId: "SENDER_ID_شما",
-          appId: "APP_ID_شما"
-          // measurementId: "اختیاری"
+            apiKey: "AIzaSyBpVHnjF5gdTm3vJiHEoAZCowsRkTapj_4",
+            authDomain: "hokm-d6911.firebaseapp.com",
+            projectId: "hokm-d6911",
+            storageBucket: "hokm-d6911.appspot.com",
+            messagingSenderId: "128133280011",
+            appId: "1:128133280011:web:c9fe28f5201eef7a3a320e",
+            measurementId: "G-LN0S9W86MK"
         };
-        // =================================================================================
-        // ============================ پایان بخش ویرایش ===================================
-        // =================================================================================
 
         // Initialize Firebase
         const app = initializeApp(firebaseConfig);
@@ -1415,13 +1347,6 @@
         // Global variables for Firebase context (as per environment instructions)
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
         const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
-
-        // [MAINTENANCE MODE] DOM Elements
-        const maintenanceOverlay = document.getElementById('maintenance-overlay');
-        const maintenanceMessage = document.getElementById('maintenance-message');
-        const maintenanceCountdown = document.getElementById('maintenance-countdown');
-        const adminTesterPanel = document.getElementById('admin-tester-panel');
-        const adminCountdown = document.getElementById('admin-countdown');
 
         // DOM Elements
         const loadingScreen = document.getElementById('loading-screen');
@@ -1543,10 +1468,6 @@
         const cancelJoinPasswordBtn = document.getElementById('cancel-join-password-btn');
         const passwordPromptMessageBox = document.getElementById('password-prompt-message-box');
 
-        // [MAINTENANCE MODE] State variables
-        let maintenanceInterval = null;
-        let unsubscribeMaintenance = null;
-
         // State variables
         let authMode = 'login'; // Default mode is login
         let currentActiveScreen = loadingScreen;
@@ -1566,89 +1487,6 @@
         // Promise resolver for custom confirmation modal
         let resolveCustomConfirm;
 
-        // [MAINTENANCE MODE] Starts a countdown timer and updates the given UI element.
-        function startCountdown(endTime, countdownElement) {
-            if (maintenanceInterval) {
-                clearInterval(maintenanceInterval);
-            }
-
-            const endTimestamp = endTime.toDate().getTime();
-
-            maintenanceInterval = setInterval(() => {
-                const now = new Date().getTime();
-                const distance = endTimestamp - now;
-
-                if (distance < 0) {
-                    clearInterval(maintenanceInterval);
-                    maintenanceInterval = null;
-                    countdownElement.textContent = "بارگذاری مجدد...";
-                    // The main listener will handle hiding the screen when isActive becomes false.
-                    return;
-                }
-
-                const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-                const seconds = Math.floor((distance % (1000 * 60)) / 1000);
-
-                // Format with leading zeros
-                const formattedTime = [
-                    hours.toString().padStart(2, '0'),
-                    minutes.toString().padStart(2, '0'),
-                    seconds.toString().padStart(2, '0')
-                ].join(':');
-
-                countdownElement.textContent = formattedTime;
-            }, 1000);
-        }
-
-        // [MAINTENANCE MODE] Handles the state of the maintenance mode.
-        function handleMaintenanceState(data) {
-            const user = auth.currentUser;
-
-            if (data && data.isActive) {
-                const isUserAllowed = user && data.allowedUIDs && data.allowedUIDs.includes(user.uid);
-
-                if (isUserAllowed) {
-                    // --- ADMIN/TESTER VIEW ---
-                    maintenanceOverlay.classList.add('hidden'); // Hide main overlay
-                    adminTesterPanel.classList.remove('hidden'); // Show admin panel
-                    startCountdown(data.endTime, adminCountdown);
-                } else {
-                    // --- NORMAL USER VIEW ---
-                    adminTesterPanel.classList.add('hidden'); // Hide admin panel
-                    maintenanceOverlay.classList.remove('hidden'); // Show main overlay
-                    maintenanceMessage.textContent = data.message || "سرورها در حال به‌روزرسانی هستند.";
-                    startCountdown(data.endTime, maintenanceCountdown);
-                }
-            } else {
-                // --- MAINTENANCE IS OFF ---
-                maintenanceOverlay.classList.add('hidden');
-                adminTesterPanel.classList.add('hidden');
-                if (maintenanceInterval) {
-                    clearInterval(maintenanceInterval);
-                    maintenanceInterval = null;
-                }
-            }
-        }
-
-        // [MAINTENANCE MODE] Sets up the global listener for maintenance mode.
-        function setupMaintenanceListener() {
-            if (unsubscribeMaintenance) {
-                unsubscribeMaintenance(); // Unsubscribe from previous listener if any
-            }
-            const maintenanceDocRef = doc(db, 'app_config', 'maintenance');
-            unsubscribeMaintenance = onSnapshot(maintenanceDocRef, (docSnap) => {
-                if (docSnap.exists()) {
-                    handleMaintenanceState(docSnap.data());
-                } else {
-                    console.warn("Maintenance document not found in `app_config/maintenance`.");
-                    handleMaintenanceState({ isActive: false }); // Assume maintenance is off
-                }
-            }, (error) => {
-                console.error("Error listening to maintenance status:", error);
-                handleMaintenanceState({ isActive: false }); // Assume maintenance is off on error
-            });
-        }
 
         // Function to show custom message box (re-used for auth and create lobby modals)
         function showCustomMessage(element, message, type = 'info') {
@@ -1879,8 +1717,6 @@
             // We can now safely transition away from the loading screen.
             if (!isAuthResolved) {
                 isAuthResolved = true;
-                // [MAINTENANCE MODE] Set up the global listener as soon as the app starts.
-                setupMaintenanceListener();
             }
 
             if (user) {
@@ -2873,8 +2709,7 @@
                 const lobbySnap = await getDoc(lobbyRef);
                 if (lobbySnap.exists() && lobbySnap.data().hostId === auth.currentUser.uid) {
                     const currentLockState = lobbySnap.data().isChatLocked || false;
-                                        // این خط در کد شما وجود دارد. ادامه کد از بعد از این خط شروع می‌شود
-                     await updateDoc(lobbyRef, { isChatLocked: !currentLockState }); 
+                    await updateDoc(lobbyRef, { isChatLocked: !currentLockState });
                 }
             } catch (error) {
                 console.error("Error toggling chat lock:", error);
