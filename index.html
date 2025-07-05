@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
-    <!-- تمام محتوای head شما بدون تغییر باقی می‌ماند -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>بازی حکم کلاسیک</title>
@@ -10,8 +9,7 @@
     <!-- Google Fonts for Classic Look -->
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Merriweather:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        /* تمام استایل‌های CSS شما بدون تغییر باقی می‌مانند */
-        /* ... (تمام 800+ خط CSS شما اینجا قرار می‌گیرد) ... */
+        /* General Classic Theme Background and Fonts */
         html, body, #app { /* Ensure these take full viewport height */
             height: 100%;
             margin: 0;
@@ -209,42 +207,6 @@
             justify-content: space-between;
             align-items: center;
         }
-        
-        /* NEW: Friend Request Icon and Badge in Header */
-        .friend-request-container {
-            position: relative;
-            margin-left: 1rem; /* Space between bell and user info */
-        }
-        .friend-request-btn {
-            position: relative;
-            color: #FFD700;
-            transition: transform 0.2s;
-        }
-        .friend-request-btn:hover {
-            transform: scale(1.1);
-        }
-        .friend-request-badge {
-            position: absolute;
-            top: -5px;
-            right: -8px;
-            background-color: #DC2626; /* Red-600 */
-            color: white;
-            border-radius: 50%;
-            width: 20px;
-            height: 20px;
-            font-size: 12px;
-            font-weight: bold;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            border: 2px solid white;
-            transform: scale(0);
-            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-        }
-        .friend-request-badge.visible {
-            transform: scale(1);
-        }
-
         /* Lobby Screen Specific Header */
         .lobby-header {
             background: linear-gradient(to right, #4A2B00 0%, #7A4C00 50%, #4A2B00 100%);
@@ -377,22 +339,21 @@
         }
         
         /* Profile Modal specific styles */
-        .modal-overlay {
+        .profile-modal-overlay {
             background-color: rgba(0,0,0,0.7); /* Darker overlay */
             transition: opacity 0.3s ease-in-out;
         }
-        .modal-content {
+        .profile-modal-content {
             transform: translateY(-20px); /* Initial slightly elevated */
             transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
         }
-        .modal-enter-active .modal-content {
+        .profile-modal-enter-active .profile-modal-content {
             transform: translateY(0);
         }
-        .modal-leave-active .modal-content {
+        .profile-modal-leave-active .profile-modal-content {
             transform: translateY(-20px);
             opacity: 0;
         }
-
 
         /* Create Lobby Modal Specific Styles */
         #create-lobby-modal {
@@ -571,15 +532,6 @@
         .player-list-item.is-host {
             border-color: #FFD700;
         }
-        /* NEW: Make non-host player names clickable */
-        .player-list-item:not(.is-host) .player-info-wrapper {
-            cursor: pointer;
-            transition: color 0.2s;
-        }
-        .player-list-item:not(.is-host) .player-info-wrapper:hover .player-name {
-            color: #FFD700;
-        }
-
         .player-list-item .player-name {
             font-weight: bold;
             color: #E0E0E0;
@@ -697,71 +649,20 @@
              flex-wrap: wrap;
              gap: 1rem;
         }
-        
-        /* NEW: Friend Request List Item Styles */
-        .friend-request-item {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            background-color: rgba(255, 255, 255, 0.05);
-            padding: 0.75rem;
-            border-radius: 8px;
-        }
-        .friend-request-item .actions {
-            display: flex;
-            gap: 0.5rem;
-        }
-        .friend-request-item .actions .action-btn {
-            padding: 0.4rem 0.8rem;
-            font-size: 0.9rem;
-        }
-
-        /* NEW: Friend List Item Styles in Friends Modal */
-        .friend-list-item {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            background-color: rgba(255, 255, 255, 0.05);
-            padding: 0.75rem;
-            border-radius: 8px;
-            margin-bottom: 0.5rem;
-            cursor: pointer;
-            transition: background-color 0.2s;
-        }
-        .friend-list-item:hover {
-            background-color: rgba(255, 215, 0, 0.1); /* Gold tint on hover */
-        }
-        .friend-list-item .friend-name {
-            font-weight: bold;
-            color: #E0E0E0;
-        }
-
 
         /* Custom Scrollbars */
-        .custom-scrollbar::-webkit-scrollbar,
         .lobby-sidebar::-webkit-scrollbar,
         #player-list-container::-webkit-scrollbar,
-        .lobby-chat-messages::-webkit-scrollbar,
-        #friends-list-content::-webkit-scrollbar /* NEW: Add custom scrollbar to new modal */
-        { width: 8px; }
-        .custom-scrollbar::-webkit-scrollbar-track,
+        .lobby-chat-messages::-webkit-scrollbar { width: 8px; }
         .lobby-sidebar::-webkit-scrollbar-track,
         #player-list-container::-webkit-scrollbar-track,
-        .lobby-chat-messages::-webkit-scrollbar-track,
-        #friends-list-content::-webkit-scrollbar-track /* NEW */
-        { background: #202020; border-radius: 4px; }
-        .custom-scrollbar::-webkit-scrollbar-thumb,
+        .lobby-chat-messages::-webkit-scrollbar-track { background: #202020; border-radius: 4px; }
         .lobby-sidebar::-webkit-scrollbar-thumb,
         #player-list-container::-webkit-scrollbar-thumb,
-        .lobby-chat-messages::-webkit-scrollbar-thumb,
-        #friends-list-content::-webkit-scrollbar-thumb /* NEW */
-        { background: #DAA520; border-radius: 4px; }
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover,
+        .lobby-chat-messages::-webkit-scrollbar-thumb { background: #DAA520; border-radius: 4px; }
         .lobby-sidebar::-webkit-scrollbar-thumb:hover,
         #player-list-container::-webkit-scrollbar-thumb:hover,
-        .lobby-chat-messages::-webkit-scrollbar-thumb:hover,
-        #friends-list-content::-webkit-scrollbar-thumb:hover /* NEW */
-        { background: #FFD700; }
+        .lobby-chat-messages::-webkit-scrollbar-thumb:hover { background: #FFD700; }
         
         /* ===== CORRECTED RESPONSIVE STYLES ===== */
         @media (max-width: 860px) {
@@ -994,6 +895,7 @@
     <!-- Main container for all screens -->
     <div id="app" class="relative w-full h-full flex justify-center items-center">
 
+        <!-- All Modals and other screens remain the same... -->
         <!-- 1. Loading Screen -->
         <div id="loading-screen" class="absolute inset-0 flex flex-col justify-center items-center bg-gray-900 z-50 page-transition-active page-transition-visible" tabindex="-1">
             <div class="spinner mb-4"></div>
@@ -1046,17 +948,14 @@
             <!-- Header for Main Screen - Fixed at top -->
             <header class="app-header">
                 <!-- User Info and ID - Aligned Right (for RTL) -->
-                <div class="flex items-center">
-                    <!-- CHANGE: Bell icon for friend requests is now in the Lobby screen header. This section is simplified. -->
-                    <div id="profile-summary" class="flex items-center space-x-2 space-x-reverse cursor-pointer p-2 rounded-lg hover:bg-gray-700 transition-colors duration-200" title="مشاهده پروفایل">
-                         <!-- User icon SVG -->
-                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-user-circle">
-                            <circle cx="12" cy="12" r="10"/><circle cx="12" cy="10" r="3"/><path d="M7 20.662V19a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v1.662"/>
-                        </svg>
-                        <div class="flex flex-col text-right">
-                            <span id="header-display-name" class="font-bold text-lg text-white">نام کاربری</span>
-                            <span id="header-user-id" class="text-xs text-gray-300 break-all">ID: ---</span>
-                        </div>
+                <div id="profile-summary" class="flex items-center space-x-2 space-x-reverse cursor-pointer p-2 rounded-lg hover:bg-gray-700 transition-colors duration-200" title="مشاهده پروفایل">
+                     <!-- User icon SVG -->
+                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-user-circle">
+                        <circle cx="12" cy="12" r="10"/><circle cx="12" cy="10" r="3"/><path d="M7 20.662V19a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v1.662"/>
+                    </svg>
+                    <div class="flex flex-col text-right">
+                        <span id="header-display-name" class="font-bold text-lg text-white">نام کاربری</span>
+                        <span id="header-user-id" class="text-xs text-gray-300 break-all">ID: ---</span>
                     </div>
                 </div>
                 <!-- Hamburger Menu Icon - Aligned Left (for RTL) -->
@@ -1093,20 +992,19 @@
         <div id="lobby-screen" class="hidden absolute inset-0 flex flex-col z-30 page-transition-active page-transition-hidden" tabindex="-1">
             <!-- Header for Lobby Screen -->
             <header class="lobby-header">
-                <!-- CHANGE: Added friend request bell icon here -->
-                <div id="lobby-friend-request-container" class="friend-request-container hidden">
-                    <button id="lobby-friend-request-btn" class="friend-request-btn p-2" title="درخواست‌های دوستی">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-bell"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
-                        <span id="lobby-friend-request-badge" class="friend-request-badge">0</span>
-                    </button>
-                </div>
                 <div class="search-container">
                     <button id="back-to-main-btn" class="p-1">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-right"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+                        <!-- Right arrow icon for back (in RTL, it points left visually) -->
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-right">
+                            <path d="M5 12h14"/><path d="m12 5 7 7-7 7"/>
+                        </svg>
                     </button>
                     <input type="text" id="lobby-search-input" placeholder="جستجو بر اساس نام لابی، سازنده یا سناریو" class="flex-grow text-sm">
                     <button id="search-lobbies-btn" class="p-1">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-search"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+                        <!-- Search icon -->
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-search">
+                            <circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>
+                        </svg>
                     </button>
                 </div>
             </header>
@@ -1125,19 +1023,22 @@
             <!-- Footer for Lobby Screen -->
             <footer class="lobby-footer">
                 <button id="add-icon-btn" class="icon-btn">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-plus-square"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M12 8v8"/><path d="M8 12h8"/></svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-plus-square">
+                        <rect width="18" height="18" x="3" y="3" rx="2"/><path d="M12 8v8"/><path d="M8 12h8"/>
+                    </svg>
                     <span>ایجاد</span>
                 </button>
                 <button id="refresh-lobbies-btn" class="icon-btn">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-rotate-cw"><path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/></svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-rotate-cw">
+                        <path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/>
+                    </svg>
                     <span>بروزرسانی</span>
                 </button>
-                <!-- CHANGE: "My Lobbies" button is now "Friends List" button -->
-                <button id="friends-list-btn" class="icon-btn">
+                <button id="my-lobbies-btn" class="icon-btn">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-users">
                         <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
                     </svg>
-                    <span>دوستان من</span>
+                    <span>لابی‌های من</span>
                 </button>
                 <div class="games-running-text">
                     <span id="active-games-count">0</span>
@@ -1146,10 +1047,9 @@
             </footer>
         </div>
 
-        <!-- ... Other modals like Profile, Create Lobby, etc. remain unchanged ... -->
         <!-- 5. Profile Modal (Hidden by default) -->
-        <div id="profile-modal" class="hidden fixed inset-0 flex justify-center items-center z-50 modal-overlay">
-            <div class="classic-card modal-content p-6 sm:p-8 w-11/12 max-w-md text-center relative">
+        <div id="profile-modal" class="hidden fixed inset-0 flex justify-center items-center z-50 profile-modal-overlay">
+            <div class="classic-card profile-modal-content p-6 sm:p-8 w-11/12 max-w-md text-center relative">
                 <h2 class="text-2xl sm:text-3xl font-bold mb-6">پروفایل کاربری</h2>
                 <button id="close-profile-modal-btn" class="absolute top-4 left-4 text-white hover:text-gray-300 transition-colors duration-200">
                     <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-x">
@@ -1159,9 +1059,8 @@
                 <div class="text-lg space-y-4 mb-8 text-white">
                     <p><strong>نام نمایشی:</strong> <span id="profile-display-name">---</span></p>
                     <p><strong>ایمیل:</strong> <span id="profile-email">---</span></p>
-                    <!-- NEW: Friend count -->
-                    <p><strong>تعداد دوستان:</strong> <span id="profile-friend-count">0</span></p>
                     <p><strong>شناسه کاربر (UID):</strong> <span id="profile-uid" class="break-all text-sm text-gray-400">---</span></p>
+                    <!-- Add more profile stats here later (e.g., wins, losses) -->
                 </div>
                 <button id="profile-logout-btn"
                         class="w-full classic-btn btn-red-classic text-lg sm:text-xl">
@@ -1171,8 +1070,8 @@
         </div>
 
         <!-- 6. Create Lobby Input Modal (NEW) -->
-        <div id="create-lobby-modal" class="hidden fixed inset-0 flex justify-center items-center z-50 modal-overlay">
-            <div class="classic-card modal-content p-6 sm:p-8 w-11/12 max-w-md text-center relative">
+        <div id="create-lobby-modal" class="hidden fixed inset-0 flex justify-center items-center z-50 profile-modal-overlay">
+            <div class="classic-card profile-modal-content p-6 sm:p-8 w-11/12 max-w-md text-center relative">
                 <h2 class="text-2xl sm:text-3xl font-bold mb-6">ساخت لابی جدید</h2>
                 <button id="close-create-lobby-modal-btn" class="absolute top-4 left-4 text-white hover:text-gray-300 transition-colors duration-200">
                     <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-x">
@@ -1218,8 +1117,8 @@
         </div>
 
         <!-- 7. Custom Confirmation Modal -->
-        <div id="custom-confirm-modal" class="hidden fixed inset-0 flex justify-center items-center z-50 modal-overlay">
-            <div class="classic-card modal-content p-6 sm:p-8 w-11/12 max-w-md text-center relative">
+        <div id="custom-confirm-modal" class="hidden fixed inset-0 flex justify-center items-center z-50 profile-modal-overlay">
+            <div class="classic-card profile-modal-content p-6 sm:p-8 w-11/12 max-w-md text-center relative">
                 <h2 id="confirm-title" class="text-2xl sm:text-3xl font-bold mb-6 text-yellow-300">تایید عملیات</h2>
                 <p id="confirm-message" class="text-lg mb-8 text-white">آیا از انجام این عمل مطمئن هستید؟</p>
                 <div class="flex justify-around space-x-4 space-x-reverse">
@@ -1229,7 +1128,6 @@
             </div>
         </div>
 
-        <!-- ... Other screens like Lobby Detail and Game remain unchanged ... -->
         <!-- 8. Lobby Detail Screen (REDESIGNED) -->
         <div id="lobby-detail-screen" class="hidden absolute inset-0 z-30 page-transition-active page-transition-hidden lobby-detail-screen-full" tabindex="-1">
             <div class="lobby-detail-content">
@@ -1355,13 +1253,15 @@
             </div>
         </div>
 
-        <!-- ... ALL OTHER MODALS like Kick, Kicked Message, Enter Password, etc. remain here... -->
+        <!-- ... All other modals (kick, kicked message, etc.) remain the same ... -->
         <!-- 10. Kick Player Confirmation Modal -->
-        <div id="kick-player-confirm-modal" class="hidden fixed inset-0 flex justify-center items-center z-50 modal-overlay">
-            <div class="classic-card modal-content p-6 sm:p-8 w-11/12 max-w-md text-center relative">
+        <div id="kick-player-confirm-modal" class="hidden fixed inset-0 flex justify-center items-center z-50 profile-modal-overlay">
+            <div class="classic-card profile-modal-content p-6 sm:p-8 w-11/12 max-w-md text-center relative">
                 <h2 class="text-2xl sm:text-3xl font-bold mb-6 text-yellow-300">اخراج بازیکن</h2>
                 <button id="close-kick-player-confirm-modal-btn" class="absolute top-4 left-4 text-white hover:text-gray-300 transition-colors duration-200">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-x"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-x">
+                        <path d="M18 6 6 18"/><path d="m6 6 12 12"/>
+                    </svg>
                 </button>
                 <p class="text-lg mb-8 text-white">آیا مطمئن هستید که می‌خواهید <span id="kick-player-confirm-name" class="font-bold"></span> را از لابی اخراج کنید؟</p>
                 <div class="flex justify-around space-x-4 space-x-reverse">
@@ -1372,8 +1272,8 @@
         </div>
 
         <!-- 11. Kicked Message Modal -->
-        <div id="kicked-message-modal" class="hidden fixed inset-0 flex justify-center items-center z-50 modal-overlay">
-            <div class="classic-card modal-content p-6 sm:p-8 w-11/12 max-w-md text-center relative">
+        <div id="kicked-message-modal" class="hidden fixed inset-0 flex justify-center items-center z-50 profile-modal-overlay">
+            <div class="classic-card profile-modal-content p-6 sm:p-8 w-11/12 max-w-md text-center relative">
                 <h2 class="text-2xl sm:text-3xl font-bold mb-6 text-red-400">شما اخراج شدید!</h2>
                 <p id="kicked-message-text" class="text-lg mb-8 text-white">شما از لابی <span class="font-bold" id="kicked-lobby-name"></span> اخراج شده‌اید و نمی‌توانید به آن بازگردید.</p>
                 <button id="kicked-message-ok-btn" class="w-full classic-btn btn-blue-classic">متوجه شدم</button>
@@ -1381,27 +1281,32 @@
         </div>
 
         <!-- 12. Kicked Players List Modal -->
-        <div id="kicked-players-list-modal" class="hidden fixed inset-0 flex justify-center items-center z-50 modal-overlay">
-            <div class="classic-card modal-content p-6 sm:p-8 w-11/12 max-w-md text-center relative">
+        <div id="kicked-players-list-modal" class="hidden fixed inset-0 flex justify-center items-center z-50 profile-modal-overlay">
+            <div class="classic-card profile-modal-content p-6 sm:p-8 w-11/12 max-w-md text-center relative">
                 <h2 class="text-2xl sm:text-3xl font-bold mb-6 text-yellow-300">لیست بازیکنان اخراج شده</h2>
                 <button id="close-kicked-players-list-modal-btn" class="absolute top-4 left-4 text-white hover:text-gray-300 transition-colors duration-200">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-x"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-x">
+                        <path d="M18 6 6 18"/><path d="m6 6 12 12"/>
+                    </svg>
                 </button>
-                <div id="kicked-players-list-content" class="space-y-4 mb-8 text-white text-right max-h-60 overflow-y-auto custom-scrollbar">
+                <div id="kicked-players-list-content" class="space-y-4 mb-8 text-white text-left max-h-60 overflow-y-auto custom-scrollbar">
+                    <!-- Kicked players will be dynamically loaded here -->
                     <p class="text-gray-400 text-center">هیچ بازیکنی اخراج نشده است.</p>
                 </div>
                 <button id="kicked-list-ok-btn" class="w-full classic-btn btn-gray-classic">بستن</button>
             </div>
         </div>
         
-        <!-- 13. Enter Password Modal -->
-        <div id="enter-password-modal" class="hidden fixed inset-0 flex justify-center items-center z-50 modal-overlay">
-            <div class="classic-card modal-content p-6 sm:p-8 w-11/12 max-w-md text-center relative">
+        <!-- 13. Enter Password Modal (for private lobbies) -->
+        <div id="enter-password-modal" class="hidden fixed inset-0 flex justify-center items-center z-50 profile-modal-overlay">
+            <div class="classic-card profile-modal-content p-6 sm:p-8 w-11/12 max-w-md text-center relative">
                 <h2 class="text-2xl sm:text-3xl font-bold mb-4">ورود به لابی خصوصی</h2>
                 <p class="text-lg mb-6 text-white">لابی <span id="password-prompt-lobby-name" class="font-bold text-yellow-300"></span> نیاز به رمز عبور دارد.</p>
                 <form id="enter-password-form" class="space-y-5">
                     <div>
-                        <input type="password" id="join-lobby-password-input" placeholder="رمز عبور را وارد کنید" class="w-full focus:outline-none focus:ring-2 focus:ring-blue-500 text-center" required>
+                        <input type="password" id="join-lobby-password-input" placeholder="رمز عبور را وارد کنید"
+                               class="w-full focus:outline-none focus:ring-2 focus:ring-blue-500 text-center"
+                               required>
                     </div>
                     <div class="flex justify-around space-x-4 space-x-reverse">
                         <button type="submit" id="submit-join-password-btn" class="w-1/2 classic-btn btn-green-classic">ورود</button>
@@ -1412,67 +1317,6 @@
             </div>
         </div>
 
-        <!-- 14. Player Info Modal (for friend requests) -->
-        <div id="player-info-modal" class="hidden fixed inset-0 flex justify-center items-center z-50 modal-overlay">
-            <div class="classic-card modal-content p-6 sm:p-8 w-11/12 max-w-md text-center relative">
-                <h2 class="text-2xl sm:text-3xl font-bold mb-6">اطلاعات بازیکن</h2>
-                <button id="close-player-info-modal-btn" class="absolute top-4 left-4 text-white hover:text-gray-300 transition-colors duration-200">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-x"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
-                </button>
-                <div class="text-lg space-y-4 mb-8 text-white">
-                    <p><strong>نام نمایشی:</strong> <span id="player-info-display-name">---</span></p>
-                    <p><strong>ایمیل:</strong> <span id="player-info-email">---</span></p>
-                </div>
-                <button id="send-friend-request-btn" class="w-full classic-btn btn-blue-classic text-lg sm:text-xl">
-                    ارسال درخواست دوستی
-                </button>
-                <div id="player-info-message-box" class="mt-5 p-3.5 rounded-xl text-base text-center hidden" role="alert"></div>
-            </div>
-        </div>
-
-        <!-- 15. Friend Requests List Modal -->
-        <div id="friend-requests-modal" class="hidden fixed inset-0 flex justify-center items-center z-50 modal-overlay">
-            <div class="classic-card modal-content p-6 sm:p-8 w-11/12 max-w-md text-center relative">
-                <h2 class="text-2xl sm:text-3xl font-bold mb-6 text-yellow-300">درخواست‌های دوستی</h2>
-                <button id="close-friend-requests-modal-btn" class="absolute top-4 left-4 text-white hover:text-gray-300 transition-colors duration-200">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-x"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
-                </button>
-                <div id="friend-requests-list-content" class="space-y-4 mb-8 text-white text-right max-h-60 overflow-y-auto custom-scrollbar">
-                    <!-- Friend requests will be loaded here -->
-                    <p class="text-gray-400 text-center">درخواست دوستی جدیدی ندارید.</p>
-                </div>
-                <button id="friend-requests-ok-btn" class="w-full classic-btn btn-gray-classic">بستن</button>
-            </div>
-        </div>
-        
-        <!-- NEW MODAL: Friends List -->
-        <div id="friends-list-modal" class="hidden fixed inset-0 flex justify-center items-center z-50 modal-overlay">
-            <div class="classic-card modal-content p-6 sm:p-8 w-11/12 max-w-md text-center relative">
-                <h2 class="text-2xl sm:text-3xl font-bold mb-6 text-yellow-300">لیست دوستان</h2>
-                <button id="close-friends-list-modal-btn" class="absolute top-4 left-4 text-white hover:text-gray-300 transition-colors duration-200">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-x"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
-                </button>
-                <div id="friends-list-content" class="text-white text-right max-h-80 overflow-y-auto custom-scrollbar pr-2">
-                    <!-- Friends list will be loaded here -->
-                    <p class="text-gray-400 text-center">در حال بارگذاری لیست دوستان...</p>
-                </div>
-            </div>
-        </div>
-
-        <!-- NEW MODAL: Friend Profile / Actions -->
-        <div id="friend-profile-modal" class="hidden fixed inset-0 flex justify-center items-center z-50 modal-overlay">
-            <div class="classic-card modal-content p-6 sm:p-8 w-11/12 max-w-sm text-center relative">
-                <h2 id="friend-profile-modal-name" class="text-2xl sm:text-3xl font-bold mb-6 text-yellow-300">پروفایل دوست</h2>
-                <button id="close-friend-profile-modal-btn" class="absolute top-4 left-4 text-white hover:text-gray-300 transition-colors duration-200">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-x"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
-                </button>
-                <div class="space-y-4 mb-8">
-                     <p class="text-lg text-white">شما با این کاربر دوست هستید.</p>
-                     <button id="remove-friend-btn" class="w-full classic-btn btn-red-classic">حذف از لیست دوستان</button>
-                </div>
-            </div>
-        </div>
-
     </div>
 
     <!-- Firebase SDKs -->
@@ -1480,8 +1324,8 @@
         // Import the functions you need from the SDKs you need
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, signInWithCustomToken, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        // REVISED: Imported deleteField, writeBatch for updating player maps and friend requests
-        import { getFirestore, doc, setDoc, getDoc, collection, addDoc, serverTimestamp, query, where, onSnapshot, updateDoc, arrayUnion, arrayRemove, deleteDoc, getDocs, orderBy, deleteField, writeBatch } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js"; 
+        // REVISED: Imported deleteField for updating player maps
+        import { getFirestore, doc, setDoc, getDoc, collection, addDoc, serverTimestamp, query, where, onSnapshot, updateDoc, arrayUnion, arrayRemove, deleteDoc, getDocs, orderBy, deleteField } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js"; 
 
         // Firebase Configuration (from user's input)
         // **IMPORTANT**: You should replace these with your actual Firebase project configuration.
@@ -1525,23 +1369,16 @@
         const headerUserId = document.getElementById('header-user-id');
         const friendlyGameBtn = document.getElementById('friendly-game-btn');
         const ratedGameBtn = document.getElementById('rated-game-btn');
-        
-        // Lobby Screen Header Elements
-        const lobbyFriendRequestContainer = document.getElementById('lobby-friend-request-container');
-        const lobbyFriendRequestBtn = document.getElementById('lobby-friend-request-btn');
-        const lobbyFriendRequestBadge = document.getElementById('lobby-friend-request-badge');
-
 
         // Lobby Screen UI Elements
         const lobbyScreen = document.getElementById('lobby-screen');
-        const backToMainBtn = document.getElementById('back-to-main-btn'); 
+        const backToMainBtn = document.getElementById('back-to-main-btn'); // Inside Lobby Header Search Bar
         const lobbySearchInput = document.getElementById('lobby-search-input');
         const searchLobbiesBtn = document.getElementById('search-lobbies-btn');
         const lobbiesList = document.getElementById('lobbies-list');
-        const addIconBtn = document.getElementById('add-icon-btn'); 
-        const refreshLobbiesBtn = document.getElementById('refresh-lobbies-btn'); 
-        // NEW: Changed ID from my-lobbies-btn to friends-list-btn
-        const friendsListBtn = document.getElementById('friends-list-btn'); 
+        const addIconBtn = document.getElementById('add-icon-btn'); // Footer icon
+        const refreshLobbiesBtn = document.getElementById('refresh-lobbies-btn'); // Footer icon
+        const myLobbiesBtn = document.getElementById('my-lobbies-btn'); // Footer icon
         const activeGamesCount = document.getElementById('active-games-count');
 
         // Profile Modal Elements
@@ -1551,9 +1388,8 @@
         const profileEmail = document.getElementById('profile-email');
         const profileUid = document.getElementById('profile-uid');
         const profileLogoutBtn = document.getElementById('profile-logout-btn');
-        const profileFriendCount = document.getElementById('profile-friend-count');
 
-        // ... ALL OTHER ELEMENT SELECTORS ...
+        // Create Lobby Modal Elements
         const createLobbyModal = document.getElementById('create-lobby-modal');
         const closeCreateLobbyModalBtn = document.getElementById('close-create-lobby-modal-btn'); 
         const createLobbyForm = document.getElementById('create-lobby-form');
@@ -1566,11 +1402,15 @@
         const togglePasswordVisibilityBtn = document.getElementById('toggle-password-visibility');
         const eyeIconOpen = document.getElementById('eye-icon-open');
         const eyeIconClosed = document.getElementById('eye-icon-closed');
+
+        // Custom Confirmation Modal Elements
         const customConfirmModal = document.getElementById('custom-confirm-modal');
         const confirmTitle = document.getElementById('confirm-title');
         const confirmMessage = document.getElementById('confirm-message');
         const confirmYesBtn = document.getElementById('confirm-yes-btn');
         const confirmNoBtn = document.getElementById('confirm-no-btn');
+
+        // Lobby Detail Screen Elements (UPDATED)
         const lobbyDetailScreen = document.getElementById('lobby-detail-screen');
         const detailLobbyName = document.getElementById('detail-lobby-name');
         const detailHostName = document.getElementById('detail-host-name');
@@ -1578,13 +1418,15 @@
         const detailPlayerCount = document.getElementById('detail-player-count');
         const hostActionsContainer = document.getElementById('host-actions-container');
         const startGameBtn = document.getElementById('start-game-btn');
-        const toggleChatLockBtn = document.getElementById('toggle-chat-lock-btn');
+        const toggleChatLockBtn = document.getElementById('toggle-chat-lock-btn'); // NEW
         const viewKickedPlayersBtn = document.getElementById('view-kicked-players-btn');
         const leaveLobbyBtn = document.getElementById('leave-lobby-btn');
         const lobbyChatMessages = document.getElementById('lobby-chat-messages');
         const lobbyChatForm = document.getElementById('lobby-chat-form');
         const lobbyChatInput = document.getElementById('lobby-chat-input');
         const lobbyChatSendBtn = document.getElementById('lobby-chat-send-btn');
+
+        // Game Screen Elements (NEW)
         const gameScreen = document.getElementById('game-screen');
         const leaveGameBtn = document.getElementById('leave-game-btn');
         const hokmSuitIcon = document.getElementById('hokm-suit-icon');
@@ -1597,19 +1439,27 @@
             top: document.getElementById('player-slot-top'),
             right: document.getElementById('player-slot-right'),
         };
+
+        // Kick Player Confirmation Modal Elements
         const kickPlayerConfirmModal = document.getElementById('kick-player-confirm-modal');
         const closeKickPlayerConfirmModalBtn = document.getElementById('close-kick-player-confirm-modal-btn');
         const kickPlayerConfirmName = document.getElementById('kick-player-confirm-name');
         const kickPlayerConfirmBtn = document.getElementById('kick-player-confirm-btn');
         const cancelKickPlayerBtn = document.getElementById('cancel-kick-player-btn');
+
+        // Kicked Message Modal Elements
         const kickedMessageModal = document.getElementById('kicked-message-modal');
         const kickedMessageText = document.getElementById('kicked-message-text');
         const kickedLobbyName = document.getElementById('kicked-lobby-name');
         const kickedMessageOkBtn = document.getElementById('kicked-message-ok-btn');
+
+        // Kicked Players List Modal Elements
         const kickedPlayersListModal = document.getElementById('kicked-players-list-modal');
         const closeKickedPlayersListModalBtn = document.getElementById('close-kicked-players-list-modal-btn');
         const kickedPlayersListContent = document.getElementById('kicked-players-list-content');
         const kickedListOkBtn = document.getElementById('kicked-list-ok-btn');
+        
+        // New Enter Password Modal Elements
         const enterPasswordModal = document.getElementById('enter-password-modal');
         const passwordPromptLobbyName = document.getElementById('password-prompt-lobby-name');
         const enterPasswordForm = document.getElementById('enter-password-form');
@@ -1617,51 +1467,28 @@
         const submitJoinPasswordBtn = document.getElementById('submit-join-password-btn');
         const cancelJoinPasswordBtn = document.getElementById('cancel-join-password-btn');
         const passwordPromptMessageBox = document.getElementById('password-prompt-message-box');
-        const playerInfoModal = document.getElementById('player-info-modal');
-        const closePlayerInfoModalBtn = document.getElementById('close-player-info-modal-btn');
-        const playerInfoDisplayName = document.getElementById('player-info-display-name');
-        const playerInfoEmail = document.getElementById('player-info-email');
-        const sendFriendRequestBtn = document.getElementById('send-friend-request-btn');
-        const playerInfoMessageBox = document.getElementById('player-info-message-box');
-        const friendRequestsModal = document.getElementById('friend-requests-modal');
-        const closeFriendRequestsModalBtn = document.getElementById('close-friend-requests-modal-btn');
-        const friendRequestsListContent = document.getElementById('friend-requests-list-content');
-        const friendRequestsOkBtn = document.getElementById('friend-requests-ok-btn');
-
-        // NEW: Elements for the new Friends List and Friend Profile modals
-        const friendsListModal = document.getElementById('friends-list-modal');
-        const closeFriendsListModalBtn = document.getElementById('close-friends-list-modal-btn');
-        const friendsListContent = document.getElementById('friends-list-content');
-        const friendProfileModal = document.getElementById('friend-profile-modal');
-        const closeFriendProfileModalBtn = document.getElementById('close-friend-profile-modal-btn');
-        const friendProfileModalName = document.getElementById('friend-profile-modal-name');
-        const removeFriendBtn = document.getElementById('remove-friend-btn');
-
 
         // State variables
-        let authMode = 'login'; 
+        let authMode = 'login'; // Default mode is login
         let currentActiveScreen = loadingScreen;
-        let currentUserData = null; 
-        let unsubscribeLobbies = null; 
-        let unsubscribeLobbyDetail = null; 
-        let unsubscribeGame = null; 
-        let unsubscribeKickedPlayers = null; 
-        let unsubscribeLobbyChat = null; 
-        let unsubscribeFriendRequests = null;
-        let isAuthResolved = false; 
-        let userHasActiveLobby = false;
-        let currentLobbyId = null;
-        let kickedPlayerToProcess = null;
-        let lobbyToJoin = null;
-        let isRefreshing = false;
+        let currentUserData = null; // To store user's profile data
+        let unsubscribeLobbies = null; // Global variable to store the unsubscribe function for lobby list listener
+        let unsubscribeLobbyDetail = null; // Global variable for single lobby detail listener
+        let unsubscribeGame = null; // NEW: Listener for the active game state
+        let unsubscribeKickedPlayers = null; // Listener for kicked players list
+        let unsubscribeLobbyChat = null; // NEW: Listener for lobby chat messages
+        let isAuthResolved = false; // Flag to indicate if onAuthStateChanged has run at least once
+        let userHasActiveLobby = false; // Track if the current user has an active lobby (created or joined)
+        let currentLobbyId = null; // Stores the ID of the lobby the current user is in
+        let kickedPlayerToProcess = null; // Stores UID/name of player selected for kicking
+        let lobbyToJoin = null; // To store data of private lobby user wants to join
+        let isRefreshing = false; // NEW: State for refresh button
+
+        // Promise resolver for custom confirmation modal
         let resolveCustomConfirm;
-        // NEW: State to hold detailed friend data to avoid re-fetching
-        let friendsDetailedData = [];
-        let currentlySelectedFriend = null;
 
 
-        // ... showCustomMessage, showCustomConfirm, closeModal, openModal, etc. remain the same ...
-        // Function to show custom message box (re-used for multiple modals)
+        // Function to show custom message box (re-used for auth and create lobby modals)
         function showCustomMessage(element, message, type = 'info') {
             element.textContent = message;
             element.className = 'mt-5 p-3.5 rounded-xl text-base text-center';
@@ -1678,10 +1505,10 @@
                 element.classList.add('hidden');
             }, 5000);
         }
-        // Wrappers for different message boxes
+        // Wrapper for main message box
         const showMessageBox = (msg, type) => showCustomMessage(messageBox, msg, type);
+        // Wrapper for create lobby message box
         const showCreateLobbyMessageBox = (msg, type) => showCustomMessage(createLobbyMessageBox, msg, type);
-        const showPlayerInfoMessageBox = (msg, type) => showCustomMessage(playerInfoMessageBox, msg, type);
 
 
         // Function to show custom confirmation modal
@@ -1691,7 +1518,7 @@
                 confirmMessage.textContent = message;
                 customConfirmModal.classList.remove('hidden');
                 void customConfirmModal.offsetWidth; // Trigger reflow for transition
-                customConfirmModal.classList.add('modal-enter-active');
+                customConfirmModal.classList.add('profile-modal-enter-active');
 
                 resolveCustomConfirm = resolve; // Store the resolve function
 
@@ -1709,11 +1536,11 @@
 
         // Function to close the custom confirmation modal
         function closeCustomConfirm() {
-            customConfirmModal.classList.remove('modal-enter-active');
-            customConfirmModal.classList.add('modal-leave-active');
+            customConfirmModal.classList.remove('profile-modal-enter-active');
+            customConfirmModal.classList.add('profile-modal-leave-active');
             setTimeout(() => {
                 customConfirmModal.classList.add('hidden');
-                customConfirmModal.classList.remove('modal-leave-active');
+                customConfirmModal.classList.remove('profile-modal-leave-active');
             }, 300); // Match modal transition duration
         }
 
@@ -1756,211 +1583,110 @@
             }, 600); // Matches CSS transition duration
         }
 
-        // Generic function to open any modal with the standard animation
-        function openModal(modal) {
-            modal.classList.remove('hidden');
-            void modal.offsetWidth;
-            modal.querySelector('.modal-content').parentElement.classList.add('modal-enter-active');
-        }
-
-        // Generic function to close any modal with the standard animation
-        function closeModal(modal) {
-            const modalContainer = modal.querySelector('.modal-content').parentElement;
-            modalContainer.classList.remove('modal-enter-active');
-            modalContainer.classList.add('modal-leave-active');
-            setTimeout(() => {
-                modal.classList.add('hidden');
-                modalContainer.classList.remove('modal-leave-active');
-            }, 300);
-        }
-
-        // --- NEW/MODIFIED FUNCTIONS FOR FRIENDS LIST ---
-
-        function openFriendsListModal() {
-            openModal(friendsListModal);
-            renderFriendsList();
-        }
-        function closeFriendsListModal() { closeModal(friendsListModal); }
-        
-        function openFriendProfileModal(friendData) {
-            currentlySelectedFriend = friendData;
-            friendProfileModalName.textContent = friendData.displayName || 'دوست شما';
-            openModal(friendProfileModal);
-        }
-        function closeFriendProfileModal() { closeModal(friendProfileModal); currentlySelectedFriend = null; }
-
-        async function renderFriendsList() {
-            friendsListContent.innerHTML = '<p class="text-gray-400 text-center">در حال بارگذاری لیست دوستان...</p>';
-
-            if (!currentUserData?.friends || currentUserData.friends.length === 0) {
-                friendsListContent.innerHTML = '<p class="text-gray-400 text-center">شما هنوز دوستی ندارید.</p>';
-                return;
-            }
-
-            try {
-                // Create a list of promises to fetch each friend's profile
-                const friendPromises = currentUserData.friends.map(friendUid =>
-                    getDoc(doc(db, `artifacts/${appId}/users/${friendUid}/profile/data`))
-                );
-                
-                // Wait for all profiles to be fetched
-                const friendDocs = await Promise.all(friendPromises);
-                
-                friendsDetailedData = friendDocs
-                    .filter(docSnap => docSnap.exists())
-                    .map(docSnap => ({ uid: docSnap.id, ...docSnap.data() }));
-
-                // Clear the content area
-                friendsListContent.innerHTML = '';
-                
-                if (friendsDetailedData.length === 0) {
-                     friendsListContent.innerHTML = '<p class="text-gray-400 text-center">اطلاعات دوستان یافت نشد.</p>';
-                     return;
-                }
-                
-                friendsDetailedData.forEach(friend => {
-                    const friendItem = document.createElement('div');
-                    friendItem.className = 'friend-list-item';
-                    friendItem.dataset.friendUid = friend.uid;
-                    friendItem.innerHTML = `
-                        <div class="flex items-center">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="mr-2 lucide lucide-user"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-                            <span class="friend-name">${friend.displayName || 'کاربر ناشناس'}</span>
-                        </div>
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-left"><path d="m9 18 6-6-6-6"/></svg>
-                    `;
-                    friendsListContent.appendChild(friendItem);
-                });
-
-            } catch (error) {
-                console.error("Error fetching friends details:", error);
-                friendsListContent.innerHTML = '<p class="text-red-400 text-center">خطا در بارگذاری لیست دوستان.</p>';
-            }
-        }
-        
-        async function removeFriend() {
-            if (!currentUserData || !currentlySelectedFriend) return;
-
-            const confirmed = await showCustomConfirm(`آیا مطمئن هستید که می‌خواهید "${currentlySelectedFriend.displayName}" را از لیست دوستان خود حذف کنید؟`, "حذف دوست");
-            if (!confirmed) return;
-            
-            const myUid = currentUserData.uid;
-            const friendUid = currentlySelectedFriend.uid;
-
-            const batch = writeBatch(db);
-
-            // Remove friend from my list
-            const myProfileRef = doc(db, `artifacts/${appId}/users/${myUid}/profile/data`);
-            batch.update(myProfileRef, { friends: arrayRemove(friendUid) });
-
-            // Remove me from their list
-            const friendProfileRef = doc(db, `artifacts/${appId}/users/${friendUid}/profile/data`);
-            batch.update(friendProfileRef, { friends: arrayRemove(myUid) });
-            
-            try {
-                await batch.commit();
-                showMessageBox(`"${currentlySelectedFriend.displayName}" از لیست دوستان حذف شد.`, 'success');
-                
-                // Update local state for immediate UI feedback
-                currentUserData.friends = currentUserData.friends.filter(uid => uid !== friendUid);
-                profileFriendCount.textContent = currentUserData.friends.length;
-
-                closeFriendProfileModal();
-                renderFriendsList(); // Re-render the friends list
-            } catch (error) {
-                console.error("Error removing friend:", error);
-                showMessageBox("خطا در حذف دوست.", "error");
-            }
-        }
-
-        // ... Other modal open/close functions remain the same ...
-        // Functions to open/close specific modals
+        // Functions to open/close modals
         function openProfileModal() {
-            openModal(profileModal);
+            profileModal.classList.remove('hidden');
+            void profileModal.offsetWidth;
+            profileModal.classList.add('profile-modal-enter-active');
             if (currentUserData) {
                 profileDisplayName.textContent = currentUserData.displayName || 'ناشناس';
                 profileEmail.textContent = currentUserData.email || 'ناشناس';
                 profileUid.textContent = currentUserData.uid || 'ناشناس';
-                profileFriendCount.textContent = currentUserData.friends?.length || 0; // NEW
             }
         }
-        function closeProfileModal() { closeModal(profileModal); }
-        function openCreateLobbyModal() { openModal(createLobbyModal); newLobbyNameInput.focus(); createLobbyMessageBox.classList.add('hidden'); }
-        function closeCreateLobbyModal() {
-            closeModal(createLobbyModal);
+
+        function closeProfileModal() {
+            profileModal.classList.remove('profile-modal-enter-active');
+            profileModal.classList.add('profile-modal-leave-active');
             setTimeout(() => {
+                profileModal.classList.add('hidden');
+                profileModal.classList.remove('profile-modal-leave-active');
+            }, 300);
+        }
+
+        function openCreateLobbyModal() {
+            createLobbyModal.classList.remove('hidden');
+            void createLobbyModal.offsetWidth;
+            createLobbyModal.classList.add('profile-modal-enter-active');
+            newLobbyNameInput.focus();
+            createLobbyMessageBox.classList.add('hidden');
+        }
+
+        function closeCreateLobbyModal() {
+            createLobbyModal.classList.remove('profile-modal-enter-active');
+            createLobbyModal.classList.add('profile-modal-leave-active');
+            setTimeout(() => {
+                createLobbyModal.classList.add('hidden');
+                createLobbyModal.classList.remove('profile-modal-leave-active');
                 createLobbyForm.reset();
+                // Reset toggle buttons to default
                 newLobbyPasswordField.classList.add('hidden');
                 document.querySelectorAll('.lobby-type-btn').forEach(btn => btn.classList.remove('active'));
                 document.querySelector('input[value="public"]').nextElementSibling.classList.add('active');
             }, 300);
         }
+        
         function openKickPlayerConfirmModal(playerName, playerUid) {
             kickPlayerConfirmName.textContent = playerName;
-            openModal(kickPlayerConfirmModal);
+            kickPlayerConfirmModal.classList.remove('hidden');
+            void kickPlayerConfirmModal.offsetWidth;
+            kickPlayerConfirmModal.classList.add('profile-modal-enter-active');
             kickedPlayerToProcess = { uid: playerUid, displayName: playerName };
         }
-        function closeKickPlayerConfirmModal() { closeModal(kickPlayerConfirmModal); kickedPlayerToProcess = null; }
-        
+
+        function closeKickPlayerConfirmModal() {
+            kickPlayerConfirmModal.classList.remove('profile-modal-enter-active');
+            kickPlayerConfirmModal.classList.add('profile-modal-leave-active');
+            setTimeout(() => {
+                kickPlayerConfirmModal.classList.add('hidden');
+                kickPlayerConfirmModal.classList.remove('profile-modal-leave-active');
+                kickedPlayerToProcess = null;
+            }, 300);
+        }
+
         function showKickedMessageModal(lobbyName) {
             kickedLobbyName.textContent = lobbyName;
-            openModal(kickedMessageModal);
+            kickedMessageModal.classList.remove('hidden');
+            void kickedMessageModal.offsetWidth;
+            kickedMessageModal.classList.add('profile-modal-enter-active');
         }
+
         function closeKickedMessageModal() {
-            closeModal(kickedMessageModal);
+            kickedMessageModal.classList.remove('profile-modal-enter-active');
+            kickedMessageModal.classList.add('profile-modal-leave-active');
             setTimeout(() => {
+                kickedMessageModal.classList.add('hidden');
+                kickedMessageModal.classList.remove('profile-modal-leave-active');
                 setActiveScreen(lobbyScreen);
                 unsubscribeLobbies = setupLobbyListener('');
             }, 300);
         }
-        
+
         function openKickedPlayersListModal() {
-            openModal(kickedPlayersListModal);
+            kickedPlayersListModal.classList.remove('hidden');
+            void kickedPlayersListModal.offsetWidth;
+            kickedPlayersListModal.classList.add('profile-modal-enter-active');
             if (currentLobbyId) {
                 unsubscribeKickedPlayers = setupKickedPlayersListListener(currentLobbyId);
             } else {
                 kickedPlayersListContent.innerHTML = '<p class="text-gray-400 text-center">خطا: لابی فعال یافت نشد.</p>';
             }
         }
+
         function closeKickedPlayersListModal() {
-            closeModal(kickedPlayersListModal);
-            if (unsubscribeKickedPlayers) {
-                unsubscribeKickedPlayers();
-                unsubscribeKickedPlayers = null;
-            }
+            kickedPlayersListModal.classList.remove('profile-modal-enter-active');
+            kickedPlayersListModal.classList.add('profile-modal-leave-active');
+            setTimeout(() => {
+                kickedPlayersListModal.classList.add('hidden');
+                kickedPlayersListModal.classList.remove('profile-modal-leave-active');
+                if (unsubscribeKickedPlayers) {
+                    unsubscribeKickedPlayers();
+                    unsubscribeKickedPlayers = null;
+                }
+            }, 300);
         }
 
-        // NEW: Player Info Modal functions
-        async function openPlayerInfoModal(playerData) {
-            playerInfoDisplayName.textContent = playerData.displayName || 'ناشناس';
-            playerInfoEmail.textContent = playerData.email || 'ناشناس';
-            sendFriendRequestBtn.dataset.playerUid = playerData.uid;
-            
-            // Check if already friends or request pending
-            const isFriend = currentUserData.friends?.includes(playerData.uid);
-            const requestSent = await getDoc(doc(db, `artifacts/${appId}/users/${playerData.uid}/friend_requests/${currentUserData.uid}`)).then(d => d.exists());
 
-            if (isFriend) {
-                sendFriendRequestBtn.textContent = 'شما دوست هستید';
-                sendFriendRequestBtn.disabled = true;
-            } else if (requestSent) {
-                sendFriendRequestBtn.textContent = 'درخواست ارسال شده';
-                sendFriendRequestBtn.disabled = true;
-            } else {
-                sendFriendRequestBtn.textContent = 'ارسال درخواست دوستی';
-                sendFriendRequestBtn.disabled = false;
-            }
-            
-            playerInfoMessageBox.classList.add('hidden');
-            openModal(playerInfoModal);
-        }
-        function closePlayerInfoModal() { closeModal(playerInfoModal); }
-
-        // NEW: Friend Requests Modal functions
-        function openFriendRequestsModal() { openModal(friendRequestsModal); }
-        function closeFriendRequestsModal() { closeModal(friendRequestsModal); }
-
-        // ... AI check function remains the same ...
         /**
          * Calls a simulated AI content moderation API to check if the lobby name is appropriate.
          * @param {string} lobbyName - The name of the lobby to check.
@@ -1983,53 +1709,47 @@
             } catch (error) { console.error("Error calling AI moderation API:", error); return { is_appropriate: false, reason: `خطا در ارتباط با سیستم اعتدال: ${error.message}.` }; }
         }
 
-
         // Firebase Authentication State Listener
         onAuthStateChanged(auth, async (user) => {
             console.log("onAuthStateChanged triggered. User:", user ? user.uid : "logged out");
             
-            if (!isAuthResolved) { isAuthResolved = true; }
+            // This is the first time the auth state has been determined.
+            // We can now safely transition away from the loading screen.
+            if (!isAuthResolved) {
+                isAuthResolved = true;
+            }
 
             if (user) {
                 try {
                     const userDocRef = doc(db, `artifacts/${appId}/users/${user.uid}/profile/data`); 
                     const userDocSnap = await getDoc(userDocRef);
-                    const userDataFromDb = userDocSnap.exists() ? userDocSnap.data() : {};
-
                     currentUserData = {
                         uid: user.uid,
                         email: user.email,
-                        displayName: userDataFromDb.displayName || (user.displayName || (user.email ? user.email.split('@')[0] : 'کاربر ناشناس')),
-                        friends: userDataFromDb.friends || []
+                        displayName: (userDocSnap.exists() && userDocSnap.data().displayName) ? userDocSnap.data().displayName : (user.displayName || (user.email ? user.email.split('@')[0] : 'کاربر ناشناس'))
                     };
-                    
                     if (!userDocSnap.exists() && authMode === 'register' && displayNameInput.value.trim() !== '') {
-                        const newProfileData = { displayName: displayNameInput.value.trim(), email: user.email, friends: [] };
-                        await setDoc(userDocRef, newProfileData);
-                        currentUserData.displayName = newProfileData.displayName;
+                        await setDoc(userDocRef, { displayName: displayNameInput.value.trim(), email: user.email }, { merge: true });
+                        currentUserData.displayName = displayNameInput.value.trim();
                     }
-
                     headerDisplayName.textContent = currentUserData.displayName;
                     headerUserId.textContent = `شناسه: ${currentUserData.uid.substring(0, 8)}...`;
                     
-                    // Setup friend request listener for the LOBBY screen header
-                    lobbyFriendRequestContainer.classList.remove('hidden');
-                    if (unsubscribeFriendRequests) unsubscribeFriendRequests();
-                    unsubscribeFriendRequests = setupFriendRequestListener();
-                    
+                    // Only transition if we are coming from loading or auth screen
                     if(currentActiveScreen === loadingScreen || currentActiveScreen === authScreen) {
                         setActiveScreen(mainScreen);
                     }
 
                 } catch (firestoreError) {
                     console.error("Firestore profile error:", firestoreError);
-                    currentUserData = { uid: user.uid, email: user.email, displayName: user.displayName || 'کاربر ناشناس', friends: [] };
+                    currentUserData = { uid: user.uid, email: user.email, displayName: user.displayName || (user.email ? user.email.split('@')[0] : 'کاربر ناشناس') };
                     headerDisplayName.textContent = currentUserData.displayName;
                     headerUserId.textContent = `شناسه: ${currentUserData.uid.substring(0, 8)}...`;
                     setActiveScreen(mainScreen);
                     showMessageBox("مشکل در بارگذاری پروفایل.", "error");
                 }
             } else {
+                // User is logged out
                 setActiveScreen(authScreen);
                 authForm.reset();
                 displayNameField.classList.add('hidden');
@@ -2044,167 +1764,103 @@
                 if (unsubscribeKickedPlayers) unsubscribeKickedPlayers();
                 if (unsubscribeLobbyChat) unsubscribeLobbyChat();
                 if (unsubscribeGame) unsubscribeGame();
-                if (unsubscribeFriendRequests) unsubscribeFriendRequests();
-                unsubscribeLobbies = unsubscribeLobbyDetail = unsubscribeKickedPlayers = unsubscribeLobbyChat = unsubscribeGame = unsubscribeFriendRequests = null;
+                unsubscribeLobbies = unsubscribeLobbyDetail = unsubscribeKickedPlayers = unsubscribeLobbyChat = unsubscribeGame = null;
                 currentLobbyId = null;
-                lobbyFriendRequestContainer.classList.add('hidden'); 
             }
         });
 
-        // --- Corrected Initial Firebase Authentication Flow ---
+        // --- FIX START: Corrected Initial Firebase Authentication Flow ---
+        // This function now correctly handles the initial sign-in logic,
+        // preventing the auth screen from showing unnecessarily.
         async function initializeFirebaseAndAuth() {
             console.log("Initializing Firebase Auth...");
+            
+            // The onAuthStateChanged listener is already set up globally.
+            // We just need to trigger the sign-in process if a token is available.
+            // If no token is available, onAuthStateChanged will still fire with `null` or
+            // with a user from a cached session, which is the correct behavior.
+            
             if (initialAuthToken) {
                 console.log("Initial auth token found. Attempting to sign in...");
                 try {
+                    // Signing in with the custom token will trigger onAuthStateChanged.
+                    // We don't need to do anything else here. The listener will handle the screen transition.
                     await signInWithCustomToken(auth, initialAuthToken);
                     console.log("Sign in with custom token successful.");
                 } catch (error) {
+                    // If the token is invalid, log the error.
+                    // onAuthStateChanged will fire with a `null` user, taking them to the auth screen.
                     console.error("Error signing in with initial custom token:", error);
                 }
             } else {
                 console.log("No initial auth token. Waiting for onAuthStateChanged to resolve session.");
+                // No token, so Firebase will check for a cached user.
+                // onAuthStateChanged will handle the result automatically.
             }
         }
+        // --- FIX END ---
 
         // Maps Firebase auth error codes to user-friendly Persian messages.
         function getFirebaseErrorMessage(errorCode) {
             const messages = {
-                'auth/invalid-email': "فرمت ایمیل نامعتبر است.", 'auth/user-disabled': "حساب کاربری شما غیرفعال شده است.",
-                'auth/user-not-found': "کاربری با این ایمیل یافت نشد.", 'auth/wrong-password': "ایمیل یا رمز عبور اشتباه است.",
-                'auth/invalid-credential': "ایمیل یا رمز عبور اشتباه است.", 'auth/email-already-in-use': "این ایمیل قبلاً ثبت نام شده است.",
-                'auth/weak-password': "رمز عبور باید حداقل ۶ کاراکتر باشد.", 'auth/operation-not-allowed': "این نوع ورود فعال نیست.",
-                'auth/network-request-failed': "مشکل در اتصال به اینترنت.", 'auth/too-many-requests': "تعداد تلاش‌های ناموفق بیش از حد مجاز.",
+                'auth/invalid-email': "فرمت ایمیل نامعتبر است.",
+                'auth/user-disabled': "حساب کاربری شما غیرفعال شده است.",
+                'auth/user-not-found': "کاربری با این ایمیل یافت نشد.",
+                'auth/wrong-password': "ایمیل یا رمز عبور اشتباه است.",
+                'auth/invalid-credential': "ایمیل یا رمز عبور اشتباه است.",
+                'auth/email-already-in-use': "این ایمیل قبلاً ثبت نام شده است.",
+                'auth/weak-password': "رمز عبور باید حداقل ۶ کاراکتر باشد.",
+                'auth/operation-not-allowed': "این نوع ورود فعال نیست.",
+                'auth/network-request-failed': "مشکل در اتصال به اینترنت.",
+                'auth/too-many-requests': "تعداد تلاش‌های ناموفق بیش از حد مجاز.",
             };
             return messages[errorCode] || "خطایی ناشناخته رخ داده است.";
         }
 
-        // --- NEW: Friend System Functions ---
-        function setupFriendRequestListener() {
-            if (!auth.currentUser) return null;
-            const requestsRef = collection(db, `artifacts/${appId}/users/${auth.currentUser.uid}/friend_requests`);
-            const q = query(requestsRef);
-
-            return onSnapshot(q, (snapshot) => {
-                const requestCount = snapshot.size;
-                lobbyFriendRequestBadge.textContent = requestCount; // Changed to lobby badge
-                if (requestCount > 0) {
-                    lobbyFriendRequestBadge.classList.add('visible'); // Changed to lobby badge
-                } else {
-                    lobbyFriendRequestBadge.classList.remove('visible'); // Changed to lobby badge
-                }
-
-                // If the modal is open, update its content
-                if (!friendRequestsModal.classList.contains('hidden')) {
-                    friendRequestsListContent.innerHTML = '';
-                    if (snapshot.empty) {
-                        friendRequestsListContent.innerHTML = '<p class="text-gray-400 text-center">درخواست دوستی جدیدی ندارید.</p>';
-                    } else {
-                        snapshot.forEach(doc => {
-                            const request = doc.data();
-                            const item = document.createElement('div');
-                            item.className = 'friend-request-item';
-                            item.innerHTML = `
-                                <span>${request.senderName || 'کاربر ناشناس'}</span>
-                                <div class="actions">
-                                    <button data-sender-uid="${doc.id}" class="action-btn accept-friend-btn classic-btn btn-green-classic">قبول</button>
-                                    <button data-sender-uid="${doc.id}" class="action-btn reject-friend-btn classic-btn btn-red-classic">رد</button>
-                                </div>
-                            `;
-                            friendRequestsListContent.appendChild(item);
-                        });
-                    }
-                }
-            }, (error) => {
-                console.error("Error listening to friend requests:", error);
-            });
-        }
-
-        async function sendFriendRequest(targetUid) {
-            if (!currentUserData || !targetUid) return;
-            const senderUid = currentUserData.uid;
-            
-            sendFriendRequestBtn.disabled = true;
-            try {
-                const requestRef = doc(db, `artifacts/${appId}/users/${targetUid}/friend_requests/${senderUid}`);
-                await setDoc(requestRef, {
-                    senderName: currentUserData.displayName,
-                    timestamp: serverTimestamp()
-                });
-                sendFriendRequestBtn.textContent = 'درخواست ارسال شد';
-                showPlayerInfoMessageBox('درخواست دوستی شما با موفقیت ارسال شد.', 'success');
-            } catch (error) {
-                console.error("Error sending friend request:", error);
-                showPlayerInfoMessageBox('خطا در ارسال درخواست.', 'error');
-                sendFriendRequestBtn.disabled = false;
-            }
-        }
-
-        async function acceptFriendRequest(senderUid) {
-             if (!auth.currentUser) return;
-            const currentUserUid = auth.currentUser.uid;
-
-            const batch = writeBatch(db);
-            
-            const myProfileRef = doc(db, `artifacts/${appId}/users/${currentUserUid}/profile/data`);
-            batch.update(myProfileRef, { friends: arrayUnion(senderUid) });
-
-            const senderProfileRef = doc(db, `artifacts/${appId}/users/${senderUid}/profile/data`);
-            batch.update(senderProfileRef, { friends: arrayUnion(currentUserUid) });
-
-            const requestRef = doc(db, `artifacts/${appId}/users/${currentUserUid}/friend_requests/${senderUid}`);
-            batch.delete(requestRef);
-            
-            try {
-                await batch.commit();
-                console.log(`Friendship established between ${currentUserUid} and ${senderUid}`);
-                if (currentUserData.friends && !currentUserData.friends.includes(senderUid)) {
-                    currentUserData.friends.push(senderUid);
-                    profileFriendCount.textContent = currentUserData.friends.length;
-                }
-            } catch (error) {
-                console.error("Error accepting friend request:", error);
-                showMessageBox("خطا در قبول کردن درخواست دوستی.", "error");
-            }
-        }
-        
-        async function rejectFriendRequest(senderUid) {
-             if (!auth.currentUser) return;
-            const requestRef = doc(db, `artifacts/${appId}/users/${auth.currentUser.uid}/friend_requests/${senderUid}`);
-            try {
-                await deleteDoc(requestRef);
-                console.log(`Rejected friend request from ${senderUid}`);
-            } catch (error) {
-                console.error("Error rejecting friend request:", error);
-                 showMessageBox("خطا در رد کردن درخواست دوستی.", "error");
-            }
-        }
-
-        // --- ALL OTHER FIREBASE AND LOGIC FUNCTIONS ---
-        // These are mostly unchanged, but copied here for a complete, working file.
-        // ... (The rest of your JavaScript functions: createLobby, closeLobby, setupLobbyListener, etc.)
-        
         // --- Firebase Lobby Functions ---
         async function createLobby(lobbyName, userId, displayName, lobbyType, password) {
             try {
                 const creatorDisplayName = displayName && displayName.trim() !== '' ? displayName : 'ناشناس';
-                const userLobbiesQuery = query(collection(db, `global_lobbies`), where("hostId", "==", userId), where("status", "in", ["waiting", "playing"]));
-                const userLobbiesSnapshot = await getDocs(userLobbiesQuery);
-                if (!userLobbiesSnapshot.empty) { throw new Error("شما از قبل یک لابی فعال ساخته‌اید. لطفاً ابتدا لابی قبلی خود را ببندید."); }
         
+                const userLobbiesQuery = query(
+                    collection(db, `global_lobbies`),
+                    where("hostId", "==", userId),
+                    where("status", "in", ["waiting", "playing"])
+                );
+                const userLobbiesSnapshot = await getDocs(userLobbiesQuery);
+                if (!userLobbiesSnapshot.empty) {
+                    throw new Error("شما از قبل یک لابی فعال ساخته‌اید. لطفاً ابتدا لابی قبلی خود را ببندید.");
+                }
+        
+                const lobbiesRef = collection(db, `global_lobbies`);
+                
                 const newLobbyData = {
-                    name: lobbyName, hostId: userId, status: "waiting", type: lobbyType,
-                    players: { [userId]: creatorDisplayName },
-                    kickedPlayers: [], isChatLocked: false, createdAt: serverTimestamp(),
+                    name: lobbyName,
+                    hostId: userId,
+                    status: "waiting",
+                    type: lobbyType,
+                    players: {
+                        [userId]: creatorDisplayName // Using a map: { "uid": "displayName" }
+                    },
+                    kickedPlayers: [], // Still an array of objects
+                    createdAt: serverTimestamp(),
+                    isChatLocked: false, // NEW: Chat is open by default
                     gameSettings: { maxPlayers: 4, roundsToWin: 7 }
                 };
-                if (lobbyType === 'private') { newLobbyData.password = password; }
         
-                const newLobbyRef = await addDoc(collection(db, `global_lobbies`), newLobbyData);
+                if (lobbyType === 'private') {
+                    newLobbyData.password = password;
+                }
+        
+                const newLobbyRef = await addDoc(lobbiesRef, newLobbyData);
+                
                 console.log(`لابی ${lobbyType} با ID ساخته شد: `, newLobbyRef.id);
                 userHasActiveLobby = true;
                 return newLobbyRef.id;
-            } catch (e) { console.error("خطا در ساخت لابی: ", e); throw e; }
+            } catch (e) {
+                console.error("خطا در ساخت لابی: ", e);
+                throw e;
+            }
         }
         
         async function closeLobby(lobbyId, userId) {
@@ -2214,43 +1870,68 @@
                 if (!lobbySnap.exists()) { showMessageBox("لابی مورد نظر یافت نشد.", "error"); return; }
                 const lobbyData = lobbySnap.data();
                 if (lobbyData.hostId !== userId) { showMessageBox("شما اجازه بستن این لابی را ندارید.", "error"); return; }
+
                 const lobbyElement = document.querySelector(`[data-lobby-id="${lobbyId}"]`);
                 if (lobbyElement) {
                     lobbyElement.classList.add('fade-out');
                     await new Promise(resolve => setTimeout(resolve, 500));
                 }
+
                 await deleteDoc(lobbyRef);
                 showMessageBox(`لابی "${lobbyData.name}" با موفقیت بسته شد.`, "success");
                 userHasActiveLobby = false;
                 if (currentLobbyId === lobbyId) currentLobbyId = null;
-            } catch (e) { console.error("خطا در بستن لابی: ", e); showMessageBox(`خطا در بستن لابی: ${e.message}`, "error"); }
+            } catch (e) {
+                console.error("خطا در بستن لابی: ", e);
+                showMessageBox(`خطا در بستن لابی: ${e.message}`, "error");
+            }
         }
         
         function setupLobbyListener(searchTerm = '') {
             console.log(`شروع راه‌اندازی Listener لابی‌ها با عبارت جستجو: "${searchTerm}"`);
-            if (unsubscribeLobbyDetail) { unsubscribeLobbyDetail(); unsubscribeLobbyDetail = null; currentLobbyId = null; }
-            if (unsubscribeKickedPlayers) { unsubscribeKickedPlayers(); unsubscribeKickedPlayers = null; }
-            if (unsubscribeLobbyChat) { unsubscribeLobbyChat(); unsubscribeLobbyChat = null; }
-            if (unsubscribeGame) { unsubscribeGame(); unsubscribeGame = null; }
+            if (unsubscribeLobbyDetail) {
+                unsubscribeLobbyDetail();
+                unsubscribeLobbyDetail = null;
+                currentLobbyId = null;
+            }
+            if (unsubscribeKickedPlayers) {
+                unsubscribeKickedPlayers();
+                unsubscribeKickedPlayers = null;
+            }
+            if (unsubscribeLobbyChat) {
+                unsubscribeLobbyChat();
+                unsubscribeLobbyChat = null;
+            }
+            if (unsubscribeGame) { // NEW: Clear game listener too
+                unsubscribeGame();
+                unsubscribeGame = null;
+            }
         
             lobbiesList.innerHTML = '<p class="text-gray-400">در حال بارگذاری لابی‌ها...</p>';
             userHasActiveLobby = false;
         
             const normalizedSearchTerm = searchTerm.toLowerCase();
-            const q = query(collection(db, `global_lobbies`), where("status", "==", "waiting"));
+            const q = query(
+                collection(db, `global_lobbies`), 
+                where("status", "==", "waiting") // This is key: only shows 'waiting' lobbies.
+            );
         
             const unsubscribe = onSnapshot(q, (snapshot) => {
                 lobbiesList.innerHTML = '';
+        
                 let lobbiesToDisplay = [];
                 let currentUserIsInAnyLobby = false;
         
                 snapshot.forEach((doc) => {
                     const lobby = { id: doc.id, ...doc.data() };
                     const playersMap = lobby.players || {};
+                    
                     const hostDisplayName = (playersMap[lobby.hostId] || 'ناشناس').toLowerCase();
                     const lobbyName = (lobby.name || '').toLowerCase();
                     
-                    if (auth.currentUser && playersMap[auth.currentUser.uid]) { currentUserIsInAnyLobby = true; }
+                    if (auth.currentUser && playersMap[auth.currentUser.uid]) {
+                        currentUserIsInAnyLobby = true;
+                    }
         
                     if (normalizedSearchTerm === '' || lobbyName.includes(normalizedSearchTerm) || hostDisplayName.includes(normalizedSearchTerm)) {
                         lobbiesToDisplay.push(lobby);
@@ -2258,6 +1939,9 @@
                 });
         
                 userHasActiveLobby = currentUserIsInAnyLobby;
+                
+                // Count active games separately by another query or accept this might be slightly off
+                // For now, we will update the active games count less frequently or assume it's decorative.
                 getDocs(query(collection(db, `global_lobbies`), where("status", "==", "playing"))).then(playingSnapshot => {
                     activeGamesCount.textContent = playingSnapshot.size;
                 });
@@ -2276,15 +1960,23 @@
                         const isCurrentUserKicked = auth.currentUser && lobby.kickedPlayers?.some(p => p.uid === auth.currentUser.uid);
                         const canJoinThisLobby = auth.currentUser && !currentUserIsInAnyLobby && playerCount < maxPlayers && !isCurrentUserKicked;
         
-                        const lockIconHtml = lobby.type === 'private' ? `<svg xmlns="http://www.w3.org/2000/svg" class="lobby-lock-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>` : '';
+                        const lockIconHtml = lobby.type === 'private' 
+                            ? `<svg xmlns="http://www.w3.org/2000/svg" class="lobby-lock-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>` 
+                            : '';
         
                         let joinButtonHtml = '';
-                        if (isCurrentUserKicked) { joinButtonHtml = `<button class="join-lobby-btn classic-btn btn-red-classic opacity-50 cursor-not-allowed" disabled>اخراج شده‌اید</button>`; }
-                        else if (isCurrentUserHostOfThisLobby) { joinButtonHtml = `<button data-lobby-id="${lobby.id}" class="view-my-lobby-btn classic-btn btn-blue-classic">ورود به لابی من</button>`; }
-                        else if (canJoinThisLobby) { joinButtonHtml = `<button data-lobby-id="${lobby.id}" data-lobby-type="${lobby.type || 'public'}" data-lobby-name="${lobby.name}" class="join-lobby-btn classic-btn btn-blue-classic">ورود به لابی</button>`; }
-                        else { joinButtonHtml = `<button class="join-lobby-btn classic-btn btn-blue-classic opacity-50 cursor-not-allowed" disabled>ورود به لابی</button>`; }
+                        if (isCurrentUserKicked) {
+                             joinButtonHtml = `<button class="join-lobby-btn classic-btn btn-red-classic opacity-50 cursor-not-allowed" disabled>اخراج شده‌اید</button>`;
+                        } else if (isCurrentUserHostOfThisLobby) {
+                            joinButtonHtml = `<button data-lobby-id="${lobby.id}" class="view-my-lobby-btn classic-btn btn-blue-classic">ورود به لابی من</button>`;
+                        } else if (canJoinThisLobby) {
+                            joinButtonHtml = `<button data-lobby-id="${lobby.id}" data-lobby-type="${lobby.type || 'public'}" data-lobby-name="${lobby.name}" class="join-lobby-btn classic-btn btn-blue-classic">ورود به لابی</button>`;
+                        } else {
+                            joinButtonHtml = `<button class="join-lobby-btn classic-btn btn-blue-classic opacity-50 cursor-not-allowed" disabled>ورود به لابی</button>`;
+                        }
                         
-                        const closeButtonHtml = isCurrentUserHostOfThisLobby ? `<button data-lobby-id="${lobby.id}" class="close-lobby-btn classic-btn btn-red-classic">بستن لابی</button>` : '';
+                        const closeButtonHtml = isCurrentUserHostOfThisLobby 
+                            ? `<button data-lobby-id="${lobby.id}" class="close-lobby-btn classic-btn btn-red-classic">بستن لابی</button>` : '';
         
                         const lobbyItem = document.createElement('div');
                         lobbyItem.className = 'lobby-item mb-3 w-full';
@@ -2298,23 +1990,39 @@
                             <div class="lobby-actions">
                                 ${closeButtonHtml}
                                 ${joinButtonHtml}
-                            </div>`;
+                            </div>
+                        `;
                         lobbiesList.appendChild(lobbyItem);
                     });
                 }
                 
                 lobbiesList.querySelectorAll('.join-lobby-btn:not([disabled])').forEach(button => {
                     button.addEventListener('click', async (e) => {
-                        const lobbyId = e.currentTarget.dataset.lobbyId; const lobbyType = e.currentTarget.dataset.lobbyType; const lobbyName = e.currentTarget.dataset.lobbyName;
-                        if (lobbyType === 'private') { openEnterPasswordModal(lobbyId, lobbyName); }
-                        else { try { await joinLobby(lobbyId, auth.currentUser.uid, currentUserData.displayName); } catch (error) { console.error("Error joining public lobby:", error); showMessageBox(`خطا در ورود به لابی: ${error.message}`, "error"); } }
+                        const lobbyId = e.currentTarget.dataset.lobbyId;
+                        const lobbyType = e.currentTarget.dataset.lobbyType;
+                        const lobbyName = e.currentTarget.dataset.lobbyName;
+                        
+                        if (lobbyType === 'private') {
+                            openEnterPasswordModal(lobbyId, lobbyName);
+                        } else {
+                            try {
+                                await joinLobby(lobbyId, auth.currentUser.uid, currentUserData.displayName);
+                            } catch (error) {
+                                console.error("Error joining public lobby:", error);
+                                showMessageBox(`خطا در ورود به لابی: ${error.message}`, "error");
+                            }
+                        }
                     });
                 });
         
                 lobbiesList.querySelectorAll('.view-my-lobby-btn').forEach(button => {
                     button.addEventListener('click', (e) => {
                         const lobbyId = e.target.dataset.lobbyId;
-                        if (lobbyId && auth.currentUser) { currentLobbyId = lobbyId; setActiveScreen(lobbyDetailScreen); unsubscribeLobbyDetail = setupLobbyDetailListener(lobbyId); }
+                        if (lobbyId && auth.currentUser) {
+                            currentLobbyId = lobbyId;
+                            setActiveScreen(lobbyDetailScreen);
+                            unsubscribeLobbyDetail = setupLobbyDetailListener(lobbyId);
+                        }
                     });
                 });
         
@@ -2322,9 +2030,11 @@
                     button.addEventListener('click', async (e) => {
                         const lobbyId = e.target.dataset.lobbyId;
                         if (lobbyId && auth.currentUser) {
-                            const lobbyName = e.target.closest('.lobby-item').querySelector('h3').textContent.trim();
+                            const lobbyName = e.target.closest('.lobby-item').querySelector('h3').textContent;
                             const confirmed = await showCustomConfirm(`آیا مطمئن هستید که می‌خواهید لابی "${lobbyName}" را ببندید؟`);
-                            if (confirmed) { await closeLobby(lobbyId, auth.currentUser.uid); }
+                            if (confirmed) {
+                                await closeLobby(lobbyId, auth.currentUser.uid);
+                            }
                         }
                     });
                 });
@@ -2348,15 +2058,32 @@
                 const maxPlayers = lobbyData.gameSettings?.maxPlayers || 4;
                 const kickedPlayers = lobbyData.kickedPlayers || [];
 
-                if (kickedPlayers.some(p => p.uid === userId)) { throw new Error("شما از این لابی اخراج شده‌اید."); }
-                if (playersMap[userId]) { currentLobbyId = lobbyId; setActiveScreen(lobbyDetailScreen); unsubscribeLobbyDetail = setupLobbyDetailListener(lobbyId); return; }
+                if (kickedPlayers.some(p => p.uid === userId)) {
+                    throw new Error("شما از این لابی اخراج شده‌اید.");
+                }
+                if (playersMap[userId]) { // Player is already in
+                    currentLobbyId = lobbyId;
+                    setActiveScreen(lobbyDetailScreen);
+                    unsubscribeLobbyDetail = setupLobbyDetailListener(lobbyId);
+                    return;
+                }
                 if (Object.keys(playersMap).length >= maxPlayers) { throw new Error("لابی پر است."); }
                 
-                await updateDoc(lobbyRef, { [`players.${userId}`]: displayName });
+                // Add player to map using dot notation for the key
+                await updateDoc(lobbyRef, {
+                    [`players.${userId}`]: displayName
+                });
+                
                 showMessageBox(`شما به لابی "${lobbyData.name}" وارد شدید.`, "success");
-                currentLobbyId = lobbyId; userHasActiveLobby = true;
-                setActiveScreen(lobbyDetailScreen); unsubscribeLobbyDetail = setupLobbyDetailListener(lobbyId);
-            } catch (e) { console.error("خطا در ورود به لابی: ", e); throw e; }
+                
+                currentLobbyId = lobbyId;
+                userHasActiveLobby = true;
+                setActiveScreen(lobbyDetailScreen);
+                unsubscribeLobbyDetail = setupLobbyDetailListener(lobbyId);
+            } catch (e) {
+                console.error("خطا در ورود به لابی: ", e);
+                throw e; // Re-throw to be caught by the caller
+            }
         }
         
         function setupLobbyDetailListener(lobbyId) {
@@ -2367,15 +2094,21 @@
             if (unsubscribeGame) { unsubscribeGame(); unsubscribeGame = null; }
             
             const lobbyRef = doc(db, `global_lobbies`, lobbyId);
-            return onSnapshot(lobbyRef, async (docSnap) => {
+            const unsubscribe = onSnapshot(lobbyRef, async (docSnap) => {
                 if (docSnap.exists()) {
                     const lobbyData = docSnap.data();
                     const isCurrentUserHost = auth.currentUser && lobbyData.hostId === auth.currentUser.uid;
 
+                    // NEW: Check if game has started
                     if (lobbyData.status === 'playing') {
-                        if (currentActiveScreen !== gameScreen) { setActiveScreen(gameScreen); }
-                        if (!unsubscribeGame) { unsubscribeGame = setupGameListener(lobbyId); }
-                        return;
+                        if (currentActiveScreen !== gameScreen) {
+                            setActiveScreen(gameScreen);
+                        }
+                        // Start the game listener if it's not already running
+                        if (!unsubscribeGame) {
+                            unsubscribeGame = setupGameListener(lobbyId);
+                        }
+                        return; // Stop processing lobby details, let game listener take over
                     }
 
                     const playersMap = lobbyData.players || {};
@@ -2391,7 +2124,8 @@
                     detailPlayerCount.textContent = `بازیکنان: ${playerCount}/${maxPlayers}`;
 
                     if (auth.currentUser && lobbyData.kickedPlayers?.some(p => p.uid === auth.currentUser.uid)) {
-                        showKickedMessageModal(lobbyData.name); return;
+                        showKickedMessageModal(lobbyData.name);
+                        return;
                     }
 
                     playerListContainer.innerHTML = '';
@@ -2404,54 +2138,73 @@
                         if (isHost) playerItem.classList.add('is-host');
 
                         const kickButtonHtml = (isCurrentUserHost && !isHost) 
-                            ? `<button class="kick-player-btn" data-player-uid="${player.uid}" data-player-name="${player.displayName}">اخراج</button>` : '';
-                        const hostLabelHtml = isHost ? '<span class="host-label">(سازنده)</span>' : '';
-                        const playerInfoWrapperClass = !isHost ? 'player-info-wrapper' : '';
+                            ? `<button class="kick-player-btn" data-player-uid="${player.uid}" data-player-name="${player.displayName}">اخراج</button>` 
+                            : '';
                         
+                        const hostLabelHtml = isHost ? '<span class="host-label">(سازنده)</span>' : '';
+
                         playerItem.innerHTML = `
-                            <div class="flex items-center ${playerInfoWrapperClass}" data-player-uid="${player.uid}">
+                            <div class="flex items-center">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="mr-2 lucide lucide-user"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
                                 <span class="player-name">${player.displayName}</span>
                                 ${hostLabelHtml}
                             </div>
-                            ${kickButtonHtml}`;
+                            ${kickButtonHtml}
+                        `;
                         playerListContainer.appendChild(playerItem);
                     }
 
                     playerListContainer.querySelectorAll('.kick-player-btn').forEach(button => {
-                        button.addEventListener('click', (e) => { openKickPlayerConfirmModal(e.currentTarget.dataset.playerName, e.currentTarget.dataset.playerUid); });
+                        button.addEventListener('click', (e) => {
+                           openKickPlayerConfirmModal(e.currentTarget.dataset.playerName, e.currentTarget.dataset.playerUid);
+                        });
                     });
 
+                    // === LOGIC CHANGE: Manage "Leave/Close Lobby" Button Visibility ===
                     if (isCurrentUserHost) {
-                        leaveLobbyBtn.classList.remove('hidden'); leaveLobbyBtn.textContent = 'بستن لابی';
+                        leaveLobbyBtn.classList.remove('hidden');
+                        leaveLobbyBtn.textContent = 'بستن لابی'; // Host closes the lobby
                     } else {
+                        // Per instructions, the leave button is hidden for non-hosts.
+                        // They must use the back button in the header (if available) or restart to leave.
                         leaveLobbyBtn.classList.add('hidden');
                     }
 
+                    // Manage Host Actions
                     if (isCurrentUserHost) {
                         hostActionsContainer.style.display = 'flex';
                         startGameBtn.disabled = playerCount !== maxPlayers;
                         startGameBtn.textContent = `شروع بازی (${playerCount}/${maxPlayers})`;
+                        
                         toggleChatLockBtn.textContent = isChatLocked ? 'باز کردن چت' : 'قفل کردن چت';
+
                     } else {
                         hostActionsContainer.style.display = 'none';
                     }
 
                     if (isChatLocked && !isCurrentUserHost) {
-                        lobbyChatInput.disabled = true; lobbyChatSendBtn.disabled = true; lobbyChatInput.placeholder = "چت توسط سازنده قفل شده است";
+                        lobbyChatInput.disabled = true;
+                        lobbyChatSendBtn.disabled = true;
+                        lobbyChatInput.placeholder = "چت توسط سازنده قفل شده است";
                     } else {
-                        lobbyChatInput.disabled = false; lobbyChatSendBtn.disabled = false; lobbyChatInput.placeholder = "پیام خود را بنویسید...";
+                        lobbyChatInput.disabled = false;
+                        lobbyChatSendBtn.disabled = false;
+                        lobbyChatInput.placeholder = "پیام خود را بنویسید...";
                     }
+
 
                 } else {
                     showMessageBox("لابی که در آن بودید بسته شد یا بازی شروع شد.", "info");
-                    setActiveScreen(lobbyScreen); unsubscribeLobbies = setupLobbyListener('');
+                    setActiveScreen(lobbyScreen);
+                    unsubscribeLobbies = setupLobbyListener('');
                 }
             }, (error) => {
                 console.error("Lobby detail listener error:", error);
                 showMessageBox("خطا در بارگذاری جزئیات لابی.", "error");
-                setActiveScreen(lobbyScreen); unsubscribeLobbies = setupLobbyListener('');
+                setActiveScreen(lobbyScreen);
+                unsubscribeLobbies = setupLobbyListener('');
             });
+            return unsubscribe;
         }
 
         async function leaveLobby() {
@@ -2460,15 +2213,27 @@
             const userId = auth.currentUser.uid;
             try {
                 const lobbySnap = await getDoc(lobbyRef);
-                if (!lobbySnap.exists()) { setActiveScreen(lobbyScreen); unsubscribeLobbies = setupLobbyListener(''); return; }
+                if (!lobbySnap.exists()) {
+                    setActiveScreen(lobbyScreen);
+                    unsubscribeLobbies = setupLobbyListener('');
+                    return;
+                }
                 const isHost = lobbySnap.data().hostId === userId;
+                // The button is now only visible to the host, so this check is redundant but safe.
                 if (isHost) {
                     const confirmed = await showCustomConfirm("شما سازنده لابی هستید. خروج شما باعث بسته شدن لابی برای همه می‌شود. آیا مطمئن هستید؟", "بستن لابی");
-                    if (confirmed) { await deleteDoc(lobbyRef); }
+                    if (confirmed) {
+                        await deleteDoc(lobbyRef);
+                        // The onSnapshot listener will handle screen transition for all players.
+                    }
                 } else {
+                    // This block is now unreachable via the UI as per the new requirement, but the logic is kept for safety.
                     console.warn("A non-host tried to leave the lobby. This path should not be reachable.");
-                    await updateDoc(lobbyRef, { [`players.${userId}`]: deleteField() });
-                    setActiveScreen(lobbyScreen); unsubscribeLobbies = setupLobbyListener('');
+                    await updateDoc(lobbyRef, {
+                        [`players.${userId}`]: deleteField()
+                    });
+                    setActiveScreen(lobbyScreen);
+                    unsubscribeLobbies = setupLobbyListener('');
                 }
             } catch (e) { console.error("Error leaving lobby:", e); showMessageBox("خطا در ترک لابی.", "error"); }
         }
@@ -2528,17 +2293,31 @@
             const messagesRef = collection(db, `global_lobbies/${lobbyId}/messages`);
             try {
                 await addDoc(messagesRef, {
-                    text: text.trim(), senderUid: auth.currentUser.uid, senderName: currentUserData.displayName,
-                    timestamp: serverTimestamp(), isDeleted: false
+                    text: text.trim(),
+                    senderUid: auth.currentUser.uid,
+                    senderName: currentUserData.displayName,
+                    timestamp: serverTimestamp(),
+                    isDeleted: false // NEW
                 });
-                lobbyChatInput.value = '';
-            } catch (error) { console.error("Error sending chat message:", error); showMessageBox("خطا در ارسال پیام.", "error"); }
+                lobbyChatInput.value = ''; // Clear input after sending
+            } catch (error) {
+                console.error("Error sending chat message:", error);
+                showMessageBox("خطا در ارسال پیام.", "error");
+            }
         }
         
+        // NEW: Soft-deletes a message
         async function deleteLobbyMessage(lobbyId, messageId) {
             const messageRef = doc(db, `global_lobbies/${lobbyId}/messages`, messageId);
-            try { await updateDoc(messageRef, { text: "[این پیام حذف شده است]", isDeleted: true }); }
-            catch (error) { console.error("Error deleting message:", error); showMessageBox("خطا در حذف پیام.", "error"); }
+            try {
+                await updateDoc(messageRef, {
+                    text: "[این پیام حذف شده است]",
+                    isDeleted: true
+                });
+            } catch (error) {
+                console.error("Error deleting message:", error);
+                showMessageBox("خطا در حذف پیام.", "error");
+            }
         }
 
         function setupLobbyChatListener(lobbyId, hostId) {
@@ -2548,47 +2327,260 @@
             return onSnapshot(q, (snapshot) => {
                 lobbyChatMessages.innerHTML = '';
                 snapshot.forEach(doc => {
-                    const messageData = doc.data(); const messageId = doc.id;
+                    const messageData = doc.data();
+                    const messageId = doc.id;
                     const isCurrentUserMsg = messageData.senderUid === auth.currentUser.uid;
                     const isCurrentUserHost = auth.currentUser.uid === hostId;
+
                     const canDelete = !messageData.isDeleted && (isCurrentUserMsg || isCurrentUserHost);
 
                     const messageDiv = document.createElement('div');
                     messageDiv.classList.add('chat-message');
-                    if (isCurrentUserMsg) { messageDiv.classList.add('current-user'); }
+                    if (isCurrentUserMsg) {
+                        messageDiv.classList.add('current-user');
+                    }
                     
-                    const deleteButtonHtml = canDelete ? `<button class="delete-message-btn" data-message-id="${messageId}" title="حذف پیام"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-trash-2"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg></button>` : '';
-                    const messageContentHtml = messageData.isDeleted ? `<p class="message-text-deleted">${messageData.text}</p>` : `<span class="sender-name">${messageData.senderName}</span><p class="message-text">${messageData.text}</p>`;
+                    const deleteButtonHtml = canDelete ? `
+                        <button class="delete-message-btn" data-message-id="${messageId}" title="حذف پیام">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-trash-2"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg>
+                        </button>
+                    ` : '';
 
-                    messageDiv.innerHTML = `<div class="chat-message-content">${messageContentHtml}</div>${deleteButtonHtml}`;
+                    const messageContentHtml = messageData.isDeleted ? `
+                        <p class="message-text-deleted">${messageData.text}</p>
+                    ` : `
+                        <span class="sender-name">${messageData.senderName}</span>
+                        <p class="message-text">${messageData.text}</p>
+                    `;
+
+                    messageDiv.innerHTML = `
+                        <div class="chat-message-content">
+                            ${messageContentHtml}
+                        </div>
+                        ${deleteButtonHtml}
+                    `;
                     lobbyChatMessages.appendChild(messageDiv);
                 });
+                // Auto-scroll to the bottom
                 lobbyChatMessages.scrollTop = lobbyChatMessages.scrollHeight;
-            }, (error) => { console.error("Lobby chat listener error:", error); });
+            }, (error) => {
+                console.error("Lobby chat listener error:", error);
+                console.warn("Could not load chat messages:", error.message);
+            });
         }
         
-        // --- Game Logic Functions (Placeholders) ---
-        async function initializeGameInFirestore(lobbyId, lobbyData) { /* ... implementation unchanged ... */ }
-        function setupGameListener(lobbyId) { /* ... implementation unchanged ... */ }
-        function renderGameScreen(lobbyData) { /* ... implementation unchanged ... */ }
-        function createCardElement(cardStr, isBack) { /* ... implementation unchanged ... */ }
+        // --- Game Logic Functions (NEW) ---
+
+        function createShuffledDeck() {
+            const suits = ['H', 'D', 'C', 'S']; // Hearts, Diamonds, Clubs, Spades
+            const ranks = ['2', '3', '4', '5', '6', '7', '8', '9', 'T', 'J', 'Q', 'K', 'A'];
+            const deck = [];
+            for (const suit of suits) {
+                for (const rank of ranks) {
+                    deck.push(rank + suit); // Swapped to Rank+Suit for easier parsing
+                }
+            }
+            // Fisher-Yates Shuffle
+            for (let i = deck.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [deck[i], deck[j]] = [deck[j], deck[i]];
+            }
+            return deck;
+        }
+
+        async function initializeGameInFirestore(lobbyId, lobbyData) {
+            const deck = createShuffledDeck();
+            const playerUIDs = Object.keys(lobbyData.players);
+            
+            const hands = {};
+            playerUIDs.forEach((uid, index) => {
+                hands[uid] = deck.slice(index * 13, (index + 1) * 13);
+            });
+
+            const hakem = lobbyData.hostId;
+
+            const initialGameState = {
+                players: playerUIDs,
+                playerNames: lobbyData.players, // Map of uid -> displayName
+                hakem: hakem,
+                currentTurn: hakem,
+                phase: 'CHOOSE_HOKM',
+                hokmSuit: null,
+                hands: hands,
+                currentTrick: [],
+                scores: { team1: 0, team2: 0 },
+                roundPoints: { team1: 0, team2: 0 },
+            };
+
+            const lobbyRef = doc(db, 'global_lobbies', lobbyId);
+            try {
+                await updateDoc(lobbyRef, {
+                    gameState: initialGameState,
+                    status: "playing"
+                });
+                console.log(`Game state initialized for lobby ${lobbyId}`);
+            } catch (error) {
+                console.error("Error initializing game state:", error);
+                await updateDoc(lobbyRef, { status: "waiting" }); // Revert on failure
+                throw new Error("Failed to initialize game.");
+            }
+        }
+        
+        function setupGameListener(lobbyId) {
+            console.log(`Listening to game state for lobby ID: ${lobbyId}`);
+            if (unsubscribeLobbyDetail) { unsubscribeLobbyDetail(); unsubscribeLobbyDetail = null; }
+            const lobbyRef = doc(db, `global_lobbies`, lobbyId);
+            return onSnapshot(lobbyRef, (docSnap) => {
+                if (docSnap.exists() && docSnap.data().gameState) {
+                    const lobbyData = docSnap.data();
+                    renderGameScreen(lobbyData);
+                } else {
+                    showMessageBox("بازی مورد نظر پایان یافت یا با خطا مواجه شد.", "info");
+                    setActiveScreen(lobbyScreen);
+                    unsubscribeLobbies = setupLobbyListener('');
+                }
+            }, (error) => {
+                console.error("Game state listener error:", error);
+                showMessageBox("ارتباط با بازی قطع شد.", "error");
+                setActiveScreen(lobbyScreen);
+                unsubscribeLobbies = setupLobbyListener('');
+            });
+        }
+
+        function renderGameScreen(lobbyData) {
+            const gameState = lobbyData.gameState;
+            const myUid = auth.currentUser.uid;
+            
+            // Find my position in the game
+            const myIndex = gameState.players.indexOf(myUid);
+            if (myIndex === -1) {
+                console.error("Current user not found in game players list!");
+                // Possibly kicked during game start transition, or an error occurred.
+                leaveGameBtn.click(); // Force leave
+                return;
+            }
+
+            // Define positions relative to me
+            const positions = ['bottom', 'left', 'top', 'right'];
+            const slotMap = {}; // Maps UID to slot name ('bottom', 'left', etc.)
+            gameState.players.forEach((uid, index) => {
+                const relativeIndex = (index - myIndex + 4) % 4;
+                slotMap[uid] = positions[relativeIndex];
+            });
+
+            // Render player names and turn indicator
+            for (const uid in slotMap) {
+                const slotName = slotMap[uid];
+                const slotElement = playerSlots[slotName];
+                const nameDisplay = slotElement.querySelector('.player-name-display');
+                nameDisplay.textContent = gameState.playerNames[uid];
+
+                // Clear previous active turns before setting the new one
+                Object.values(playerSlots).forEach(slot => slot.classList.remove('active-turn'));
+
+                if (uid === gameState.currentTurn) {
+                    slotElement.classList.add('active-turn');
+                }
+            }
+
+            // Render hands
+            for (const uid in gameState.hands) {
+                const hand = gameState.hands[uid];
+                const slotName = slotMap[uid];
+                if (!slotName) continue; // Skip if player not in slot map (e.g., left game)
+
+                const handContainer = playerSlots[slotName].querySelector('.player-hand');
+                handContainer.innerHTML = ''; // Clear old cards
+
+                /*
+                // --- CARD RENDERING LOGIC DISABLED AS PER INSTRUCTIONS ---
+                if (uid === myUid) {
+                    // My hand - face up
+                    hand.sort(); // Sort my hand for better view
+                    hand.forEach(cardStr => {
+                        handContainer.appendChild(createCardElement(cardStr, false));
+                    });
+                } else {
+                    // Others' hands - face down
+                    hand.forEach(() => {
+                        handContainer.appendChild(createCardElement(null, true));
+                    });
+                }
+                */
+            }
+             // TODO: Render scores, hokm, and play area later
+        }
+
+        function createCardElement(cardStr, isBack) {
+            const cardDiv = document.createElement('div');
+            cardDiv.className = 'card';
+            
+            if (isBack) {
+                cardDiv.classList.add('back');
+                return cardDiv;
+            }
+
+            const suitMap = { 'S': '♠', 'H': '♥', 'D': '♦', 'C': '♣' };
+            const colorMap = { 'S': 'black', 'H': 'red', 'D': 'red', 'C': 'black' };
+
+            const rank = cardStr.substring(0, cardStr.length - 1);
+            const suitChar = cardStr.slice(-1);
+            const suitSymbol = suitMap[suitChar];
+            const color = colorMap[suitChar];
+
+            cardDiv.classList.add(color);
+            cardDiv.dataset.card = cardStr;
+
+            cardDiv.innerHTML = `
+                <div class="card-suit top">${suitSymbol}</div>
+                <div class="card-rank">${rank}</div>
+                <div class="card-suit bottom">${suitSymbol}</div>
+            `;
+            return cardDiv;
+        }
 
 
         // --- Event Listeners ---
         // Auth, Profile, Modals, Lobby List
-        loginToggleBtn.addEventListener('click', () => { authMode = 'login'; displayNameField.classList.add('hidden'); submitAuthBtn.textContent = 'ورود'; submitAuthBtn.classList.remove('hidden'); loginToggleBtn.classList.add('hidden'); registerToggleBtn.classList.remove('hidden'); emailInput.focus(); authForm.reset(); });
+        loginToggleBtn.addEventListener('click', () => {
+            authMode = 'login';
+            displayNameField.classList.add('hidden');
+            submitAuthBtn.textContent = 'ورود';
+            submitAuthBtn.classList.remove('hidden');
+            loginToggleBtn.classList.add('hidden');
+            registerToggleBtn.classList.remove('hidden');
+            emailInput.focus();
+            authForm.reset();
+        });
+
+        registerToggleBtn.addEventListener('click', () => {
+            authMode = 'register';
+            displayNameField.classList.remove('hidden');
+            submitAuthBtn.textContent = 'ثبت نام';
+            submitAuthBtn.classList.remove('hidden');
+            registerToggleBtn.classList.add('hidden');
+            loginToggleBtn.classList.remove('hidden');
+            emailInput.focus();
+            authForm.reset();
+        });
+
         authForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            const email = emailInput.value.trim(), password = passwordInput.value.trim(), displayName = displayNameInput.value.trim();
+            const email = emailInput.value.trim();
+            const password = passwordInput.value.trim();
+            const displayName = displayNameInput.value.trim();
+
             if (!email || !password) { showMessageBox("لطفاً ایمیل و رمز عبور را وارد کنید.", 'error'); return; }
             if (authMode === 'register' && !displayName) { showMessageBox("لطفاً نام نمایشی را وارد کنید.", 'error'); return; }
             if (authMode === 'register' && password.length < 6) { showMessageBox("رمز عبور باید حداقل ۶ کاراکتر باشد.", "error"); return; }
+
             try {
-                if (authMode === 'login') { await signInWithEmailAndPassword(auth, email, password); } 
-                else {
+                if (authMode === 'login') {
+                    await signInWithEmailAndPassword(auth, email, password);
+                } else {
                     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
                     const userDocRef = doc(db, `artifacts/${appId}/users/${userCredential.user.uid}/profile/data`);
-                    await setDoc(userDocRef, { displayName: displayName, email: email, friends: [] }); // Initialize friends array
+                    await setDoc(userDocRef, { displayName: displayName, email: email }, { merge: true });
                 }
             } catch (error) { showMessageBox(getFirebaseErrorMessage(error.code), 'error'); }
         });
@@ -2597,14 +2589,40 @@
         profileSummary.addEventListener('click', openProfileModal);
         closeProfileModalBtn.addEventListener('click', closeProfileModal);
         profileModal.addEventListener('click', (e) => e.target === profileModal && closeProfileModal());
-        profileLogoutBtn.addEventListener('click', async () => { try { await signOut(auth); closeProfileModal(); } catch (error) { showMessageBox(getFirebaseErrorMessage(error.code), 'error'); } });
-        friendlyGameBtn.addEventListener('click', () => { if (!auth.currentUser) { showMessageBox("برای مشاهده لابی‌ها، ابتدا وارد شوید.", "error"); return; } setActiveScreen(lobbyScreen); unsubscribeLobbies = setupLobbyListener(''); });
+        
+        profileLogoutBtn.addEventListener('click', async () => {
+            try { await signOut(auth); closeProfileModal(); } catch (error) { showMessageBox(getFirebaseErrorMessage(error.code), 'error'); }
+        });
+
+        friendlyGameBtn.addEventListener('click', () => {
+            if (!auth.currentUser) { showMessageBox("برای مشاهده لابی‌ها، ابتدا وارد شوید.", "error"); return; }
+            setActiveScreen(lobbyScreen);
+            unsubscribeLobbies = setupLobbyListener('');
+        });
+        
         ratedGameBtn.addEventListener('click', () => showMessageBox("بازی امتیازی به زودی!", "info"));
-        backToMainBtn.addEventListener('click', () => { setActiveScreen(mainScreen); if (unsubscribeLobbies) unsubscribeLobbies(); if (unsubscribeLobbyDetail) unsubscribeLobbyDetail(); if (unsubscribeLobbyChat) unsubscribeLobbyChat(); if (unsubscribeGame) unsubscribeGame(); unsubscribeLobbies = unsubscribeLobbyDetail = unsubscribeLobbyChat = unsubscribeGame = null; });
-        addIconBtn.addEventListener('click', () => { if (!auth.currentUser) { showMessageBox("برای ساخت لابی، ابتدا وارد شوید.", "error"); return; } if (userHasActiveLobby) { showMessageBox("شما از قبل در یک لابی فعال هستید.", "info"); return; } openCreateLobbyModal(); });
+
+        backToMainBtn.addEventListener('click', () => {
+            setActiveScreen(mainScreen);
+            if (unsubscribeLobbies) unsubscribeLobbies();
+            if (unsubscribeLobbyDetail) unsubscribeLobbyDetail();
+            if (unsubscribeLobbyChat) unsubscribeLobbyChat();
+            if (unsubscribeGame) unsubscribeGame();
+            unsubscribeLobbies = unsubscribeLobbyDetail = unsubscribeLobbyChat = unsubscribeGame = null;
+        });
+
+        addIconBtn.addEventListener('click', () => {
+            if (!auth.currentUser) { showMessageBox("برای ساخت لابی، ابتدا وارد شوید.", "error"); return; }
+            if (userHasActiveLobby) { showMessageBox("شما از قبل در یک لابی فعال هستید.", "info"); return; }
+            openCreateLobbyModal();
+        });
+        
         createLobbyForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            const lobbyName = newLobbyNameInput.value.trim(); const lobbyType = document.querySelector('input[name="lobby-type"]:checked').value; const password = newLobbyPasswordInput.value;
+            const lobbyName = newLobbyNameInput.value.trim();
+            const lobbyType = document.querySelector('input[name="lobby-type"]:checked').value;
+            const password = newLobbyPasswordInput.value;
+        
             if (!lobbyName) { showCreateLobbyMessageBox("لطفاً نام لابی را وارد کنید.", "error"); return; }
             if (lobbyType === 'private' && password.length < 4) { showCreateLobbyMessageBox("رمز عبور برای لابی خصوصی باید حداقل ۴ کاراکتر باشد.", "error"); return; }
             if (!auth.currentUser || !currentUserData?.displayName) { showCreateLobbyMessageBox("مشکلی در اطلاعات کاربری شما وجود دارد.", "error"); return; }
@@ -2654,12 +2672,7 @@
             }, 1000);
         });
 
-        // NEW: Event listener for the new "Friends List" button
-        friendsListBtn.addEventListener('click', () => {
-             if (!auth.currentUser) { showMessageBox("برای مشاهده دوستان، ابتدا وارد شوید.", "error"); return; }
-             openFriendsListModal();
-        });
-
+        myLobbiesBtn.addEventListener('click', () => showMessageBox("لابی‌های من به زودی!", "info"));
         lobbySearchInput.addEventListener('input', (e) => {
             if (unsubscribeLobbies) unsubscribeLobbies();
             unsubscribeLobbies = setupLobbyListener(e.target.value.trim().toLowerCase());
@@ -2688,6 +2701,7 @@
             }
         });
         
+        // NEW: Toggle Chat Lock Listener
         toggleChatLockBtn.addEventListener('click', async () => {
             if (!currentLobbyId || !auth.currentUser) return;
             const lobbyRef = doc(db, 'global_lobbies', currentLobbyId);
@@ -2702,33 +2716,6 @@
                 showMessageBox("خطا در تغییر وضعیت چت.", "error");
             }
         });
-
-        playerListContainer.addEventListener('click', async (e) => {
-            const playerInfoWrapper = e.target.closest('.player-info-wrapper');
-            if (playerInfoWrapper) {
-                const targetUid = playerInfoWrapper.dataset.playerUid;
-                if (targetUid && targetUid !== auth.currentUser.uid) {
-                    try {
-                        const userDocRef = doc(db, `artifacts/${appId}/users/${targetUid}/profile/data`);
-                        const userDoc = await getDoc(userDocRef);
-                        if(userDoc.exists()) {
-                             const userData = userDoc.data();
-                             openPlayerInfoModal({
-                                uid: targetUid,
-                                displayName: userData.displayName,
-                                email: userData.email
-                            });
-                        } else {
-                            showMessageBox("اطلاعات بازیکن یافت نشد.", "error");
-                        }
-                    } catch (error) {
-                        console.error("Error fetching player details:", error);
-                        showMessageBox("خطا در دریافت اطلاعات بازیکن.", "error");
-                    }
-                }
-            }
-        });
-
 
         // Kick/Unkick related
         kickPlayerConfirmBtn.addEventListener('click', () => kickedPlayerToProcess && kickPlayer(currentLobbyId, kickedPlayerToProcess.uid, kickedPlayerToProcess.displayName));
@@ -2755,13 +2742,20 @@
             passwordPromptLobbyName.textContent = lobbyName;
             enterPasswordForm.reset();
             passwordPromptMessageBox.classList.add('hidden');
-            openModal(enterPasswordModal);
+            enterPasswordModal.classList.remove('hidden');
+            void enterPasswordModal.offsetWidth;
+            enterPasswordModal.classList.add('profile-modal-enter-active');
             joinLobbyPasswordInput.focus();
         }
 
         function closeEnterPasswordModal() {
-            closeModal(enterPasswordModal);
-            lobbyToJoin = null;
+            enterPasswordModal.classList.remove('profile-modal-enter-active');
+            enterPasswordModal.classList.add('profile-modal-leave-active');
+            setTimeout(() => {
+                enterPasswordModal.classList.add('hidden');
+                enterPasswordModal.classList.remove('profile-modal-leave-active');
+                lobbyToJoin = null;
+            }, 300);
         }
 
         lobbyTypeToggle.addEventListener('change', (e) => {
@@ -2825,6 +2819,7 @@
             }
         });
 
+        // NEW: Event Delegation for Message Deletion
         lobbyChatMessages.addEventListener('click', (e) => {
             const deleteButton = e.target.closest('.delete-message-btn');
             if (deleteButton) {
@@ -2835,56 +2830,7 @@
             }
         });
 
-        // Friend Request System Event Listeners
-        lobbyFriendRequestBtn.addEventListener('click', openFriendRequestsModal); // Changed from friendRequestBtn
-        closeFriendRequestsModalBtn.addEventListener('click', closeFriendRequestsModal);
-        friendRequestsOkBtn.addEventListener('click', closeFriendRequestsModal);
-        friendRequestsModal.addEventListener('click', (e) => e.target === friendRequestsModal && closeFriendRequestsModal());
-
-        friendRequestsListContent.addEventListener('click', (e) => {
-            const acceptBtn = e.target.closest('.accept-friend-btn');
-            const rejectBtn = e.target.closest('.reject-friend-btn');
-            if (acceptBtn) {
-                acceptBtn.disabled = true;
-                acceptFriendRequest(acceptBtn.dataset.senderUid);
-            } else if (rejectBtn) {
-                rejectBtn.disabled = true;
-                rejectFriendRequest(rejectBtn.dataset.senderUid);
-            }
-        });
-        
-        closePlayerInfoModalBtn.addEventListener('click', closePlayerInfoModal);
-        playerInfoModal.addEventListener('click', (e) => e.target === playerInfoModal && closePlayerInfoModal());
-        sendFriendRequestBtn.addEventListener('click', (e) => {
-            const targetUid = e.currentTarget.dataset.playerUid;
-            if(targetUid) {
-                sendFriendRequest(targetUid);
-            }
-        });
-        
-        // --- NEW EVENT LISTENERS FOR FRIENDS LIST MODALS ---
-        
-        closeFriendsListModalBtn.addEventListener('click', closeFriendsListModal);
-        friendsListModal.addEventListener('click', (e) => e.target === friendsListModal && closeFriendsListModal());
-        
-        // Event delegation to handle clicks on friends in the list
-        friendsListContent.addEventListener('click', (e) => {
-            const friendItem = e.target.closest('.friend-list-item');
-            if (friendItem) {
-                const friendUid = friendItem.dataset.friendUid;
-                const friendData = friendsDetailedData.find(f => f.uid === friendUid);
-                if (friendData) {
-                    openFriendProfileModal(friendData);
-                }
-            }
-        });
-
-        closeFriendProfileModalBtn.addEventListener('click', closeFriendProfileModal);
-        friendProfileModal.addEventListener('click', (e) => e.target === friendProfileModal && closeFriendProfileModal());
-        removeFriendBtn.addEventListener('click', removeFriend);
-
-
-        // Game Screen Event Listeners
+        // NEW: Game Screen Event Listeners
         leaveGameBtn.addEventListener('click', async () => {
             if (!currentLobbyId || !auth.currentUser) return;
 
@@ -2895,10 +2841,15 @@
             const lobbySnap = await getDoc(lobbyRef);
 
             if (lobbySnap.exists() && lobbySnap.data().hostId === auth.currentUser.uid) {
+                // Host leaves, delete the entire lobby/game
                 await deleteDoc(lobbyRef);
             } else {
+                // A player leaves. For now, we'll just delete the lobby as well.
+                // A more advanced implementation would replace the player with a bot or end the game.
                 await deleteDoc(lobbyRef);
             }
+
+            // All players will be kicked back to lobby screen by their listeners
         });
 
         // Initialize the app when the window loads
