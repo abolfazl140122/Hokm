@@ -1,5 +1,3 @@
---- START OF FILE index.html ---
-
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
@@ -43,6 +41,7 @@
                                class="w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
                                required>
                     </div>
+                    <!-- Toggle buttons for Auth mode -->
                     <div class="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4 sm:space-x-reverse mt-6">
                         <button type="button" id="login-toggle-btn"
                                 class="w-full sm:w-1/2 classic-btn btn-blue-classic text-xl sm:text-2xl">
@@ -53,19 +52,24 @@
                             ثبت نام
                         </button>
                     </div>
+                    <!-- Main submit button, text changes based on authMode -->
                     <button type="submit" id="submit-auth-btn"
                             class="w-full mt-4 classic-btn btn-purple-classic text-xl sm:text-2xl hidden">
                         ادامه
                     </button>
                 </form>
+                <!-- Message box for user feedback -->
                 <div id="message-box" class="mt-5 p-3.5 rounded-xl text-base text-center hidden" role="alert"></div>
             </div>
         </div>
 
         <!-- 3. Main Screen -->
         <div id="main-screen" class="hidden absolute inset-0 flex flex-col z-30 page-transition-active page-transition-hidden" tabindex="-1">
+            <!-- Header for Main Screen - Fixed at top -->
             <header class="app-header">
+                <!-- User Info and ID - Aligned Right (for RTL) -->
                 <div id="profile-summary" class="flex items-center space-x-2 space-x-reverse cursor-pointer p-2 rounded-lg hover:bg-gray-700 transition-colors duration-200" title="مشاهده پروفایل">
+                     <!-- User icon SVG -->
                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-user-circle">
                         <circle cx="12" cy="12" r="10"/><circle cx="12" cy="10" r="3"/><path d="M7 20.662V19a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v1.662"/>
                     </svg>
@@ -74,21 +78,29 @@
                         <span id="header-user-id" class="text-xs text-gray-300 break-all">ID: ---</span>
                     </div>
                 </div>
+                <!-- Hamburger Menu Icon - Aligned Left (for RTL) -->
                 <button id="menu-btn" class="text-white text-3xl p-2 rounded-full hover:bg-gray-700 transition-colors duration-200">
+                    <!-- Hamburger icon SVG -->
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-menu">
                         <line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/>
                     </svg>
                 </button>
             </header>
+
+            <!-- Main Content Area - Scrollable between fixed header and footer -->
             <div class="main-content-area">
-                <h1 class="text-4xl text-yellow-300 font-bold mb-8">به بازی خوش آمدید!</h1>
+                <!-- This area is now empty, ready for future game visuals/elements -->
+                <h1 class="text-4xl text-yellow-300 font-bold mb-8">به بازی حکم خوش آمدید!</h1>
                 <p class="text-lg text-gray-300">لطفاً یکی از گزینه‌های زیر را انتخاب کنید.</p>
             </div>
+
+            <!-- Footer Navigation - Fixed at bottom -->
             <footer class="app-footer">
                 <button id="friendly-game-btn"
                         class="classic-btn btn-purple-classic text-base sm:text-lg w-1/2 mx-2 py-3.5 px-4">
                     بازی دوستانه
                 </button>
+                <!-- Placeholder for other main buttons like 'Rated Game' -->
                 <button id="rated-game-btn"
                         class="classic-btn btn-brown-classic text-base sm:text-lg w-1/2 mx-2 py-3.5 px-4">
                     بازی امتیازی
@@ -96,31 +108,39 @@
             </footer>
         </div>
 
-        <!-- 4. Lobby Screen -->
+        <!-- 4. Lobby Screen (صفحه جدید برای لابی‌ها) -->
         <div id="lobby-screen" class="hidden absolute inset-0 flex flex-col z-30 page-transition-active page-transition-hidden" tabindex="-1">
+            <!-- Header for Lobby Screen -->
             <header class="lobby-header">
                 <div class="search-container">
                     <button id="back-to-main-btn" class="p-1">
+                        <!-- Right arrow icon for back (in RTL, it points left visually) -->
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-right">
                             <path d="M5 12h14"/><path d="m12 5 7 7-7 7"/>
                         </svg>
                     </button>
                     <input type="text" id="lobby-search-input" placeholder="جستجو بر اساس نام لابی، سازنده یا سناریو" class="flex-grow text-sm">
                     <button id="search-lobbies-btn" class="p-1">
+                        <!-- Search icon -->
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-search">
                             <circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>
                         </svg>
                     </button>
                 </div>
             </header>
+
+            <!-- Main Content Area for Lobby Screen -->
             <div class="main-content-area p-4 sm:p-6 text-center">
                 <div class="max-w-xl mx-auto space-y-6 w-full">
                     <h2 class="text-xl sm:text-2xl font-bold text-white mb-4">لیست لابی‌های فعال</h2>
                     <div id="lobbies-list" class="space-y-3 w-full">
+                        <!-- Lobby items will be dynamically loaded here by JavaScript -->
                         <p class="text-gray-400">در حال بارگذاری لابی‌ها...</p>
                     </div>
                 </div>
             </div>
+
+            <!-- Footer for Lobby Screen -->
             <footer class="lobby-footer">
                 <button id="add-icon-btn" class="icon-btn">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-plus-square">
@@ -147,7 +167,7 @@
             </footer>
         </div>
 
-        <!-- 5. Profile Modal -->
+        <!-- 5. Profile Modal (Hidden by default) -->
         <div id="profile-modal" class="hidden fixed inset-0 flex justify-center items-center z-50 profile-modal-overlay">
             <div class="classic-card profile-modal-content p-6 sm:p-8 w-11/12 max-w-md text-center relative">
                 <h2 class="text-2xl sm:text-3xl font-bold mb-6">پروفایل کاربری</h2>
@@ -160,6 +180,7 @@
                     <p><strong>نام نمایشی:</strong> <span id="profile-display-name">---</span></p>
                     <p><strong>ایمیل:</strong> <span id="profile-email">---</span></p>
                     <p><strong>شناسه کاربر (UID):</strong> <span id="profile-uid" class="break-all text-sm text-gray-400">---</span></p>
+                    <!-- Add more profile stats here later (e.g., wins, losses) -->
                 </div>
                 <button id="profile-logout-btn"
                         class="w-full classic-btn btn-red-classic text-lg sm:text-xl">
@@ -168,7 +189,7 @@
             </div>
         </div>
 
-        <!-- 6. Create Lobby Input Modal -->
+        <!-- 6. Create Lobby Input Modal (NEW) -->
         <div id="create-lobby-modal" class="hidden fixed inset-0 flex justify-center items-center z-50 profile-modal-overlay">
             <div class="classic-card profile-modal-content p-6 sm:p-8 w-11/12 max-w-md text-center relative">
                 <h2 class="text-2xl sm:text-3xl font-bold mb-6">ساخت لابی جدید</h2>
@@ -179,18 +200,12 @@
                 </button>
                 <form id="create-lobby-form" class="space-y-5">
                     <div>
-                        <input type="text" id="new-lobby-name-input" placeholder="نام لابی شما" class="w-full" required>
+                        <input type="text" id="new-lobby-name-input" placeholder="نام لابی شما"
+                               class="w-full focus:outline-none focus:ring-2 focus:ring-green-500"
+                               required>
                     </div>
-                    <!-- NEW: Game Duration Setting -->
-                    <div>
-                        <label for="game-duration-select" class="block text-white text-lg mb-2">مدت زمان بازی:</label>
-                        <select id="game-duration-select" class="w-full text-center">
-                            <option value="180">۳ دقیقه</option>
-                            <option value="300" selected>۵ دقیقه</option>
-                            <option value="420">۷ دقیقه</option>
-                            <option value="600">۱۰ دقیقه</option>
-                        </select>
-                    </div>
+        
+                    <!-- NEW: Lobby Type Toggle (Public/Private) -->
                     <div class="flex justify-center space-x-2 space-x-reverse my-4" id="lobby-type-toggle">
                         <label class="cursor-pointer">
                             <input type="radio" name="lobby-type" value="public" class="sr-only" checked>
@@ -201,14 +216,19 @@
                             <span class="lobby-type-btn">خصوصی</span>
                         </label>
                     </div>
+        
+                    <!-- NEW: Password field for private lobbies (initially hidden) -->
                     <div id="new-lobby-password-field" class="hidden relative">
-                        <input type="password" id="new-lobby-password-input" placeholder="رمز عبور لابی (حداقل ۴ کاراکتر)" class="w-full pr-10">
+                        <input type="password" id="new-lobby-password-input" placeholder="رمز عبور لابی (حداقل ۴ کاراکتر)"
+                               class="w-full focus:outline-none focus:ring-2 focus:ring-green-500 pr-10">
                         <button type="button" id="toggle-password-visibility" class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white">
-                           <svg id="eye-icon-open" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-eye"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
-                           <svg id="eye-icon-closed" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-eye-off" style="display: none;"><path d="M9.88 9.88a3 3 0 1 0 4.24 4.24"/><path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"/><path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61"/><line x1="2" x2="22" y1="2" y2="22"/></svg>
+                            <svg id="eye-icon-open" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-eye"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+                            <svg id="eye-icon-closed" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-eye-off" style="display: none;"><path d="M9.88 9.88a3 3 0 1 0 4.24 4.24"/><path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"/><path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61"/><line x1="2" x2="22" y1="2" y2="22"/></svg>
                         </button>
                     </div>
-                    <button type="submit" id="submit-create-lobby-btn" class="w-full mt-4 classic-btn btn-green-classic text-xl sm:text-2xl">
+        
+                    <button type="submit" id="submit-create-lobby-btn"
+                            class="w-full mt-4 classic-btn btn-green-classic text-xl sm:text-2xl">
                         ساخت لابی
                     </button>
                 </form>
@@ -228,24 +248,37 @@
             </div>
         </div>
 
-        <!-- 8. Lobby Detail Screen -->
+        <!-- 8. Lobby Detail Screen (REDESIGNED) -->
         <div id="lobby-detail-screen" class="hidden absolute inset-0 z-30 page-transition-active page-transition-hidden lobby-detail-screen-full" tabindex="-1">
             <div class="lobby-detail-content">
+                
+                <!-- Sidebar: Lobby Info & Players -->
                 <div class="lobby-sidebar">
                     <h2 id="detail-lobby-name" class="text-2xl sm:text-3xl font-bold text-yellow-300 truncate">نام لابی</h2>
                     <p id="detail-host-name" class="text-md text-gray-300 mt-2">سازنده: ---</p>
                     <p id="detail-player-count" class="text-sm font-semibold text-white mb-4">بازیکنان: 0/4</p>
+                    
                     <div class="w-full h-px bg-yellow-600 mb-4"></div>
-                    <div id="player-list-container"></div>
+
+                    <div id="player-list-container">
+                        <!-- Player list items will be dynamically loaded here -->
+                    </div>
                 </div>
+
+                <!-- Main Panel: Chat & Actions -->
                 <div class="lobby-main-panel">
+                    <!-- Chat Container -->
                     <div class="lobby-chat-container">
-                        <div id="lobby-chat-messages" class="lobby-chat-messages"></div>
+                        <div id="lobby-chat-messages" class="lobby-chat-messages">
+                            <!-- Chat messages will appear here -->
+                        </div>
                         <form id="lobby-chat-form" class="lobby-chat-input-form">
                             <input type="text" id="lobby-chat-input" placeholder="پیام خود را بنویسید..." autocomplete="off">
                             <button type="submit" id="lobby-chat-send-btn" class="classic-btn btn-blue-classic text-sm py-2 px-4">ارسال</button>
                         </form>
                     </div>
+
+                    <!-- Action Buttons Footer -->
                     <div class="lobby-actions-footer">
                         <div id="host-actions-container" style="display: none;">
                             <button id="start-game-btn" class="classic-btn start-game-btn" disabled>
@@ -263,61 +296,82 @@
                         </button>
                     </div>
                 </div>
+
             </div>
         </div>
 
-        <!-- 9. Game Screen (COMPLETELY REDESIGNED) -->
-        <div id="game-screen" class="hidden absolute inset-0 z-30 flex flex-col items-center justify-start p-4 game-screen-bg" tabindex="-1">
-            <!-- Game State Overlays -->
-            <div id="game-countdown-overlay" class="absolute inset-0 bg-black bg-opacity-80 flex justify-center items-center z-50 hidden">
-                <div id="game-start-timer" class="text-8xl font-bold text-yellow-300 countdown-animation">5</div>
+        <!-- 9. Game Screen (REDESIGNED BUT INACTIVE) -->
+        <div id="game-screen" class="hidden absolute inset-0 z-30 page-transition-active page-transition-hidden flex flex-col items-center justify-center p-2" tabindex="-1">
+            <!-- Game Header: Score, Hokm, etc. -->
+            <div class="absolute top-0 left-0 right-0 h-20 bg-black bg-opacity-40 flex justify-between items-center px-4 z-20">
+                <div id="game-team-scores" class="text-white text-lg font-bold">
+                    <span>تیم ما: <span id="our-team-score" class="text-xl text-green-300">0</span></span> |
+                    <span>تیم حریف: <span id="their-team-score" class="text-xl text-red-300">0</span></span>
+                </div>
+                <div id="game-hokm-indicator" class="flex items-center space-x-2 space-x-reverse">
+                    <span class="text-xl font-bold text-yellow-300">حکم:</span>
+                    <span id="hokm-suit-icon" class="text-4xl">❓</span>
+                </div>
+                <button id="leave-game-btn" class="classic-btn btn-red-classic text-sm py-2 px-4">ترک بازی</button>
             </div>
 
-            <!-- Header -->
-            <div class="w-full flex justify-between items-center p-3 bg-black bg-opacity-50 rounded-lg mb-4">
-                <h2 id="game-lobby-name" class="text-2xl font-bold text-yellow-400">نام بازی</h2>
-                <div class="flex items-center gap-4">
-                    <div id="game-timer-display" class="text-2xl font-bold text-white bg-red-800 border-2 border-red-500 rounded-lg px-4 py-1">00:00</div>
-                    <button id="leave-game-btn" class="classic-btn btn-red-classic text-sm py-2 px-3">ترک بازی</button>
+            <!-- Main Game Table -->
+            <div id="game-table" class="relative w-[98vw] h-[85vh] max-w-[1200px] max-h-[800px] flex items-center justify-center">
+                <!-- Center play area -->
+                <div id="play-area" class="absolute w-80 h-48 flex items-center justify-center">
+                    <!-- Cards played in the current trick will appear here -->
                 </div>
-            </div>
-            
-            <!-- Main Content Area -->
-            <div class="w-full flex-grow flex gap-4 overflow-hidden">
-                <!-- Player List & Role Info -->
-                <div class="w-1/3 flex flex-col gap-4">
-                    <div id="my-role-display" class="p-4 rounded-lg text-center">
-                        <h3 class="text-lg mb-2">نقش شما</h3>
-                        <p id="my-role-text" class="text-3xl font-bold">---</p>
-                    </div>
-                    <div class="flex-grow p-4 rounded-lg bg-black bg-opacity-50">
-                        <h3 class="text-xl font-bold text-yellow-300 mb-3 text-center border-b-2 border-yellow-500 pb-2">بازیکنان حاضر</h3>
-                        <div id="game-player-list" class="space-y-3">
-                            <!-- Game players will be populated here -->
+
+                <!-- Player Slots -->
+                <div id="player-slot-bottom" class="player-slot absolute">
+                    <div class="player-area-container">
+                        <div class="player-avatar">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-user-round"><circle cx="12" cy="8" r="5"/><path d="M20 21a8 8 0 0 0-16 0"/></svg>
                         </div>
+                        <span class="player-name-display">شما</span>
+                    </div>
+                    <div class="player-hand flex justify-center">
+                        <!-- Player's cards generated by JS -->
                     </div>
                 </div>
-                
-                <!-- Chat & Voting Area -->
-                <div id="game-main-panel" class="w-2/3 flex flex-col bg-black bg-opacity-40 rounded-lg p-4">
-                    <div id="game-chat-messages" class="flex-grow overflow-y-auto mb-3 custom-scrollbar pr-2">
-                        <!-- Game messages will appear here -->
+
+                <div id="player-slot-left" class="player-slot absolute">
+                    <div class="player-hand flex justify-center">
+                         <!-- Opponent's cards (face down) -->
                     </div>
-                    <div id="game-voting-panel" class="hidden flex-grow overflow-y-auto mb-3">
-                         <h3 class="text-2xl font-bold text-center text-red-400 mb-4">زمان رای‌گیری!</h3>
-                         <p class="text-center text-white mb-4">به بازیکنی که فکر می‌کنید هوش مصنوعی است رای دهید.</p>
-                         <div id="voting-buttons-container" class="grid grid-cols-2 gap-4">
-                            <!-- Voting buttons will appear here -->
-                         </div>
+                    <div class="player-area-container">
+                        <div class="player-avatar">
+                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-user-round"><circle cx="12" cy="8" r="5"/><path d="M20 21a8 8 0 0 0-16 0"/></svg>
+                        </div>
+                        <span class="player-name-display">بازیکن ۲</span>
                     </div>
-                    <form id="game-chat-form" class="flex gap-2">
-                        <input type="text" id="game-chat-input" placeholder="پیام خود را به سبک ادبی بنویسید..." class="flex-grow" autocomplete="off">
-                        <button type="submit" id="game-chat-send-btn" class="classic-btn btn-blue-classic text-sm py-2 px-4">ارسال</button>
-                    </form>
+                </div>
+
+                <div id="player-slot-top" class="player-slot absolute">
+                     <div class="player-area-container">
+                        <div class="player-avatar">
+                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-user-round"><circle cx="12" cy="8" r="5"/><path d="M20 21a8 8 0 0 0-16 0"/></svg>
+                        </div>
+                        <span class="player-name-display">یار شما</span>
+                    </div>
+                    <div class="player-hand flex justify-center">
+                        <!-- Partner's cards (face down) -->
+                    </div>
+                </div>
+
+                <div id="player-slot-right" class="player-slot absolute">
+                    <div class="player-hand flex justify-center">
+                        <!-- Opponent's cards (face down) -->
+                    </div>
+                    <div class="player-area-container">
+                        <div class="player-avatar">
+                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-user-round"><circle cx="12" cy="8" r="5"/><path d="M20 21a8 8 0 0 0-16 0"/></svg>
+                        </div>
+                        <span class="player-name-display">بازیکن ۴</span>
+                    </div>
                 </div>
             </div>
         </div>
-
 
         <!-- 10. Kick Player Confirmation Modal -->
         <div id="kick-player-confirm-modal" class="hidden fixed inset-0 flex justify-center items-center z-50 profile-modal-overlay">
@@ -355,13 +409,14 @@
                     </svg>
                 </button>
                 <div id="kicked-players-list-content" class="space-y-4 mb-8 text-white text-left max-h-60 overflow-y-auto custom-scrollbar">
+                    <!-- Kicked players will be dynamically loaded here -->
                     <p class="text-gray-400 text-center">هیچ بازیکنی اخراج نشده است.</p>
                 </div>
                 <button id="kicked-list-ok-btn" class="w-full classic-btn btn-gray-classic">بستن</button>
             </div>
         </div>
         
-        <!-- 13. Enter Password Modal -->
+        <!-- 13. Enter Password Modal (for private lobbies) -->
         <div id="enter-password-modal" class="hidden fixed inset-0 flex justify-center items-center z-50 profile-modal-overlay">
             <div class="classic-card profile-modal-content p-6 sm:p-8 w-11/12 max-w-md text-center relative">
                 <h2 class="text-2xl sm:text-3xl font-bold mb-4">ورود به لابی خصوصی</h2>
@@ -369,7 +424,8 @@
                 <form id="enter-password-form" class="space-y-5">
                     <div>
                         <input type="password" id="join-lobby-password-input" placeholder="رمز عبور را وارد کنید"
-                               class="w-full text-center" required>
+                               class="w-full focus:outline-none focus:ring-2 focus:ring-blue-500 text-center"
+                               required>
                     </div>
                     <div class="flex justify-around space-x-4 space-x-reverse">
                         <button type="submit" id="submit-join-password-btn" class="w-1/2 classic-btn btn-green-classic">ورود</button>
@@ -380,16 +436,6 @@
             </div>
         </div>
 
-        <!-- 14. Game Result Modal (NEW) -->
-        <div id="game-result-modal" class="hidden fixed inset-0 flex justify-center items-center z-50 profile-modal-overlay">
-            <div class="classic-card profile-modal-content p-6 sm:p-8 w-11/12 max-w-md text-center relative">
-                <h2 id="result-title" class="text-3xl font-bold mb-4">پایان بازی!</h2>
-                <p id="result-winner-text" class="text-2xl mb-4"></p>
-                <p id="result-details-text" class="text-lg text-gray-300 mb-8"></p>
-                <button id="result-back-to-lobbies-btn" class="w-full classic-btn btn-blue-classic">بازگشت به لیست لابی‌ها</button>
-            </div>
-        </div>
-
     </div>
 
     <!-- Link to your external JS file -->
@@ -397,4 +443,3 @@
 
 </body>
 </html>
---- END OF FILE index.html ---
