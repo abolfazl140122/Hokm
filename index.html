@@ -3,15 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>بازی حکم کلاسیک - نسخه هوش مصنوعی</title>
+    <title>بازی حکم کلاسیک</title>
     <!-- Tailwind CSS CDN for styling -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Google Fonts for Classic Look -->
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Merriweather:wght@400;700&display=swap" rel="stylesheet">
     <!-- Link to your external CSS file -->
     <link rel="stylesheet" href="style.css">
-    <!-- Font Awesome for icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
 
@@ -302,7 +300,7 @@
             </div>
         </div>
 
-        <!-- 9. Game Screen (REDESIGNED) -->
+        <!-- 9. Game Screen (REDESIGNED BUT INACTIVE) -->
         <div id="game-screen" class="hidden absolute inset-0 z-30 page-transition-active page-transition-hidden flex flex-col items-center justify-center p-2" tabindex="-1">
             <!-- Game Header: Score, Hokm, etc. -->
             <div class="absolute top-0 left-0 right-0 h-20 bg-black bg-opacity-40 flex justify-between items-center px-4 z-20">
@@ -435,59 +433,6 @@
                     </div>
                 </form>
                 <div id="password-prompt-message-box" class="mt-5 p-3.5 rounded-xl text-base text-center hidden" role="alert"></div>
-            </div>
-        </div>
-
-        <!-- 14. Game Countdown Modal (NEW) -->
-        <div id="game-countdown" class="hidden fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-90">
-            <div class="countdown-content text-center">
-                <h2 class="text-3xl text-yellow-300 mb-4">بازی شروع می‌شود در:</h2>
-                <div class="countdown-timer text-6xl font-bold text-white"></div>
-            </div>
-        </div>
-
-        <!-- 15. Game Settings Modal (NEW) -->
-        <div id="game-settings-modal" class="hidden fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-90">
-            <div class="classic-card p-8 w-11/12 max-w-md">
-                <h2 class="text-2xl font-bold text-yellow-300 mb-4">تنظیمات بازی</h2>
-                <div class="mb-4">
-                    <label class="block text-white mb-2">زمان بازی (دقیقه):</label>
-                    <input type="number" id="game-duration-input" min="1" max="60" value="5" class="w-full p-2 rounded">
-                </div>
-                <button id="confirm-game-settings" class="classic-btn btn-green-classic w-full">تایید</button>
-            </div>
-        </div>
-
-        <!-- 16. Game Timer (NEW) -->
-        <div id="game-timer" class="hidden fixed top-4 left-4 z-40 bg-black bg-opacity-70 p-3 rounded-lg">
-            <div class="flex items-center">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-timer mr-2">
-                    <path d="M10 2h4"/>
-                    <path d="M12 14v-4"/>
-                    <path d="M4 13a8 8 0 0 1 8-7 8 8 0 1 1-5.3 14L4 17.6"/>
-                    <path d="M9 17H4v5"/>
-                </svg>
-                <span id="game-time-remaining" class="text-xl font-bold text-white">05:00</span>
-            </div>
-        </div>
-
-        <!-- 17. AI Role Indicator (NEW) -->
-        <div id="ai-role-indicator" class="hidden fixed bottom-4 left-4 z-40 bg-black bg-opacity-70 p-3 rounded-lg">
-            <div class="flex items-center">
-                <i class="fas fa-robot text-yellow-300 mr-2"></i>
-                <span class="text-white">نقش شما: <span id="player-role-text">---</span></span>
-            </div>
-        </div>
-
-        <!-- 18. Voting Screen (NEW) -->
-        <div id="voting-screen" class="hidden fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-90">
-            <div class="classic-card p-8 w-11/12 max-w-md text-center">
-                <h2 class="text-2xl font-bold text-yellow-300 mb-4">رای‌گیری</h2>
-                <p class="text-white mb-6">به نظر شما چه کسی هوش مصنوعی بود؟</p>
-                <div id="voting-options" class="space-y-3 mb-6">
-                    <!-- Voting options will be dynamically loaded here -->
-                </div>
-                <button id="submit-vote-btn" class="classic-btn btn-blue-classic w-full">ثبت رای</button>
             </div>
         </div>
 
