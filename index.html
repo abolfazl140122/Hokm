@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>بازی حکم کلاسیک</title>
+    <title>بازی شناسایی هوش مصنوعی</title>
     <!-- Tailwind CSS CDN for styling -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Google Fonts for Classic Look -->
@@ -133,7 +133,7 @@
             <div class="main-content-area p-4 sm:p-6 text-center">
                 <div class="max-w-xl mx-auto space-y-6 w-full">
                     <h2 class="text-xl sm:text-2xl font-bold text-white mb-4">لیست لابی‌های فعال</h2>
-                    <div id="lobbies-list" class="space-y-3 w-full">
+                    <div id="lobbies-list" class="space-y-3 w-full custom-scrollbar">
                         <!-- Lobby items will be dynamically loaded here by JavaScript -->
                         <p class="text-gray-400">در حال بارگذاری لابی‌ها...</p>
                     </div>
@@ -180,7 +180,6 @@
                     <p><strong>نام نمایشی:</strong> <span id="profile-display-name">---</span></p>
                     <p><strong>ایمیل:</strong> <span id="profile-email">---</span></p>
                     <p><strong>شناسه کاربر (UID):</strong> <span id="profile-uid" class="break-all text-sm text-gray-400">---</span></p>
-                    <!-- Add more profile stats here later (e.g., wins, losses) -->
                 </div>
                 <button id="profile-logout-btn"
                         class="w-full classic-btn btn-red-classic text-lg sm:text-xl">
@@ -205,7 +204,6 @@
                                required>
                     </div>
         
-                    <!-- Lobby Type Toggle (Public/Private) -->
                     <div class="flex justify-center space-x-2 space-x-reverse my-4" id="lobby-type-toggle">
                         <label class="cursor-pointer">
                             <input type="radio" name="lobby-type" value="public" class="sr-only" checked>
@@ -217,7 +215,6 @@
                         </label>
                     </div>
         
-                    <!-- Password field for private lobbies (initially hidden) -->
                     <div id="new-lobby-password-field" class="hidden relative">
                         <input type="password" id="new-lobby-password-input" placeholder="رمز عبور لابی (حداقل ۴ کاراکتر)"
                                class="w-full focus:outline-none focus:ring-2 focus:ring-green-500 pr-10">
@@ -227,7 +224,6 @@
                         </button>
                     </div>
                     
-                    <!-- NEW: Game Duration Setting -->
                      <div class="text-white text-right">
                         <label for="game-duration-select" class="block mb-2 text-lg">مدت زمان بازی:</label>
                         <select id="game-duration-select" class="w-full text-center">
@@ -262,67 +258,42 @@
         <!-- 8. Lobby Detail Screen -->
         <div id="lobby-detail-screen" class="hidden absolute inset-0 z-30 page-transition-active page-transition-hidden lobby-detail-screen-full" tabindex="-1">
             <div class="lobby-detail-content">
-                
-                <!-- Sidebar: Lobby Info & Players -->
                 <div class="lobby-sidebar">
                     <h2 id="detail-lobby-name" class="text-2xl sm:text-3xl font-bold text-yellow-300 truncate">نام لابی</h2>
                     <p id="detail-host-name" class="text-md text-gray-300 mt-2">سازنده: ---</p>
                     <p id="detail-player-count" class="text-sm font-semibold text-white mb-4">بازیکنان: 0/4</p>
-                    
                     <div class="w-full h-px bg-yellow-600 mb-4"></div>
-
-                    <div id="player-list-container">
-                        <!-- Player list items will be dynamically loaded here -->
-                    </div>
+                    <div id="player-list-container" class="custom-scrollbar"></div>
                 </div>
-
-                <!-- Main Panel: Chat & Actions -->
                 <div class="lobby-main-panel">
-                    <!-- Chat Container -->
                     <div class="lobby-chat-container">
-                        <div id="lobby-chat-messages" class="lobby-chat-messages">
-                            <!-- Chat messages will appear here -->
-                        </div>
+                        <div id="lobby-chat-messages" class="lobby-chat-messages custom-scrollbar"></div>
                         <form id="lobby-chat-form" class="lobby-chat-input-form">
                             <input type="text" id="lobby-chat-input" placeholder="پیام خود را بنویسید..." autocomplete="off">
                             <button type="submit" id="lobby-chat-send-btn" class="classic-btn btn-blue-classic text-sm py-2 px-4">ارسال</button>
                         </form>
                     </div>
-
-                    <!-- Action Buttons Footer -->
                     <div class="lobby-actions-footer">
                         <div id="host-actions-container" style="display: none;">
-                            <button id="start-game-btn" class="classic-btn start-game-btn" disabled>
-                                شروع بازی
-                            </button>
-                             <button id="toggle-chat-lock-btn" class="classic-btn btn-gray-classic text-sm py-2 px-4">
-                                قفل کردن چت
-                            </button>
-                            <button id="view-kicked-players-btn" class="classic-btn btn-brown-classic text-sm py-2 px-4">
-                                لیست اخراجی‌ها
-                            </button>
+                            <button id="start-game-btn" class="classic-btn start-game-btn" disabled>شروع بازی</button>
+                            <button id="toggle-chat-lock-btn" class="classic-btn btn-gray-classic text-sm py-2 px-4">قفل کردن چت</button>
+                            <button id="view-kicked-players-btn" class="classic-btn btn-brown-classic text-sm py-2 px-4">لیست اخراجی‌ها</button>
                         </div>
-                        <button id="leave-lobby-btn" class="classic-btn btn-red-classic text-sm py-2 px-4 hidden">
-                            بستن لابی
-                        </button>
+                        <button id="leave-lobby-btn" class="classic-btn btn-red-classic text-sm py-2 px-4 hidden">بستن لابی</button>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- 9. Game Screen (HOKM - INACTIVE) -->
-        <div id="game-screen" class="hidden absolute inset-0 z-30 page-transition-active page-transition-hidden flex flex-col items-center justify-center p-2" tabindex="-1">
-            <!-- ... CONTENT OF HOKM GAME SCREEN (UNCHANGED) ... -->
-        </div>
+        <!-- 9. Game Screen (HOKM - DEACTIVATED) -->
+        <div id="game-screen" class="hidden"></div>
 
         <!-- 10. Kick Player Confirmation Modal -->
         <div id="kick-player-confirm-modal" class="hidden fixed inset-0 flex justify-center items-center z-50 profile-modal-overlay">
             <div class="classic-card profile-modal-content p-6 sm:p-8 w-11/12 max-w-md text-center relative">
                 <h2 class="text-2xl sm:text-3xl font-bold mb-6 text-yellow-300">اخراج بازیکن</h2>
                 <button id="close-kick-player-confirm-modal-btn" class="absolute top-4 left-4 text-white hover:text-gray-300 transition-colors duration-200">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-x">
-                        <path d="M18 6 6 18"/><path d="m6 6 12 12"/>
-                    </svg>
+                     <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
                 </button>
                 <p class="text-lg mb-8 text-white">آیا مطمئن هستید که می‌خواهید <span id="kick-player-confirm-name" class="font-bold"></span> را از لابی اخراج کنید؟</p>
                 <div class="flex justify-around space-x-4 space-x-reverse">
@@ -346,12 +317,9 @@
             <div class="classic-card profile-modal-content p-6 sm:p-8 w-11/12 max-w-md text-center relative">
                 <h2 class="text-2xl sm:text-3xl font-bold mb-6 text-yellow-300">لیست بازیکنان اخراج شده</h2>
                 <button id="close-kicked-players-list-modal-btn" class="absolute top-4 left-4 text-white hover:text-gray-300 transition-colors duration-200">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-x">
-                        <path d="M18 6 6 18"/><path d="m6 6 12 12"/>
-                    </svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
                 </button>
                 <div id="kicked-players-list-content" class="space-y-4 mb-8 text-white text-left max-h-60 overflow-y-auto custom-scrollbar">
-                    <!-- Kicked players will be dynamically loaded here -->
                     <p class="text-gray-400 text-center">هیچ بازیکنی اخراج نشده است.</p>
                 </div>
                 <button id="kicked-list-ok-btn" class="w-full classic-btn btn-gray-classic">بستن</button>
@@ -380,41 +348,27 @@
         
         <!-- 14. NEW: AI Game Screen -->
         <div id="ai-game-screen" class="hidden absolute inset-0 z-30 page-transition-active page-transition-hidden ai-game-screen-full" tabindex="-1">
-            
-            <!-- Countdown Overlay -->
-            <div id="ai-game-countdown-overlay" class="absolute inset-0 bg-black bg-opacity-90 flex justify-center items-center z-50">
+            <div id="ai-game-countdown-overlay" class="absolute inset-0 bg-black bg-opacity-90 flex justify-center items-center z-50 hidden">
                 <div id="ai-game-countdown-timer" class="countdown-text">5</div>
             </div>
-
             <div class="ai-game-content">
-                <!-- Sidebar: Game Info, Role & Players -->
                 <div class="ai-game-sidebar">
                     <div class="game-timer-container">
                         <span class="font-bold text-lg">زمان باقی‌مانده:</span>
                         <span id="ai-game-timer" class="text-2xl font-bold text-yellow-300">--:--</span>
                     </div>
-                    
                     <div class="w-full h-px bg-yellow-600 my-4"></div>
-
                     <div class="role-display-container">
                         <p class="text-lg">نقش شما:</p>
                         <p id="ai-game-role-display" class="text-3xl font-bold text-cyan-300">درحال تعیین...</p>
                     </div>
-
                     <div class="w-full h-px bg-yellow-600 my-4"></div>
-                    
                     <h3 class="text-xl font-bold text-white mb-2">بازیکنان فعال</h3>
-                    <div id="ai-game-player-list" class="space-y-2">
-                        <!-- AI Game Player list items will be dynamically loaded here -->
-                    </div>
+                    <div id="ai-game-player-list" class="space-y-2 custom-scrollbar"></div>
                 </div>
-
-                <!-- Main Panel: Chat -->
                 <div class="ai-game-main-panel">
                     <div id="ai-game-chat-container" class="lobby-chat-container">
-                        <div id="ai-game-chat-messages" class="lobby-chat-messages">
-                             <!-- Chat messages will appear here -->
-                        </div>
+                        <div id="ai-game-chat-messages" class="lobby-chat-messages custom-scrollbar"></div>
                         <form id="ai-game-chat-form" class="lobby-chat-input-form">
                             <input type="text" id="ai-game-chat-input" placeholder="پیام خود را به لحن ادبی بنویسید..." autocomplete="off">
                             <button type="submit" id="ai-game-chat-send-btn" class="classic-btn btn-blue-classic text-sm py-2 px-4">
@@ -423,9 +377,7 @@
                             </button>
                         </form>
                     </div>
-                     <div id="ai-game-chat-status" class="text-center text-yellow-300 font-bold p-2 hidden">
-                        <!-- Status like "Voting has started" will appear here -->
-                    </div>
+                     <div id="ai-game-chat-status" class="text-center text-yellow-300 font-bold p-2 hidden"></div>
                 </div>
             </div>
         </div>
@@ -441,7 +393,6 @@
                 <button id="game-over-ok-btn" class="w-full classic-btn btn-purple-classic text-xl">بازگشت به لابی‌ها</button>
             </div>
         </div>
-
     </div>
 
     <!-- Link to your external JS file -->
