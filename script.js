@@ -22,85 +22,63 @@ const db = getFirestore(app);
 // --- Constants ---
 const GEMINI_API_KEY = "AIzaSyC3FiMyunPUaYamnJGT48NuzAhBA-BWi3w";
 const MIN_PLAYERS_TO_START = 4;
+// This MUST match the appId used in your security rules path.
+const appId = "default-app-id"; 
 
 // --- DOM Elements ---
-const loadingScreen = document.getElementById('loading-screen');
-const authScreen = document.getElementById('auth-screen');
-const mainScreen = document.getElementById('main-screen');
-const lobbyScreen = document.getElementById('lobby-screen');
-const lobbyDetailScreen = document.getElementById('lobby-detail-screen');
-const aiGameScreen = document.getElementById('ai-game-screen');
-const profileModal = document.getElementById('profile-modal');
-const createLobbyModal = document.getElementById('create-lobby-modal');
-const customConfirmModal = document.getElementById('custom-confirm-modal');
-const kickedMessageModal = document.getElementById('kicked-message-modal');
-const enterPasswordModal = document.getElementById('enter-password-modal');
-const gameOverModal = document.getElementById('game-over-modal');
-const authForm = document.getElementById('auth-form');
-const emailInput = document.getElementById('email');
-const displayNameInput = document.getElementById('display-name');
-const displayNameField = document.getElementById('display-name-field');
-const passwordInput = document.getElementById('password');
-const loginToggleBtn = document.getElementById('login-toggle-btn');
-const registerToggleBtn = document.getElementById('register-toggle-btn');
-const submitAuthBtn = document.getElementById('submit-auth-btn');
-const messageBox = document.getElementById('message-box');
-const menuBtn = document.getElementById('menu-btn');
-const profileSummary = document.getElementById('profile-summary');
-const headerDisplayName = document.getElementById('header-display-name');
-const headerUserId = document.getElementById('header-user-id');
-const friendlyGameBtn = document.getElementById('friendly-game-btn');
-const ratedGameBtn = document.getElementById('rated-game-btn');
-const closeProfileModalBtn = document.getElementById('close-profile-modal-btn');
-const profileDisplayName = document.getElementById('profile-display-name');
-const profileEmail = document.getElementById('profile-email');
-const profileUid = document.getElementById('profile-uid');
-const profileLogoutBtn = document.getElementById('profile-logout-btn');
-const backToMainBtn = document.getElementById('back-to-main-btn');
-const lobbySearchInput = document.getElementById('lobby-search-input');
-const lobbiesList = document.getElementById('lobbies-list');
-const addIconBtn = document.getElementById('add-icon-btn');
-const refreshLobbiesBtn = document.getElementById('refresh-lobbies-btn');
-const myLobbiesBtn = document.getElementById('my-lobbies-btn');
-const closeCreateLobbyModalBtn = document.getElementById('close-create-lobby-modal-btn'); 
-const createLobbyForm = document.getElementById('create-lobby-form');
-const newLobbyNameInput = document.getElementById('new-lobby-name-input');
-const createLobbyMessageBox = document.getElementById('create-lobby-message-box');
-const newLobbyPasswordInput = document.getElementById('new-lobby-password-input');
-const gameDurationSelect = document.getElementById('game-duration-select');
-const detailLobbyName = document.getElementById('detail-lobby-name');
-const detailHostName = document.getElementById('detail-host-name');
-const detailPlayerCount = document.getElementById('detail-player-count');
-const hostActionsContainer = document.getElementById('host-actions-container');
-const startGameBtn = document.getElementById('start-game-btn');
-const leaveLobbyBtn = document.getElementById('leave-lobby-btn');
-const aiGameCountdownOverlay = document.getElementById('ai-game-countdown-overlay');
-const aiGameCountdownTimer = document.getElementById('ai-game-countdown-timer');
-const aiGameTimer = document.getElementById('ai-game-timer');
-const aiGameRoleDisplay = document.getElementById('ai-game-role-display');
-const aiGamePlayerList = document.getElementById('ai-game-player-list');
-const aiGameChatForm = document.getElementById('ai-game-chat-form');
-const aiGameChatInput = document.getElementById('ai-game-chat-input');
-const aiGameChatSendBtn = document.getElementById('ai-game-chat-send-btn');
-const aiGameChatStatus = document.getElementById('ai-game-chat-status');
-const gameOverTitle = document.getElementById('game-over-title');
-const gameOverMessage = document.getElementById('game-over-message');
-const gameOverAiReveal = document.getElementById('game-over-ai-reveal');
-const gameOverAiName = document.getElementById('game-over-ai-name');
-const gameOverOkBtn = document.getElementById('game-over-ok-btn');
-const confirmTitle = document.getElementById('confirm-title');
-const confirmMessage = document.getElementById('confirm-message');
-const confirmYesBtn = document.getElementById('confirm-yes-btn');
-const confirmNoBtn = document.getElementById('confirm-no-btn');
+const screens = {
+    loading: document.getElementById('loading-screen'),
+    auth: document.getElementById('auth-screen'),
+    main: document.getElementById('main-screen'),
+    lobby: document.getElementById('lobby-screen'),
+    lobbyDetail: document.getElementById('lobby-detail-screen'),
+    aiGame: document.getElementById('ai-game-screen'),
+};
+const modals = {
+    profile: document.getElementById('profile-modal'),
+    createLobby: document.getElementById('create-lobby-modal'),
+    confirm: document.getElementById('custom-confirm-modal'),
+    kicked: document.getElementById('kicked-message-modal'),
+    password: document.getElementById('enter-password-modal'),
+    gameOver: document.getElementById('game-over-modal'),
+};
+const dom = {
+    authForm: document.getElementById('auth-form'), emailInput: document.getElementById('email'),
+    displayNameInput: document.getElementById('display-name'), displayNameField: document.getElementById('display-name-field'),
+    passwordInput: document.getElementById('password'), loginToggleBtn: document.getElementById('login-toggle-btn'),
+    registerToggleBtn: document.getElementById('register-toggle-btn'), submitAuthBtn: document.getElementById('submit-auth-btn'),
+    messageBox: document.getElementById('message-box'), menuBtn: document.getElementById('menu-btn'),
+    profileSummary: document.getElementById('profile-summary'), headerDisplayName: document.getElementById('header-display-name'),
+    headerUserId: document.getElementById('header-user-id'), friendlyGameBtn: document.getElementById('friendly-game-btn'),
+    ratedGameBtn: document.getElementById('rated-game-btn'), closeProfileModalBtn: document.getElementById('close-profile-modal-btn'),
+    profileDisplayName: document.getElementById('profile-display-name'), profileEmail: document.getElementById('profile-email'),
+    profileUid: document.getElementById('profile-uid'), profileLogoutBtn: document.getElementById('profile-logout-btn'),
+    backToMainBtn: document.getElementById('back-to-main-btn'), lobbySearchInput: document.getElementById('lobby-search-input'),
+    lobbiesList: document.getElementById('lobbies-list'), addIconBtn: document.getElementById('add-icon-btn'),
+    refreshLobbiesBtn: document.getElementById('refresh-lobbies-btn'), myLobbiesBtn: document.getElementById('my-lobbies-btn'),
+    closeCreateLobbyModalBtn: document.getElementById('close-create-lobby-modal-btn'), createLobbyForm: document.getElementById('create-lobby-form'),
+    newLobbyNameInput: document.getElementById('new-lobby-name-input'), createLobbyMessageBox: document.getElementById('create-lobby-message-box'),
+    newLobbyPasswordInput: document.getElementById('new-lobby-password-input'), gameDurationSelect: document.getElementById('game-duration-select'),
+    detailLobbyName: document.getElementById('detail-lobby-name'), detailHostName: document.getElementById('detail-host-name'),
+    detailPlayerCount: document.getElementById('detail-player-count'), hostActionsContainer: document.getElementById('host-actions-container'),
+    startGameBtn: document.getElementById('start-game-btn'), leaveLobbyBtn: document.getElementById('leave-lobby-btn'),
+    aiGameCountdownOverlay: document.getElementById('ai-game-countdown-overlay'), aiGameCountdownTimer: document.getElementById('ai-game-countdown-timer'),
+    aiGameTimer: document.getElementById('ai-game-timer'), aiGameRoleDisplay: document.getElementById('ai-game-role-display'),
+    aiGamePlayerList: document.getElementById('ai-game-player-list'), aiGameChatForm: document.getElementById('ai-game-chat-form'),
+    aiGameChatInput: document.getElementById('ai-game-chat-input'), aiGameChatSendBtn: document.getElementById('ai-game-chat-send-btn'),
+    aiGameChatStatus: document.getElementById('ai-game-chat-status'), gameOverTitle: document.getElementById('game-over-title'),
+    gameOverMessage: document.getElementById('game-over-message'), gameOverAiReveal: document.getElementById('game-over-ai-reveal'),
+    gameOverAiName: document.getElementById('game-over-ai-name'), gameOverOkBtn: document.getElementById('game-over-ok-btn'),
+    confirmTitle: document.getElementById('confirm-title'), confirmMessage: document.getElementById('confirm-message'),
+    confirmYesBtn: document.getElementById('confirm-yes-btn'), confirmNoBtn: document.getElementById('confirm-no-btn'),
+};
 
 // --- State Variables ---
 let authMode = 'login';
-let currentActiveScreen = loadingScreen;
+let currentActiveScreen = screens.loading;
 let currentUserData = null;
 let unsubscribeLobbies = null;
 let unsubscribeLobbyDetail = null;
-let unsubscribeKickedPlayers = null;
-let unsubscribeLobbyChat = null;
 let unsubscribeAiGame = null;
 let currentLobbyId = null;
 let gameTimerInterval = null;
@@ -117,21 +95,21 @@ function showCustomMessage(element, message, type = 'info') {
     element.classList.remove('hidden');
     setTimeout(() => { element.classList.add('hidden'); }, 5000);
 }
-const showMessageBox = (msg, type) => showCustomMessage(messageBox, msg, type);
-const showCreateLobbyMessageBox = (msg, type) => showCustomMessage(createLobbyMessageBox, msg, type);
+const showMessageBox = (msg, type) => showCustomMessage(dom.messageBox, msg, type);
+const showCreateLobbyMessageBox = (msg, type) => showCustomMessage(dom.createLobbyMessageBox, msg, type);
 
 function showCustomConfirm(message, title = 'تایید عملیات') {
     return new Promise((resolve) => {
-        if (!customConfirmModal || !confirmTitle || !confirmMessage) return resolve(false);
-        confirmTitle.textContent = title;
-        confirmMessage.textContent = message;
-        customConfirmModal.classList.remove('hidden');
+        if (!modals.confirm || !dom.confirmTitle || !dom.confirmMessage) return resolve(false);
+        dom.confirmTitle.textContent = title;
+        dom.confirmMessage.textContent = message;
+        modals.confirm.classList.remove('hidden');
         resolveCustomConfirm = resolve;
     });
 }
 
 function closeCustomConfirm(result) {
-    if (customConfirmModal) customConfirmModal.classList.add('hidden');
+    if (modals.confirm) modals.confirm.classList.add('hidden');
     if (resolveCustomConfirm) resolveCustomConfirm(result);
 }
 
@@ -146,18 +124,18 @@ function setActiveScreen(newScreen) {
         currentActiveScreen.classList.add('hidden');
         newScreen.classList.remove('hidden', 'page-transition-hidden');
         currentActiveScreen = newScreen;
-        if (newScreen === authScreen && emailInput) emailInput.focus();
-        else if (newScreen === lobbyScreen && lobbySearchInput) lobbySearchInput.focus();
-        else if (newScreen === aiGameScreen && aiGameChatInput) aiGameChatInput.focus();
+        if (newScreen === screens.auth && dom.emailInput) dom.emailInput.focus();
+        else if (newScreen === screens.lobby && dom.lobbySearchInput) dom.lobbySearchInput.focus();
+        else if (newScreen === screens.aiGame && dom.aiGameChatInput) dom.aiGameChatInput.focus();
     }, 500);
 }
 
 function getFirebaseErrorMessage(errorCode) {
     const messages = {
-        'auth/invalid-email': "فرمت ایمیل نامعتبر است.", 'auth/user-disabled': "حساب کاربری شما غیرفعال شده است.",
-        'auth/user-not-found': "کاربری با این ایمیل یافت نشد.", 'auth/wrong-password': "ایمیل یا رمز عبور اشتباه است.",
-        'auth/invalid-credential': "ایمیل یا رمز عبور اشتباه است.", 'auth/email-already-in-use': "این ایمیل قبلاً ثبت نام شده است.",
-        'auth/weak-password': "رمز عبور باید حداقل ۶ کاراکتر باشد.", 'auth/network-request-failed': "مشکل در اتصال به اینترنت.",
+        'auth/invalid-email': "فرمت ایمیل نامعتبر است.",'auth/user-disabled': "حساب کاربری شما غیرفعال شده است.",
+        'auth/user-not-found': "کاربری با این ایمیل یافت نشد.",'auth/wrong-password': "ایمیل یا رمز عبور اشتباه است.",
+        'auth/invalid-credential': "ایمیل یا رمز عبور اشتباه است.",'auth/email-already-in-use': "این ایمیل قبلاً ثبت نام شده است.",
+        'auth/weak-password': "رمز عبور باید حداقل ۶ کاراکتر باشد.",'auth/network-request-failed': "مشکل در اتصال به اینترنت.",
         'auth/too-many-requests': "تعداد تلاش‌های ناموفق بیش از حد مجاز.",
     };
     return messages[errorCode] || "خطایی ناشناخته رخ داده است.";
@@ -183,51 +161,39 @@ async function checkMessageWithAI(messageText) {
     }
 }
 
-// --- Authentication Flow (REVISED) ---
+// --- Authentication Flow ---
 onAuthStateChanged(auth, async (user) => {
-    console.log("Auth state changed. User:", user?.uid || "None");
     try {
         if (user) {
-            // User is signed in. Fetch their profile.
-            const userDocRef = doc(db, "users", user.uid);
+            const userDocRef = doc(db, `artifacts/${appId}/users/${user.uid}/profile/data`);
             const userDocSnap = await getDoc(userDocRef);
             
             if (userDocSnap.exists()) {
-                currentUserData = {
-                    uid: user.uid,
-                    email: user.email,
-                    displayName: userDocSnap.data().displayName
-                };
+                currentUserData = { uid: user.uid, email: user.email, displayName: userDocSnap.data().displayName };
             } else {
-                // This might happen if registration succeeded but profile creation failed.
-                // We'll create a default profile.
                 const defaultDisplayName = user.email?.split('@')[0] || 'کاربر جدید';
                 await setDoc(userDocRef, { displayName: defaultDisplayName, email: user.email });
                 currentUserData = { uid: user.uid, email: user.email, displayName: defaultDisplayName };
             }
 
-            // Update UI with user data
-            if(headerDisplayName) headerDisplayName.textContent = currentUserData.displayName;
-            if(headerUserId) headerUserId.textContent = `ID: ${currentUserData.uid.substring(0, 8)}...`;
-            if(profileDisplayName) profileDisplayName.textContent = currentUserData.displayName;
-            if(profileEmail) profileEmail.textContent = currentUserData.email;
-            if(profileUid) profileUid.textContent = currentUserData.uid;
+            if(dom.headerDisplayName) dom.headerDisplayName.textContent = currentUserData.displayName;
+            if(dom.headerUserId) dom.headerUserId.textContent = `ID: ${currentUserData.uid.substring(0, 8)}...`;
+            if(dom.profileDisplayName) dom.profileDisplayName.textContent = currentUserData.displayName;
+            if(dom.profileEmail) dom.profileEmail.textContent = currentUserData.email;
+            if(dom.profileUid) dom.profileUid.textContent = currentUserData.uid;
             
-            // Transition to main screen
-            if (currentActiveScreen === loadingScreen || currentActiveScreen === authScreen) {
-                setActiveScreen(mainScreen);
+            if (currentActiveScreen === screens.loading || currentActiveScreen === screens.auth) {
+                setActiveScreen(screens.main);
             }
         } else {
-            // User is signed out.
             currentUserData = null;
-            setActiveScreen(authScreen);
+            setActiveScreen(screens.auth);
         }
     } catch (error) {
         console.error("Auth state change error:", error);
         showMessageBox("خطا در بارگذاری اطلاعات کاربری.", "error");
-        // If something goes wrong, force logout and show auth screen for safety.
         await signOut(auth);
-        setActiveScreen(authScreen);
+        setActiveScreen(screens.auth);
     }
 });
 
@@ -248,30 +214,29 @@ async function createLobby(lobbyName, userId, displayName, lobbyType, password, 
 }
 
 function setupLobbyDetailListener(lobbyId, hostId) {
-    console.log(`Listening to lobby details for ID: ${lobbyId}`);
     const lobbyRef = doc(db, "global_lobbies", lobbyId);
     unsubscribeLobbyDetail = onSnapshot(lobbyRef, (docSnap) => {
         if (docSnap.exists()) {
             const lobbyData = docSnap.data();
             if (lobbyData.status === 'playing') {
-                setActiveScreen(aiGameScreen);
+                setActiveScreen(screens.aiGame);
                 unsubscribeAiGame = setupAiGameListener(lobbyId, hostId);
                 return;
             }
             const playersMap = lobbyData.players || {};
             const playerCount = Object.keys(playersMap).length;
-            if(detailLobbyName) detailLobbyName.textContent = lobbyData.name;
-            if(detailHostName) detailHostName.textContent = `سازنده: ${playersMap[lobbyData.hostId] || 'ناشناس'}`;
-            if(detailPlayerCount) detailPlayerCount.textContent = `بازیکنان: ${playerCount}/${MIN_PLAYERS_TO_START}`;
+            if(dom.detailLobbyName) dom.detailLobbyName.textContent = lobbyData.name;
+            if(dom.detailHostName) dom.detailHostName.textContent = `سازنده: ${playersMap[lobbyData.hostId] || 'ناشناس'}`;
+            if(dom.detailPlayerCount) dom.detailPlayerCount.textContent = `بازیکنان: ${playerCount}/${MIN_PLAYERS_TO_START}`;
             const isCurrentUserHost = auth.currentUser?.uid === lobbyData.hostId;
-            if (hostActionsContainer) hostActionsContainer.style.display = isCurrentUserHost ? 'flex' : 'none';
-            if (startGameBtn) {
-                startGameBtn.disabled = playerCount !== MIN_PLAYERS_TO_START;
-                startGameBtn.textContent = `شروع بازی (${playerCount}/${MIN_PLAYERS_TO_START})`;
+            if (dom.hostActionsContainer) dom.hostActionsContainer.style.display = isCurrentUserHost ? 'flex' : 'none';
+            if (dom.startGameBtn) {
+                dom.startGameBtn.disabled = playerCount !== MIN_PLAYERS_TO_START;
+                dom.startGameBtn.textContent = `شروع بازی (${playerCount}/${MIN_PLAYERS_TO_START})`;
             }
         } else {
             showMessageBox("لابی بسته شد.", "info");
-            setActiveScreen(lobbyScreen);
+            setActiveScreen(screens.lobby);
             if (!unsubscribeLobbies) unsubscribeLobbies = setupLobbyListener('');
         }
     });
@@ -299,17 +264,16 @@ async function startGame(lobbyId) {
     });
 }
 
-// ... (Rest of the game logic functions like setupAiGameListener, renderAiGameUI, etc. from the previous correct response)
 function setupAiGameListener(lobbyId, hostId) {
-    if(aiGameCountdownOverlay) aiGameCountdownOverlay.classList.remove('hidden');
+    if(dom.aiGameCountdownOverlay) dom.aiGameCountdownOverlay.classList.remove('hidden');
     let count = 5;
-    if(aiGameCountdownTimer) aiGameCountdownTimer.textContent = count;
+    if(dom.aiGameCountdownTimer) dom.aiGameCountdownTimer.textContent = count;
     const countdownInterval = setInterval(() => {
         count--;
-        if(aiGameCountdownTimer) aiGameCountdownTimer.textContent = count > 0 ? count : 'شروع!';
+        if(dom.aiGameCountdownTimer) dom.aiGameCountdownTimer.textContent = count > 0 ? count : 'شروع!';
         if (count <= 0) {
             clearInterval(countdownInterval);
-            if(aiGameCountdownOverlay) setTimeout(() => aiGameCountdownOverlay.classList.add('hidden'), 1000);
+            if(dom.aiGameCountdownOverlay) setTimeout(() => dom.aiGameCountdownOverlay.classList.add('hidden'), 1000);
         }
     }, 1000);
     const lobbyRef = doc(db, "global_lobbies", lobbyId);
@@ -332,19 +296,19 @@ function setupAiGameListener(lobbyId, hostId) {
             }
         } else {
             showMessageBox("لابی حذف شد.", "info");
-            setActiveScreen(lobbyScreen);
+            setActiveScreen(screens.lobby);
         }
     });
 }
 
 function renderAiGameUI(gameState, players, myUid) {
     const myRole = gameState.roles[myUid];
-    if (aiGameRoleDisplay) {
-        aiGameRoleDisplay.textContent = myRole === 'AI' ? 'هوش مصنوعی' : 'انسان';
-        aiGameRoleDisplay.style.color = myRole === 'AI' ? '#ff4f81' : '#00c6ff';
+    if (dom.aiGameRoleDisplay) {
+        dom.aiGameRoleDisplay.textContent = myRole === 'AI' ? 'هوش مصنوعی' : 'انسان';
+        dom.aiGameRoleDisplay.style.color = myRole === 'AI' ? '#ff4f81' : '#00c6ff';
     }
-    if(aiGamePlayerList) {
-        aiGamePlayerList.innerHTML = '';
+    if(dom.aiGamePlayerList) {
+        dom.aiGamePlayerList.innerHTML = '';
         const canVote = gameState.phase === 'voting';
         const hasVoted = !!gameState.votes[myUid];
         Object.entries(players).forEach(([uid, name]) => {
@@ -358,20 +322,20 @@ function renderAiGameUI(gameState, players, myUid) {
                 voteButtonHtml = `<button class="vote-btn" disabled>${hasVoted ? 'ثبت شد' : 'شما'}</button>`;
             }
             playerDiv.innerHTML = `<span>${name}</span> ${voteButtonHtml}`;
-            aiGamePlayerList.appendChild(playerDiv);
+            dom.aiGamePlayerList.appendChild(playerDiv);
         });
     }
-    if(aiGameChatInput) {
+    if(dom.aiGameChatInput) {
         const isChatDisabled = gameState.phase !== 'discussion';
-        aiGameChatInput.disabled = isChatDisabled;
-        if(aiGameChatSendBtn) aiGameChatSendBtn.disabled = isChatDisabled;
-        if(aiGameChatStatus) aiGameChatStatus.classList.toggle('hidden', !isChatDisabled);
+        dom.aiGameChatInput.disabled = isChatDisabled;
+        if(dom.aiGameChatSendBtn) dom.aiGameChatSendBtn.disabled = isChatDisabled;
+        if(dom.aiGameChatStatus) dom.aiGameChatStatus.classList.toggle('hidden', !isChatDisabled);
         if(isChatDisabled) {
-            aiGameChatInput.placeholder = "مرحله بحث تمام شد.";
-            if(aiGameChatStatus) aiGameChatStatus.textContent = "زمان رأی‌گیری!";
+            dom.aiGameChatInput.placeholder = "مرحله بحث تمام شد.";
+            if(dom.aiGameChatStatus) dom.aiGameChatStatus.textContent = "زمان رأی‌گیری!";
         } else {
-            aiGameChatInput.placeholder = "پیام خود را به لحن ادبی بنویسید...";
-            if(aiGameChatStatus) aiGameChatStatus.textContent = "";
+            dom.aiGameChatInput.placeholder = "پیام خود را به لحن ادبی بنویسید...";
+            if(dom.aiGameChatStatus) dom.aiGameChatStatus.textContent = "";
         }
     }
 }
@@ -379,17 +343,17 @@ function renderAiGameUI(gameState, players, myUid) {
 function updateAiGameTimer(gameState, totalDuration, hostId, myUid, lobbyId) {
     if (gameTimerInterval) clearInterval(gameTimerInterval);
     if (gameState.phase !== 'discussion') {
-        if (aiGameTimer) aiGameTimer.textContent = "00:00";
+        if (dom.aiGameTimer) dom.aiGameTimer.textContent = "00:00";
         return;
     }
     const startTime = gameState.gameStartTime?.toDate().getTime();
     if (!startTime) return;
     gameTimerInterval = setInterval(async () => {
         const remaining = Math.max(0, totalDuration - (Date.now() - startTime) / 1000);
-        if (aiGameTimer) {
+        if (dom.aiGameTimer) {
             const minutes = Math.floor(remaining / 60);
             const seconds = Math.floor(remaining % 60);
-            aiGameTimer.textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+            dom.aiGameTimer.textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
         }
         if (remaining <= 0) {
             clearInterval(gameTimerInterval);
@@ -413,8 +377,7 @@ async function processVotes(lobbyId) {
     await runTransaction(db, async (transaction) => {
         const lobbySnap = await transaction.get(lobbyRef);
         if (!lobbySnap.exists()) return;
-        const lobbyData = lobbySnap.data();
-        let gameState = lobbyData.gameState;
+        let gameState = lobbySnap.data().gameState;
         const voteCounts = {};
         Object.values(gameState.votes).forEach(votedFor => { voteCounts[votedFor] = (voteCounts[votedFor] || 0) + 1; });
         let maxVotes = 0;
@@ -424,7 +387,7 @@ async function processVotes(lobbyId) {
         }
         if (playerToEliminate) gameState.eliminatedPlayers[playerToEliminate] = 'voted_out';
         const aiPlayerId = Object.keys(gameState.roles).find(pId => gameState.roles[pId] === 'AI');
-        const activeHumans = Object.keys(lobbyData.players).filter(pId => !gameState.eliminatedPlayers[pId] && gameState.roles[pId] === 'Human');
+        const activeHumans = Object.keys(lobbySnap.data().players).filter(pId => !gameState.eliminatedPlayers[pId] && gameState.roles[pId] === 'Human');
         if (gameState.eliminatedPlayers[aiPlayerId]) {
             gameState.isGameOver = true; gameState.winner = 'humans';
         } else if (activeHumans.length <= 1) {
@@ -440,145 +403,97 @@ function openGameOverModal(gameState, players) {
     if (unsubscribeAiGame) { unsubscribeAiGame(); unsubscribeAiGame = null; }
     if (gameTimerInterval) { clearInterval(gameTimerInterval); gameTimerInterval = null; }
     const aiPlayerId = Object.keys(gameState.roles).find(pId => gameState.roles[pId] === 'AI');
-    if(gameOverAiName && players[aiPlayerId]) gameOverAiName.textContent = players[aiPlayerId];
-    if (gameOverTitle && gameOverMessage) {
+    if(dom.gameOverAiName && players[aiPlayerId]) dom.gameOverAiName.textContent = players[aiPlayerId];
+    if (dom.gameOverTitle && dom.gameOverMessage) {
         if (gameState.winner === 'humans') {
-            gameOverTitle.textContent = "انسان‌ها پیروز شدند!";
-            gameOverMessage.textContent = "شما با موفقیت هوش مصنوعی را شناسایی و حذف کردید.";
-            gameOverTitle.style.color = "#00c6ff";
+            dom.gameOverTitle.textContent = "انسان‌ها پیروز شدند!";
+            dom.gameOverMessage.textContent = "شما با موفقیت هوش مصنوعی را شناسایی و حذف کردید.";
+            dom.gameOverTitle.style.color = "#00c6ff";
         } else {
-            gameOverTitle.textContent = "هوش مصنوعی پیروز شد!";
-            gameOverMessage.textContent = "هوش مصنوعی با موفقیت در میان شما باقی ماند.";
-            gameOverTitle.style.color = "#ff4f81";
+            dom.gameOverTitle.textContent = "هوش مصنوعی پیروز شد!";
+            dom.gameOverMessage.textContent = "هوش مصنوعی با موفقیت در میان شما باقی ماند.";
+            dom.gameOverTitle.style.color = "#ff4f81";
         }
     }
-    if (gameOverModal) gameOverModal.classList.remove('hidden');
+    if (modals.gameOver) modals.gameOver.classList.remove('hidden');
 }
-
 
 // --- Event Listeners Setup ---
 function setupEventListeners() {
-    // Auth Form (REVISED)
-    if (authForm) authForm.addEventListener('submit', async (e) => {
+    if (dom.authForm) dom.authForm.addEventListener('submit', async (e) => {
         e.preventDefault();
-        const email = emailInput.value.trim();
-        const password = passwordInput.value.trim();
+        const email = dom.emailInput.value.trim();
+        const password = dom.passwordInput.value.trim();
         if (!email || !password) { showMessageBox("ایمیل و رمز عبور الزامی است.", 'error'); return; }
-        
         try {
             if (authMode === 'login') {
                 await signInWithEmailAndPassword(auth, email, password);
-                // onAuthStateChanged will handle the rest
-            } else { // Register Mode
-                const displayName = displayNameInput.value.trim();
+            } else {
+                const displayName = dom.displayNameInput.value.trim();
                 if (!displayName) { showMessageBox("نام نمایشی الزامی است.", 'error'); return; }
-                
-                // 1. Create user in Auth
                 const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-                const user = userCredential.user;
-                
-                // 2. Immediately create their profile in Firestore
-                await setDoc(doc(db, "users", user.uid), {
-                    displayName: displayName,
-                    email: user.email
+                await setDoc(doc(db, `artifacts/${appId}/users/${userCredential.user.uid}/profile/data`), {
+                    displayName, email: userCredential.user.email
                 });
-                
-                // 3. onAuthStateChanged will now fire and load this new profile
-                console.log("Registration successful, user profile created.");
             }
-        } catch (error) {
-            showMessageBox(getFirebaseErrorMessage(error.code), 'error');
-        }
+        } catch (error) { showMessageBox(getFirebaseErrorMessage(error.code), 'error'); }
     });
 
-    if (loginToggleBtn) loginToggleBtn.addEventListener('click', () => { 
-        authMode = 'login';
-        if(displayNameField) displayNameField.classList.add('hidden');
-        if(submitAuthBtn) { submitAuthBtn.textContent = 'ورود'; submitAuthBtn.classList.remove('hidden'); }
-        if(loginToggleBtn) loginToggleBtn.classList.add('hidden');
-        if(registerToggleBtn) registerToggleBtn.classList.remove('hidden');
-    });
-    if (registerToggleBtn) registerToggleBtn.addEventListener('click', () => {
-        authMode = 'register';
-        if(displayNameField) displayNameField.classList.remove('hidden');
-        if(submitAuthBtn) { submitAuthBtn.textContent = 'ثبت نام'; submitAuthBtn.classList.remove('hidden'); }
-        if(registerToggleBtn) registerToggleBtn.classList.add('hidden');
-        if(loginToggleBtn) loginToggleBtn.classList.remove('hidden');
-    });
-
-    // Profile Modal
-    if (menuBtn) menuBtn.addEventListener('click', () => profileModal.classList.remove('hidden'));
-    if (profileSummary) profileSummary.addEventListener('click', () => profileModal.classList.remove('hidden'));
-    if (closeProfileModalBtn) closeProfileModalBtn.addEventListener('click', () => profileModal.classList.add('hidden'));
-    if (profileLogoutBtn) profileLogoutBtn.addEventListener('click', () => signOut(auth));
-
-    // Navigation
-    if (friendlyGameBtn) friendlyGameBtn.addEventListener('click', () => {
-        setActiveScreen(lobbyScreen);
-        if (!unsubscribeLobbies) unsubscribeLobbies = setupLobbyListener('');
-    });
-    if (ratedGameBtn) ratedGameBtn.addEventListener('click', () => showMessageBox("بازی امتیازی به زودی!", "info"));
-    if (backToMainBtn) backToMainBtn.addEventListener('click', () => setActiveScreen(mainScreen));
-    if (myLobbiesBtn) myLobbiesBtn.addEventListener('click', () => showMessageBox("این قابلیت به زودی اضافه می‌شود!", "info"));
-
-    // Lobby Creation
-    if (addIconBtn) addIconBtn.addEventListener('click', () => createLobbyModal.classList.remove('hidden'));
-    if (closeCreateLobbyModalBtn) closeCreateLobbyModalBtn.addEventListener('click', () => createLobbyModal.classList.add('hidden'));
-    if (createLobbyForm) createLobbyForm.addEventListener('submit', async (e) => {
+    if (dom.loginToggleBtn) dom.loginToggleBtn.addEventListener('click', () => { authMode = 'login'; dom.displayNameField.classList.add('hidden'); dom.submitAuthBtn.textContent = 'ورود'; dom.loginToggleBtn.classList.add('hidden'); dom.registerToggleBtn.classList.remove('hidden'); });
+    if (dom.registerToggleBtn) dom.registerToggleBtn.addEventListener('click', () => { authMode = 'register'; dom.displayNameField.classList.remove('hidden'); dom.submitAuthBtn.textContent = 'ثبت نام'; dom.registerToggleBtn.classList.add('hidden'); dom.loginToggleBtn.classList.remove('hidden'); });
+    if (dom.menuBtn) dom.menuBtn.addEventListener('click', () => modals.profile.classList.remove('hidden'));
+    if (dom.profileSummary) dom.profileSummary.addEventListener('click', () => modals.profile.classList.remove('hidden'));
+    if (dom.closeProfileModalBtn) dom.closeProfileModalBtn.addEventListener('click', () => modals.profile.classList.add('hidden'));
+    if (dom.profileLogoutBtn) dom.profileLogoutBtn.addEventListener('click', () => signOut(auth));
+    if (dom.friendlyGameBtn) dom.friendlyGameBtn.addEventListener('click', () => { setActiveScreen(screens.lobby); if (!unsubscribeLobbies) unsubscribeLobbies = setupLobbyListener(''); });
+    if (dom.ratedGameBtn) dom.ratedGameBtn.addEventListener('click', () => showMessageBox("بازی امتیازی به زودی!", "info"));
+    if (dom.backToMainBtn) dom.backToMainBtn.addEventListener('click', () => setActiveScreen(screens.main));
+    if (dom.myLobbiesBtn) dom.myLobbiesBtn.addEventListener('click', () => showMessageBox("این قابلیت به زودی اضافه می‌شود!", "info"));
+    if (dom.addIconBtn) dom.addIconBtn.addEventListener('click', () => modals.createLobby.classList.remove('hidden'));
+    if (dom.closeCreateLobbyModalBtn) dom.closeCreateLobbyModalBtn.addEventListener('click', () => modals.createLobby.classList.add('hidden'));
+    if (dom.createLobbyForm) dom.createLobbyForm.addEventListener('submit', async (e) => {
         e.preventDefault();
-        const lobbyName = newLobbyNameInput.value.trim();
+        const lobbyName = dom.newLobbyNameInput.value.trim();
         if (!lobbyName) { showCreateLobbyMessageBox("نام لابی را وارد کنید.", "error"); return; }
         try {
             const newLobbyId = await createLobby(lobbyName, auth.currentUser.uid, currentUserData.displayName,
-                document.querySelector('input[name="lobby-type"]:checked').value, newLobbyPasswordInput.value, gameDurationSelect.value);
-            createLobbyModal.classList.add('hidden');
-            setActiveScreen(lobbyDetailScreen);
+                document.querySelector('input[name="lobby-type"]:checked').value, dom.newLobbyPasswordInput.value, dom.gameDurationSelect.value);
+            modals.createLobby.classList.add('hidden');
+            setActiveScreen(screens.lobbyDetail);
             unsubscribeLobbyDetail = setupLobbyDetailListener(newLobbyId, auth.currentUser.uid);
         } catch (error) { showCreateLobbyMessageBox(error.message, "error"); }
     });
-    
-    // Start Game
-    if (startGameBtn) startGameBtn.addEventListener('click', () => {
-        if (startGameBtn.disabled || !currentLobbyId) return;
+    if (dom.startGameBtn) dom.startGameBtn.addEventListener('click', () => {
+        if (dom.startGameBtn.disabled || !currentLobbyId) return;
         showCustomConfirm("آیا برای شروع بازی آماده‌اید؟", "شروع بازی").then(confirmed => {
             if (confirmed) startGame(currentLobbyId);
         });
     });
-
-    // AI Game Chat
-    if (aiGameChatForm) aiGameChatForm.addEventListener('submit', async (e) => {
+    if (dom.aiGameChatForm) dom.aiGameChatForm.addEventListener('submit', async (e) => {
         e.preventDefault();
-        const messageText = aiGameChatInput.value.trim();
+        const messageText = dom.aiGameChatInput.value.trim();
         if (!messageText || !currentLobbyId) return;
-        if(aiGameChatSendBtn) aiGameChatSendBtn.disabled = true;
+        if(dom.aiGameChatSendBtn) dom.aiGameChatSendBtn.disabled = true;
         const moderationResult = await checkMessageWithAI(messageText);
         if (moderationResult.is_ai_like) {
             await addDoc(collection(db, `global_lobbies/${currentLobbyId}/messages`), {
-                text: messageText, senderUid: auth.currentUser.uid, senderName: currentUserData.displayName,
-                timestamp: serverTimestamp() });
-            aiGameChatInput.value = '';
-        } else {
-            showMessageBox(`پیام رد شد: ${moderationResult.reason}`, 'error');
-        }
-        if(aiGameChatSendBtn) aiGameChatSendBtn.disabled = false;
+                text: messageText, senderUid: auth.currentUser.uid, senderName: currentUserData.displayName, timestamp: serverTimestamp() });
+            dom.aiGameChatInput.value = '';
+        } else { showMessageBox(`پیام رد شد: ${moderationResult.reason}`, 'error'); }
+        if(dom.aiGameChatSendBtn) dom.aiGameChatSendBtn.disabled = false;
     });
-
-    // Modals
-    if(confirmYesBtn) confirmYesBtn.addEventListener('click', () => closeCustomConfirm(true));
-    if(confirmNoBtn) confirmNoBtn.addEventListener('click', () => closeCustomConfirm(false));
-    if(gameOverOkBtn) gameOverOkBtn.addEventListener('click', () => {
-        gameOverModal.classList.add('hidden');
-        setActiveScreen(lobbyScreen);
+    if(dom.confirmYesBtn) dom.confirmYesBtn.addEventListener('click', () => closeCustomConfirm(true));
+    if(dom.confirmNoBtn) dom.confirmNoBtn.addEventListener('click', () => closeCustomConfirm(false));
+    if(dom.gameOverOkBtn) dom.gameOverOkBtn.addEventListener('click', () => {
+        modals.gameOver.classList.add('hidden');
+        setActiveScreen(screens.lobby);
         if (!unsubscribeLobbies) unsubscribeLobbies = setupLobbyListener('');
     });
-    
-    // Dynamic content delegation
-    if (aiGamePlayerList) aiGamePlayerList.addEventListener('click', (e) => {
+    if (dom.aiGamePlayerList) dom.aiGamePlayerList.addEventListener('click', (e) => {
         if (e.target.matches('.vote-btn[data-target-uid]')) {
             castVote(currentLobbyId, e.target.dataset.targetUid);
         }
     });
 }
 
-// Initialize the application
 document.addEventListener('DOMContentLoaded', setupEventListeners);
