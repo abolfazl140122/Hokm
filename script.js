@@ -30,7 +30,8 @@ let currentUserData = null;
 let unsubscribeLobbies = null;
 let unsubscribeLobbyDetail = null;
 let currentLobbyId = null;
-let gameTimerInterval = null; // For the countdown timer in the game
+let gameTimerInterval = null;
+let isAuthResolved = false; // --- FIX: Flag to ensure initial transition happens only once
 
 // DOM Elements
 const loadingScreen = document.getElementById('loading-screen');
@@ -39,12 +40,18 @@ const mainScreen = document.getElementById('main-screen');
 const lobbyScreen = document.getElementById('lobby-screen');
 const lobbyDetailScreen = document.getElementById('lobby-detail-screen');
 const createLobbyModal = document.getElementById('create-lobby-modal');
-const gameScreen = document.getElementById('game-screen'); // New Game Screen
+const gameScreen = document.getElementById('game-screen');
+
+// Auth Form Elements
+const authForm = document.getElementById('auth-form');
+const emailInput = document.getElementById('email');
+const passwordInput = document.getElementById('password');
+const displayNameField = document.getElementById('display-name-field');
 
 // Create Lobby Modal Elements
 const createLobbyForm = document.getElementById('create-lobby-form');
 const newLobbyNameInput = document.getElementById('new-lobby-name-input');
-const gameDurationInput = document.getElementById('game-duration-input'); // New
+const gameDurationInput = document.getElementById('game-duration-input');
 
 // Lobby Detail Elements
 const detailLobbyName = document.getElementById('detail-lobby-name');
@@ -69,17 +76,16 @@ const gameChatMessages = document.getElementById('game-chat-messages');
 const gameChatForm = document.getElementById('game-chat-form');
 const gameChatInput = document.getElementById('game-chat-input');
 const gameChatValidationMsg = document.getElementById('game-chat-validation-msg');
+const gameChatSendBtn = document.getElementById('game-chat-send-btn');
 const gameStatusOverlay = document.getElementById('game-status-overlay');
 const gameOverTitle = document.getElementById('game-over-title');
 const gameOverReason = document.getElementById('game-over-reason');
 const backToLobbyListBtn = document.getElementById('back-to-lobby-list-btn');
 
-
 // --- Utility & UI Functions ---
 
 function showMessageBox(message, type = 'info') {
-    // This function can be used for general notifications
-    const box = document.getElementById('message-box'); // Assuming a general message box exists
+    const box = document.getElementById('message-box');
     if(!box) return;
     box.textContent = message;
     box.className = 'mt-5 p-3.5 rounded-xl text-base text-center';
@@ -93,14 +99,18 @@ function showMessageBox(message, type = 'info') {
 function setActiveScreen(newScreen) {
     if (currentActiveScreen === newScreen) return;
     
-    // Cleanup old listeners when changing screens
     if (unsubscribeLobbyDetail) { unsubscribeLobbyDetail(); unsubscribeLobbyDetail = null; }
     if (gameTimerInterval) { clearInterval(gameTimerInterval); gameTimerInterval = null; }
 
     currentActiveScreen.classList.remove('page-transition-visible');
+    currentActiveScreen.classList.add('page-transition-hidden');
+    
     setTimeout(() => {
         currentActiveScreen.classList.add('hidden');
+        currentActiveScreen.classList.remove('page-transition-hidden');
+        
         newScreen.classList.remove('hidden');
+        void newScreen.offsetWidth; // Trigger reflow for transition
         newScreen.classList.add('page-transition-visible');
         currentActiveScreen = newScreen;
     }, 600);
@@ -115,12 +125,6 @@ function closeCreateLobbyModal() {
 }
 
 // --- AI Chat Validation Function ---
-
-/**
- * Validates if a message conforms to a literary/AI-like style using Gemini.
- * @param {string} messageText - The text to validate.
- * @returns {Promise<{is_compliant: boolean, reason: string}>} - The validation result.
- */
 async function validateMessageStyleAI(messageText) {
     const prompt = `You are a strict linguistic style validator. A user is playing a game where they must pretend to be a sophisticated, literary, and analytical AI. Analyze the following user message. Does it adhere to this persona? The message should avoid slang, casual chat, and simple reactions. It should sound more like a machine processing and outputting information.
 
@@ -132,10 +136,7 @@ User message to analyze: "${messageText}"`;
 
     const payload = {
         contents: [{ role: "user", parts: [{ text: prompt }] }],
-        generationConfig: {
-            responseMimeType: "application/json",
-            temperature: 0.1
-        }
+        generationConfig: { responseMimeType: "application/json", temperature: 0.1 }
     };
     const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${GEMINI_API_KEY}`;
 
@@ -145,44 +146,66 @@ User message to analyze: "${messageText}"`;
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload)
         });
-        if (!response.ok) {
-            return { is_compliant: false, reason: "خطا در ارتباط با سرور اعتبارسنجی." };
-        }
+        if (!response.ok) return { is_compliant: false, reason: "خطا در ارتباط با سرور اعتبارسنجی." };
         const result = await response.json();
         const jsonString = result.candidates[0].content.parts[0].text;
-        const parsedJson = JSON.parse(jsonString);
-        return parsedJson;
+        return JSON.parse(jsonString);
     } catch (error) {
         console.error("AI Validation Error:", error);
         return { is_compliant: false, reason: "خطا در پردازش پاسخ اعتبارسنجی." };
     }
 }
 
-
 // --- Firebase & Game Logic ---
 
-// Authentication listener
+// --- FIX START: Corrected Authentication State Listener ---
+// This listener is the most critical part for solving the "stuck on loading" issue.
+// It now ensures that the app transitions away from the loading screen as soon as
+// the initial authentication state is determined by Firebase.
 onAuthStateChanged(auth, async (user) => {
+    console.log("Auth state changed. User:", user ? user.uid : "null");
+
     if (user) {
+        // User is logged in. Fetch their profile data.
         const userDocRef = doc(db, `users/${user.uid}`);
         const userDocSnap = await getDoc(userDocRef);
         if (userDocSnap.exists()) {
             currentUserData = { uid: user.uid, ...userDocSnap.data() };
         } else {
-            // Create profile for new users
-            const displayName = user.email.split('@')[0];
+            // This case handles a new registration where profile might not exist yet.
+            const displayName = document.getElementById('display-name').value || user.email.split('@')[0];
             await setDoc(userDocRef, { email: user.email, displayName: displayName });
             currentUserData = { uid: user.uid, email: user.email, displayName: displayName };
         }
-        // Update header UI
+        // Update UI elements that depend on user data
         document.getElementById('header-display-name').textContent = currentUserData.displayName;
         document.getElementById('header-user-id').textContent = `ID: ${user.uid.substring(0,8)}`;
-        setActiveScreen(mainScreen);
     } else {
-        setActiveScreen(authScreen);
+        // User is logged out.
         currentUserData = null;
     }
+
+    // This is the key part of the fix.
+    // We only perform the *initial* screen transition once.
+    if (!isAuthResolved) {
+        isAuthResolved = true;
+        console.log("Auth state resolved for the first time. Transitioning from loading screen.");
+        if (user) {
+            // If user is logged in, go to the main screen.
+            setActiveScreen(mainScreen);
+        } else {
+            // If user is not logged in, go to the authentication screen.
+            setActiveScreen(authScreen);
+        }
+    } else {
+        // For subsequent auth changes (like logging out), the logic is simpler.
+        if (!user && currentActiveScreen !== authScreen) {
+             setActiveScreen(authScreen);
+        }
+    }
 });
+// --- FIX END ---
+
 
 // Create Lobby
 createLobbyForm.addEventListener('submit', async (e) => {
@@ -196,18 +219,10 @@ createLobbyForm.addEventListener('submit', async (e) => {
     
     try {
         const newLobbyData = {
-            name: lobbyName,
-            hostId: currentUserData.uid,
-            status: "waiting", // waiting, starting, playing, voting, finished
-            type: lobbyType,
-            players: {
-                [currentUserData.uid]: currentUserData.displayName
-            },
+            name: lobbyName, hostId: currentUserData.uid, status: "waiting", type: lobbyType,
+            players: { [currentUserData.uid]: currentUserData.displayName },
             createdAt: serverTimestamp(),
-            gameSettings: {
-                maxPlayers: 4, // You can make this configurable
-                gameDurationInSeconds: duration,
-            }
+            gameSettings: { maxPlayers: 4, gameDurationInSeconds: duration, }
         };
         if (lobbyType === 'private') newLobbyData.password = password;
 
@@ -225,14 +240,14 @@ createLobbyForm.addEventListener('submit', async (e) => {
 
 // Setup Lobby List Listener
 function setupLobbyListener() {
-    lobbiesList.innerHTML = '<p class="text-gray-400">در حال بارگذاری لابی‌ها...</p>';
+    const lobbiesListElement = document.getElementById('lobbies-list');
+    lobbiesListElement.innerHTML = '<p class="text-gray-400">در حال بارگذاری لابی‌ها...</p>';
     const q = query(collection(db, 'lobbies'), where("status", "==", "waiting"));
 
     return onSnapshot(q, (snapshot) => {
-        const lobbiesList = document.getElementById('lobbies-list');
-        lobbiesList.innerHTML = '';
+        lobbiesListElement.innerHTML = '';
         if (snapshot.empty) {
-            lobbiesList.innerHTML = '<p class="text-gray-400">هیچ لابی فعالی وجود ندارد. یکی بسازید!</p>';
+            lobbiesListElement.innerHTML = '<p class="text-gray-400">هیچ لابی فعالی وجود ندارد. یکی بسازید!</p>';
             return;
         }
         snapshot.forEach((doc) => {
@@ -240,7 +255,6 @@ function setupLobbyListener() {
             const playerCount = Object.keys(lobby.players).length;
             const maxPlayers = lobby.gameSettings.maxPlayers;
             
-            // Basic lobby item HTML, you can style this better
             const lobbyItem = document.createElement('div');
             lobbyItem.className = 'lobby-item p-4 border rounded mb-2 flex justify-between items-center';
             lobbyItem.innerHTML = `
@@ -251,7 +265,7 @@ function setupLobbyListener() {
                 </div>
                 <button data-lobby-id="${lobby.id}" class="join-lobby-btn classic-btn btn-blue-classic">ورود</button>
             `;
-            lobbiesList.appendChild(lobbyItem);
+            lobbiesListElement.appendChild(lobbyItem);
         });
     });
 }
@@ -280,51 +294,33 @@ startGameBtn.addEventListener('click', async () => {
     if (!currentLobbyId || !currentUserData) return;
     const lobbyRef = doc(db, 'lobbies', currentLobbyId);
     try {
-        // This should ideally be a Cloud Function for security and fairness
         const lobbySnap = await getDoc(lobbyRef);
         const lobbyData = lobbySnap.data();
         const players = lobbyData.players || {};
         const playerIds = Object.keys(players);
         
-        // Randomly assign roles
         const aiIndex = Math.floor(Math.random() * playerIds.length);
         const aiPlayerId = playerIds[aiIndex];
         const roles = {};
-        playerIds.forEach(id => {
-            roles[id] = (id === aiPlayerId) ? 'ai' : 'human';
-        });
+        playerIds.forEach(id => { roles[id] = (id === aiPlayerId) ? 'ai' : 'human'; });
 
-        // Set game state
         await updateDoc(lobbyRef, {
             status: 'starting',
-            gameState: {
-                roles: roles,
-                timerEndTime: null, // will be set after countdown
-                eliminatedPlayers: [],
-                votes: {},
-                winner: null,
-                gameoverReason: ''
-            }
+            gameState: { roles, timerEndTime: null, eliminatedPlayers: [], votes: {}, winner: null, gameoverReason: '' }
         });
-    } catch (error) {
-        console.error("Error starting game:", error);
-    }
+    } catch (error) { console.error("Error starting game:", error); }
 });
 
 // Leave Game/Lobby
 leaveGameBtn.addEventListener('click', async () => {
-    // A simple implementation: host deletes lobby, others just leave
     if (!currentLobbyId || !currentUserData) return;
     const lobbyRef = doc(db, 'lobbies', currentLobbyId);
     const lobbySnap = await getDoc(lobbyRef);
-    if(lobbySnap.data().hostId === currentUserData.uid) {
+    if(lobbySnap.exists() && lobbySnap.data().hostId === currentUserData.uid) {
         await deleteDoc(lobbyRef);
     } else {
-        await updateDoc(lobbyRef, {
-            [`players.${currentUserData.uid}`]: deleteField()
-        });
+        await updateDoc(lobbyRef, { [`players.${currentUserData.uid}`]: deleteField() });
     }
-    // Listeners will handle screen transition
 });
 
 backToLobbyListBtn.addEventListener('click', () => {
@@ -340,7 +336,6 @@ function setupLobbyDetailListener(lobbyId) {
 
     return onSnapshot(lobbyRef, (docSnap) => {
         if (!docSnap.exists()) {
-            // Lobby was deleted
             showMessageBox("لابی بسته شد.", "info");
             setActiveScreen(lobbyScreen);
             unsubscribeLobbies = setupLobbyListener();
@@ -353,7 +348,6 @@ function setupLobbyDetailListener(lobbyId) {
         const maxPlayers = lobbyData.gameSettings.maxPlayers;
         const isHost = lobbyData.hostId === currentUserData?.uid;
 
-        // Route based on game status
         switch(lobbyData.status) {
             case 'waiting':
                 setActiveScreen(lobbyDetailScreen);
@@ -370,7 +364,7 @@ function setupLobbyDetailListener(lobbyId) {
                 break;
             case 'finished':
                 setActiveScreen(gameScreen);
-                updateGameUI(lobbyData); // Show final state
+                updateGameUI(lobbyData);
                 showGameOverScreen(lobbyData.gameState);
                 break;
         }
@@ -381,14 +375,16 @@ function setupLobbyDetailListener(lobbyId) {
 function updateLobbyDetailsUI(lobbyData, players, playerCount, maxPlayers, isHost) {
     detailLobbyName.textContent = lobbyData.name;
     detailPlayerCount.textContent = `بازیکنان: ${playerCount}/${maxPlayers}`;
-    playerListContainer.innerHTML = Object.values(players).map(name => `<div>${name}</div>`).join('');
+    playerListContainer.innerHTML = Object.values(players).map(name => `<div class="p-2 bg-gray-700 rounded mb-1">${name}</div>`).join('');
     
     if(isHost) {
         hostActionsContainer.style.display = 'block';
-        startGameBtn.disabled = playerCount !== maxPlayers;
+        startGameBtn.disabled = playerCount < 2; // For testing, allow start with 2. Change to maxPlayers for production.
         leaveLobbyBtn.classList.remove('hidden');
     } else {
         hostActionsContainer.style.display = 'none';
+        leaveLobbyBtn.classList.remove('hidden'); // Non-hosts can also leave
+        leaveLobbyBtn.textContent = "خروج از لابی";
     }
 }
 
@@ -404,14 +400,10 @@ function runGameCountdown(lobbyData) {
         if (count <= 0) {
             clearInterval(countdownInterval);
             gameCountdownOverlay.classList.add('hidden');
-            // Only the host sets the timer end time to prevent race conditions
             if (lobbyData.hostId === currentUserData?.uid) {
                 const lobbyRef = doc(db, 'lobbies', currentLobbyId);
                 const gameEndTime = new Date(Date.now() + lobbyData.gameSettings.gameDurationInSeconds * 1000);
-                updateDoc(lobbyRef, {
-                    status: 'playing',
-                    'gameState.timerEndTime': gameEndTime,
-                });
+                updateDoc(lobbyRef, { status: 'playing', 'gameState.timerEndTime': gameEndTime });
             }
         }
     }, 1000);
@@ -422,11 +414,9 @@ function updateGameUI(lobbyData) {
     const gameState = lobbyData.gameState;
     const myRole = gameState.roles[currentUserData.uid];
     
-    // Update Role Display
     myRoleDisplay.textContent = `شما: ${myRole === 'ai' ? 'هوش مصنوعی' : 'انسان'}`;
     myRoleDisplay.className = `my-role ${myRole === 'ai' ? 'role-ai' : 'role-human'}`;
 
-    // Update Game Timer
     if (gameTimerInterval) clearInterval(gameTimerInterval);
     if (gameState.timerEndTime) {
         gameTimerInterval = setInterval(() => {
@@ -437,7 +427,6 @@ function updateGameUI(lobbyData) {
             if (diff <= 0) {
                 clearInterval(gameTimerInterval);
                 gameTimerDisplay.textContent = "00:00";
-                // Host transitions game to voting state
                 if (lobbyData.hostId === currentUserData.uid && lobbyData.status === 'playing') {
                     updateDoc(doc(db, 'lobbies', currentLobbyId), { status: 'voting' });
                 }
@@ -449,7 +438,6 @@ function updateGameUI(lobbyData) {
         }, 1000);
     }
     
-    // Update Player Cards for Voting
     gamePlayersContainer.innerHTML = '';
     const livingPlayers = Object.keys(lobbyData.players).filter(uid => !gameState.eliminatedPlayers.includes(uid));
 
@@ -459,23 +447,16 @@ function updateGameUI(lobbyData) {
         if(gameState.votes[currentUserData.uid] === uid) playerCard.classList.add('has-voted');
         
         const canVoteFor = lobbyData.status === 'voting' && uid !== currentUserData.uid && !gameState.votes[currentUserData.uid];
-        const voteButtonHtml = canVoteFor 
-            ? `<button data-vote-for="${uid}" class="vote-button classic-btn btn-red-classic">رای به حذف</button>`
-            : '';
+        const voteButtonHtml = canVoteFor ? `<button data-vote-for="${uid}" class="vote-button classic-btn btn-red-classic">رای به حذف</button>` : '';
 
-        playerCard.innerHTML = `
-            <span class="player-name">${lobbyData.players[uid]}</span>
-            ${voteButtonHtml}
-        `;
+        playerCard.innerHTML = `<span class="player-name">${lobbyData.players[uid]}</span> ${voteButtonHtml}`;
         gamePlayersContainer.appendChild(playerCard);
     });
     
-    // Update Chat
     gameChatInput.disabled = lobbyData.status !== 'playing';
     gameChatSendBtn.disabled = lobbyData.status !== 'playing';
     gameChatInput.placeholder = lobbyData.status === 'playing' ? "با لحن ادبی/هوش مصنوعی صحبت کنید..." : "رای‌گیری آغاز شده است. چت بسته شد.";
 
-    // Process votes if everyone has voted
     if(lobbyData.status === 'voting') {
         const livingVoters = livingPlayers.filter(uid => !gameState.eliminatedPlayers.includes(uid));
         const allVoted = livingVoters.every(uid => gameState.votes[uid]);
@@ -485,7 +466,7 @@ function updateGameUI(lobbyData) {
     }
 }
 
-// Process votes (should be a Cloud Function)
+// Process votes
 async function processVotes(lobbyData) {
     const gameState = lobbyData.gameState;
     const voteCounts = {};
@@ -493,22 +474,14 @@ async function processVotes(lobbyData) {
         voteCounts[votedForUid] = (voteCounts[votedForUid] || 0) + 1;
     });
 
-    let maxVotes = 0;
-    let playerToEliminate = null;
+    let maxVotes = 0, playerToEliminate = null;
     for (const [uid, count] of Object.entries(voteCounts)) {
-        if (count > maxVotes) {
-            maxVotes = count;
-            playerToEliminate = uid;
-        }
+        if (count > maxVotes) { maxVotes = count; playerToEliminate = uid; }
     }
     
-    // In case of a tie, for now, we do nothing. A real game needs a tie-breaker.
     if (!playerToEliminate) {
-        // No one was eliminated (e.g. a tie)
         await updateDoc(doc(db, 'lobbies', currentLobbyId), {
-            status: 'finished',
-            'gameState.winner': 'ai',
-            'gameState.gameoverReason': 'هوش مصنوعی به دلیل عدم اجماع در رای‌گیری، پیروز شد.'
+            status: 'finished', 'gameState.winner': 'ai', 'gameState.gameoverReason': 'هوش مصنوعی به دلیل عدم اجماع در رای‌گیری، پیروز شد.'
         });
         return;
     }
@@ -517,30 +490,22 @@ async function processVotes(lobbyData) {
     const newEliminated = [...gameState.eliminatedPlayers, playerToEliminate];
     const livingPlayersCount = Object.keys(lobbyData.players).length - newEliminated.length;
     
-    let newStatus = 'finished';
-    let winner = '';
-    let reason = '';
-
+    let winner = '', reason = '';
     if (wasAI) {
         winner = 'humans';
         reason = `انسان‌ها پیروز شدند! هوش مصنوعی (${lobbyData.players[playerToEliminate]}) شناسایی و حذف شد.`;
-    } else if (livingPlayersCount <= 2) { // 1 human vs 1 AI left
+    } else if (livingPlayersCount <= 2) {
         winner = 'ai';
         reason = `هوش مصنوعی پیروز شد! تنها یک انسان باقی مانده بود.`;
     } else {
-        // This case is not handled in the simple scenario. Game ends.
         winner = 'ai';
         reason = `یک انسان حذف شد، اما هوش مصنوعی همچنان مخفی است! هوش مصنوعی پیروز شد.`;
     }
 
     await updateDoc(doc(db, 'lobbies', currentLobbyId), {
-        status: newStatus,
-        'gameState.winner': winner,
-        'gameState.gameoverReason': reason,
-        'gameState.eliminatedPlayers': newEliminated
+        status: 'finished', 'gameState.winner': winner, 'gameState.gameoverReason': reason, 'gameState.eliminatedPlayers': newEliminated
     });
 }
-
 
 // Show Game Over Screen
 function showGameOverScreen(gameState) {
@@ -559,7 +524,10 @@ document.addEventListener('DOMContentLoaded', () => {
         setActiveScreen(lobbyScreen);
         unsubscribeLobbies = setupLobbyListener();
     });
-    document.getElementById('back-to-main-btn').addEventListener('click', () => setActiveScreen(mainScreen));
+    document.getElementById('back-to-main-btn').addEventListener('click', () => {
+        if (unsubscribeLobbies) unsubscribeLobbies();
+        setActiveScreen(mainScreen)
+    });
     document.getElementById('add-icon-btn').addEventListener('click', openCreateLobbyModal);
     document.getElementById('close-create-lobby-modal-btn').addEventListener('click', closeCreateLobbyModal);
 
@@ -577,15 +545,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (validation.is_compliant) {
             gameChatValidationMsg.classList.add('hidden');
-            // Send message (this part can be its own function)
             try {
                 const messagesRef = collection(db, `lobbies/${currentLobbyId}/messages`);
-                await addDoc(messagesRef, {
-                    text: text,
-                    senderUid: currentUserData.uid,
-                    senderName: currentUserData.displayName,
-                    timestamp: serverTimestamp()
-                });
+                await addDoc(messagesRef, { text, senderUid: currentUserData.uid, senderName: currentUserData.displayName, timestamp: serverTimestamp() });
                 gameChatInput.value = '';
             } catch (error) { console.error("Error sending message:", error); }
         } else {
@@ -601,31 +563,38 @@ document.addEventListener('DOMContentLoaded', () => {
             const voteForUid = e.target.dataset.voteFor;
             if(voteForUid && currentLobbyId && currentUserData) {
                 const lobbyRef = doc(db, 'lobbies', currentLobbyId);
-                await updateDoc(lobbyRef, {
-                    [`gameState.votes.${currentUserData.uid}`]: voteForUid
-                });
+                await updateDoc(lobbyRef, { [`gameState.votes.${currentUserData.uid}`]: voteForUid });
             }
         }
     });
 
+    // Auth Form Logic
+    authForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const email = emailInput.value;
+        const password = passwordInput.value;
+        const isRegister = displayNameField.offsetParent !== null;
+
+        try {
+            if (isRegister) {
+                await createUserWithEmailAndPassword(auth, email, password);
+            } else {
+                await signInWithEmailAndPassword(auth, email, password);
+            }
+        } catch (error) { showMessageBox(error.message, 'error'); }
+    });
+
+    // Toggle between login and register
+    document.getElementById('register-toggle-btn').addEventListener('click', () => {
+        displayNameField.style.display = 'block';
+    });
+    document.getElementById('login-toggle-btn').addEventListener('click', () => {
+        displayNameField.style.display = 'none';
+    });
 });
 
-// A simplified auth flow for demonstration
-document.getElementById('auth-form').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const email = document.getElementById('email').value;
-    const password = document.getElementById('password').value;
-    const displayName = document.getElementById('display-name').value;
-    const isRegister = document.getElementById('display-name-field').offsetParent !== null;
-
-    try {
-        if (isRegister) {
-            await createUserWithEmailAndPassword(auth, email, password);
-            // The onAuthStateChanged listener will handle profile creation
-        } else {
-            await signInWithEmailAndPassword(auth, email, password);
-        }
-    } catch (error) {
-        showMessageBox(error.message, 'error');
-    }
-});
+// Initialize the app on window load
+window.onload = () => {
+    // The onAuthStateChanged listener is already set up and will handle the initial state check.
+    console.log("App loaded. Waiting for Firebase auth state...");
+};
