@@ -1035,7 +1035,7 @@
                                class="w-full focus:outline-none focus:ring-2 focus:ring-green-500 pr-10">
                         <button type="button" id="toggle-password-visibility" class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white">
                             <svg id="eye-icon-open" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-eye"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
-                            <svg id="eye-icon-closed" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-eye-off" style="display: none;"><path d="M9.88 9.88a3 3 0 1 0 4.24 4.24"/><path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"/><path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61"/><line x1="2" x2="22" y1="2" y2="22"/></svg>
+                            <svg id="eye-icon-closed" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-eye-off" style="display: none;"><path d="M9.88 9.88a3 3 0 1 0 4.24 4.24"/><path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"/><path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9 0 0 0 5.39-1.61"/><line x1="2" x2="22" y1="2" y2="22"/></svg>
                         </button>
                     </div>
                     
@@ -1318,8 +1318,8 @@
         const submitCreateLobbyBtn = document.getElementById('submit-create-lobby-btn');
         const createLobbyMessageBox = document.getElementById('create-lobby-message-box');
         const lobbyTypeToggle = document.getElementById('lobby-type-toggle');
-        const newLobbyPasswordField = document.getElementById('new-lobby-password-field');
-        const newLobbyPasswordInput = document.getElementById('new-lobby-password-input');
+        const newLobbyPasswordField = document.getElementById('newLobby-password-field');
+        const newLobbyPasswordInput = document.getElementById('newLobby-password-input');
         const togglePasswordVisibilityBtn = document.getElementById('toggle-password-visibility');
         const eyeIconOpen = document.getElementById('eye-icon-open');
         const eyeIconClosed = document.getElementById('eye-icon-closed');
@@ -1525,8 +1525,8 @@
          */
         async function checkLobbyNameWithAI(lobbyName) {
             if (!GEMINI_API_KEY || GEMINI_API_KEY === "YOUR_GEMINI_API_KEY_HERE") {
-                console.warn("Gemini API Key is not configured. Skipping lobby name moderation.");
-                return { is_appropriate: true, reason: "API key missing. Moderation skipped." };
+                console.warn("کلید API هوش مصنوعی (جمینی) تنظیم نشده است. بررسی نام لابی نادیده گرفته می‌شود.");
+                return { is_appropriate: true, reason: "کلید API وجود ندارد. بررسی نادیده گرفته شد." };
             }
 
             const prompt = `As a highly rigorous and professional content moderation AI, meticulously analyze the following lobby name for compliance with the strictest community guidelines across *all* languages. You must absolutely identify and disallow any political, racist, sexual, offensive, vulgar, violent, or otherwise inappropriate content, including but not limited to terms like "fuck", "asshole", "shit", "bitch", and their equivalents in Persian such as "کیر", "کون", "کس", "کسکش", "جنده", "حرومزاده", "بیناموس" etc., regardless of how they are spelled (e.g., phonetic or deliberate misspellings to evade detection). Your analysis should consider the context and intent where possible. Your response *must* be a JSON object: {"is_appropriate": boolean, "reason": string}. If 'is_appropriate' is false, provide a *brief, objective, and precise* reason identifying the specific type of violation (e.g., "Contains offensive language", "Political reference detected", "Violates decency standards"). If appropriate, 'reason' should be an empty string. Lobby name to analyze: "${lobbyName}"`;
@@ -1535,20 +1535,20 @@
             const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`;
             try {
                 const response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
-                if (!response.ok) { const errorText = await response.text(); console.error("AI API HTTP Error:", response.status, response.statusText, errorText); return { is_appropriate: false, reason: `خطا در ارتباط با سرور اعتدال: ${response.statusText}.` }; }
+                if (!response.ok) { const errorText = await response.text(); console.error("خطای HTTP از API هوش مصنوعی:", response.status, response.statusText, errorText); return { is_appropriate: false, reason: `خطا در ارتباط با سرور اعتدال: ${response.statusText}.` }; }
                 const result = await response.json();
                 if (result && result.candidates?.[0]?.content?.parts?.[0]) {
                     const jsonString = result.candidates[0].content.parts[0].text;
-                    try { const parsedJson = JSON.parse(jsonString); if (typeof parsedJson.is_appropriate === 'boolean' && typeof parsedJson.reason === 'string') { return parsedJson; } else { console.warn("AI response has unexpected structure:", parsedJson); return { is_appropriate: false, reason: "پاسخ سیستم اعتدال نامفهوم است." }; } } catch (parseError) { console.error("Error parsing AI response JSON:", parseError, "Raw:", jsonString); return { is_appropriate: false, reason: "خطا در پردازش پاسخ اعتدال." }; }
-                } else { console.warn("AI response missing content structure:", result); return { is_appropriate: false, reason: "عدم دریافت پاسخ معتبر از سیستم اعتدال." }; }
-            } catch (error) { console.error("Error calling AI moderation API:", error); return { is_appropriate: false, reason: `خطا در ارتباط با سیستم اعتدال: ${error.message}.` }; }
+                    try { const parsedJson = JSON.parse(jsonString); if (typeof parsedJson.is_appropriate === 'boolean' && typeof parsedJson.reason === 'string') { return parsedJson; } else { console.warn("پاسخ هوش مصنوعی ساختار غیرمنتظره‌ای دارد:", parsedJson); return { is_appropriate: false, reason: "پاسخ سیستم اعتدال نامفهوم است." }; } } catch (parseError) { console.error("خطا در تجزیه JSON پاسخ هوش مصنوعی:", parseError, "خام:", jsonString); return { is_appropriate: false, reason: "خطا در پردازش پاسخ اعتدال." }; }
+                } else { console.warn("پاسخ هوش مصنوعی فاقد ساختار محتوا است:", result); return { is_appropriate: false, reason: "عدم دریافت پاسخ معتبر از سیستم اعتدال." }; }
+            } catch (error) { console.error("خطا در فراخوانی API اعتدال هوش مصنوعی:", error); return { is_appropriate: false, reason: `خطا در ارتباط با سیستم اعتدال: ${error.message}.` }; }
         }
 
         // Function to check if a message is "literary/AI-like" using Gemini AI
         async function checkMessageForLiteraryAIStyle(message) {
             if (!GEMINI_API_KEY || GEMINI_API_KEY === "YOUR_GEMINI_API_KEY_HERE") {
-                console.warn("Gemini API Key is not configured. Skipping chat style moderation.");
-                return { is_literary: true, reason: "API key missing. Moderation skipped." };
+                console.warn("کلید API هوش مصنوعی (جمینی) تنظیم نشده است. بررسی سبک چت نادیده گرفته می‌شود.");
+                return { is_literary: true, reason: "کلید API وجود ندارد. بررسی نادیده گرفته شد." };
             }
 
             const prompt = `As a highly sophisticated and discerning AI language analyst, you are to evaluate the provided Persian text for its adherence to a "literary" or "AI-like" style. This implies:
@@ -1588,7 +1588,7 @@
 
                 if (!response.ok) { 
                     const errorText = await response.text();
-                    console.error("AI API HTTP Error:", response.status, response.statusText, errorText);
+                    console.error("خطای HTTP از API هوش مصنوعی:", response.status, response.statusText, errorText);
                     return { is_literary: false, reason: `خطا در ارتباط با سرور هوش مصنوعی: ${response.statusText}.` }; 
                 }
 
@@ -1601,19 +1601,19 @@
                         if (typeof parsedJson.is_literary === 'boolean' && typeof parsedJson.reason === 'string') { 
                             return parsedJson; 
                         } else { 
-                            console.warn("AI response has unexpected structure:", parsedJson); 
+                            console.warn("پاسخ هوش مصنوعی ساختار غیرمنتظره‌ای دارد:", parsedJson); 
                             return { is_literary: false, reason: "پاسخ سیستم بررسی نامفهوم است." }; 
                         } 
                     } catch (parseError) { 
-                        console.error("Error parsing AI response JSON:", parseError, "Raw:", jsonString); 
+                        console.error("خطا در تجزیه JSON پاسخ هوش مصنوعی:", parseError, "خام:", jsonString); 
                         return { is_literary: false, reason: "خطا در پردازش پاسخ سیستم بررسی." }; 
                     }
                 } else { 
-                    console.warn("AI response missing content structure:", result); 
+                    console.warn("پاسخ هوش مصنوعی فاقد ساختار محتوا است:", result); 
                     return { is_literary: false, reason: "عدم دریافت پاسخ معتبر از سیستم بررسی." }; 
                 }
             } catch (error) { 
-                console.error("Error calling AI chat style API:", error); 
+                console.error("خطا در فراخوانی API بررسی سبک چت هوش مصنوعی:", error); 
                 return { is_literary: false, reason: `خطا در ارتباط با سیستم بررسی: ${error.message}.` }; 
             }
         }
@@ -1622,7 +1622,10 @@
         function setActiveScreen(newScreen) {
             console.log(`درخواست تغییر صفحه به: ${newScreen.id}. صفحه فعلی: ${currentActiveScreen.id}`);
 
-            if (currentActiveScreen === newScreen) return;
+            if (currentActiveScreen === newScreen) {
+                console.log(`صفحه درخواستی ${newScreen.id} از قبل فعال است. عملیاتی انجام نشد.`);
+                return;
+            }
             
             // Cleanup all existing listeners from the previous lobby/game
             currentLobbyUnsubscribers.forEach(unsub => unsub());
@@ -1646,13 +1649,15 @@
 
                 // Show the new screen with transition
                 newScreen.classList.remove('hidden');
-                void newScreen.offsetWidth;
+                void newScreen.offsetWidth; // Trigger reflow to ensure transition
                 newScreen.classList.add('page-transition-visible');
-                newScreen.removeAttribute('tabindex');
+                newScreen.removeAttribute('tabindex'); // Allow focus
                 console.log(`صفحه ${newScreen.id} اکنون قابل مشاهده است.`);
 
+                // Set focus for accessibility and usability
                 if (newScreen === authScreen) emailInput.focus();
                 else if (newScreen === lobbyScreen) lobbySearchInput.focus();
+                else if (newScreen === mainScreen) friendlyGameBtn.focus(); // Focus on a main button
 
                 currentActiveScreen = newScreen;
 
@@ -1736,7 +1741,9 @@
                 kickedMessageModal.classList.add('hidden');
                 kickedMessageModal.classList.remove('profile-modal-leave-active');
                 setActiveScreen(lobbyScreen);
-                currentLobbyUnsubscribers.push(setupLobbyListener(''));
+                // After being kicked, user might try to refresh lobbies, so setup listener.
+                // It's safe to always call setupLobbyListener as it cleans up previous ones.
+                setupLobbyListener(''); 
             }, 300);
         }
 
@@ -1746,7 +1753,7 @@
             kickedPlayersListModal.classList.add('profile-modal-enter-active');
             if (currentLobbyId) {
                 const unsubscribe = setupKickedPlayersListListener(currentLobbyId);
-                currentLobbyUnsubscribers.push(unsubscribe);
+                currentLobbyUnsubscribers.push(unsubscribe); // Add to current unsubscribers
             } else {
                 kickedPlayersListContent.innerHTML = '<p class="text-gray-400 text-center">خطا: لابی فعال یافت نشد.</p>';
             }
@@ -1765,10 +1772,10 @@
 
         // Firebase Authentication State Listener
         onAuthStateChanged(auth, async (user) => {
-            console.log("onAuthStateChanged triggered. User:", user ? user.uid : "logged out");
+            console.log("onAuthStateChanged فعال شد. کاربر:", user ? user.uid : "خارج شده");
             
             if (!isAuthResolved) {
-                isAuthResolved = true;
+                isAuthResolved = true; // این پرچم فقط برای اولین بار فعال می‌شود
             }
 
             if (user) {
@@ -1780,6 +1787,7 @@
                         email: user.email,
                         displayName: (userDocSnap.exists() && userDocSnap.data().displayName) ? userDocSnap.data().displayName : (user.displayName || (user.email ? user.email.split('@')[0] : 'کاربر ناشناس'))
                     };
+                    // اگر کاربر تازه ثبت نام کرده و نام نمایشی وارد کرده بود، آن را در فایربیس ذخیره کن
                     if (!userDocSnap.exists() && authMode === 'register' && displayNameInput.value.trim() !== '') {
                         await setDoc(userDocRef, { displayName: displayNameInput.value.trim(), email: user.email }, { merge: true });
                         currentUserData.displayName = displayNameInput.value.trim();
@@ -1787,19 +1795,26 @@
                     headerDisplayName.textContent = currentUserData.displayName;
                     headerUserId.textContent = `شناسه: ${currentUserData.uid.substring(0, 8)}...`;
                     
+                    // فقط اگر روی صفحه بارگذاری یا احراز هویت بودیم، تغییر صفحه را انجام بده
                     if(currentActiveScreen === loadingScreen || currentActiveScreen === authScreen) {
                         setActiveScreen(mainScreen);
+                    } else {
+                        // اگر در صفحه دیگری بودیم (مثلا لابی)، فقط اطلاعات کاربر را به‌روز کن
+                        console.log("کاربر لاگین است، اما در حال حاضر روی صفحه اصلی یا احراز هویت نیست. اطلاعات پروفایل به‌روز شد.");
                     }
 
                 } catch (firestoreError) {
-                    console.error("Firestore profile error:", firestoreError);
+                    console.error("خطا در بارگذاری پروفایل از فایربیس:", firestoreError);
                     currentUserData = { uid: user.uid, email: user.email, displayName: user.displayName || (user.email ? user.email.split('@')[0] : 'کاربر ناشناس') };
                     headerDisplayName.textContent = currentUserData.displayName;
                     headerUserId.textContent = `شناسه: ${currentUserData.uid.substring(0, 8)}...`;
-                    setActiveScreen(mainScreen);
+                    if(currentActiveScreen === loadingScreen || currentActiveScreen === authScreen) {
+                        setActiveScreen(mainScreen); // حتی در صورت خطا، به صفحه اصلی برو
+                    }
                     showMessageBox("مشکل در بارگذاری پروفایل.", "error");
                 }
             } else {
+                console.log("کاربر خارج شده یا وارد نشده است. به صفحه احراز هویت منتقل می‌شود.");
                 setActiveScreen(authScreen);
                 authForm.reset();
                 displayNameField.classList.add('hidden');
@@ -1808,7 +1823,7 @@
                 registerToggleBtn.classList.remove('hidden');
                 authMode = 'login';
                 currentUserData = null;
-                // Cleanup all listeners and game intervals
+                // Cleanup all listeners and game intervals when user logs out
                 currentLobbyUnsubscribers.forEach(unsub => unsub());
                 currentLobbyUnsubscribers = [];
                 clearGameIntervals();
@@ -1817,23 +1832,34 @@
             }
         });
 
-        // --- FIX START: Corrected Initial Firebase Authentication Flow ---
+        // تابع برای آغاز فرآیند احراز هویت اولیه
         async function initializeFirebaseAndAuth() {
-            console.log("Initializing Firebase Auth...");
+            console.log("آغاز فرآیند احراز هویت اولیه فایربیس...");
             
+            // اگر یک توکن احراز هویت اولیه از محیط برنامه ارائه شده بود، سعی در ورود با آن کن.
             if (initialAuthToken) {
-                console.log("Initial auth token found. Attempting to sign in...");
+                console.log("توکن احراز هویت اولیه یافت شد. تلاش برای ورود...");
                 try {
                     await signInWithCustomToken(auth, initialAuthToken);
-                    console.log("Sign in with custom token successful.");
+                    console.log("ورود با توکن سفارشی با موفقیت انجام شد.");
                 } catch (error) {
-                    console.error("Error signing in with initial custom token:", error);
+                    console.error("خطا در ورود با توکن احراز هویت اولیه:", error);
+                    // اگر ورود با توکن سفارشی با شکست مواجه شد، onAuthStateChanged به طور خودکار به صفحه احراز هویت هدایت می‌کند.
                 }
             } else {
-                console.log("No initial auth token. Waiting for onAuthStateChanged to resolve session.");
+                // اگر توکن احراز هویت اولیه نبود، onAuthStateChanged به صورت خودکار جلسات پایدار را بررسی می‌کند.
+                // اگر جلسه‌ای یافت نشد، با user=null فعال شده و به صفحه احراز هویت هدایت می‌شود.
+                console.log("توکن احراز هویت اولیه وجود ندارد. به onAuthStateChanged برای مدیریت جلسه تکیه می‌شود.");
             }
+
+            // یک تایم‌اوت فال‌بک در صورتی که onAuthStateChanged به هر دلیلی (مثلا مشکل شبکه) به سرعت وضعیت احراز هویت را مشخص نکند.
+            setTimeout(() => {
+                if (currentActiveScreen === loadingScreen) {
+                    console.warn("وضعیت احراز هویت به سرعت مشخص نشد. انتقال اجباری به صفحه احراز هویت.");
+                    setActiveScreen(authScreen);
+                }
+            }, 3000); // 3 ثانیه به فایربیس فرصت بده تا وضعیت احراز هویت را مشخص کند
         }
-        // --- FIX END ---
 
         // Maps Firebase auth error codes to user-friendly Persian messages.
         function getFirebaseErrorMessage(errorCode) {
@@ -2059,7 +2085,7 @@
                             try {
                                 await joinLobby(lobbyId, auth.currentUser.uid, currentUserData.displayName);
                             } catch (error) {
-                                console.error("Error joining public lobby:", error);
+                                console.error("خطا در ورود به لابی عمومی:", error);
                                 showMessageBox(`خطا در ورود به لابی: ${error.message}`, "error");
                             }
                         }
@@ -2139,7 +2165,7 @@
         }
         
         function setupLobbyDetailListener(lobbyId) {
-            console.log(`Listening to lobby details for ID: ${lobbyId}`);
+            console.log(`در حال گوش دادن به جزئیات لابی با شناسه: ${lobbyId}`);
             // Cleanup existing listeners via currentLobbyUnsubscribers, already handled by setActiveScreen
             
             clearGameIntervals();
@@ -2253,7 +2279,7 @@
 
 
             }, (error) => {
-                console.error("Lobby detail listener error:", error);
+                console.error("خطا در شنیدن جزئیات لابی:", error);
                 showMessageBox("خطا در بارگذاری جزئیات لابی.", "error");
                 currentLobbyId = null;
                 setActiveScreen(lobbyScreen);
@@ -2285,7 +2311,7 @@
                 } else {
                     // This block is now unreachable via the UI as per the new requirement, but the logic is kept for safety.
                     // If a player somehow manages to trigger this, they would leave the lobby.
-                    console.warn("A non-host tried to leave the lobby. This path should not be reachable via UI button.");
+                    console.warn("یک بازیکن غیر میزبان سعی کرد لابی را ترک کند. این مسیر نباید از طریق دکمه UI قابل دسترسی باشد.");
                     await updateDoc(lobbyRef, {
                         [`players.${userId}`]: deleteField()
                     });
@@ -2293,7 +2319,7 @@
                     setActiveScreen(lobbyScreen);
                     currentLobbyUnsubscribers.push(setupLobbyListener(''));
                 }
-            } catch (e) { console.error("Error leaving lobby:", e); showMessageBox("خطا در ترک لابی.", "error"); }
+            } catch (e) { console.error("خطا در ترک لابی:", e); showMessageBox("خطا در ترک لابی.", "error"); }
         }
 
         async function kickPlayer(lobbyId, playerToKickUid, playerToKickDisplayName) {
@@ -2321,7 +2347,7 @@
                 }
                 showMessageBox(`بازیکن "${playerToKickDisplayName}" اخراج شد.`, "success");
                 closeKickPlayerConfirmModal();
-            } catch (e) { console.error("Error kicking player:", e); showMessageBox("خطا در اخراج بازیکن.", "error"); }
+            } catch (e) { console.error("خطا در اخراج بازیکن:", e); showMessageBox("خطا در اخراج بازیکن.", "error"); }
         }
 
         async function unkickPlayer(lobbyId, playerToUnkickUid) {
@@ -2336,7 +2362,7 @@
                         showMessageBox(`بازیکن "${playerToUnkick.displayName}" می‌تواند دوباره وارد شود.`, "success");
                     }
                 }
-            } catch (e) { console.error("Error unkicking player:", e); showMessageBox("خطا در بازگرداندن بازیکن.", "error"); }
+            } catch (e) { console.error("خطا در بازگرداندن بازیکن:", e); showMessageBox("خطا در بازگرداندن بازیکن.", "error"); }
         }
 
         function setupKickedPlayersListListener(lobbyId) {
@@ -2390,7 +2416,7 @@
                 });
                 lobbyChatInput.value = ''; // Clear input after sending
             } catch (error) {
-                console.error("Error sending chat message:", error);
+                console.error("خطا در ارسال پیام چت:", error);
                 showMessageBox("خطا در ارسال پیام.", "error");
             }
         }
@@ -2403,7 +2429,7 @@
                     isDeleted: true
                 });
             } catch (error) {
-                console.error("Error deleting message:", error);
+                console.error("خطا در حذف پیام:", error);
                 showMessageBox("خطا در حذف پیام.", "error");
             }
         }
@@ -2455,8 +2481,8 @@
                 });
                 lobbyChatMessages.scrollTop = lobbyChatMessages.scrollHeight;
             }, (error) => {
-                console.error("Lobby chat listener error:", error);
-                console.warn("Could not load chat messages:", error.message);
+                console.error("خطا در شنیدن پیام‌های چت لابی:", error);
+                console.warn("پیام‌های چت بارگذاری نشد:", error.message);
             });
             return lobbyChatListenerUnsubscribe;
         }
@@ -2518,16 +2544,16 @@
                     gameState: initialGameState,
                     status: "playing" // Lobby status changes to playing
                 });
-                console.log(`Game state initialized for lobby ${lobbyId}`);
+                console.log(`وضعیت بازی برای لابی ${lobbyId} مقداردهی اولیه شد.`);
             } catch (error) {
-                console.error("Error initializing game state:", error);
+                console.error("خطا در مقداردهی اولیه وضعیت بازی:", error);
                 await updateDoc(lobbyRef, { status: "waiting" }); // Revert on failure
-                throw new Error("Failed to initialize game.");
+                throw new Error("مقداردهی اولیه بازی با شکست مواجه شد.");
             }
         }
         
         function setupGameUI(lobbyId, lobbyData) {
-            console.log(`Setting up game UI for lobby ID: ${lobbyId}, status: ${lobbyData.gameState.status}`);
+            console.log(`در حال راه‌اندازی رابط کاربری بازی برای لابی ID: ${lobbyId}, وضعیت: ${lobbyData.gameState.status}`);
             clearGameIntervals();
             resetGameUI(); // Reset previous state
 
@@ -2874,7 +2900,7 @@
                     }
                 }
             } catch (error) {
-                console.error("Error casting elimination vote:", error);
+                console.error("خطا در ثبت رای حذفی:", error);
                 showMessageBox("خطا در ثبت رای.", "error");
             }
         }
@@ -3009,7 +3035,7 @@
                     'gameState.winner': winner,
                     'gameState.winReason': winReason,
                 });
-                console.log(`Game Ended! Winner: ${winner}, Reason: ${winReason}`);
+                console.log(`بازی به پایان رسید! برنده: ${winner}, دلیل: ${winReason}`);
                 clearGameIntervals(); // Ensure all intervals stop when game ends
             }
         }
@@ -3187,7 +3213,7 @@
                         await initializeGameInFirestore(currentLobbyId, lobbySnap.data());
                     }
                 } catch (error) {
-                    console.error("Error starting game:", error);
+                    console.error("خطا در شروع بازی:", error);
                     showMessageBox(`خطا در شروع بازی: ${error.message}`, "error");
                 }
             }
@@ -3204,7 +3230,7 @@
                     await updateDoc(lobbyRef, { isChatLocked: !currentLockState });
                 }
             } catch (error) {
-                console.error("Error toggling chat lock:", error);
+                console.error("خطا در تغییر وضعیت قفل چت:", error);
                 showMessageBox("خطا در تغییر وضعیت چت.", "error");
             }
         });
@@ -3295,7 +3321,7 @@
                     joinLobbyPasswordInput.focus();
                 }
             } catch (error) {
-                console.error("Error verifying lobby password:", error);
+                console.error("خطا در بررسی رمز عبور لابی:", error);
                 showPasswordPromptMessage('خطا در بررسی رمز عبور.');
             } finally {
                 submitJoinPasswordBtn.disabled = false;
@@ -3401,7 +3427,7 @@
                 }
             } else {
                 // If lobby doesn't exist, just go back to lobbies screen
-                console.warn("Lobby does not exist while trying to leave game.");
+                console.warn("لابی در حالی که قصد ترک بازی را داشتید، وجود ندارد.");
             }
             // All players will be kicked back to lobby screen by their listeners, or manually sent back here.
             currentLobbyId = null;
