@@ -3,41 +3,75 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>بازی هوش مصنوعی</title>
+    <title>بازی هوش مصنوعی کلاسیک</title>
     <!-- Tailwind CSS CDN for styling -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Google Fonts for Classic Look -->
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Vazirmatn:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Merriweather:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        /* ================================================= */
-        /* === بخش CSS بدون تغییر باقی می‌ماند (بسیار طولانی است) === */
-        /* === فقط استایل‌های جدید در زیر اضافه می‌شوند === */
-        /* ================================================= */
+        /* General Classic Theme Background and Fonts (Unchanged) */
         html, body, #app { height: 100%; margin: 0; padding: 0; overflow: hidden; }
-        body { font-family: 'Vazirmatn', sans-serif; background: radial-gradient(ellipse at bottom, #100C08 0%, #000000 100%); color: #E0E0E0; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+        body { font-family: 'Merriweather', serif; background: radial-gradient(ellipse at bottom, #100C08 0%, #000000 100%); color: #E0E0E0; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
         h1, h2 { font-family: 'Playfair Display', serif; color: #FFD700; text-shadow: 2px 2px 4px rgba(0,0,0,0.5); }
-        .classic-card { background: linear-gradient(145deg, #4B0000 0%, #660000 60%, #800000 100%); border: 4px solid #DAA520; border-radius: 20px; box-shadow: 0 15px 30px rgba(0,0,0,0.6), inset 0 0 15px rgba(255,255,255,0.1); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); position: relative; max-height: 90vh; overflow-y: hidden; overflow-x: hidden; }
-        .classic-btn { border: 2px solid #DAA520; border-radius: 15px; font-weight: 700; text-shadow: 1px 1px 2px rgba(0,0,0,0.6); transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1); box-shadow: 0 8px 16px rgba(0,0,0,0.4), inset 0 0 8px rgba(255,255,255,0.1); color: #FFFFFF; padding: 0.875rem 1.5rem; font-size: 1.125rem; position: relative; overflow: hidden; }
-        .classic-btn:hover { transform: translateY(-5px) scale(1.03); box-shadow: 0 12px 24px rgba(0,0,0,0.6), inset 0 0 10px rgba(255,255,255,0.2); }
-        input { background-color: #202020; border: 2px solid #5A5A5A; color: #E0E0E0; padding: 0.875rem; border-radius: 0.75rem; box-shadow: inset 0 2px 4px rgba(0,0,0,0.5); }
-        input:focus { border-color: #DAA520 !important; box-shadow: 0 0 0 4px rgba(218, 165, 32, 0.5) !important, inset 0 2px 4px rgba(0,0,0,0.5) !important; }
-        .main-content-area { padding-top: 70px; padding-bottom: 90px; flex-grow: 1; overflow-y: hidden; overflow-x: hidden; width: 100%; display: flex; flex-direction: column; justify-content: flex-start; align-items: center; background: linear-gradient(180deg, #2C2C2C 0%, #1A1A1A 100%); position: relative; }
+        .spinner { border: 4px solid rgba(255, 255, 255, 0.3); border-top: 4px solid #DAA520; border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        @keyframes spin-refresh { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        .is-refreshing { animation: spin-refresh 0.8s ease-in-out; }
         .page-transition-active { transition: opacity 0.6s ease-in-out; }
         .page-transition-hidden { opacity: 0; }
         .page-transition-visible { opacity: 1; }
 
-        /* === استایل‌های جدید برای بازی هوش مصنوعی === */
+        /* Classic Card/Modal Styling (Unchanged) */
+        .classic-card { background: linear-gradient(145deg, #4B0000 0%, #660000 60%, #800000 100%); border: 4px solid #DAA520; border-radius: 20px; box-shadow: 0 15px 30px rgba(0,0,0,0.6), inset 0 0 15px rgba(255,255,255,0.1); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); position: relative; max-height: 90vh; overflow-y: hidden; overflow-x: hidden; }
+        .classic-card::before { content: ''; position: absolute; top: -10px; left: -10px; width: 30px; height: 30px; border-top: 5px solid #FFD700; border-left: 5px solid #FFD700; border-radius: 5px 0 0 0; box-shadow: 0 0 10px rgba(255,215,0,0.5); }
+        .classic-card::after { content: ''; position: absolute; bottom: -10px; right: -10px; width: 30px; height: 30px; border-bottom: 5px solid #FFD700; border-right: 5px solid #FFD700; border-radius: 0 0 5px 0; box-shadow: 0 0 10px rgba(255,215,0,0.5); }
 
-        /* استایل برای شمارش معکوس شروع بازی */
-        #game-countdown-overlay {
-            background-color: rgba(0, 0, 0, 0.85);
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
-            transition: opacity 0.5s ease-in-out;
+        /* Button & Input Styles (Unchanged) */
+        .classic-btn { border: 2px solid #DAA520; border-radius: 15px; font-weight: 700; text-shadow: 1px 1px 2px rgba(0,0,0,0.6); transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1); box-shadow: 0 8px 16px rgba(0,0,0,0.4), inset 0 0 8px rgba(255,255,255,0.1); color: #FFFFFF; padding: 0.875rem 1.5rem; font-size: 1.125rem; position: relative; overflow: hidden; }
+        .classic-btn::before { content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: rgba(255,255,255,0.1); transform: skewX(-30deg); transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1); }
+        .classic-btn:hover::before { left: 100%; }
+        .classic-btn:hover { transform: translateY(-5px) scale(1.03); box-shadow: 0 12px 24px rgba(0,0,0,0.6), inset 0 0 10px rgba(255,255,255,0.2); }
+        .classic-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; box-shadow: 0 8px 16px rgba(0,0,0,0.4), inset 0 0 8px rgba(255,255,255,0.1); }
+        .btn-purple-classic { background: linear-gradient(145deg, #8A2BE2 0%, #6A0DAD 100%); }
+        .btn-blue-classic { background: linear-gradient(145deg, #4682B4 0%, #2A52BE 100%); }
+        .btn-green-classic { background: linear-gradient(145deg, #228B22 0%, #006400 100%); }
+        .btn-red-classic { background: linear-gradient(145deg, #CD5C5C 0%, #B22222 100%); }
+        .btn-gray-classic { background: linear-gradient(145deg, #A9A9A9 0%, #808080 100%); }
+        input { background-color: #202020; border: 2px solid #5A5A5A; color: #E0E0E0; padding: 0.875rem; border-radius: 0.75rem; box-shadow: inset 0 2px 4px rgba(0,0,0,0.5); }
+        input::placeholder { color: #A0A0A0; }
+        input:focus { border-color: #DAA520 !important; box-shadow: 0 0 0 4px rgba(218, 165, 32, 0.5) !important, inset 0 2px 4px rgba(0,0,0,0.5) !important; }
+        
+        /* Layout & Lobby Styles (Mostly Unchanged) */
+        .app-header, .lobby-header, .app-footer, .lobby-footer { /* ... existing styles ... */ }
+        .main-content-area { /* ... existing styles ... */ }
+        .lobby-item { /* ... existing styles ... */ }
+        .lobby-detail-screen-full, .lobby-detail-content, .lobby-sidebar, .lobby-main-panel { /* ... existing styles ... */ }
+        .player-list-item, .lobby-chat-container, .lobby-chat-messages, .chat-message { /* ... existing styles ... */ }
+
+        /* === NEW: Game Screen & Countdown Styles === */
+        #game-screen {
+            background: radial-gradient(ellipse at bottom, #0a0a1a 0%, #000000 100%); /* Dark blue/black theme */
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            height: 100%;
+            padding: 70px 1rem 90px 1rem; /* Padding for header/footer */
+        }
+        
+        /* Countdown Overlay */
+        #countdown-overlay {
+            position: absolute;
+            inset: 0;
+            background-color: rgba(0,0,0,0.9);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+            transition: opacity 0.5s ease-out;
         }
         #countdown-timer {
             font-family: 'Playfair Display', serif;
-            font-size: 12rem;
+            font-size: 15rem;
             color: #FFD700;
             text-shadow: 0 0 30px #FFD700, 0 0 60px #DAA520;
             animation: pulse 1s infinite;
@@ -48,303 +82,440 @@
             100% { transform: scale(1); opacity: 0.8; }
         }
 
-        /* استایل برای نمایش نقش بازیکن */
-        #my-role-display {
-            background: rgba(0, 0, 0, 0.6);
-            border: 2px solid #FFD700;
-            border-radius: 12px;
-            box-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
-            transition: all 0.5s ease-in-out;
-            transform: translateY(-100px);
-            opacity: 0;
+        /* Game Header (for timer and role) */
+        .game-header {
+            background: linear-gradient(to right, #1a1a2e 0%, #16213e 50%, #1a1a2e 100%);
+            border-bottom: 3px solid #0f3460;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.7);
+            height: 70px;
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            z-index: 40;
+            padding: 0.75rem 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
-        #my-role-display.visible {
-            transform: translateY(0);
-            opacity: 1;
-        }
-        .role-human { color: #60a5fa; /* blue-400 */ }
-        .role-ai { color: #f87171; /* red-400 */ }
 
-        /* استایل برای تایمر گفتگو */
-        #discussion-timer {
-            background-color: rgba(0,0,0,0.5);
-            border-radius: 10px;
+        #game-timer-display, #my-role-display {
+            color: #E0E0E0;
+            font-size: 1.25rem;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        #my-role-display span {
+            padding: 0.25rem 0.75rem;
+            border-radius: 8px;
+        }
+        .role-human { background-color: #4682B4; color: white; }
+        .role-ai { background-color: #B22222; color: white; }
+        
+        /* Main Game Content Area */
+        .game-content-area {
+            display: flex;
+            flex-grow: 1;
+            gap: 1.5rem;
+            overflow: hidden;
+            width: 100%;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* Player list during the game */
+        .game-player-list-container {
+            flex-shrink: 0;
+            width: 300px;
+            background-color: rgba(0,0,0,0.3);
+            border-radius: 15px;
+            padding: 1rem;
+            border: 1px solid #0f3460;
+            overflow-y: auto;
+        }
+        .game-player-item {
+            background-color: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            padding: 0.75rem;
+            margin-bottom: 0.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+        .game-player-item.ejected {
+            opacity: 0.4;
+            background-color: #333;
+            text-decoration: line-through;
+        }
+        .vote-btn {
+            background: linear-gradient(145deg, #4682B4 0%, #2A52BE 100%);
             border: 1px solid #DAA520;
+            color: white;
+            border-radius: 5px;
+            padding: 0.3rem 0.8rem;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .vote-btn:hover:not(:disabled) {
+            transform: scale(1.05);
+            box-shadow: 0 0 10px rgba(218, 165, 32, 0.7);
+        }
+        .vote-btn:disabled {
+            background: #555;
+            border-color: #777;
+            cursor: not-allowed;
+        }
+
+        /* Chat area during game (re-uses lobby chat styles) */
+        .game-chat-panel {
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+            min-width: 0;
         }
         
-        /* استایل برای اینترفیس رای‌گیری */
-        #voting-interface {
-            background: rgba(10, 0, 0, 0.7);
-            border: 2px solid #DAA520;
-            border-radius: 15px;
-            backdrop-filter: blur(5px);
+        /* NEW: Game Over Modal */
+        #game-over-modal {
+            background-color: rgba(0,0,0,0.8);
+            transition: opacity 0.3s ease-in-out;
         }
-        .vote-player-btn {
-            background: linear-gradient(145deg, #4682B4 0%, #2A52BE 100%); /* Steel Blue / Royal Blue */
-        }
-        .vote-player-btn:disabled {
-            background: #555;
-            cursor: not-allowed;
-            opacity: 0.6;
-        }
-        .vote-player-btn.voted-for {
-            border-color: #34d399; /* green-400 */
-            box-shadow: 0 0 15px #34d399;
-        }
-
-        /* استایل برای صفحه پایان بازی */
-        #game-over-overlay {
-            background: rgba(0, 0, 0, 0.9);
-            backdrop-filter: blur(10px);
-            transition: opacity 0.8s ease-in-out;
-        }
+        
     </style>
 </head>
 <body>
 
     <div id="app" class="relative w-full h-full flex justify-center items-center">
-        <!-- بقیه مودال‌ها و صفحه‌ها بدون تغییر باقی می‌مانند... -->
 
-        <!-- Loading Screen -->
-        <div id="loading-screen" class="absolute inset-0 flex flex-col justify-center items-center bg-gray-900 z-50 page-transition-active page-transition-visible"></div>
+        <!-- Screens 1-7 (Loading, Auth, Main, Lobby, Modals) remain mostly unchanged in their HTML structure -->
+        <!-- They will be included here for completeness but are collapsed for brevity -->
+        <!-- 1. Loading Screen -->
+        <div id="loading-screen" class="absolute inset-0 flex flex-col justify-center items-center bg-gray-900 z-50 page-transition-active page-transition-visible" tabindex="-1">
+            <div class="spinner mb-4"></div>
+            <p class="text-xl md:text-2xl font-semibold text-blue-400">در حال بارگذاری...</p>
+        </div>
 
-        <!-- Auth Screen -->
-        <div id="auth-screen" class="hidden absolute inset-0 flex justify-center items-center z-40 page-transition-active page-transition-hidden"></div>
-        
-        <!-- Main Screen -->
-        <div id="main-screen" class="hidden absolute inset-0 flex flex-col z-30 page-transition-active page-transition-hidden"></div>
-        
-        <!-- Lobby Screen -->
-        <div id="lobby-screen" class="hidden absolute inset-0 flex flex-col z-30 page-transition-active page-transition-hidden"></div>
+        <!-- 2. Authentication Screen -->
+        <div id="auth-screen" class="hidden absolute inset-0 flex justify-center items-center bg-gray-900 bg-opacity-90 z-40 page-transition-active page-transition-hidden" tabindex="-1">
+            <div class="classic-card p-6 sm:p-8 w-11/12 max-w-md text-center">
+                <h2 class="text-2xl sm:text-3xl font-bold mb-6">ورود / ثبت نام</h2>
+                <form id="auth-form" class="space-y-5">
+                    <div><input type="email" id="email" placeholder="ایمیل شما" class="w-full focus:outline-none" required></div>
+                    <div id="display-name-field" class="hidden"><input type="text" id="display-name" placeholder="نام نمایشی (در بازی)" class="w-full focus:outline-none"></div>
+                    <div><input type="password" id="password" placeholder="رمز عبور (حداقل ۶ کاراکتر)" class="w-full focus:outline-none" required></div>
+                    <div class="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4 sm:space-x-reverse mt-6">
+                        <button type="button" id="login-toggle-btn" class="w-full sm:w-1/2 classic-btn btn-blue-classic text-xl sm:text-2xl">ورود</button>
+                        <button type="button" id="register-toggle-btn" class="w-full sm:w-1/2 classic-btn btn-green-classic text-xl sm:text-2xl">ثبت نام</button>
+                    </div>
+                    <button type="submit" id="submit-auth-btn" class="w-full mt-4 classic-btn btn-purple-classic text-xl sm:text-2xl hidden">ادامه</button>
+                </form>
+                <div id="message-box" class="mt-5 p-3.5 rounded-xl text-base text-center hidden" role="alert"></div>
+            </div>
+        </div>
 
-        <!-- Profile Modal -->
-        <div id="profile-modal" class="hidden fixed inset-0 flex justify-center items-center z-50"></div>
-        
-        <!-- Create Lobby Modal (MODIFIED) -->
+        <!-- 3. Main Screen -->
+        <div id="main-screen" class="hidden absolute inset-0 flex flex-col z-30 page-transition-active page-transition-hidden" tabindex="-1">
+            <header class="app-header">
+                 <div id="profile-summary" class="flex items-center space-x-2 space-x-reverse cursor-pointer p-2 rounded-lg hover:bg-gray-700 transition-colors duration-200" title="مشاهده پروفایل">
+                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-user-circle"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="10" r="3"/><path d="M7 20.662V19a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v1.662"/></svg>
+                    <div class="flex flex-col text-right">
+                        <span id="header-display-name" class="font-bold text-lg text-white">نام کاربری</span>
+                        <span id="header-user-id" class="text-xs text-gray-300 break-all">ID: ---</span>
+                    </div>
+                </div>
+                <button id="menu-btn" class="text-white text-3xl p-2 rounded-full hover:bg-gray-700 transition-colors duration-200">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-menu"><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/></svg>
+                </button>
+            </header>
+            <div class="main-content-area">
+                <h1 class="text-4xl text-yellow-300 font-bold mb-8">به بازی هوش مصنوعی خوش آمدید!</h1>
+                <p class="text-lg text-gray-300">برای شروع، یک لابی بسازید یا به لابی دوستانتان بپیوندید.</p>
+            </div>
+            <footer class="app-footer">
+                <button id="friendly-game-btn" class="classic-btn btn-purple-classic text-base sm:text-lg w-1/2 mx-2 py-3.5 px-4">ورود به لابی‌ها</button>
+                <button id="rated-game-btn" class="classic-btn btn-brown-classic text-base sm:text-lg w-1/2 mx-2 py-3.5 px-4">بازی امتیازی</button>
+            </footer>
+        </div>
+
+        <!-- 4. Lobby Screen -->
+        <div id="lobby-screen" class="hidden absolute inset-0 flex flex-col z-30 page-transition-active page-transition-hidden" tabindex="-1">
+            <header class="lobby-header">
+                <div class="search-container">
+                    <button id="back-to-main-btn" class="p-1">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-right"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+                    </button>
+                    <input type="text" id="lobby-search-input" placeholder="جستجو بر اساس نام لابی یا سازنده" class="flex-grow text-sm">
+                    <button id="search-lobbies-btn" class="p-1">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-search"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+                    </button>
+                </div>
+            </header>
+            <div class="main-content-area p-4 sm:p-6 text-center">
+                <div class="max-w-xl mx-auto space-y-6 w-full">
+                    <h2 class="text-xl sm:text-2xl font-bold text-white mb-4">لیست لابی‌های فعال</h2>
+                    <div id="lobbies-list" class="space-y-3 w-full"><p class="text-gray-400">در حال بارگذاری لابی‌ها...</p></div>
+                </div>
+            </div>
+            <footer class="lobby-footer">
+                <button id="add-icon-btn" class="icon-btn">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-plus-square"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M12 8v8"/><path d="M8 12h8"/></svg>
+                    <span>ایجاد</span>
+                </button>
+                <button id="refresh-lobbies-btn" class="icon-btn">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-rotate-cw"><path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/></svg>
+                    <span>بروزرسانی</span>
+                </button>
+                <button id="my-lobbies-btn" class="icon-btn">
+                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-users"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                    <span>لابی‌های من</span>
+                </button>
+                <div class="games-running-text">
+                    <span id="active-games-count">0</span>
+                    <span>بازی در حال اجرا</span>
+                </div>
+            </footer>
+        </div>
+
+        <!-- 5. Profile Modal -->
+        <div id="profile-modal" class="hidden fixed inset-0 flex justify-center items-center z-50 profile-modal-overlay">
+            <div class="classic-card profile-modal-content p-6 sm:p-8 w-11/12 max-w-md text-center relative">
+                <h2 class="text-2xl sm:text-3xl font-bold mb-6">پروفایل کاربری</h2>
+                <button id="close-profile-modal-btn" class="absolute top-4 left-4 text-white hover:text-gray-300"><svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button>
+                <div class="text-lg space-y-4 mb-8 text-white">
+                    <p><strong>نام نمایشی:</strong> <span id="profile-display-name">---</span></p>
+                    <p><strong>ایمیل:</strong> <span id="profile-email">---</span></p>
+                    <p><strong>شناسه کاربر:</strong> <span id="profile-uid" class="break-all text-sm text-gray-400">---</span></p>
+                </div>
+                <button id="profile-logout-btn" class="w-full classic-btn btn-red-classic text-lg sm:text-xl">خروج از حساب</button>
+            </div>
+        </div>
+
+        <!-- 6. Create Lobby Modal (MODIFIED) -->
         <div id="create-lobby-modal" class="hidden fixed inset-0 flex justify-center items-center z-50 profile-modal-overlay">
             <div class="classic-card profile-modal-content p-6 sm:p-8 w-11/12 max-w-md text-center relative">
                 <h2 class="text-2xl sm:text-3xl font-bold mb-6">ساخت لابی جدید</h2>
-                <button id="close-create-lobby-modal-btn" class="absolute top-4 left-4 text-white hover:text-gray-300">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
-                </button>
+                <button id="close-create-lobby-modal-btn" class="absolute top-4 left-4 text-white hover:text-gray-300"><svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button>
                 <form id="create-lobby-form" class="space-y-5">
-                    <input type="text" id="new-lobby-name-input" placeholder="نام لابی شما" class="w-full" required>
+                    <div><input type="text" id="new-lobby-name-input" placeholder="نام لابی شما" class="w-full focus:outline-none" required></div>
                     
                     <!-- NEW: Game Duration Setting -->
                     <div>
-                        <label for="game-duration-select" class="block text-right mb-2 text-yellow-300">مدت زمان گفتگو:</label>
-                        <select id="game-duration-select" class="w-full text-white bg-gray-800 border-gray-600 p-3 rounded-lg">
+                        <label for="game-duration-select" class="block text-white text-right mb-2">زمان بازی (بحث و گفتگو):</label>
+                        <select id="game-duration-select" class="w-full bg-gray-700 border border-gray-600 rounded-lg p-2 text-white">
                             <option value="180">۳ دقیقه</option>
                             <option value="300" selected>۵ دقیقه</option>
+                            <option value="420">۷ دقیقه</option>
                             <option value="600">۱۰ دقیقه</option>
-                            <option value="900">۱۵ دقیقه</option>
                         </select>
                     </div>
-                    
-                    <button type="submit" id="submit-create-lobby-btn" class="w-full mt-4 classic-btn btn-green-classic text-xl sm:text-2xl">
-                        ساخت لابی
-                    </button>
+
+                    <div class="flex justify-center space-x-2 space-x-reverse my-4" id="lobby-type-toggle">
+                        <label class="cursor-pointer"><input type="radio" name="lobby-type" value="public" class="sr-only" checked><span class="lobby-type-btn active">عمومی</span></label>
+                        <label class="cursor-pointer"><input type="radio" name="lobby-type" value="private" class="sr-only"><span class="lobby-type-btn">خصوصی</span></label>
+                    </div>
+                    <div id="new-lobby-password-field" class="hidden relative">
+                         <input type="password" id="new-lobby-password-input" placeholder="رمز عبور لابی" class="w-full pr-10">
+                         <!-- ... password visibility toggle icons ... -->
+                    </div>
+                    <button type="submit" id="submit-create-lobby-btn" class="w-full mt-4 classic-btn btn-green-classic text-xl sm:text-2xl">ساخت لابی</button>
                 </form>
                 <div id="create-lobby-message-box" class="mt-5 p-3.5 rounded-xl text-base text-center hidden" role="alert"></div>
             </div>
         </div>
-        
-        <!-- Lobby Detail Screen -->
-        <div id="lobby-detail-screen" class="hidden absolute inset-0 z-30 page-transition-active page-transition-hidden lobby-detail-screen-full"></div>
-        
-        <!-- Game Screen (HEAVILY MODIFIED) -->
-        <div id="game-screen" class="hidden absolute inset-0 z-30 page-transition-active page-transition-hidden flex flex-col items-center justify-center p-2" tabindex="-1">
-            
-            <!-- Game Header -->
-            <div class="absolute top-0 left-0 right-0 h-24 bg-black bg-opacity-40 flex justify-between items-center px-4 z-20">
-                <!-- NEW: My Role Display -->
-                <div id="my-role-display" class="p-4 text-center">
-                    <h3 class="text-lg">نقش شما:</h3>
-                    <p id="my-role-text" class="text-2xl font-bold"></p>
-                </div>
-                
-                <!-- NEW: Discussion Timer -->
-                <div id="discussion-timer" class="p-4 text-center text-white">
-                    <h3 class="text-lg text-yellow-300">زمان باقی‌مانده</h3>
-                    <p id="timer-display" class="text-3xl font-bold">--:--</p>
-                </div>
 
-                <button id="leave-game-btn" class="classic-btn btn-red-classic text-sm py-2 px-4">ترک بازی</button>
-            </div>
-
-            <!-- Main Game Content (Replaces Table) -->
-            <div id="game-content-area" class="w-full h-full flex pt-24">
-                <!-- Player List Sidebar -->
-                <div class="w-1/4 bg-black bg-opacity-30 p-4 rounded-lg overflow-y-auto">
-                    <h3 class="text-xl font-bold text-yellow-300 mb-4">بازیکنان</h3>
-                    <div id="game-player-list" class="space-y-3">
-                        <!-- Player items will be dynamically loaded here -->
+        <!-- 7. Lobby Detail Screen -->
+        <div id="lobby-detail-screen" class="hidden absolute inset-0 z-30 page-transition-active page-transition-hidden lobby-detail-screen-full" tabindex="-1">
+            <div class="lobby-detail-content">
+                <div class="lobby-sidebar">
+                    <h2 id="detail-lobby-name" class="text-2xl sm:text-3xl font-bold text-yellow-300 truncate">نام لابی</h2>
+                    <p id="detail-host-name" class="text-md text-gray-300 mt-2">سازنده: ---</p>
+                    <p id="detail-player-count" class="text-sm font-semibold text-white mb-4">بازیکنان: 0/4</p>
+                    <div class="w-full h-px bg-yellow-600 mb-4"></div>
+                    <div id="player-list-container"><!-- Player list items --></div>
+                </div>
+                <div class="lobby-main-panel">
+                    <div class="lobby-chat-container">
+                        <div id="lobby-chat-messages" class="lobby-chat-messages"><!-- Chat messages --></div>
+                        <form id="lobby-chat-form" class="lobby-chat-input-form">
+                            <input type="text" id="lobby-chat-input" placeholder="پیام خود را بنویسید..." autocomplete="off">
+                            <button type="submit" id="lobby-chat-send-btn" class="classic-btn btn-blue-classic text-sm py-2 px-4">ارسال</button>
+                        </form>
+                    </div>
+                    <div class="lobby-actions-footer">
+                        <div id="host-actions-container" style="display: none;">
+                            <button id="start-game-btn" class="classic-btn start-game-btn" disabled>شروع بازی</button>
+                            <!-- Other host buttons can go here -->
+                        </div>
+                        <button id="leave-lobby-btn" class="classic-btn btn-red-classic text-sm py-2 px-4 hidden">بستن لابی</button>
                     </div>
                 </div>
-                
-                <!-- Chat Area -->
-                <div class="w-3/4 flex flex-col p-4">
-                    <div class="flex-grow bg-black bg-opacity-40 border-2 border-gray-700 rounded-lg p-2 flex flex-col overflow-hidden">
-                        <div id="game-chat-messages" class="flex-grow overflow-y-auto space-y-2 pr-2">
-                           <!-- Game chat messages will appear here -->
+            </div>
+        </div>
+
+        <!-- 8. Game Screen (COMPLETELY REDESIGNED) -->
+        <div id="game-screen" class="hidden absolute inset-0 z-30 page-transition-active page-transition-hidden" tabindex="-1">
+            <!-- Countdown Overlay -->
+            <div id="countdown-overlay" class="hidden">
+                <div id="countdown-timer">5</div>
+            </div>
+
+            <!-- Game Header -->
+            <header class="game-header">
+                <div id="my-role-display">
+                    <!-- Role will be injected by JS, e.g., -->
+                    <!-- نقش: <span class="role-human">انسان</span> -->
+                </div>
+                <div id="game-timer-display">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                    <span>--:--</span>
+                </div>
+                <button id="leave-game-btn" class="classic-btn btn-red-classic text-sm py-2 px-4">ترک بازی</button>
+            </header>
+
+            <!-- Main Game Content -->
+            <div class="game-content-area">
+                <!-- Player List Panel -->
+                <div class="game-player-list-container">
+                    <h3 class="text-xl font-bold text-yellow-200 mb-4">بازیکنان حاضر</h3>
+                    <div id="game-player-list">
+                        <!-- Player items will be injected by JS -->
+                    </div>
+                </div>
+
+                <!-- Chat Panel -->
+                <div class="game-chat-panel">
+                    <div class="lobby-chat-container">
+                        <div id="game-chat-messages" class="lobby-chat-messages">
+                             <div class="chat-message"><p>بحث و گفتگو آغاز شد. هوش مصنوعی را شناسایی کنید.</p></div>
                         </div>
-                        <form id="game-chat-form" class="mt-2 flex gap-2">
-                            <input type="text" id="game-chat-input" placeholder="پیام خود را با لحنی ادبی بنویسید..." class="flex-grow" autocomplete="off">
+                        <form id="game-chat-form" class="lobby-chat-input-form">
+                            <input type="text" id="game-chat-input" placeholder="پیام خود را به سبک ادبی وارد کنید..." autocomplete="off">
                             <button type="submit" id="game-chat-send-btn" class="classic-btn btn-blue-classic text-sm py-2 px-4">ارسال</button>
                         </form>
                     </div>
                 </div>
             </div>
-
-            <!-- NEW: Countdown Overlay -->
-            <div id="game-countdown-overlay" class="hidden absolute inset-0 z-50 flex flex-col justify-center items-center">
-                <p id="countdown-timer">5</p>
-                <h2 class="text-4xl mt-8">بازی در حال شروع است...</h2>
-            </div>
-            
-            <!-- NEW: Voting Interface Overlay -->
-            <div id="voting-interface" class="hidden absolute inset-0 z-40 flex flex-col justify-center items-center p-8">
-                <h2 class="text-4xl mb-6">زمان رای‌گیری!</h2>
-                <p class="text-lg mb-8">به فردی که فکر می‌کنید هوش مصنوعی است رای دهید تا حذف شود.</p>
-                <div id="voting-options" class="grid grid-cols-2 gap-4 w-full max-w-lg">
-                    <!-- Voting buttons will be generated here -->
-                </div>
-                 <p id="vote-status-text" class="mt-6 text-xl text-yellow-300"></p>
-            </div>
-
-            <!-- NEW: Game Over Overlay -->
-            <div id="game-over-overlay" class="hidden absolute inset-0 z-50 flex flex-col justify-center items-center text-center p-8">
-                <h2 id="game-over-title" class="text-6xl font-bold mb-4">بازی تمام شد</h2>
-                <p id="game-over-reason" class="text-2xl mb-8"></p>
-                <div id="game-over-roles" class="mb-8"></div>
-                <button id="return-to-lobby-btn" class="classic-btn btn-blue-classic text-xl">بازگشت به لابی‌ها</button>
-            </div>
         </div>
 
-        <!-- All other modals (kick, confirmation, etc.) -->
+        <!-- 9. Game Over Modal (NEW) -->
+        <div id="game-over-modal" class="hidden fixed inset-0 flex justify-center items-center z-50">
+            <div class="classic-card profile-modal-content p-6 sm:p-8 w-11/12 max-w-lg text-center relative">
+                <h2 id="game-over-title" class="text-3xl sm:text-4xl font-bold mb-4">بازی تمام شد!</h2>
+                <p id="game-over-reason" class="text-xl mb-6 text-white">---</p>
+                <p class="text-lg mb-8 text-yellow-300">هوش مصنوعی <span id="game-over-ai-name" class="font-bold"></span> بود.</p>
+                <button id="return-to-lobby-btn" class="w-full classic-btn btn-blue-classic">بازگشت به لابی‌ها</button>
+            </div>
+        </div>
+        
+        <!-- Other modals like confirmation, kick player, etc. are unchanged -->
+        <div id="custom-confirm-modal" class="hidden fixed inset-0 flex justify-center items-center z-50 profile-modal-overlay"> <!-- ... --> </div>
+        <div id="kick-player-confirm-modal" class="hidden fixed inset-0 z-50"> <!-- ... --> </div>
+        <div id="kicked-message-modal" class="hidden fixed inset-0 z-50"> <!-- ... --> </div>
+        <div id="kicked-players-list-modal" class="hidden fixed inset-0 z-50"> <!-- ... --> </div>
+        <div id="enter-password-modal" class="hidden fixed inset-0 z-50"> <!-- ... --> </div>
 
     </div>
 
     <!-- Firebase SDKs -->
     <script type="module">
-        // All previous Firebase imports and config remain the same...
+        // Import the functions you need from the SDKs you need
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInWithCustomToken, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, setDoc, getDoc, collection, addDoc, serverTimestamp, query, where, onSnapshot, updateDoc, arrayUnion, arrayRemove, deleteDoc, getDocs, orderBy, deleteField, runTransaction } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js"; 
+        import { getFirestore, doc, setDoc, getDoc, collection, addDoc, serverTimestamp, query, where, onSnapshot, updateDoc, arrayUnion, arrayRemove, deleteDoc, getDocs, orderBy, deleteField, writeBatch } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js"; 
 
-        // All previous Firebase and DOM element variables...
-        // ... (The long list of variables from your original code)
+        // --- Firebase Configuration ---
+        const firebaseConfig = {
+            apiKey: "AIzaSyBpVHnjF5gdTm3vJiHEoAZCowsRkTapj_4",
+            authDomain: "hokm-d6911.firebaseapp.com",
+            projectId: "hokm-d6911",
+            storageBucket: "hokm-d6911.appspot.com",
+            messagingSenderId: "128133280011",
+            appId: "1:128133280011:web:c9fe28f5201eef7a3a320e",
+            measurementId: "G-LN0S9W86MK"
+        };
+        const geminiApiKey = "AIzaSyDfMZwyWNnRFUDLHKR1t_hZ5cWv2c_KvvE"; // API Key for chat validation
 
-        // === NEW & MODIFIED DOM Elements ===
-        const gameDurationSelect = document.getElementById('game-duration-select');
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // --- DOM Elements ---
+        // (Most existing DOM element variables are the same)
+        const loadingScreen = document.getElementById('loading-screen');
+        const authScreen = document.getElementById('auth-screen');
+        const mainScreen = document.getElementById('main-screen');
+        const lobbyScreen = document.getElementById('lobby-screen');
+        const lobbyDetailScreen = document.getElementById('lobby-detail-screen');
+        
+        // MODIFIED: Create Lobby Modal Elements
+        const createLobbyForm = document.getElementById('create-lobby-form');
+        const newLobbyNameInput = document.getElementById('new-lobby-name-input');
+        const gameDurationSelect = document.getElementById('game-duration-select'); // NEW
+
+        // MODIFIED: Lobby Detail Screen Elements
+        const startGameBtn = document.getElementById('start-game-btn');
+        
+        // NEW or REDESIGNED: Game Screen Elements
         const gameScreen = document.getElementById('game-screen');
+        const countdownOverlay = document.getElementById('countdown-overlay');
+        const countdownTimerEl = document.getElementById('countdown-timer');
         const myRoleDisplay = document.getElementById('my-role-display');
-        const myRoleText = document.getElementById('my-role-text');
-        const discussionTimer = document.getElementById('discussion-timer');
-        const timerDisplay = document.getElementById('timer-display');
+        const gameTimerDisplay = document.getElementById('game-timer-display');
+        const leaveGameBtn = document.getElementById('leave-game-btn');
         const gamePlayerList = document.getElementById('game-player-list');
         const gameChatMessages = document.getElementById('game-chat-messages');
         const gameChatForm = document.getElementById('game-chat-form');
         const gameChatInput = document.getElementById('game-chat-input');
         const gameChatSendBtn = document.getElementById('game-chat-send-btn');
-        const gameCountdownOverlay = document.getElementById('game-countdown-overlay');
-        const countdownTimer = document.getElementById('countdown-timer');
-        const votingInterface = document.getElementById('voting-interface');
-        const votingOptions = document.getElementById('voting-options');
-        const voteStatusText = document.getElementById('vote-status-text');
-        const gameOverOverlay = document.getElementById('game-over-overlay');
+        const gameOverModal = document.getElementById('game-over-modal');
         const gameOverTitle = document.getElementById('game-over-title');
         const gameOverReason = document.getElementById('game-over-reason');
-        const gameOverRoles = document.getElementById('game-over-roles');
+        const gameOverAiName = document.getElementById('game-over-ai-name');
         const returnToLobbyBtn = document.getElementById('return-to-lobby-btn');
-        const leaveGameBtn = document.getElementById('leave-game-btn');
 
+        // Other common elements
+        const friendlyGameBtn = document.getElementById('friendly-game-btn');
+        const backToMainBtn = document.getElementById('back-to-main-btn');
+        const lobbiesList = document.getElementById('lobbies-list');
+        // ... and other elements from the original code
 
-        // === NEW & MODIFIED State Variables ===
-        let unsubscribeGame = null;
-        let gameTimerInterval = null; // To hold the setInterval ID for the discussion timer
+        // --- State Variables ---
+        let currentActiveScreen = loadingScreen;
+        let currentUserData = null;
+        let unsubscribeLobbies = null;
+        let unsubscribeLobbyDetail = null;
+        let unsubscribeGame = null; // Listener for the active game state
+        let currentLobbyId = null;
+        let gameTimerInterval = null; // To hold the setInterval for the game timer
+        // ... other state variables from original code
 
-        // The Gemini API Key for chat validation
-        const GEMINI_API_KEY = "AIzaSyDfMZwyWNnRFUDLHKR1t_hZ5cWv2c_KvvE"; // (This should be kept secure in a real app)
+        // --- Utility Functions (Mostly Unchanged) ---
+        function setActiveScreen(newScreen) { /* ... existing code ... */ }
+        function showMessageBox(msg, type) { /* ... existing code ... */ }
+        // ... other utility functions ...
 
-        // ==========================================================
-        // === ALL PREVIOUS FUNCTIONS (Auth, Modals, etc.)
-        // === ARE KEPT HERE, BUT ARE OMITTED FOR BREVITY.
-        // === WE WILL FOCUS ONLY ON THE NEW/MODIFIED FUNCTIONS.
-        // ==========================================================
-
-        // --- Helper and Utility Functions (Some are new) ---
-
-        // Function to transition between screens (Unchanged)
-        function setActiveScreen(newScreen) { /* ... same as before ... */ }
-        function showMessageBox(msg, type) { /* ... same as before ... */ }
-        async function showCustomConfirm(message, title) { /* ... same as before ... */ }
-        
-        /**
-         * MODIFIED: This function is now used to create the AI vs Human game lobby.
-         */
-        async function createLobby(lobbyName, userId, displayName, gameDuration) {
-            // ... (previous checks for active lobbies remain the same) ...
-            const lobbiesRef = collection(db, `global_lobbies`);
-            const newLobbyData = {
-                name: lobbyName,
-                hostId: userId,
-                status: "waiting", // Game starts as 'waiting'
-                players: { [userId]: displayName },
-                createdAt: serverTimestamp(),
-                gameSettings: { 
-                    maxPlayers: 4, 
-                    // NEW: Store the game duration
-                    durationSeconds: parseInt(gameDuration, 10) 
-                }
-            };
-            const newLobbyRef = await addDoc(lobbiesRef, newLobbyData);
-            return newLobbyRef.id;
-        }
+        // =================================================================
+        // =========== CORE LOGIC MODIFICATIONS AND ADDITIONS ============
+        // =================================================================
 
         /**
-         * MODIFIED: The create lobby form handler now gets the duration.
-         */
-        createLobbyForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const lobbyName = newLobbyNameInput.value.trim();
-            const gameDuration = gameDurationSelect.value;
-            // ... (validation for name, user, etc. remains the same) ...
-            try {
-                // The AI check for the lobby name can be kept if desired.
-                const newLobbyId = await createLobby(lobbyName, auth.currentUser.uid, currentUserData.displayName, gameDuration);
-                // ... (rest of the success logic) ...
-            } catch (error) {
-                // ... (error handling) ...
-            }
-        });
-
-        /**
-         * NEW: AI Chat Style Validator
-         * Checks if the user's message is in a formal/literary/AI-like style.
-         * @param {string} messageText - The message to validate.
-         * @returns {Promise<{is_valid_style: boolean, reason: string}>}
+         * MODIFIED: Calls Gemini API to validate if a chat message is in a "literary" or "AI-like" style.
+         * This is the core of the new chat mechanic.
+         * @param {string} messageText - The text to validate.
+         * @returns {Promise<{isValid: boolean, reason: string}>} - The validation result.
          */
         async function validateMessageStyleWithAI(messageText) {
-            const prompt = `As a strict linguistic style moderator for a role-playing game, analyze the following Persian text. The required style is formal, literary, and sophisticated, as if spoken by an advanced AI. The text MUST NOT contain modern slang, casual chat abbreviations, or overly simplistic conversational phrases. Your response MUST be a JSON object with this exact structure: {"is_valid_style": boolean, "reason": string}. If 'is_valid_style' is false, provide a brief, helpful reason in Persian for the user (e.g., "لحن بیش از حد عامیانه است", "از کلمات رسمی‌تری استفاده کنید"). If the style is valid, 'reason' should be an empty string. Text to analyze: "${messageText}"`;
+            // This prompt is crucial. It asks for a simple JSON response.
+            const prompt = `Analyze the following Persian sentence. Determine if its style is formal, literary, or similar to how an advanced AI would speak. Casual, slang, or very simple conversational styles are not acceptable. Your response MUST be a JSON object with two keys: {"isValid": boolean, "reason": string}. If the style is acceptable, set "isValid" to true and "reason" to an empty string. If not, set "isValid" to false and provide a very brief, helpful reason in Persian (e.g., "بیش از حد عامیانه است"). Sentence to analyze: "${messageText}"`;
             
             const payload = {
                 contents: [{ role: "user", parts: [{ text: prompt }] }],
-                generationConfig: {
-                    responseMimeType: "application/json",
-                    responseSchema: {
-                        type: "OBJECT",
-                        properties: {
-                            "is_valid_style": { "type": "BOOLEAN" },
-                            "reason": { "type": "STRING" }
-                        },
-                        required: ["is_valid_style", "reason"]
-                    }
-                }
+                generationConfig: { responseMimeType: "application/json" }
             };
-            
-            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${GEMINI_API_KEY}`;
-            
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${geminiApiKey}`;
+
             try {
                 const response = await fetch(apiUrl, {
                     method: 'POST',
@@ -352,77 +523,350 @@
                     body: JSON.stringify(payload)
                 });
                 if (!response.ok) {
-                    return { is_valid_style: false, reason: "خطا در ارتباط با سرور اعتبارسنجی." };
+                    console.error("AI API HTTP Error:", response.status, await response.text());
+                    return { isValid: false, reason: "خطا در ارتباط با سرور اعتبارسنجی." };
                 }
                 const result = await response.json();
                 const jsonString = result.candidates[0].content.parts[0].text;
-                return JSON.parse(jsonString);
+                const parsedJson = JSON.parse(jsonString);
+                
+                if (typeof parsedJson.isValid === 'boolean') {
+                    return parsedJson;
+                } else {
+                    return { isValid: false, reason: "پاسخ سرور نامعتبر بود." };
+                }
             } catch (error) {
                 console.error("Error calling AI validation API:", error);
-                return { is_valid_style: false, reason: "خطا در پردازش درخواست اعتبارسنجی." };
+                return { isValid: false, reason: `خطای شبکه در اعتبارسنجی: ${error.message}` };
             }
         }
 
-
         /**
-         * NEW: Function to initialize the AI vs Human game in Firestore.
-         * This is called by the host when they click "Start Game".
-         * @param {string} lobbyId - The ID of the lobby.
-         * @param {object} lobbyData - The current data of the lobby.
+         * MODIFIED: createLobby function now includes game settings.
          */
-        async function initializeAiGameInFirestore(lobbyId, lobbyData) {
+        async function createLobby(lobbyName, userId, displayName, lobbyType, password, gameDuration) {
+            try {
+                // ... (check for existing lobbies remains the same)
+        
+                const lobbiesRef = collection(db, `global_lobbies`);
+                const newLobbyData = {
+                    name: lobbyName,
+                    hostId: userId,
+                    status: "waiting", // 'waiting', 'playing', 'finished'
+                    type: lobbyType,
+                    players: { [userId]: displayName },
+                    kickedPlayers: [],
+                    createdAt: serverTimestamp(),
+                    isChatLocked: false,
+                    // NEW: Game settings are now part of the lobby data
+                    gameSettings: {
+                        maxPlayers: 4,
+                        gameDurationSeconds: parseInt(gameDuration, 10)
+                    }
+                };
+        
+                if (lobbyType === 'private') {
+                    newLobbyData.password = password;
+                }
+        
+                const newLobbyRef = await addDoc(lobbiesRef, newLobbyData);
+                return newLobbyRef.id;
+            } catch (e) {
+                console.error("خطا در ساخت لابی: ", e);
+                throw e;
+            }
+        }
+        
+        /**
+         * NEW: Initializes the AI vs. Human game state in Firestore.
+         */
+        async function initializeGameInFirestore(lobbyId, lobbyData) {
             const playerUIDs = Object.keys(lobbyData.players);
-            
-            // Shuffle players to randomly assign the AI role
-            for (let i = playerUIDs.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [playerUIDs[i], playerUIDs[j]] = [playerUIDs[j], playerUIDs[i]];
+            if (playerUIDs.length !== 4) {
+                throw new Error("برای شروع بازی به ۴ بازیکن نیاز است.");
             }
 
-            const aiPlayerUid = playerUIDs[0];
+            // Randomly select one player to be the AI
+            const aiIndex = Math.floor(Math.random() * playerUIDs.length);
             const roles = {};
-            playerUIDs.forEach(uid => {
-                roles[uid] = (uid === aiPlayerUid) ? 'ai' : 'human';
+            playerUIDs.forEach((uid, index) => {
+                roles[uid] = (index === aiIndex) ? 'AI' : 'Human';
             });
 
+            const gameDuration = lobbyData.gameSettings.gameDurationSeconds;
+            const now = new Date();
+            const endTime = new Date(now.getTime() + gameDuration * 1000);
+
             const initialGameState = {
-                phase: 'countdown', // Start with the countdown
-                players: lobbyData.players, // Map of uid -> displayName
-                activePlayers: playerUIDs, // Array of UIDs of players still in game
-                roles: roles,
-                gameStartTime: serverTimestamp(),
-                durationSeconds: lobbyData.gameSettings.durationSeconds,
-                votes: {},
-                eliminatedPlayer: null,
-                winner: null,
-                winReason: null
+                phase: 'countdown', // countdown -> discussion -> voting -> ended
+                roles: roles, // { uid: 'AI', uid2: 'Human', ... }
+                players: lobbyData.players, // { uid: 'displayName', ... }
+                alivePlayers: playerUIDs, // List of UIDs of players still in game
+                timerEndTime: endTime, // Firestore Timestamp for when the discussion ends
+                votes: {}, // { votedPlayerUid: [voterUid1, voterUid2] }
+                winner: null, // 'Humans' or 'AI'
             };
 
             const lobbyRef = doc(db, 'global_lobbies', lobbyId);
             try {
-                // We're not creating a separate game document, just updating the lobby.
-                await updateDoc(lobbyRef, {
-                    gameState: initialGameState,
-                    status: "playing" // Change lobby status to 'playing'
+                // Use a batch write to update status and gameState together
+                const batch = writeBatch(db);
+                batch.update(lobbyRef, {
+                    status: "playing",
+                    gameState: initialGameState
                 });
-                console.log(`AI vs Human game initialized for lobby ${lobbyId}`);
+                // Also, clear the lobby chat
+                // (For a real app, a Cloud Function is better for deleting subcollections)
+                
+                await batch.commit();
+                console.log(`Game state initialized for lobby ${lobbyId}`);
             } catch (error) {
                 console.error("Error initializing game state:", error);
-                // Revert on failure
+                // Revert status on failure
                 await updateDoc(lobbyRef, { status: "waiting", gameState: deleteField() }); 
                 throw new Error("Failed to initialize game.");
             }
         }
 
-        // MODIFIED: The Start Game button now calls the new initializer
+        /**
+         * NEW: Listens to game state changes and renders the UI accordingly.
+         */
+        function setupGameListener(lobbyId) {
+            console.log(`Listening to game state for lobby ID: ${lobbyId}`);
+            if (unsubscribeLobbyDetail) { unsubscribeLobbyDetail(); unsubscribeLobbyDetail = null; }
+            
+            const lobbyRef = doc(db, `global_lobbies`, lobbyId);
+            return onSnapshot(lobbyRef, (docSnap) => {
+                if (docSnap.exists() && docSnap.data().gameState) {
+                    const lobbyData = docSnap.data();
+                    renderGameScreen(lobbyData.gameState);
+                } else {
+                    // Game ended or was deleted
+                    if(gameTimerInterval) clearInterval(gameTimerInterval);
+                    showMessageBox("بازی مورد نظر پایان یافت یا با خطا مواجه شد.", "info");
+                    setActiveScreen(lobbyScreen);
+                    if(unsubscribeLobbies === null) {
+                       unsubscribeLobbies = setupLobbyListener('');
+                    }
+                }
+            }, (error) => {
+                console.error("Game state listener error:", error);
+                if(gameTimerInterval) clearInterval(gameTimerInterval);
+                showMessageBox("ارتباط با بازی قطع شد.", "error");
+                setActiveScreen(lobbyScreen);
+                if(unsubscribeLobbies === null) {
+                   unsubscribeLobbies = setupLobbyListener('');
+                }
+            });
+        }
+        
+        /**
+         * NEW: Renders the entire game screen based on the current game state.
+         * This function is the main engine for the game UI.
+         */
+        function renderGameScreen(gameState) {
+            const myUid = auth.currentUser.uid;
+            const myRole = gameState.roles[myUid];
+            const currentPhase = gameState.phase;
+
+            // 1. Handle Countdown
+            if (currentPhase === 'countdown') {
+                countdownOverlay.classList.remove('hidden');
+                let count = 5;
+                countdownTimerEl.textContent = count;
+                const countdownInterval = setInterval(() => {
+                    count--;
+                    countdownTimerEl.textContent = count;
+                    if (count <= 0) {
+                        clearInterval(countdownInterval);
+                        countdownOverlay.classList.add('hidden');
+                        // The host's client will be responsible for changing the phase
+                        if (currentLobbyId && currentUserData.uid === Object.keys(gameState.roles)[0]) { // A simple way to designate the host
+                             const lobbyRef = doc(db, 'global_lobbies', currentLobbyId);
+                             updateDoc(lobbyRef, { 'gameState.phase': 'discussion' });
+                        }
+                    }
+                }, 1000);
+            } else {
+                 countdownOverlay.classList.add('hidden');
+            }
+            
+            // 2. Display My Role
+            myRoleDisplay.innerHTML = `نقش شما: `;
+            const roleSpan = document.createElement('span');
+            if (myRole === 'AI') {
+                roleSpan.textContent = 'هوش مصنوعی';
+                roleSpan.className = 'role-ai';
+            } else {
+                roleSpan.textContent = 'انسان';
+                roleSpan.className = 'role-human';
+            }
+            myRoleDisplay.appendChild(roleSpan);
+            
+            // 3. Handle Discussion Timer
+            if (currentPhase === 'discussion') {
+                if(gameTimerInterval) clearInterval(gameTimerInterval); // Clear any existing timer
+                
+                const endTime = gameState.timerEndTime.toDate(); // Convert Firestore timestamp to JS Date
+                
+                gameTimerInterval = setInterval(() => {
+                    const now = new Date();
+                    const remaining = Math.max(0, endTime - now);
+                    
+                    const minutes = Math.floor((remaining / 1000) / 60);
+                    const seconds = Math.floor((remaining / 1000) % 60);
+                    
+                    gameTimerDisplay.querySelector('span').textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                    
+                    if (remaining === 0) {
+                        clearInterval(gameTimerInterval);
+                        gameChatInput.disabled = true;
+                        gameChatSendBtn.disabled = true;
+                        gameChatInput.placeholder = "زمان گفتگو تمام شد. در حال شروع رأی‌گیری...";
+                        // Host changes phase to voting
+                        if (currentLobbyId && currentUserData.uid === Object.keys(gameState.roles)[0]) {
+                            const lobbyRef = doc(db, 'global_lobbies', currentLobbyId);
+                            updateDoc(lobbyRef, { 'gameState.phase': 'voting' });
+                        }
+                    }
+                }, 1000);
+            } else {
+                 if(gameTimerInterval) clearInterval(gameTimerInterval);
+            }
+
+            // 4. Render Player List & Voting Buttons
+            gamePlayerList.innerHTML = '';
+            const alivePlayerUids = gameState.alivePlayers || [];
+            Object.entries(gameState.players).forEach(([uid, displayName]) => {
+                const isAlive = alivePlayerUids.includes(uid);
+                const playerItem = document.createElement('div');
+                playerItem.className = 'game-player-item';
+                if (!isAlive) {
+                    playerItem.classList.add('ejected');
+                }
+                
+                let voteButtonHtml = '';
+                if (currentPhase === 'voting' && isAlive && uid !== myUid) {
+                    // Check if I have already voted
+                    const myVote = Object.values(gameState.votes || {}).flat().includes(myUid);
+                    voteButtonHtml = `<button class="vote-btn" data-vote-uid="${uid}" ${myVote ? 'disabled' : ''}>رأی</button>`;
+                }
+                
+                playerItem.innerHTML = `
+                    <span>${displayName} ${uid === myUid ? '(شما)' : ''}</span>
+                    ${voteButtonHtml}
+                `;
+                gamePlayerList.appendChild(playerItem);
+            });
+            
+            // 5. Handle Game End
+            if (currentPhase === 'ended') {
+                gameOverModal.classList.remove('hidden');
+                const aiPlayerUid = Object.keys(gameState.roles).find(uid => gameState.roles[uid] === 'AI');
+                gameOverAiName.textContent = gameState.players[aiPlayerUid];
+
+                if (gameState.winner === 'Humans') {
+                    gameOverTitle.textContent = "انسان‌ها پیروز شدند!";
+                    gameOverReason.textContent = "شما با موفقیت هوش مصنوعی را شناسایی و حذف کردید.";
+                } else if (gameState.winner === 'AI') {
+                    gameOverTitle.textContent = "هوش مصنوعی پیروز شد!";
+                    gameOverReason.textContent = "هوش مصنوعی با موفقیت انسان‌ها را فریب داد.";
+                }
+            } else {
+                gameOverModal.classList.add('hidden');
+            }
+        }
+        
+        /**
+         * NEW: Sends a chat message during the game, but only after AI validation.
+         */
+        async function sendGameChatMessage(text) {
+            if (!text.trim() || !auth.currentUser || !currentLobbyId) return;
+
+            gameChatSendBtn.disabled = true;
+            gameChatInput.placeholder = "در حال اعتبارسنجی لحن پیام...";
+
+            try {
+                const validation = await validateMessageStyleWithAI(text);
+                if (!validation.isValid) {
+                    showMessageBox(`پیام ارسال نشد: ${validation.reason}`, 'error');
+                    return; // Stop execution
+                }
+
+                // If valid, send the message
+                const messagesRef = collection(db, `global_lobbies/${currentLobbyId}/game_messages`);
+                await addDoc(messagesRef, {
+                    text: text.trim(),
+                    senderUid: auth.currentUser.uid,
+                    senderName: currentUserData.displayName,
+                    timestamp: serverTimestamp()
+                });
+                gameChatInput.value = '';
+
+            } catch (error) {
+                console.error("Error in chat sending process:", error);
+                showMessageBox("خطا در ارسال پیام.", "error");
+            } finally {
+                gameChatSendBtn.disabled = false;
+                gameChatInput.placeholder = "پیام خود را به سبک ادبی وارد کنید...";
+            }
+        }
+        
+        /**
+         * NEW: Records a player's vote in Firestore.
+         */
+        async function castVote(votedForUid) {
+            if (!currentLobbyId || !auth.currentUser) return;
+            const myUid = auth.currentUser.uid;
+            const lobbyRef = doc(db, 'global_lobbies', currentLobbyId);
+
+            // Disable all vote buttons immediately for this user
+            document.querySelectorAll('.vote-btn').forEach(btn => btn.disabled = true);
+
+            try {
+                // Update the votes map in Firestore
+                await updateDoc(lobbyRef, {
+                    [`gameState.votes.${votedForUid}`]: arrayUnion(myUid)
+                });
+                console.log(`Vote cast by ${myUid} for ${votedForUid}`);
+
+                // After voting, the host will check if all votes are in
+                // This is a simplification; a Cloud Function is better for this.
+            } catch (error) {
+                console.error("Error casting vote:", error);
+                showMessageBox("خطا در ثبت رأی.", "error");
+            }
+        }
+
+        // --- Event Listeners Modifications ---
+        
+        // MODIFIED: Create Lobby Form submission
+        createLobbyForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const lobbyName = newLobbyNameInput.value.trim();
+            const duration = gameDurationSelect.value;
+            // ... (other form values)
+
+            // ... (validation checks)
+
+            // MODIFIED: Call to createLobby with new parameter
+            try {
+                const newLobbyId = await createLobby(lobbyName, auth.currentUser.uid, currentUserData.displayName, 'public', '', duration); // Example for public
+                // ... (rest of the logic)
+            } catch (error) {
+                // ... (error handling)
+            }
+        });
+
+        // MODIFIED: Start Game Button
         startGameBtn.addEventListener('click', async () => {
             if (currentLobbyId && auth.currentUser) {
                 try {
                     const lobbyRef = doc(db, 'global_lobbies', currentLobbyId);
                     const lobbySnap = await getDoc(lobbyRef);
                     if (lobbySnap.exists()) {
-                        // Call the new game initializer
-                        await initializeAiGameInFirestore(currentLobbyId, lobbySnap.data());
+                        // The new initialization function is called here
+                        await initializeGameInFirestore(currentLobbyId, lobbySnap.data());
                     }
                 } catch (error) {
                     console.error("Error starting game:", error);
@@ -431,239 +875,84 @@
             }
         });
 
-
-        /**
-         * HEAVILY MODIFIED: This is now the main game state machine.
-         * It listens to changes in the game state and updates the UI accordingly.
-         * @param {string} lobbyId - The ID of the lobby/game.
-         */
-        function setupGameListener(lobbyId) {
-            console.log(`Listening to AI game state for lobby ID: ${lobbyId}`);
-            const lobbyRef = doc(db, `global_lobbies`, lobbyId);
-            
-            return onSnapshot(lobbyRef, (docSnap) => {
-                if (docSnap.exists() && docSnap.data().gameState) {
+        // MODIFIED: onSnapshot in setupLobbyDetailListener
+        // It now checks for 'playing' status and switches to the game screen.
+        function setupLobbyDetailListener(lobbyId) {
+             // ... existing setup
+            const unsubscribe = onSnapshot(doc(db, 'global_lobbies', lobbyId), (docSnap) => {
+                if (docSnap.exists()) {
                     const lobbyData = docSnap.data();
-                    const gameState = lobbyData.gameState;
-                    const myUid = auth.currentUser.uid;
                     
-                    // Main render function that dispatches based on phase
-                    renderGamePhase(gameState, myUid, lobbyId);
+                    // NEW: Check if game has started
+                    if (lobbyData.status === 'playing') {
+                        if (currentActiveScreen !== gameScreen) {
+                            setActiveScreen(gameScreen);
+                        }
+                        // Start the game listener if it's not already running
+                        if (!unsubscribeGame) {
+                            unsubscribeGame = setupGameListener(lobbyId);
+                        }
+                        return; // Stop processing lobby details
+                    }
+
+                    // ... (rest of the existing lobby detail rendering logic)
                 } else {
-                    // Game has ended or been deleted
-                    if(gameTimerInterval) clearInterval(gameTimerInterval);
-                    showMessageBox("بازی مورد نظر پایان یافت.", "info");
-                    setActiveScreen(lobbyScreen);
-                    // setupLobbyListener('');
+                    // ... (handle lobby deletion)
                 }
-            }, (error) => {
-                console.error("Game state listener error:", error);
-                // ... error handling ...
             });
-        }
-        
-        /**
-         * NEW: Renders the UI based on the current game phase.
-         */
-        function renderGamePhase(gameState, myUid, lobbyId) {
-            // Stop any previous timers
-            if (gameTimerInterval) clearInterval(gameTimerInterval);
-
-            // Hide all overlays by default
-            gameCountdownOverlay.classList.add('hidden');
-            votingInterface.classList.add('hidden');
-            gameOverOverlay.classList.add('hidden');
-            myRoleDisplay.classList.remove('visible');
-
-            // Always render the player list
-            renderGamePlayerList(gameState);
-
-            switch (gameState.phase) {
-                case 'countdown':
-                    handleCountdownPhase(gameState);
-                    break;
-                case 'discussion':
-                    handleDiscussionPhase(gameState, myUid, lobbyId);
-                    break;
-                case 'voting':
-                    handleVotingPhase(gameState, myUid, lobbyId);
-                    break;
-                case 'gameOver':
-                    handleGameOverPhase(gameState);
-                    break;
-            }
-        }
-        
-        // --- Phase Handling Functions ---
-        
-        function handleCountdownPhase(gameState) {
-            gameCountdownOverlay.classList.remove('hidden');
-            const startTime = gameState.gameStartTime.toDate();
-            const countdownInterval = setInterval(() => {
-                const now = new Date();
-                const diffSeconds = Math.floor((now - startTime) / 1000);
-                const count = 5 - diffSeconds;
-                countdownTimer.textContent = count > 0 ? count : 'شروع!';
-                
-                if (count < 0) {
-                    clearInterval(countdownInterval);
-                    // The server (or host client as a fallback) will change the phase.
-                    // The onSnapshot listener will then catch this change.
-                }
-            }, 1000);
+            return unsubscribe;
         }
 
-        function handleDiscussionPhase(gameState, myUid) {
-            // Show my role
-            const myRole = gameState.roles[myUid];
-            myRoleText.textContent = myRole === 'ai' ? 'هوش مصنوعی' : 'انسان';
-            myRoleText.className = myRole === 'ai' ? 'role-ai' : 'role-human';
-            myRoleDisplay.classList.add('visible');
-
-            // Enable chat
-            gameChatInput.disabled = false;
-            gameChatSendBtn.disabled = false;
-            gameChatInput.placeholder = "پیام خود را با لحنی ادبی بنویسید...";
-
-            // Start the discussion timer
-            const discussionEndTime = gameState.gameStartTime.toDate().getTime() + (gameState.durationSeconds * 1000);
-            gameTimerInterval = setInterval(() => {
-                const remaining = Math.max(0, discussionEndTime - new Date().getTime());
-                const minutes = Math.floor(remaining / 60000);
-                const seconds = Math.floor((remaining % 60000) / 1000);
-                timerDisplay.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-
-                if (remaining === 0) {
-                    clearInterval(gameTimerInterval);
-                    // The host is responsible for transitioning to the voting phase
-                    // In a real app, this should be a Cloud Function.
-                }
-            }, 1000);
-        }
-
-        function handleVotingPhase(gameState, myUid, lobbyId) {
-            votingInterface.classList.remove('hidden');
-            votingOptions.innerHTML = '';
-            
-            // Check if I am an active player and haven't voted yet
-            const canVote = gameState.activePlayers.includes(myUid) && !gameState.votes[myUid];
-            
-            gameState.activePlayers.forEach(playerUid => {
-                if (playerUid === myUid) return; // Can't vote for yourself
-                
-                const playerName = gameState.players[playerUid];
-                const btn = document.createElement('button');
-                btn.className = 'classic-btn vote-player-btn';
-                btn.textContent = `رای به: ${playerName}`;
-                btn.dataset.voteFor = playerUid;
-                btn.disabled = !canVote;
-                
-                votingOptions.appendChild(btn);
-            });
-            
-            if (!canVote) {
-                 voteStatusText.textContent = gameState.votes[myUid] ? "شما رای خود را ثبت کرده‌اید. منتظر بقیه بمانید..." : "شما حذف شده‌اید و حق رای ندارید.";
-            } else {
-                 voteStatusText.textContent = "به فرد مشکوک رای دهید.";
-            }
-        }
-        
-        function handleGameOverPhase(gameState) {
-            gameOverOverlay.classList.remove('hidden');
-            gameOverTitle.textContent = gameState.winner === 'humans' ? "انسان‌ها پیروز شدند!" : "هوش مصنوعی پیروز شد!";
-            gameOverReason.textContent = gameState.winReason;
-            
-            // Show all roles at the end
-            gameOverRoles.innerHTML = '<h4>نقش‌ها:</h4>';
-            for (const uid in gameState.roles) {
-                const playerName = gameState.players[uid];
-                const role = gameState.roles[uid] === 'ai' ? 'هوش مصنوعی' : 'انسان';
-                const roleClass = gameState.roles[uid] === 'ai' ? 'text-red-400' : 'text-blue-400';
-                gameOverRoles.innerHTML += `<p>${playerName}: <span class="${roleClass} font-bold">${role}</span></p>`;
-            }
-        }
-        
-        // --- UI Rendering Sub-functions ---
-        
-        function renderGamePlayerList(gameState) {
-            gamePlayerList.innerHTML = '';
-            for (const uid in gameState.players) {
-                const playerDiv = document.createElement('div');
-                const isEliminated = !gameState.activePlayers.includes(uid);
-                playerDiv.className = `p-2 rounded flex items-center ${isEliminated ? 'opacity-50' : 'bg-white bg-opacity-10'}`;
-                playerDiv.innerHTML = `
-                    <svg ...>...</svg> <!-- Avatar icon -->
-                    <span class="mr-2 ${isEliminated ? 'line-through' : ''}">${gameState.players[uid]}</span>
-                `;
-                gamePlayerList.appendChild(playerDiv);
-            }
-        }
-
-
-        // --- Event Handlers for New Game Mechanics ---
-
-        // Game Chat Submission with AI Validation
-        gameChatForm.addEventListener('submit', async (e) => {
+        // NEW: Game-specific Event Listeners
+        gameChatForm.addEventListener('submit', (e) => {
             e.preventDefault();
-            const messageText = gameChatInput.value.trim();
-            if (!messageText) return;
-            
-            gameChatSendBtn.disabled = true;
-            gameChatSendBtn.textContent = 'بررسی...';
-
-            try {
-                const validation = await validateMessageStyleWithAI(messageText);
-                if (validation.is_valid_style) {
-                    // If style is valid, send the message (logic to be added)
-                    // sendGameMessage(currentLobbyId, messageText);
-                    gameChatInput.value = '';
-                } else {
-                    // Show error to user
-                    showMessageBox(`سبک پیام نامعتبر: ${validation.reason}`, 'error');
+            sendGameChatMessage(gameChatInput.value);
+        });
+        
+        // Use event delegation for voting buttons
+        gamePlayerList.addEventListener('click', (e) => {
+            if (e.target.matches('.vote-btn')) {
+                const votedForUid = e.target.dataset.voteUid;
+                if (votedForUid) {
+                    castVote(votedForUid);
                 }
-            } catch (error) {
-                showMessageBox("خطا در اعتبارسنجی پیام.", "error");
-            } finally {
-                gameChatSendBtn.disabled = false;
-                gameChatSendBtn.textContent = 'ارسال';
             }
         });
         
-        // Voting Button Clicks
-        votingOptions.addEventListener('click', (e) => {
-            if (e.target.matches('.vote-player-btn')) {
-                const votedForUid = e.target.dataset.voteFor;
-                // Cast vote in Firestore (logic to be added)
-                // castVote(currentLobbyId, auth.currentUser.uid, votedForUid);
-            }
-        });
-
-        // Return to Lobby Screen after game over
-        returnToLobbyBtn.addEventListener('click', () => {
-            // Host should delete the lobby doc to clean up
-            // if (isHost) deleteDoc(...)
-            setActiveScreen(lobbyScreen);
-            // setupLobbyListener('');
-        });
-
-        // Leaving game
         leaveGameBtn.addEventListener('click', async () => {
-             const confirmed = await showCustomConfirm("خروج از بازی باعث ثبت شکست برای شما می‌شود. آیا مطمئن هستید؟");
-             if(confirmed) {
-                // Handle leaving logic - for simplicity, we treat it as a loss and remove the player.
-                // In a real app, the host leaving would end the game for everyone.
+             // Logic to leave the game, likely involves deleting the lobby doc for simplicity
+             // This part remains similar to the original request
+        });
+        
+        returnToLobbyBtn.addEventListener('click', () => {
+             // This button appears when the game is over.
+             // It should clean up listeners and return to the lobby screen.
+             if (unsubscribeGame) { unsubscribeGame(); unsubscribeGame = null; }
+             if (currentLobbyId) {
+                 // Optionally, host can delete the lobby doc here
+                 currentLobbyId = null;
              }
+             setActiveScreen(lobbyScreen);
+             unsubscribeLobbies = setupLobbyListener('');
         });
 
-
-        // --- Initialize the app ---
-        window.onload = initializeFirebaseAndAuth; // This should be your original function
-
-        // A placeholder for the original auth/init function
-        function initializeFirebaseAndAuth() {
-            // All your original code from here
-            console.log("App Initialized");
+        // Initializer function
+        async function initializeAppAndAuth() {
+            // This is the initial entry point. The original logic remains sound.
+            // onAuthStateChanged will handle routing to the correct screen.
         }
+
+        // --- Keep existing functions that are still relevant ---
+        // e.g., onAuthStateChanged, getFirebaseErrorMessage, authentication logic,
+        // profile modal logic, lobby list searching, etc. They are the framework
+        // upon which these new features are built. The provided snippet only
+        // focuses on the *changed* or *new* parts for clarity.
+        
+        // The original complete JS code would be here, with the above functions
+        // replacing or being added to it.
+        
+        window.onload = initializeAppAndAuth;
+
     </script>
 </body>
 </html>
