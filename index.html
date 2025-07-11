@@ -274,6 +274,7 @@
             display: flex;
             justify-content: space-around;
             align-items: center;
+            gap: 1rem; /* Added gap here for spacing buttons */
         }
         /* Lobby Screen Specific Footer */
         .lobby-footer {
@@ -864,7 +865,8 @@
                     <div class="flex flex-col text-right">
                         <span id="header-display-name" class="font-bold text-lg text-white">نام کاربری</span>
                         <span id="header-user-id" class="text-xs text-gray-300 break-all">ID: ---</span>
-                        <span id="header-user-coins" class="text-sm font-bold text-yellow-300"></span>
+                        <!-- NEW LOCATION FOR COINS -->
+                        <span id="header-user-coins" class="font-bold text-yellow-300 text-base">سکه‌ها: ---</span>
                     </div>
                 </div>
                 <!-- Hamburger Menu Icon - Aligned Left (for RTL) -->
@@ -884,15 +886,15 @@
             </div>
 
             <!-- Footer Navigation - Fixed at bottom -->
-            <footer class="app-footer">
+            <footer class="app-footer flex justify-center items-center gap-4">
                 <button id="friendly-game-btn"
-                        class="classic-btn btn-purple-classic text-base sm:text-lg w-1/2 mx-2 py-3.5 px-4">
+                        class="classic-btn btn-purple-classic text-base sm:text-lg flex-grow flex items-center justify-center whitespace-nowrap">
                         <svg class="coin-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm0 18a8 8 0 1 1 8-8 8 8 0 0 1-8 8zm-2-10h4a1 1 0 0 0 0-2h-4a1 1 0 0 0 0 2zm0 4h4a1 1 0 0 0 0-2h-4a1 1 0 0 0 0 2z"/></svg>
-                    بازی دوستانه (<span id="friendly-game-cost">100</span>)
+                    <span>بازی دوستانه (<span id="friendly-game-cost">100</span>)</span>
                 </button>
                 <!-- Placeholder for other main buttons like 'Rated Game' -->
                 <button id="rated-game-btn"
-                        class="classic-btn btn-brown-classic text-base sm:text-lg w-1/2 mx-2 py-3.5 px-4">
+                        class="classic-btn btn-brown-classic text-base sm:text-lg flex-grow flex items-center justify-center whitespace-nowrap">
                     بازی امتیازی
                 </button>
             </footer>
@@ -1306,7 +1308,7 @@
         const createLobbyModal = document.getElementById('create-lobby-modal');
         const closeCreateLobbyModalBtn = document.getElementById('close-create-lobby-modal-btn'); 
         const createLobbyForm = document.getElementById('create-lobby-form');
-        const newLobbyNameInput = document.getElementById('new-lobby-name-input');
+        const newLobbyNameInput = document.getElementById('new-lobby-name-input'); // This is actually proposed-lobby-name-input now
         const submitCreateLobbyBtn = document.getElementById('submit-create-lobby-btn');
         const createLobbyMessageBox = document.getElementById('create-lobby-message-box');
         const lobbyTypeToggle = document.getElementById('lobby-type-toggle');
@@ -1342,7 +1344,7 @@
         const startGameBtn = document.getElementById('start-game-btn');
         const toggleChatLockBtn = document.getElementById('toggle-chat-lock-btn');
         const viewKickedPlayersBtn = document.getElementById('view-kicked-players-btn');
-        const leaveLobbyBtn = document.getElementById('leave-lobby-btn'); // Host-only to close lobby outside game
+        const leaveLobbyBtn = document.getElementById('leave-lobby-btn'); // Host-only to close lobby outside of game
         const lobbyChatMessages = document.getElementById('lobby-chat-messages');
         const lobbyChatForm = document.getElementById('lobby-chat-form');
         const lobbyChatInput = document.getElementById('lobby-chat-input');
@@ -1715,6 +1717,7 @@
                 submitCreateLobbyBtn.classList.remove('hidden');
                 submitLobbyNameForApprovalBtn.classList.add('hidden');
             } else {
+                // If no approved names, show proposal area and disable create button
                 lobbyNameSelectionArea.classList.add('hidden');
                 lobbyNameProposalArea.classList.remove('hidden');
                 submitCreateLobbyBtn.classList.add('hidden'); // Cannot create lobby yet
@@ -2555,7 +2558,7 @@
             for (const playerId of playerUIDs) {
                 const playerProfileRef = doc(db, `artifacts/${appId}/users/${playerId}/profile/data`);
                 const playerProfileSnap = await getDoc(playerProfileRef);
-                if (!playerProfileSnap.exists() || playerProfileSnap.data().coins < currentEntryCost) {
+                if (!playerProfileSnap.exists() || (playerProfileSnap.data().coins || 0) < currentEntryCost) { // Ensure coins is not undefined
                     throw new Error(`بازیکن ${playerNames[playerId]} سکه کافی برای شروع بازی ندارد. (نیاز: ${currentEntryCost} سکه)`);
                 }
             }
@@ -2998,6 +3001,8 @@
                 });
                 showCreateLobbyMessageBox("نام لابی شما با موفقیت برای تأیید ارسال شد. لطفاً منتظر تأیید ادمین باشید.", "success");
                 proposedLobbyNameInput.value = ''; // Clear input
+                // User will need to refresh/re-login to see the approved name after admin approval
+                // A Cloud Function would make this instant by updating the user's profile directly.
                 setTimeout(closeCreateLobbyModal, 3000); // Close after a delay
             } catch (error) {
                 console.error("خطا در ارسال نام لابی برای تأیید:", error);
@@ -3008,7 +3013,9 @@
         createLobbyForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             let lobbyName;
+            // Check if user is in "select approved name" mode or "propose new name" mode
             if (lobbyNameSelectionArea.classList.contains('hidden')) {
+                // User is in "propose new name" mode, meaning they don't have approved names yet or didn't select one.
                 showCreateLobbyMessageBox("لطفاً ابتدا نام لابی خود را برای تأیید ارسال کنید و منتظر تأیید بمانید.", "error");
                 return;
             } else {
@@ -3214,7 +3221,7 @@
         lobbyChatMessages.addEventListener('click', (e) => {
             const deleteButton = e.target.closest('.delete-message-btn');
             if (deleteButton) {
-                const messageId = deleteButton.dataset.message-id;
+                const messageId = deleteButton.dataset.messageId;
                 if (currentLobbyId && messageId) {
                     deleteLobbyMessage(currentLobbyId, messageId);
                 }
