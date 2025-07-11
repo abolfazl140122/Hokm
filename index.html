@@ -280,7 +280,7 @@
 
         .app-footer {
             background: linear-gradient(to left, #4A2B00 0%, #7A4C00 50%, #4A2B00 100%); /* Richer gold/brown gradient */
-            border-top: 33px solid #FFD700; /* Thicker gold border */
+            border-top: 3px solid #FFD700; /* Thicker gold border */
             box-shadow: 0 -8px 20px rgba(0,0,0,0.7); /* Deeper shadow */
             height: 90px; /* Fixed height for footer */
             position: fixed; /* Explicitly fixed */
@@ -874,7 +874,7 @@
                     </div>
                     <!-- Main submit button, text changes based on authMode -->
                     <button type="submit" id="submit-auth-btn"
-                            class="w-full mt-4 classic-btn btn-purple-classic text-xl sm:text-2xl hidden">
+                            class="w-full mt-4 classic-btn btn-purple-classic text-xl sm:text-2xl">
                         ادامه
                     </button>
                 </form>
@@ -1581,7 +1581,7 @@
          */
         async function checkLobbyNameWithAI(lobbyName) {
             if (!GEMINI_API_KEY || GEMINI_API_KEY === "YOUR_GEMINI_API_KEY_HERE") {
-                console.warn("Gemini API Key is not configured. Skipping lobby name moderation.");
+                console.warn("Gemini API Key is not configured. Skipping lobby name moderation. Please replace 'YOUR_GEMINI_API_KEY_HERE' with your actual key.");
                 return { is_appropriate: true, reason: "API key missing. Moderation skipped." };
             }
 
@@ -1603,7 +1603,7 @@
         // Function to check if a message is "literary/AI-like" using Gemini AI
         async function checkMessageForLiteraryAIStyle(message) {
             if (!GEMINI_API_KEY || GEMINI_API_KEY === "YOUR_GEMINI_API_KEY_HERE") {
-                console.warn("Gemini API Key is not configured. Skipping chat style moderation.");
+                console.warn("Gemini API Key is not configured. Skipping chat style moderation. Please replace 'YOUR_GEMINI_API_KEY_HERE' with your actual key.");
                 return { is_literary: true, reason: "API key missing. Moderation skipped." };
             }
 
@@ -2011,6 +2011,7 @@
                     setActiveScreen(mainScreen);
                 } else {
                     setActiveScreen(authScreen);
+                    initializeAuthScreen(); // Ensure auth UI is set up correctly on first load
                 }
                 isInitialAuthCheckComplete = true; // Mark initial check as complete
             }
@@ -2086,11 +2087,7 @@
                     unsubscribeUserProfile = null;
                 }
                 authForm.reset();
-                displayNameField.classList.add('hidden');
-                submitAuthBtn.classList.add('hidden');
-                loginToggleBtn.classList.remove('hidden');
-                registerToggleBtn.classList.remove('hidden');
-                authMode = 'login';
+                initializeAuthScreen(); // Reset auth UI to default login state on logout
                 currentUserData = null;
                 // Clean up all other listeners and game intervals
                 if (unsubscribeLobbies) unsubscribeLobbies();
@@ -3191,27 +3188,36 @@
 
 
         // --- Event Listeners ---
-        // Auth, Profile, Modals, Lobby List
+        // Function to initialize the auth screen UI to a consistent state
+        function initializeAuthScreen() {
+            authMode = 'login';
+            displayNameField.classList.add('hidden');
+            submitAuthBtn.textContent = 'ورود';
+            submitAuthBtn.classList.remove('hidden'); // Ensure submit button is visible
+            loginToggleBtn.classList.add('hidden'); // Hide login toggle as it's the active mode
+            registerToggleBtn.classList.remove('hidden'); // Show register toggle to switch
+            authForm.reset();
+            emailInput.focus();
+        }
+
         loginToggleBtn.addEventListener('click', () => {
             authMode = 'login';
             displayNameField.classList.add('hidden');
             submitAuthBtn.textContent = 'ورود';
-            submitAuthBtn.classList.remove('hidden');
-            loginToggleBtn.classList.add('hidden');
-            registerToggleBtn.classList.remove('hidden');
+            loginToggleBtn.classList.add('hidden'); // Hide self (active mode)
+            registerToggleBtn.classList.remove('hidden'); // Show other toggle
+            authForm.reset(); // Clear fields when switching mode
             emailInput.focus();
-            authForm.reset();
         });
 
         registerToggleBtn.addEventListener('click', () => {
             authMode = 'register';
             displayNameField.classList.remove('hidden');
             submitAuthBtn.textContent = 'ثبت نام';
-            submitAuthBtn.classList.remove('hidden');
-            registerToggleBtn.classList.add('hidden');
-            loginToggleBtn.classList.remove('hidden');
+            registerToggleBtn.classList.add('hidden'); // Hide self (active mode)
+            loginToggleBtn.classList.remove('hidden'); // Show other toggle
+            authForm.reset(); // Clear fields when switching mode
             emailInput.focus();
-            authForm.reset();
         });
 
         authForm.addEventListener('submit', async (e) => {
