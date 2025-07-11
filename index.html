@@ -204,25 +204,9 @@
             z-index: 40;
             padding: 0.75rem 1rem; /* Adjust padding */
             display: flex;
-            justify-content: space-between; /* Spreads items */
+            justify-content: space-between;
             align-items: center;
         }
-
-        /* NEW: Coin display container in header (positioned on the left for RTL) */
-        #header-user-coins-container {
-            /* flex-grow added directly in HTML to push it rightwards */
-            background-color: rgba(0,0,0,0.3);
-            border-radius: 10px;
-            padding: 0.5rem 1rem;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
-            transition: all 0.3s ease;
-            margin-left: 1rem; /* Space between coins and menu button */
-        }
-        #header-user-coins-container:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 12px rgba(0,0,0,0.5);
-        }
-
         /* Lobby Screen Specific Header */
         .lobby-header {
             background: linear-gradient(to right, #4A2B00 0%, #7A4C00 50%, #4A2B00 100%);
@@ -717,17 +701,6 @@
             .app-footer, .lobby-footer { height: 80px; }
             .main-content-area { padding-top: 60px; padding-bottom: 80px; }
             .lobby-detail-content { margin: 20px auto; height: calc(100% - 40px); }
-
-            /* New Coin Display responsive */
-            #header-user-coins-container {
-                font-size: 1.2rem;
-                padding: 0.4rem 0.8rem; /* Adjusted for smaller screens */
-            }
-            #header-user-coins-container .coin-icon {
-                width: 1.2rem; /* Smaller icon */
-                height: 1.2rem;
-                margin-left: 0.2rem; /* Adjusted margin */
-            }
         }
         
         /* Lobby Type Toggle Styles */
@@ -892,18 +865,10 @@
                     <div class="flex flex-col text-right">
                         <span id="header-display-name" class="font-bold text-lg text-white">نام کاربری</span>
                         <span id="header-user-id" class="text-xs text-gray-300 break-all">ID: ---</span>
+                        <!-- NEW LOCATION FOR COINS -->
+                        <span id="header-user-coins" class="font-bold text-yellow-300 text-base">سکه‌ها: ---</span>
                     </div>
                 </div>
-
-                <!-- Spacer to push elements to ends -->
-                <div class="flex-grow"></div> 
-
-                <!-- NEW LOCATION FOR COINS - Near the menu button (left for RTL) -->
-                <div id="header-user-coins-container" class="flex items-center text-xl sm:text-2xl font-extrabold text-yellow-300">
-                    <svg class="coin-icon w-6 h-6 sm:w-8 sm:h-8 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm0 18a8 8 0 1 1 8-8 8 8 0 0 1-8 8zm-2-10h4a1 1 0 0 0 0-2h-4a1 1 0 0 0 0 2zm0 4h4a1 1 0 0 0 0-2h-4a1 1 0 0 0 0 2z"/></svg>
-                    <span id="header-user-coins">---</span>
-                </div>
-
                 <!-- Hamburger Menu Icon - Aligned Left (for RTL) -->
                 <button id="menu-btn" class="text-white text-3xl p-2 rounded-full hover:bg-gray-700 transition-colors duration-200">
                     <!-- Hamburger icon SVG -->
@@ -1020,7 +985,7 @@
         <!-- 6. Create Lobby Input Modal (NEW) -->
         <div id="create-lobby-modal" class="hidden fixed inset-0 flex justify-center items-center z-50 profile-modal-overlay">
             <div class="classic-card profile-modal-content p-6 sm:p-8 w-11/12 max-w-md text-center relative">
-                <h2 id="create-lobby-modal-title" class="text-2xl sm:text-3xl font-bold mb-6">ساخت لابی جدید</h2>
+                <h2 class="text-2xl sm:text-3xl font-bold mb-6">ساخت لابی جدید</h2>
                 <button id="close-create-lobby-modal-btn" class="absolute top-4 left-4 text-white hover:text-gray-300 transition-colors duration-200">
                     <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-x">
                         <path d="M18 6 6 18"/><path d="m6 6 12 12"/>
@@ -1046,7 +1011,7 @@
                                 class="w-full mt-4 classic-btn btn-blue-classic text-lg sm:text-xl">
                             ارسال برای تأیید
                         </button>
-                        <p class="text-gray-400 text-sm mt-2" id="lobby-proposal-message">بعد از ارسال، ادمین نام لابی شما را بررسی و تأیید می‌کند. سپس می‌توانید از آن نام استفاده کنید.</p>
+                        <p class="text-gray-400 text-sm mt-2">بعد از ارسال، ادمین نام لابی شما را بررسی و تأیید می‌کند. سپس می‌توانید از آن نام استفاده کنید.</p>
                     </div>
                     
                     <div class="w-full h-px bg-yellow-600 my-4"></div> <!-- Divider -->
@@ -1314,7 +1279,7 @@
         const profileSummary = document.getElementById('profile-summary');
         const headerDisplayName = document.getElementById('header-display-name');
         const headerUserId = document.getElementById('header-user-id');
-        const headerUserCoins = document.getElementById('header-user-coins'); // NEW (Updated for new location)
+        const headerUserCoins = document.getElementById('header-user-coins'); // NEW
         const friendlyGameBtn = document.getElementById('friendly-game-btn');
         const friendlyGameCostSpan = document.getElementById('friendly-game-cost'); // NEW
         const ratedGameBtn = document.getElementById('rated-game-btn');
@@ -1343,16 +1308,16 @@
         const createLobbyModal = document.getElementById('create-lobby-modal');
         const closeCreateLobbyModalBtn = document.getElementById('close-create-lobby-modal-btn'); 
         const createLobbyForm = document.getElementById('create-lobby-form');
+        // const newLobbyNameInput = document.getElementById('new-lobby-name-input'); // This is actually proposed-lobby-name-input now
         const submitCreateLobbyBtn = document.getElementById('submit-create-lobby-btn');
         const createLobbyMessageBox = document.getElementById('create-lobby-message-box');
         const lobbyTypeToggle = document.getElementById('lobby-type-toggle');
-        const newLobbyPasswordField = document.getElementById('new-lobby-password-field'); // Corrected ID
-        const newLobbyPasswordInput = document.getElementById('new-lobby-password-input');
+        const newLobbyPasswordField = document.getElementById('newLobby-password-field');
+        const newLobbyPasswordInput = document.getElementById('newLobby-password-input');
         const togglePasswordVisibilityBtn = document.getElementById('toggle-password-visibility');
         const eyeIconOpen = document.getElementById('eye-icon-open');
         const eyeIconClosed = document.getElementById('eye-icon-closed');
         const gameDurationInput = document.getElementById('game-duration-input'); // NEW
-        const createLobbyModalTitle = document.getElementById('create-lobby-modal-title'); // NEW: Added ID to H2
 
         // NEW: Lobby Name Selection/Proposal specific elements
         const lobbyNameSelectionArea = document.getElementById('lobby-name-selection-area');
@@ -1360,7 +1325,7 @@
         const lobbyNameProposalArea = document.getElementById('lobby-name-proposal-area');
         const proposedLobbyNameInput = document.getElementById('proposed-lobby-name-input');
         const submitLobbyNameForApprovalBtn = document.getElementById('submit-lobby-name-for-approval-btn');
-        const lobbyProposalMessage = document.getElementById('lobby-proposal-message'); // NEW for message about pending requests
+
 
         // Custom Confirmation Modal Elements
         const customConfirmModal = document.getElementById('custom-confirm-modal');
@@ -1402,7 +1367,7 @@
         const votingInstructions = document.getElementById('voting-instructions');
         const votingOptions = document.getElementById('voting-options');
         const gameResultDisplay = document.getElementById('game-result-display');
-        const winnerText = document.getElementById('winner-text'); 
+        const winnerText = document.getElementById('winnerText');
         const reasonText = document.getElementById('reason-text');
         const returnToLobbiesBtn = document.getElementById('return-to-lobbies-btn');
 
@@ -1443,7 +1408,6 @@
         let unsubscribeLobbyDetail = null; // Global variable for single lobby detail listener
         let unsubscribeKickedPlayers = null; // Listener for kicked players list
         let unsubscribeLobbyChat = null; // NEW: Listener for lobby chat messages
-        let unsubscribeUserProfile = null; // NEW: Listener for real-time user profile updates
         let isAuthResolved = false; // Flag to indicate if onAuthStateChanged has run at least once
         let userHasActiveLobby = false; // Track if the current user has an active lobby (created or joined)
         let currentLobbyId = null; // Stores the ID of the lobby the current user is in
@@ -1458,6 +1422,7 @@
         // Global timer variables for game
         let gameCountdownInterval = null;
         let gameTimerInterval = null;
+
 
         // Function to clear all game-related intervals
         function clearGameIntervals() {
@@ -1678,6 +1643,7 @@
             if (unsubscribeLobbyDetail) { unsubscribeLobbyDetail(); unsubscribeLobbyDetail = null; }
             if (unsubscribeKickedPlayers) { unsubscribeKickedPlayers(); unsubscribeKickedPlayers = null; }
             if (unsubscribeLobbyChat) { unsubscribeLobbyChat(); unsubscribeLobbyChat = null; }
+            // Game related cleanups
             clearGameIntervals();
             resetGameUI();
 
@@ -1731,123 +1697,44 @@
             }, 300);
         }
 
-        // NEW: Function to update the approved lobby names dropdown and visibility of related areas
-        async function updateApprovedLobbyNamesDropdownOnModalOpen(mode) {
-            if (!currentUserData) {
-                approvedLobbyNamesSelect.innerHTML = '<option value="">در حال بارگذاری اطلاعات...</option>';
-                lobbyNameSelectionArea.classList.add('hidden');
-                lobbyNameProposalArea.classList.add('hidden');
-                submitCreateLobbyBtn.classList.add('hidden');
-                submitLobbyNameForApprovalBtn.classList.add('hidden');
-                return;
-            }
-
-            const approvedNames = currentUserData.approvedLobbyNames || [];
-            
-            // Clear existing options first
-            approvedLobbyNamesSelect.innerHTML = '<option value="">نام لابی را انتخاب کنید</option>';
-            
-            if (approvedNames.length > 0) {
-                approvedNames.forEach(name => {
-                    const option = document.createElement('option');
-                    option.value = name;
-                    option.innerHTML = formatLobbyNameWithColor(name);
-                    approvedLobbyNamesSelect.appendChild(option);
-                });
-                lobbyNameSelectionArea.classList.remove('hidden');
-                submitCreateLobbyBtn.classList.remove('hidden'); // Enable 'Create Lobby' button
-                lobbyNameProposalArea.classList.add('hidden'); // Hide proposal area
-                submitLobbyNameForApprovalBtn.classList.add('hidden'); // Hide proposal button
-                approvedLobbyNamesSelect.focus();
-            } else {
-                lobbyNameSelectionArea.classList.add('hidden');
-                submitCreateLobbyBtn.classList.add('hidden'); // Disable 'Create Lobby' button
-                
-                if (mode === 'create') {
-                    lobbyNameProposalArea.classList.remove('hidden');
-                    submitLobbyNameForApprovalBtn.classList.remove('hidden'); // Enable 'Submit for Approval' button
-
-                    // Fetch pending requests
-                    const proposedLobbyNamesRef = collection(db, `artifacts/${appId}/proposedLobbyNames`);
-                    const qPending = query(
-                        proposedLobbyNamesRef,
-                        where("userId", "==", auth.currentUser.uid),
-                        where("status", "==", "pending")
-                    );
-                    const pendingSnapshot = await getDocs(qPending);
-                    const pendingCount = pendingSnapshot.size;
-
-                    if (pendingCount >= 5) {
-                        lobbyProposalMessage.textContent = `شما ${pendingCount} درخواست نام لابی در انتظار تایید دارید. تا زمانی که درخواست‌های شما بررسی نشوند، نمی‌توانید درخواست جدیدی ارسال کنید.`;
-                        lobbyProposalMessage.classList.remove('text-gray-400');
-                        lobbyProposalMessage.classList.add('text-red-400');
-                        submitLobbyNameForApprovalBtn.disabled = true;
-                        proposedLobbyNameInput.disabled = true;
-                        proposedLobbyNameInput.placeholder = "تعداد درخواست‌های شما به حداکثر رسیده است.";
-                    } else {
-                        lobbyProposalMessage.textContent = "بعد از ارسال، ادمین نام لابی شما را بررسی و تأیید می‌کند. سپس می‌توانید از آن نام استفاده کنید.";
-                        lobbyProposalMessage.classList.remove('text-red-400');
-                        lobbyProposalMessage.classList.add('text-gray-400');
-                        submitLobbyNameForApprovalBtn.disabled = false;
-                        proposedLobbyNameInput.disabled = false;
-                        proposedLobbyNameInput.placeholder = "مثال: [#FFD700]لابی طلایی من";
-                    }
-                    proposedLobbyNameInput.focus();
-                } else if (mode === 'myLobbies') {
-                    createLobbyMessageBox.classList.remove('hidden');
-                    createLobbyMessageBox.classList.add('bg-blue-500', 'text-white');
-                    createLobbyMessageBox.textContent = "شما هیچ نام لابی تأیید شده‌ای ندارید. می‌توانید از بخش 'ایجاد لابی' یک نام جدید برای تأیید ارسال کنید.";
-                    lobbyNameProposalArea.classList.add('hidden'); // Hide proposal area in 'myLobbies' mode if no approved names
-                    submitLobbyNameForApprovalBtn.classList.add('hidden'); // Hide proposal button
-                }
-            }
-        }
-
-
-        async function openCreateLobbyModal(mode = 'create') {
+        async function openCreateLobbyModal() {
             if (!currentUserData) {
                 showCreateLobbyMessageBox("ابتدا وارد حساب کاربری خود شوید.", "error");
                 return;
             }
 
-            // Check if the user is already a host of an active lobby (only relevant for 'create' mode)
-            if (userHasActiveLobby && currentLobbyId && mode === 'create') {
-                try {
-                    const activeLobbyRef = doc(db, `global_lobbies`, currentLobbyId);
-                    const activeLobbySnap = await getDoc(activeLobbyRef);
-                    if (activeLobbySnap.exists() && activeLobbySnap.data().hostId === auth.currentUser.uid) {
-                        showCreateLobbyMessageBox("شما از قبل یک لابی فعال ساخته‌اید. برای مدیریت آن به صفحه لابی برگردید.", "info");
-                        closeCreateLobbyModal();
-                        // Potentially navigate to lobbyDetailScreen if the user expects to go there directly
-                        // setActiveScreen(lobbyDetailScreen);
-                        // unsubscribeLobbyDetail = setupLobbyDetailListener(currentLobbyId);
-                        return;
-                    }
-                } catch (error) {
-                    console.error("Error checking active lobby for host:", error);
-                    // Continue, as this is a non-critical error for the modal's primary function
-                }
+            // Populate approved lobby names dropdown
+            approvedLobbyNamesSelect.innerHTML = '<option value="">نام لابی را انتخاب کنید</option>';
+            if (currentUserData.approvedLobbyNames && currentUserData.approvedLobbyNames.length > 0) {
+                currentUserData.approvedLobbyNames.forEach(name => {
+                    const option = document.createElement('option');
+                    option.value = name;
+                    option.innerHTML = formatLobbyNameWithColor(name); // Display with color
+                    approvedLobbyNamesSelect.appendChild(option);
+                });
+                lobbyNameSelectionArea.classList.remove('hidden');
+                lobbyNameProposalArea.classList.add('hidden');
+                submitCreateLobbyBtn.classList.remove('hidden');
+                submitLobbyNameForApprovalBtn.classList.add('hidden');
+            } else {
+                // If no approved names, show proposal area and disable create button
+                lobbyNameSelectionArea.classList.add('hidden');
+                lobbyNameProposalArea.classList.remove('hidden');
+                submitCreateLobbyBtn.classList.add('hidden'); // Cannot create lobby yet
+                submitLobbyNameForApprovalBtn.classList.remove('hidden');
             }
-
 
             createLobbyModal.classList.remove('hidden');
             void createLobbyModal.offsetWidth;
             createLobbyModal.classList.add('profile-modal-enter-active');
-            createLobbyMessageBox.classList.add('hidden'); // Clear previous messages
+            createLobbyMessageBox.classList.add('hidden');
             
-            // Reset form fields and styling
-            createLobbyForm.reset();
-            document.querySelector('input[name="lobby-type"][value="public"]').checked = true;
-            document.querySelectorAll('.lobby-type-btn').forEach(btn => btn.classList.remove('active'));
-            document.querySelector('input[value="public"]').nextElementSibling.classList.add('active');
-            newLobbyPasswordField.classList.add('hidden');
-            gameDurationInput.value = 5;
-
-            // Set modal title based on mode
-            createLobbyModalTitle.textContent = (mode === 'myLobbies' ? 'لابی‌های من' : 'ساخت لابی جدید');
-
-            // NEW: Call the dedicated function to populate dropdown and manage area visibility
-            await updateApprovedLobbyNamesDropdownOnModalOpen(mode); 
+            // Set focus based on what's visible
+            if (!lobbyNameSelectionArea.classList.contains('hidden')) {
+                approvedLobbyNamesSelect.focus();
+            } else {
+                proposedLobbyNameInput.focus();
+            }
         }
 
         function closeCreateLobbyModal() {
@@ -1862,8 +1749,6 @@
                 document.querySelectorAll('.lobby-type-btn').forEach(btn => btn.classList.remove('active'));
                 document.querySelector('input[value="public"]').nextElementSibling.classList.add('active');
                 gameDurationInput.value = 5; // Reset game duration
-                lobbyProposalMessage.classList.remove('text-red-400'); // Reset message color
-                lobbyProposalMessage.classList.add('text-gray-400');
             }, 300);
         }
         
@@ -1930,9 +1815,9 @@
         // NEW: Function to update coins display in header
         function updateUserCoinsDisplay() {
             if (currentUserData && currentUserData.coins !== undefined) {
-                headerUserCoins.textContent = currentUserData.coins.toLocaleString('fa-IR'); // Display only number now
+                headerUserCoins.textContent = `سکه‌ها: ${currentUserData.coins.toLocaleString('fa-IR')}`;
             } else {
-                headerUserCoins.textContent = `---`;
+                headerUserCoins.textContent = `سکه‌ها: ---`;
             }
         }
 
@@ -1940,84 +1825,63 @@
         onAuthStateChanged(auth, async (user) => {
             console.log("onAuthStateChanged triggered. User:", user ? user.uid : "logged out");
             
-            let shouldTransition = false;
+            // This is the first time the auth state has been determined.
+            // We can now safely transition away from the loading screen.
+            if (!isAuthResolved) {
+                isAuthResolved = true;
+            }
 
             if (user) {
-                const userDocRef = doc(db, `artifacts/${appId}/users/${user.uid}/profile/data`); 
-
-                // NEW: Set up real-time listener for user profile data
-                if (unsubscribeUserProfile) {
-                    unsubscribeUserProfile(); // Clean up old listener if exists
-                }
-                unsubscribeUserProfile = onSnapshot(userDocRef, (docSnap) => {
-                    if (docSnap.exists()) {
-                        const latestUserData = docSnap.data();
-                        currentUserData = {
-                            uid: user.uid,
-                            email: user.email,
-                            displayName: latestUserData.displayName || user.displayName || (user.email ? user.email.split('@')[0] : 'کاربر ناشناس'),
-                            coins: latestUserData.coins, // NEW
-                            approvedLobbyNames: latestUserData.approvedLobbyNames, // NEW
-                            banStatus: latestUserData.banStatus || { isBanned: false } // NEW
-                        };
-                        headerDisplayName.textContent = currentUserData.displayName;
-                        headerUserId.textContent = `شناسه: ${currentUserData.uid.substring(0, 8)}...`;
-                        updateUserCoinsDisplay(); // NEW
-
-                        // If the create lobby modal is currently open, refresh its dropdown
-                        if (!createLobbyModal.classList.contains('hidden') && !createLobbyModal.classList.contains('profile-modal-leave-active')) {
-                            // Determine the current mode of the modal (create or myLobbies) to pass to the update function
-                            const currentMode = createLobbyModalTitle.textContent.includes('لابی‌های من') ? 'myLobbies' : 'create';
-                            updateApprovedLobbyNamesDropdownOnModalOpen(currentMode);
-                        }
-                        
-                        console.log("User profile data updated by real-time listener:", currentUserData);
-
-                        // Only transition screens on the very first auth state resolution
-                        if (!isAuthResolved) {
-                            isAuthResolved = true;
-                            setActiveScreen(mainScreen);
-                        }
-
-                    } else {
-                        console.warn("User profile document not found during snapshot. User might be new or document deleted.");
-                        // Handle case where profile doc doesn't exist for a logged-in user
-                        currentUserData = { uid: user.uid, email: user.email, displayName: user.displayName || (user.email ? user.email.split('@')[0] : 'کاربر ناشناس'), coins: 0, approvedLobbyNames: [], banStatus: { isBanned: false } }; // Fallback
-                        headerDisplayName.textContent = currentUserData.displayName;
-                        headerUserId.textContent = `شناسه: ${currentUserData.uid.substring(0, 8)}...`;
-                        updateUserCoinsDisplay();
-                        if (!isAuthResolved) {
-                            isAuthResolved = true;
-                            setActiveScreen(mainScreen);
-                        }
-                    }
-                }, (error) => {
-                    console.error("Error listening to user profile:", error);
-                    showMessageBox("خطا در بارگذاری پروفایل به صورت لحظه‌ای.", "error");
-                });
-
-                // This part ensures that if display name needs to be set immediately after registration, it happens.
-                // This logic is separate from the onSnapshot which handles *subsequent* updates.
                 try {
-                    const userDocSnap = await getDoc(userDocRef); // Get once for initial check
-                    if (!userDocSnap.exists() && authMode === 'register' && displayNameInput.value.trim() !== '') {
-                        // Set initial data if registering and document doesn't exist
-                        await setDoc(userDocRef, { displayName: displayNameInput.value.trim(), email: user.email, coins: 500, approvedLobbyNames: [], banStatus: { isBanned: false } }, { merge: true });
-                        // The onSnapshot will pick this up and update currentUserData
+                    const userDocRef = doc(db, `artifacts/${appId}/users/${user.uid}/profile/data`); 
+                    const userDocSnap = await getDoc(userDocRef);
+                    
+                    let userDataFromFirestore = userDocSnap.exists() ? userDocSnap.data() : {};
+                    
+                    // Initialize coins if not present
+                    if (userDataFromFirestore.coins === undefined) {
+                        userDataFromFirestore.coins = 500; // Default coins
+                        await setDoc(userDocRef, { coins: userDataFromFirestore.coins }, { merge: true });
                     }
+                    // Initialize approvedLobbyNames if not present
+                    if (userDataFromFirestore.approvedLobbyNames === undefined) {
+                        userDataFromFirestore.approvedLobbyNames = [];
+                        await setDoc(userDocRef, { approvedLobbyNames: userDataFromFirestore.approvedLobbyNames }, { merge: true });
+                    }
+
+                    currentUserData = {
+                        uid: user.uid,
+                        email: user.email,
+                        displayName: userDataFromFirestore.displayName || user.displayName || (user.email ? user.email.split('@')[0] : 'کاربر ناشناس'),
+                        coins: userDataFromFirestore.coins, // NEW
+                        approvedLobbyNames: userDataFromFirestore.approvedLobbyNames // NEW
+                    };
+
+                    if (!userDocSnap.exists() && authMode === 'register' && displayNameInput.value.trim() !== '') {
+                        await setDoc(userDocRef, { displayName: displayNameInput.value.trim(), email: user.email }, { merge: true });
+                        currentUserData.displayName = displayNameInput.value.trim();
+                    }
+                    headerDisplayName.textContent = currentUserData.displayName;
+                    headerUserId.textContent = `شناسه: ${currentUserData.uid.substring(0, 8)}...`;
+                    updateUserCoinsDisplay(); // NEW
+
+                    // Only transition if we are coming from loading or auth screen
+                    if(currentActiveScreen === loadingScreen || currentActiveScreen === authScreen) {
+                        setActiveScreen(mainScreen);
+                    }
+
                 } catch (firestoreError) {
-                    console.error("Firestore initial profile check/set error:", firestoreError);
-                    showMessageBox("مشکل در تنظیم پروفایل اولیه.", "error");
+                    console.error("Firestore profile error:", firestoreError);
+                    currentUserData = { uid: user.uid, email: user.email, displayName: user.displayName || (user.email ? user.email.split('@')[0] : 'کاربر ناشناس'), coins: 0, approvedLobbyNames: [] }; // Fallback
+                    headerDisplayName.textContent = currentUserData.displayName;
+                    headerUserId.textContent = `شناسه: ${currentUserData.uid.substring(0, 8)}...`;
+                    updateUserCoinsDisplay(); // NEW
+                    setActiveScreen(mainScreen);
+                    showMessageBox("مشکل در بارگذاری پروفایل.", "error");
                 }
-
-
             } else {
                 // User is logged out
-                if (unsubscribeUserProfile) {
-                    unsubscribeUserProfile(); // Clean up profile listener on logout
-                    unsubscribeUserProfile = null;
-                }
-                shouldTransition = true;
+                setActiveScreen(authScreen);
                 authForm.reset();
                 displayNameField.classList.add('hidden');
                 submitAuthBtn.classList.add('hidden');
@@ -2025,7 +1889,7 @@
                 registerToggleBtn.classList.remove('hidden');
                 authMode = 'login';
                 currentUserData = null;
-                // Clean up all other listeners and game intervals
+                // Clean up all listeners and game intervals
                 if (unsubscribeLobbies) unsubscribeLobbies();
                 if (unsubscribeLobbyDetail) unsubscribeLobbyDetail();
                 if (unsubscribeKickedPlayers) unsubscribeKickedPlayers();
@@ -2035,15 +1899,6 @@
                 currentLobbyId = null;
                 resetGameUI(); // Ensure game UI is reset
                 updateUserCoinsDisplay(); // Clear coin display
-            }
-
-            // Centralized screen transition logic for non-initial state changes
-            if (isAuthResolved) { 
-                if (user && currentActiveScreen !== mainScreen) {
-                    setActiveScreen(mainScreen);
-                } else if (!user && currentActiveScreen !== authScreen) {
-                    setActiveScreen(authScreen);
-                }
             }
         });
 
@@ -2078,7 +1933,7 @@
             // with a user from a cached session, which is the correct behavior.
             
             if (initialAuthToken) {
-                console.log("Initial auth token found. Attempting to sign in with custom token...");
+                console.log("Initial auth token found. Attempting to sign in...");
                 try {
                     // Signing in with the custom token will trigger onAuthStateChanged.
                     // We don't need to do anything else here. The listener will handle the screen transition.
@@ -2090,11 +1945,10 @@
                     console.error("Error signing in with initial custom token:", error);
                 }
             } else {
-                console.log("No initial auth token. Waiting for onAuthStateChanged to resolve session or prompt login.");
+                console.log("No initial auth token. Waiting for onAuthStateChanged to resolve session.");
                 // No token, so Firebase will check for a cached user.
                 // onAuthStateChanged will handle the result automatically.
             }
-            console.log("initializeFirebaseAndAuth finished.");
         }
         // --- FIX END ---
 
@@ -2201,7 +2055,7 @@
             resetGameUI(); // Ensure game UI is reset when returning to lobby list
 
             lobbiesList.innerHTML = '<p class="text-gray-400">در حال بارگذاری لابی‌ها...</p>';
-            userHasActiveLobby = false; // Reset this flag when going to lobby list
+            userHasActiveLobby = false;
         
             const normalizedSearchTerm = searchTerm.toLowerCase();
             const q = query(
@@ -2458,7 +2312,7 @@
 
                     playerItem.innerHTML = `
                         <div class="flex items-center">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="mr-2 lucide lucude-user"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="mr-2 lucide lucide-user"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
                             <span class="player-name">${player.displayName}</span>
                             ${hostLabelHtml}
                         </div>
@@ -2569,14 +2423,8 @@
                     const kickedPlayers = docSnap.data().kickedPlayers || [];
                     if (kickedPlayers.length === 0) {
                         kickedPlayersListContent.innerHTML = '<p class="text-gray-400 text-center">هیچ بازیکنی اخراج نشده است.</p>';
-                    }
-                    // Filter out any undefined or null entries if they somehow exist
-                    const validKickedPlayers = kickedPlayers.filter(p => p && p.displayName && p.uid);
-
-                    if (validKickedPlayers.length === 0) {
-                        kickedPlayersListContent.innerHTML = '<p class="text-gray-400 text-center">هیچ بازیکنی اخراج نشده است.</p>';
                     } else {
-                        validKickedPlayers.forEach(player => {
+                        kickedPlayers.forEach(player => {
                             const playerDiv = document.createElement('div');
                             playerDiv.className = 'flex items-center justify-between bg-gray-700 p-3 rounded-lg mb-2';
                             playerDiv.innerHTML = `<span>${player.displayName}</span><button data-player-uid="${player.uid}" class="unkick-player-btn classic-btn btn-green-classic text-sm py-1 px-3">بازگرداندن</button>`;
@@ -2869,10 +2717,8 @@
 
                 if (!gameTimerInterval) {
                     gameTimerInterval = setInterval(async () => {
-                        // Note: gameStartTimestamp is a Firestore Timestamp object, need to convert to milliseconds
-                        // It can be null if the host hasn't explicitly set it yet after countdown.
-                        const startMillis = gameState.gameStartTimestamp ? gameState.gameStartTimestamp.toMillis() : Date.now();
-                        const elapsedMs = Date.now() - startMillis;
+                        const currentServerTime = Date.now(); // Simulate server time
+                        const elapsedMs = currentServerTime - gameState.gameStartTimestamp.toMillis();
                         const remainingMs = gameState.gameDurationSeconds * 1000 - elapsedMs;
 
                         if (remainingMs <= 0) {
@@ -2897,7 +2743,7 @@
                 gameCountdownOverlay.classList.add('hidden');
                 gameVotingOverlay.classList.remove('hidden');
                 gameResultDisplay.classList.add('hidden');
-                gameTimerDisplay.classList.add('hidden');
+                gameTimerDisplay.classList.add('hidden'); // Hide game timer
                 
                 // Disable chat inputs
                 lobbyChatInput.disabled = true;
@@ -2944,10 +2790,8 @@
                 return; // No need to render buttons if already voted
             }
 
-            // Filter players based on who is still active in the lobby
-            const livingPlayers = gameState.players.filter(uid => lobbyData.players && lobbyData.players[uid]);
-            const aiPlayers = livingPlayers.filter(uid => gameState.roles[uid] === 'AI');
-            const humanPlayers = livingPlayers.filter(uid => gameState.roles[uid] === 'Human' && uid !== myUid); // Don't vote for self
+            const aiPlayers = gameState.players.filter(uid => gameState.roles[uid] === 'AI' && lobbyData.players && lobbyData.players[uid]);
+            const humanPlayers = gameState.players.filter(uid => gameState.roles[uid] === 'Human' && uid !== myUid && lobbyData.players && lobbyData.players[uid]); // Don't vote for self
 
             // Option to vote for the AI
             if (aiPlayers.length > 0) {
@@ -2990,7 +2834,6 @@
                     const totalVotesExpected = livingHumanPlayers.length;
                     const actualVotesCount = Object.keys(updatedGameState.votes || {}).length;
 
-                    // If all living human players have voted
                     if (actualVotesCount >= totalVotesExpected) {
                         // Only host should trigger this to avoid race conditions and multiple updates
                         if (auth.currentUser && updatedLobbyData.hostId === auth.currentUser.uid) {
@@ -3029,7 +2872,7 @@
             // If there's an AI and enough human players have voted
             if (livingAIPlayers.length > 0) {
                 const aiPlayerUid = livingAIPlayers[0]; // Assuming only one AI
-                const votesForAI = Object.values(votes).filter(votedUid => votedUid === aiPlayerUid).length;
+                const votesForAI = votes[aiPlayerUid] ? Object.values(votes).filter(votedUid => votedUid === aiPlayerUid).length : 0;
                 
                 // If more than half of living human players voted for AI
                 if (votesForAI > livingHumanPlayers.length / 2) {
@@ -3094,9 +2937,10 @@
                 if (authMode === 'login') {
                     await signInWithEmailAndPassword(auth, email, password);
                 } else {
-                    await createUserWithEmailAndPassword(auth, email, password);
-                    // The onAuthStateChanged listener now sets up the profile document with default values
-                    // when it's first observed for a new user.
+                    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                    const userDocRef = doc(db, `artifacts/${appId}/users/${userCredential.user.uid}/profile/data`);
+                    // Initialize with default coins and empty approved lobby names
+                    await setDoc(userDocRef, { displayName: displayName, email: email, coins: 500, approvedLobbyNames: [] }, { merge: true });
                 }
             } catch (error) { showMessageBox(getFirebaseErrorMessage(error.code), 'error'); }
         });
@@ -3111,23 +2955,11 @@
         });
 
         friendlyGameBtn.addEventListener('click', () => {
-            console.log("Friendly game button clicked.");
-            if (!auth.currentUser) {
-                showMessageBox("برای مشاهده لابی‌ها، ابتدا وارد شوید.", "error");
-                console.log("Friendly game click prevented: User not authenticated.");
-                return;
-            }
-            if (!currentUserData) {
-                showMessageBox("در حال بارگذاری اطلاعات کاربری، لطفاً کمی صبر کنید.", "info");
-                console.log("Friendly game click prevented: currentUserData not loaded yet.");
-                return;
-            }
-            if (currentUserData.coins < gameEntryCost) {
+            if (!auth.currentUser) { showMessageBox("برای مشاهده لابی‌ها، ابتدا وارد شوید.", "error"); return; }
+            if (currentUserData && currentUserData.coins < gameEntryCost) {
                 showMessageBox(`سکه شما برای ورود به بازی دوستانه کافی نیست. (نیاز: ${gameEntryCost} سکه، موجودی شما: ${currentUserData.coins})`, "error");
-                console.log(`Friendly game click prevented: Insufficient coins. User coins: ${currentUserData.coins}, Required: ${gameEntryCost}`);
                 return;
             }
-            console.log("Friendly game button conditions met. Transitioning to lobby screen.");
             setActiveScreen(lobbyScreen);
             unsubscribeLobbies = setupLobbyListener('');
         });
@@ -3139,19 +2971,11 @@
             // These cleanups are now handled by setActiveScreen
         });
 
-        // UPDATED: 'Create' button now explicitly sends 'create' mode
         addIconBtn.addEventListener('click', () => {
             if (!auth.currentUser) { showMessageBox("برای ساخت لابی، ابتدا وارد شوید.", "error"); return; }
-            // The check for userHasActiveLobby is now inside openCreateLobbyModal itself, for more nuanced handling.
-            openCreateLobbyModal('create');
+            if (userHasActiveLobby) { showMessageBox("شما از قبل در یک لابی فعال هستید. لطفاً ابتدا لابی قبلی خود را ببندید.", "info"); return; }
+            openCreateLobbyModal();
         });
-
-        // UPDATED: 'My Lobbies' button now explicitly sends 'myLobbies' mode
-        myLobbiesBtn.addEventListener('click', () => {
-            if (!auth.currentUser) { showMessageBox("برای مشاهده لابی‌های من، ابتدا وارد شوید.", "error"); return; }
-            openCreateLobbyModal('myLobbies');
-        });
-
 
         // NEW: Submit Lobby Name for Approval Button
         submitLobbyNameForApprovalBtn.addEventListener('click', async () => {
@@ -3159,23 +2983,7 @@
             if (!proposedName) { showCreateLobbyMessageBox("لطفاً نام لابی پیشنهادی خود را وارد کنید.", "error"); return; }
             if (!auth.currentUser || !currentUserData) { showCreateLobbyMessageBox("خطا: اطلاعات کاربری در دسترس نیست.", "error"); return; }
 
-            // Re-check pending requests before final submission
-            const proposedLobbyNamesRef = collection(db, `artifacts/${appId}/proposedLobbyNames`);
-            const qPending = query(
-                proposedLobbyNamesRef,
-                where("userId", "==", auth.currentUser.uid),
-                where("status", "==", "pending")
-            );
-            const pendingSnapshot = await getDocs(qPending);
-            const pendingCount = pendingSnapshot.size;
-
-            if (pendingCount >= 5) {
-                showCreateLobbyMessageBox("شما بیشتر از 5 درخواست لابی در انتظار تایید دارید. نمی‌توانید درخواست جدیدی ارسال کنید.", "error");
-                return;
-            }
-
             showCreateLobbyMessageBox("در حال بررسی و ارسال نام لابی برای تأیید...", "info");
-            submitLobbyNameForApprovalBtn.disabled = true; // Disable to prevent double click
             try {
                 const moderationResult = await checkLobbyNameWithAI(proposedName);
                 if (!moderationResult.is_appropriate) {
@@ -3183,50 +2991,37 @@
                     return;
                 }
 
-                await addDoc(proposedLobbyNamesRef, {
+                const proposedLobbyRef = collection(db, `artifacts/${appId}/proposedLobbyNames`);
+                await addDoc(proposedLobbyRef, {
                     name: proposedName,
                     userId: auth.currentUser.uid,
                     displayName: currentUserData.displayName,
-                    isApproved: false, // Old field for compatibility
-                    status: 'pending', // NEW field for explicit status
+                    isApproved: false,
                     createdAt: serverTimestamp()
                 });
                 showCreateLobbyMessageBox("نام لابی شما با موفقیت برای تأیید ارسال شد. لطفاً منتظر تأیید ادمین باشید.", "success");
                 proposedLobbyNameInput.value = ''; // Clear input
-                
-                // Simulate waiting for admin approval or tell user to refresh.
-                // In a real app, a Cloud Function would update currentUserData.approvedLobbyNames
-                // upon admin approval, which would then trigger onAuthStateChanged.
-                // For now, we close the modal after success.
-                setTimeout(closeCreateLobbyModal, 3000); 
+                // User will need to refresh/re-login to see the approved name after admin approval
+                // A Cloud Function would make this instant by updating the user's profile directly.
+                setTimeout(closeCreateLobbyModal, 3000); // Close after a delay
             } catch (error) {
                 console.error("خطا در ارسال نام لابی برای تأیید:", error);
                 showCreateLobbyMessageBox(`خطا در ارسال نام لابی: ${error.message}`, "error");
-            } finally {
-                submitLobbyNameForApprovalBtn.disabled = false;
             }
         });
         
         createLobbyForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             let lobbyName;
-            
-            // User must select an approved name from the dropdown if available
-            // This condition ensures this path is only taken if selection area is actually visible
-            if (!lobbyNameSelectionArea.classList.contains('hidden')) {
-                lobbyName = approvedLobbyNamesSelect.value;
-                if (!lobbyName) { 
-                    showCreateLobbyMessageBox("لطفاً یک نام لابی تأیید شده را از لیست انتخاب کنید.", "error"); 
-                    return; 
-                }
-            } else {
-                // If selection area is hidden, and we are in submit handler for create-lobby-form,
-                // it means somehow the submit button for creation was enabled without an approved name.
-                // This shouldn't happen with the new logic, but as a fallback:
-                showCreateLobbyMessageBox("امکان ساخت لابی وجود ندارد. لطفاً یک نام تأیید شده انتخاب کنید یا آن را برای تأیید ارسال کنید.", "error");
+            // Check if user is in "select approved name" mode or "propose new name" mode
+            if (lobbyNameSelectionArea.classList.contains('hidden')) {
+                // User is in "propose new name" mode, meaning they don't have approved names yet or didn't select one.
+                showCreateLobbyMessageBox("لطفاً ابتدا نام لابی خود را برای تأیید ارسال کنید و منتظر تأیید بمانید.", "error");
                 return;
+            } else {
+                lobbyName = approvedLobbyNamesSelect.value;
+                if (!lobbyName) { showCreateLobbyMessageBox("لطفاً یک نام لابی تأیید شده را انتخاب کنید.", "error"); return; }
             }
-
 
             const lobbyType = document.querySelector('input[name="lobby-type"]:checked').value;
             const password = newLobbyPasswordInput.value;
@@ -3236,21 +3031,11 @@
             if (isNaN(gameDuration) || gameDuration < 1 || gameDuration > 60) { showCreateLobbyMessageBox("مدت زمان بازی باید بین ۱ تا ۶۰ دقیقه باشد.", "error"); return; }
             if (!auth.currentUser || !currentUserData?.displayName) { showCreateLobbyMessageBox("مشکلی در اطلاعات کاربری شما وجود دارد.", "error"); return; }
             if (userHasActiveLobby) { showCreateLobbyMessageBox("شما از قبل در یک لابی فعال هستید.", "info"); closeCreateLobbyModal(); return; }
-            
-            submitCreateLobbyBtn.disabled = true; // Prevent double submission
+        
             try {
                 const newLobbyId = await createLobby(lobbyName, auth.currentUser.uid, currentUserData.displayName, lobbyType, password, gameDuration);
                 showCreateLobbyMessageBox("لابی شما با موفقیت ساخته شد!", "success");
                 
-                // Remove the used lobby name from the user's approved list in Firestore
-                const userDocRef = doc(db, `artifacts/${appId}/users/${auth.currentUser.uid}/profile/data`);
-                await updateDoc(userDocRef, {
-                    approvedLobbyNames: arrayRemove(lobbyName)
-                });
-                // Note: The onSnapshot listener on `userDocRef` will automatically update `currentUserData.approvedLobbyNames`
-                // and trigger `updateApprovedLobbyNamesDropdownOnModalOpen` if the modal is open.
-                // So, no need to manually update `currentUserData.approvedLobbyNames` here.
-
                 setTimeout(() => {
                     closeCreateLobbyModal();
                     currentLobbyId = newLobbyId;
@@ -3261,8 +3046,6 @@
             } catch (error) {
                 console.error("خطا در ساخت لابی از مودال:", error);
                 showCreateLobbyMessageBox(error.message.includes("شما از قبل یک لابی فعال ساخته‌اید.") ? error.message : `خطا در ساخت لابی: ${error.message}`, "error");
-            } finally {
-                submitCreateLobbyBtn.disabled = false;
             }
         });
 
@@ -3287,13 +3070,7 @@
             }, 1000);
         });
 
-        // My Lobbies button: Now explicitly uses 'myLobbies' mode
-        // This was moved up into `myLobbiesBtn.addEventListener`
-        // myLobbiesBtn.addEventListener('click', () => {
-        //     if (!auth.currentUser) { showMessageBox("برای مشاهده لابی‌های من، ابتدا وارد شوید.", "error"); return; }
-        //     openCreateLobbyModal('myLobbies'); // Reusing the modal logic
-        // });
-
+        myLobbiesBtn.addEventListener('click', () => showMessageBox("لابی‌های من به زودی!", "info"));
         lobbySearchInput.addEventListener('input', (e) => {
             if (unsubscribeLobbies) unsubscribeLobbies();
             unsubscribeLobbies = setupLobbyListener(e.target.value.trim().toLowerCase());
@@ -3444,7 +3221,7 @@
         lobbyChatMessages.addEventListener('click', (e) => {
             const deleteButton = e.target.closest('.delete-message-btn');
             if (deleteButton) {
-                const messageId = deleteButton.dataset.message-id; 
+                const messageId = deleteButton.dataset.message-id;
                 if (currentLobbyId && messageId) {
                     deleteLobbyMessage(currentLobbyId, messageId);
                 }
@@ -3545,7 +3322,231 @@
 
         // Initialize the app when the window loads
         window.onload = initializeFirebaseAndAuth;
-        console.log("Script execution finished."); // Added for debugging
+    </script>
+</body>
+</html>tModal);
+        closePlayerManagementModalBtn.addEventListener('click', closePlayerManagementModal);
+        playerManagementModal.addEventListener('click', (e) => e.target === playerManagementModal && closePlayerManagementModal());
+
+
+        kickedMessageOkBtn.addEventListener('click', closeKickedMessageModal);
+        viewKickedPlayersBtn.addEventListener('click', openKickedPlayersListModal);
+        closeKickedPlayersListModalBtn.addEventListener('click', closeKickedPlayersListModal);
+        kickedListOkBtn.addEventListener('click', closeKickedPlayersListModal);
+        kickedPlayersListModal.addEventListener('click', (e) => e.target === kickedPlayersListModal && closeKickedPlayersListModal());
+        
+        // Private lobby password related
+        function showPasswordPromptMessage(message, type = 'error') {
+            passwordPromptMessageBox.textContent = message;
+            passwordPromptMessageBox.className = 'mt-5 p-3.5 rounded-xl text-base text-center';
+            passwordPromptMessageBox.classList.add(type === 'error' ? 'bg-red-500' : 'bg-blue-500', 'text-white');
+            passwordPromptMessageBox.classList.remove('hidden');
+            setTimeout(() => passwordPromptMessageBox.classList.add('hidden'), 4000);
+        }
+
+        function openEnterPasswordModal(lobbyId, lobbyName) {
+            lobbyToJoin = { id: lobbyId, name: lobbyName };
+            passwordPromptLobbyName.textContent = lobbyName;
+            enterPasswordForm.reset();
+            passwordPromptMessageBox.classList.add('hidden');
+            enterPasswordModal.classList.remove('hidden');
+            void enterPasswordModal.offsetWidth;
+            enterPasswordModal.classList.add('profile-modal-enter-active');
+            joinLobbyPasswordInput.focus();
+        }
+
+        function closeEnterPasswordModal() {
+            enterPasswordModal.classList.remove('profile-modal-enter-active');
+            enterPasswordModal.classList.add('profile-modal-leave-active');
+            setTimeout(() => {
+                enterPasswordModal.classList.add('hidden');
+                enterPasswordModal.classList.remove('profile-modal-leave-active');
+                lobbyToJoin = null;
+            }, 300);
+        }
+
+        lobbyTypeToggle.addEventListener('change', (e) => {
+            document.querySelectorAll('.lobby-type-btn').forEach(btn => btn.classList.remove('active'));
+            e.target.nextElementSibling.classList.add('active');
+            if (e.target.value === 'private') {
+                newLobbyPasswordField.classList.remove('hidden');
+            } else {
+                newLobbyPasswordField.classList.add('hidden');
+            }
+        });
+
+        togglePasswordVisibilityBtn.addEventListener('click', () => {
+            const isPassword = newLobbyPasswordInput.type === 'password';
+            newLobbyPasswordInput.type = isPassword ? 'text' : 'password';
+            eyeIconOpen.style.display = isPassword ? 'none' : 'block';
+            eyeIconClosed.style.display = isPassword ? 'block' : 'none';
+        });
+
+        cancelJoinPasswordBtn.addEventListener('click', closeEnterPasswordModal);
+        enterPasswordModal.addEventListener('click', (e) => e.target === enterPasswordModal && closeEnterPasswordModal());
+
+        enterPasswordForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            if (!lobbyToJoin) return;
+            const enteredPassword = joinLobbyPasswordInput.value;
+            if (!enteredPassword) { showPasswordPromptMessage('لطفاً رمز عبور را وارد کنید.'); return; }
+
+            submitJoinPasswordBtn.disabled = true;
+            submitJoinPasswordBtn.textContent = 'در حال بررسی...';
+            try {
+                const lobbyRef = doc(db, 'global_lobbies', lobbyToJoin.id);
+                const lobbySnap = await getDoc(lobbyRef);
+                if (!lobbySnap.exists() || lobbySnap.data().type !== 'private') {
+                    showPasswordPromptMessage('این لابی دیگر خصوصی نیست یا وجود ندارد.');
+                    closeEnterPasswordModal();
+                    return;
+                }
+                if (enteredPassword === lobbySnap.data().password) {
+                    closeEnterPasswordModal();
+                    await joinLobby(lobbyToJoin.id, auth.currentUser.uid, currentUserData.displayName);
+                } else {
+                    showPasswordPromptMessage('رمز عبور اشتباه است.');
+                    joinLobbyPasswordInput.value = '';
+                    joinLobbyPasswordInput.focus();
+                }
+            } catch (error) {
+                console.error("Error verifying lobby password:", error);
+                showPasswordPromptMessage('خطا در بررسی رمز عبور.');
+            } finally {
+                submitJoinPasswordBtn.disabled = false;
+                submitJoinPasswordBtn.textContent = 'ورود';
+            }
+        });
+        
+        // Chat Form Submission (for both lobby and in-game chat)
+        lobbyChatForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            if (currentLobbyId) {
+                // NEW: Prevent banned users from chatting
+                if (currentUserData?.banStatus?.isBanned && currentUserData.banStatus.bannedUntil?.toMillis() > Date.now()) {
+                    showMessageBox("شما مسدود هستید و نمی‌توانید چت کنید.", "error");
+                    lobbyChatInput.value = ''; // Clear input
+                    return;
+                }
+                sendLobbyMessage(currentLobbyId, lobbyChatInput.value);
+            }
+        });
+
+        // NEW: Event Delegation for Message Deletion
+        lobbyChatMessages.addEventListener('click', (e) => {
+            const deleteButton = e.target.closest('.delete-message-btn');
+            if (deleteButton) {
+                const messageId = deleteButton.dataset.messageId;
+                if (currentLobbyId && messageId) {
+                    deleteLobbyMessage(currentLobbyId, messageId);
+                }
+            }
+        });
+
+        // NEW: Game Screen Event Listeners (using leaveGameFromLobbyBtn)
+        leaveGameFromLobbyBtn.addEventListener('click', async () => {
+            if (!currentLobbyId || !auth.currentUser) return;
+
+            // NEW: Prevent action if user is banned
+            if (currentUserData?.banStatus?.isBanned && currentUserData.banStatus.bannedUntil?.toMillis() > Date.now()) {
+                showMessageBox("شما مسدود هستید و نمی‌توانید از بازی خارج شوید.", "error"); // Though they are already banned, they might try
+                setActiveScreen(banScreen);
+                const banTimestampDate = currentUserData.banStatus.banTimestamp?.toDate();
+                const banTimestampFormatted = banTimestampDate ? banTimestampDate.toLocaleString('fa-IR', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'نامشخص';
+                setupBanCountdown(currentUserData.banStatus.bannedUntil.toMillis(), currentUserData.banStatus.banReason, currentUserData.banStatus.bannedBy, banTimestampFormatted);
+                return;
+            }
+
+            const confirmed = await showCustomConfirm("آیا مطمئن هستید که می‌خواهید بازی را ترک کنید؟"); // Updated message
+            if (!confirmed) return;
+
+            const lobbyRef = doc(db, `global_lobbies`, currentLobbyId);
+            const lobbySnap = await getDoc(lobbyRef);
+
+            if (lobbySnap.exists()) {
+                const lobbyData = lobbySnap.data();
+                const gameState = lobbyData.gameState;
+                const myRoleInGame = gameState.roles[auth.currentUser.uid];
+                const isHost = lobbyData.hostId === auth.currentUser.uid;
+
+                if (myRoleInGame === 'AI') {
+                    // If AI leaves, Human team wins
+                    await updateDoc(lobbyRef, {
+                        'gameState.status': 'ended',
+                        'gameState.winner': 'Human',
+                        'gameState.winReason': 'هوش مصنوعی بازی را ترک کرد.'
+                    });
+                } else {
+                    // Human player leaves
+                    // Remove the player from the game's gameState players list
+                    // AND from the main lobby.players map (which also tracks presence)
+                    await updateDoc(lobbyRef, {
+                        [`gameState.players`]: arrayRemove(auth.currentUser.uid),
+                        [`gameState.playerNames.${auth.currentUser.uid}`]: deleteField(), // Remove from playerNames map
+                        [`players.${auth.currentUser.uid}`]: deleteField() // Remove from current lobby players map
+                    });
+                    showMessageBox("شما از بازی خارج شدید.", "info");
+
+                    // Check remaining players to see if game needs to end due to departures
+                    const updatedLobbySnap = await getDoc(lobbyRef);
+                    if(updatedLobbySnap.exists() && updatedLobbySnap.data().gameState) {
+                        const updatedGameState = updatedLobbySnap.data().gameState;
+                        const currentLobbyPlayers = updatedLobbySnap.data().players; // Players still connected to lobby
+                        
+                        // Filter remaining players based on those still in the lobby AND in gameState players list
+                        const remainingActivePlayers = updatedGameState.players.filter(uid => currentLobbyPlayers && currentLobbyPlayers[uid]);
+
+                        const remainingHumanPlayers = remainingActivePlayers.filter(uid => updatedGameState.roles[uid] === 'Human');
+                        const remainingAIPlayers = remainingActivePlayers.filter(uid => updatedGameState.roles[uid] === 'AI');
+
+                        if (remainingAIPlayers.length === 0 && remainingHumanPlayers.length > 0) {
+                            // No AI left, humans automatically win
+                            await updateDoc(lobbyRef, {
+                                'gameState.status': 'ended',
+                                'gameState.winner': 'Human',
+                                'gameState.winReason': 'هوش مصنوعی از بازی خارج شد.'
+                            });
+                        } else if (remainingAIPlayers.length === 1 && remainingHumanPlayers.length === 1) {
+                            // One AI and one Human remaining, AI wins (if they are the last two)
+                            await updateDoc(lobbyRef, {
+                                'gameState.status': 'ended',
+                                'gameState.winner': 'AI',
+                                'gameState.winReason': 'فقط هوش مصنوعی و یک انسان باقی ماندند. هوش مصنوعی برنده است.'
+                            });
+                        } else if (remainingActivePlayers.length < 2) {
+                            // If only one active player left or no active players left, end game (no clear winner)
+                            await updateDoc(lobbyRef, {
+                                'gameState.status': 'ended',
+                                'gameState.winner': null, // No clear winner if everyone left
+                                'gameState.winReason': 'تعداد بازیکنان کافی برای ادامه بازی نیست.'
+                            });
+                        }
+                    }
+                }
+                
+                // If host leaves, delete the entire lobby for everyone
+                if (isHost) { 
+                     await deleteDoc(lobbyRef); // This will trigger onSnapshot for other players
+                }
+            } else {
+                // If lobby doesn't exist, just go back to lobbies screen
+                console.warn("Lobby does not exist while trying to leave game.");
+            }
+            // All players will be kicked back to lobby screen by their listeners, or manually sent back here.
+            currentLobbyId = null;
+            setActiveScreen(lobbyScreen);
+            unsubscribeLobbies = setupLobbyListener('');
+        });
+
+        returnToLobbiesBtn.addEventListener('click', () => {
+            currentLobbyId = null;
+            setActiveScreen(lobbyScreen);
+            unsubscribeLobbies = setupLobbyListener('');
+        });
+
+
+        // Initialize the app when the window loads
+        window.onload = initializeFirebaseAndAuth;
     </script>
 </body>
 </html>
