@@ -1082,7 +1082,7 @@
                     </div>
 
                     <button type="submit" id="submit-create-lobby-btn"
-                            class="w-full mt-4 classic-btn btn-green-classic text-xl sm:text-2xl hidden" disabled>
+                            class="w-full mt-4 classic-btn btn-green-classic text-xl sm:text-2xl hidden">
                         ساخت لابی
                     </button>
                 </form>
@@ -1733,7 +1733,7 @@
 
         // NEW: Function to update the approved lobby names dropdown and visibility of related areas
         async function updateApprovedLobbyNamesDropdownOnModalOpen(mode) {
-            if (!currentUserData || !auth.currentUser) {
+            if (!currentUserData) {
                 approvedLobbyNamesSelect.innerHTML = '<option value="">در حال بارگذاری اطلاعات...</option>';
                 lobbyNameSelectionArea.classList.add('hidden');
                 lobbyNameProposalArea.classList.add('hidden');
@@ -1742,66 +1742,13 @@
                 return;
             }
 
-            const currentApprovedNames = new Set(currentUserData.approvedLobbyNames || []);
-            const userId = auth.currentUser.uid;
-            
-            // --- Step 1: Sync newly approved names from proposedLobbyNames to user's profile ---
-            const proposedLobbyNamesRef = collection(db, `artifacts/${appId}/proposedLobbyNames`);
-            const qApprovedButNotAdded = query(
-                proposedLobbyNamesRef,
-                where("userId", "==", userId),
-                where("status", "==", "approved")
-            );
-
-            try {
-                const approvedSnap = await getDocs(qApprovedButNotAdded);
-                const batch = db.batch();
-                let newNamesAddedCount = 0;
-
-                approvedSnap.forEach(docSnap => {
-                    const approvedNameData = docSnap.data();
-                    const approvedName = approvedNameData.name;
-                    if (approvedName && !currentApprovedNames.has(approvedName)) {
-                        // Add to user's approvedLobbyNames
-                        const userProfileRef = doc(db, `artifacts/${appId}/users/${userId}/profile/data`);
-                        batch.update(userProfileRef, {
-                            approvedLobbyNames: arrayUnion(approvedName)
-                        });
-                        // Mark the proposed name as processed
-                        batch.update(docSnap.ref, { status: 'processed_by_client', processedAt: serverTimestamp() });
-                        currentApprovedNames.add(approvedName); // Update local set immediately for this session
-                        newNamesAddedCount++;
-                    }
-                });
-
-                if (newNamesAddedCount > 0) {
-                    await batch.commit();
-                    console.log(`Synced ${newNamesAddedCount} newly approved lobby names to user profile.`);
-                    // The onSnapshot listener for currentUserData will re-trigger and update currentUserData.approvedLobbyNames
-                    // and then this function will be called again with updated currentUserData, so the dropdown will populate correctly.
-                    // We can return early here, as the onSnapshot will handle the re-render.
-                    // IMPORTANT: If onSnapshot doesn't re-trigger immediately (e.g., due to local cache),
-                    // the dropdown might not update until currentUserData is explicitly refreshed or onSnapshot fires.
-                    // For client-side simulation, this is usually acceptable.
-                    return; 
-                }
-
-            } catch (error) {
-                console.error("Error syncing approved lobby names:", error);
-                // Continue with existing approved names if sync fails
-            }
-            // --- End Step 1 ---
-
-            // --- Step 2: Populate dropdown and manage visibility based on currentApprovedNames ---
-            // (currentApprovedNames is either the original one, or updated by the sync if it ran)
+            const approvedNames = currentUserData.approvedLobbyNames || [];
             
             // Clear existing options first
             approvedLobbyNamesSelect.innerHTML = '<option value="">نام لابی را انتخاب کنید</option>';
             
-            if (currentApprovedNames.size > 0) {
-                // Convert Set back to array for sorting, or iterate directly if order doesn't matter
-                const sortedApprovedNames = Array.from(currentApprovedNames).sort();
-                sortedApprovedNames.forEach(name => {
+            if (approvedNames.length > 0) {
+                approvedNames.forEach(name => {
                     const option = document.createElement('option');
                     option.value = name;
                     option.innerHTML = formatLobbyNameWithColor(name);
@@ -1820,16 +1767,17 @@
                     lobbyNameProposalArea.classList.remove('hidden');
                     submitLobbyNameForApprovalBtn.classList.remove('hidden'); // Enable 'Submit for Approval' button
 
-                    // Fetch pending requests for display logic
+                    // Fetch pending requests
+                    const proposedLobbyNamesRef = collection(db, `artifacts/${appId}/proposedLobbyNames`);
                     const qPending = query(
                         proposedLobbyNamesRef,
-                        where("userId", "==", userId),
+                        where("userId", "==", auth.currentUser.uid),
                         where("status", "==", "pending")
                     );
                     const pendingSnapshot = await getDocs(qPending);
                     const pendingCount = pendingSnapshot.size;
 
-                    if (pendingCount >= 5) { // Assuming a max of 5 pending requests
+                    if (pendingCount >= 5) {
                         lobbyProposalMessage.textContent = `شما ${pendingCount} درخواست نام لابی در انتظار تایید دارید. تا زمانی که درخواست‌های شما بررسی نشوند، نمی‌توانید درخواست جدیدی ارسال کنید.`;
                         lobbyProposalMessage.classList.remove('text-gray-400');
                         lobbyProposalMessage.classList.add('text-red-400');
@@ -1853,9 +1801,6 @@
                     submitLobbyNameForApprovalBtn.classList.add('hidden'); // Hide proposal button
                 }
             }
-            
-            // Enable/Disable 'ساخت لابی' button based on selection in dropdown
-            submitCreateLobbyBtn.disabled = approvedLobbyNamesSelect.value === '';
         }
 
 
@@ -2020,13 +1965,10 @@
                         updateUserCoinsDisplay(); // NEW
 
                         // If the create lobby modal is currently open, refresh its dropdown
-                        // IMPORTANT: This ensures the dropdown is re-populated after the profile update (e.g., after an approved name is synced)
                         if (!createLobbyModal.classList.contains('hidden') && !createLobbyModal.classList.contains('profile-modal-leave-active')) {
+                            // Determine the current mode of the modal (create or myLobbies) to pass to the update function
                             const currentMode = createLobbyModalTitle.textContent.includes('لابی‌های من') ? 'myLobbies' : 'create';
-                            // We call it without 'await' because this snapshot handler shouldn't block.
-                            // The sync logic inside updateApprovedLobbyNamesDropdownOnModalOpen will re-trigger this snapshot
-                            // if it adds new names, ensuring eventual consistency.
-                            updateApprovedLobbyNamesDropdownOnModalOpen(currentMode); 
+                            updateApprovedLobbyNamesDropdownOnModalOpen(currentMode);
                         }
                         
                         console.log("User profile data updated by real-time listener:", currentUserData);
@@ -3324,11 +3266,6 @@
             }
         });
 
-        // NEW: Event listener for approvedLobbyNamesSelect to enable/disable create button
-        approvedLobbyNamesSelect.addEventListener('change', () => {
-            submitCreateLobbyBtn.disabled = approvedLobbyNamesSelect.value === '';
-        });
-
         closeCreateLobbyModalBtn.addEventListener('click', closeCreateLobbyModal);
         createLobbyModal.addEventListener('click', (e) => e.target === createLobbyModal && closeCreateLobbyModal());
         
@@ -3507,7 +3444,7 @@
         lobbyChatMessages.addEventListener('click', (e) => {
             const deleteButton = e.target.closest('.delete-message-btn');
             if (deleteButton) {
-                const messageId = deleteButton.dataset.messageId; // Corrected: message-id -> messageId
+                const messageId = deleteButton.dataset.message-id; 
                 if (currentLobbyId && messageId) {
                     deleteLobbyMessage(currentLobbyId, messageId);
                 }
