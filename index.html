@@ -7,7 +7,7 @@
     <!-- Tailwind CSS CDN for styling -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Google Fonts for Classic Look -->
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Merriweather:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Merriweather:wght%40400%3B700&display=swap" rel="stylesheet">
     <style>
         /* General Classic Theme Background and Fonts */
         html, body, #app { /* Ensure these take full viewport height */
@@ -177,7 +177,7 @@
 
 
         /* Input Field Styles - More refined Classic Look */
-        input, textarea, select { /* Added textarea and select */
+        input {
             background-color: #202020; /* Even darker input background */
             border: 2px solid #5A5A5A; /* Dark gray border */
             color: #E0E0E0; /* Light text color */
@@ -185,16 +185,12 @@
             border-radius: 0.75rem; /* Equivalent to rounded-xl */
             box-shadow: inset 0 2px 4px rgba(0,0,0,0.5); /* Inner shadow for depth */
         }
-        input::placeholder, textarea::placeholder {
+        input::placeholder {
             color: #A0A0A0; /* Lighter placeholder text */
         }
-        input:focus, textarea:focus, select:focus {
+        input:focus {
             border-color: #DAA520 !important; /* Gold border on focus */
             box-shadow: 0 0 0 4px rgba(218, 165, 32, 0.5) !important, inset 0 2px 4px rgba(0,0,0,0.5) !important; /* Gold focus ring with inner shadow */
-        }
-        select option {
-            background-color: #202020;
-            color: #E0E0E0;
         }
 
         /* Header specific styles - Richer Gold/Brown */
@@ -551,12 +547,7 @@
             font-size: 0.8rem;
             margin-right: 0.5rem;
         }
-        /* Player management buttons in list item */
-        .player-list-item .management-btns {
-            display: flex;
-            gap: 0.5rem;
-        }
-        .kick-player-btn, .ban-player-list-btn { /* Unified styling */
+        .kick-player-btn {
             background: none;
             border: 1px solid #B22222;
             color: #B22222;
@@ -566,7 +557,7 @@
             cursor: pointer;
             transition: all 0.2s ease;
         }
-        .kick-player-btn:hover, .ban-player-list-btn:hover {
+        .kick-player-btn:hover {
             background: #B22222;
             color: white;
         }
@@ -1134,38 +1125,20 @@
             </div>
         </div>
 
-        <!-- 9. Ban Screen (NEW) -->
-        <div id="ban-screen" class="hidden absolute inset-0 flex flex-col justify-center items-center bg-gray-900 bg-opacity-90 z-50 page-transition-active page-transition-hidden" tabindex="-1">
-            <div class="classic-card p-6 sm:p-8 w-11/12 max-w-md text-center">
-                <h2 class="text-3xl sm:text-4xl font-bold mb-6 text-red-500">حساب شما مسدود شد!</h2>
-                <p class="text-lg mb-4 text-white">متاسفانه حساب کاربری شما به دلیل <span class="font-bold text-yellow-300" id="ban-reason">---</span> مسدود شده است.</p>
-                <p class="text-xl font-bold text-gray-300 mb-8">زمان اتمام مسدودیت: <span id="ban-countdown" class="text-white text-2xl">--:--:--</span></p>
-                <p class="text-sm text-gray-400">مسدود شده توسط: <span id="banned-by">---</span></p>
-                <p class="text-sm text-gray-400 mb-8">در تاریخ: <span id="ban-timestamp">---</span></p>
-
-                <button id="ban-logout-btn" class="w-full classic-btn btn-red-classic text-xl sm:text-2xl">
-                    خروج
-                </button>
-            </div>
-        </div>
-
-        <!-- 10. Player Management Modal (RE-PURPOSED FROM KICK PLAYER CONFIRM) -->
-        <!-- Note: This modal's content (buttons, selects, textarea) will be dynamically modified by JS -->
+        <!-- ... All other modals (kick, kicked message, etc.) remain the same ... -->
+        <!-- 10. Kick Player Confirmation Modal -->
         <div id="kick-player-confirm-modal" class="hidden fixed inset-0 flex justify-center items-center z-50 profile-modal-overlay">
             <div class="classic-card profile-modal-content p-6 sm:p-8 w-11/12 max-w-md text-center relative">
-                <h2 class="text-2xl sm:text-3xl font-bold mb-6 text-yellow-300">مدیریت بازیکن</h2>
+                <h2 class="text-2xl sm:text-3xl font-bold mb-6 text-yellow-300">اخراج بازیکن</h2>
                 <button id="close-kick-player-confirm-modal-btn" class="absolute top-4 left-4 text-white hover:text-gray-300 transition-colors duration-200">
                     <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-x">
                         <path d="M18 6 6 18"/><path d="m6 6 12 12"/>
                     </svg>
                 </button>
-                <p class="text-lg mb-8 text-white">اقدام برای <span id="kick-player-confirm-name" class="font-bold"></span></p>
-                <div class="flex flex-col space-y-4">
-                    <!-- Dynamic elements for ban duration/reason will be inserted here by JS -->
-                    <div class="flex justify-around space-x-4 space-x-reverse">
-                        <button id="kick-player-confirm-btn" class="classic-btn btn-red-classic">اخراج فقط از لابی</button>
-                        <button id="cancel-kick-player-btn" class="classic-btn btn-gray-classic">انصراف</button>
-                    </div>
+                <p class="text-lg mb-8 text-white">آیا مطمئن هستید که می‌خواهید <span id="kick-player-confirm-name" class="font-bold"></span> را از لابی اخراج کنید؟</p>
+                <div class="flex justify-around space-x-4 space-x-reverse">
+                    <button id="kick-player-confirm-btn" class="w-1/2 classic-btn btn-red-classic">اخراج کردن</button>
+                    <button id="cancel-kick-player-btn" class="w-1/2 classic-btn btn-gray-classic">انصراف</button>
                 </div>
             </div>
         </div>
@@ -1213,6 +1186,16 @@
                     </div>
                 </form>
                 <div id="password-prompt-message-box" class="mt-5 p-3.5 rounded-xl text-base text-center hidden" role="alert"></div>
+            </div>
+        </div>
+
+        <!-- 14. Banned Message Modal (NEW) -->
+        <div id="banned-message-modal" class="hidden fixed inset-0 flex justify-center items-center z-50 profile-modal-overlay">
+            <div class="classic-card profile-modal-content p-6 sm:p-8 w-11/12 max-w-md text-center relative">
+                <h2 class="text-2xl sm:text-3xl font-bold mb-6 text-red-400">شما مسدود شده‌اید!</h2>
+                <p id="banned-message-text" class="text-lg mb-8 text-white">متاسفانه، حساب کاربری شما مسدود شده است.</p>
+                <p id="banned-reason-text" class="text-md mb-8 text-gray-300"></p>
+                <button id="banned-message-ok-btn" class="w-full classic-btn btn-red-classic">متوجه شدم</button>
             </div>
         </div>
 
@@ -1355,21 +1338,12 @@
         const returnToLobbiesBtn = document.getElementById('return-to-lobbies-btn');
 
 
-        // Ban Screen Elements (NEW)
-        const banScreen = document.getElementById('ban-screen');
-        const banReason = document.getElementById('ban-reason');
-        const banCountdown = document.getElementById('ban-countdown');
-        const bannedBy = document.getElementById('banned-by');
-        const banTimestamp = document.getElementById('ban-timestamp');
-        const banLogoutBtn = document.getElementById('ban-logout-btn');
-
-        // Player Management Modal Elements (RE-PURPOSED FROM KICK PLAYER CONFIRM)
-        const playerManagementModal = document.getElementById('kick-player-confirm-modal'); // Reusing the modal
-        const closePlayerManagementModalBtn = document.getElementById('close-kick-player-confirm-modal-btn'); // Reusing close button
-        const playerManagementName = document.getElementById('kick-player-confirm-name'); // Reusing player name display
-        const playerManagementActionsContainer = playerManagementModal.querySelector('.flex-col.space-y-4 > .flex.justify-around'); // The div containing action buttons
-        const kickPlayerOnlyBtn = document.getElementById('kick-player-confirm-btn'); // Renamed for clarity (now 'Kick Only')
-        const cancelPlayerManagementBtn = document.getElementById('cancel-kick-player-btn'); // Reusing cancel button
+        // Kick Player Confirmation Modal Elements
+        const kickPlayerConfirmModal = document.getElementById('kick-player-confirm-modal');
+        const closeKickPlayerConfirmModalBtn = document.getElementById('close-kick-player-confirm-modal-btn');
+        const kickPlayerConfirmName = document.getElementById('kick-player-confirm-name');
+        const kickPlayerConfirmBtn = document.getElementById('kick-player-confirm-btn');
+        const cancelKickPlayerBtn = document.getElementById('cancel-kick-player-btn');
 
         // Kicked Message Modal Elements
         const kickedMessageModal = document.getElementById('kicked-message-modal');
@@ -1392,6 +1366,12 @@
         const cancelJoinPasswordBtn = document.getElementById('cancel-join-password-btn');
         const passwordPromptMessageBox = document.getElementById('password-prompt-message-box');
 
+        // NEW Banned Message Modal Elements
+        const bannedMessageModal = document.getElementById('banned-message-modal');
+        const bannedMessageText = document.getElementById('banned-message-text');
+        const bannedReasonText = document.getElementById('banned-reason-text');
+        const bannedMessageOkBtn = document.getElementById('banned-message-ok-btn');
+
         // State variables
         let authMode = 'login'; // Default mode is login
         let currentActiveScreen = loadingScreen;
@@ -1403,10 +1383,9 @@
         let isAuthResolved = false; // Flag to indicate if onAuthStateChanged has run at least once
         let userHasActiveLobby = false; // Track if the current user has an active lobby (created or joined)
         let currentLobbyId = null; // Stores the ID of the lobby the current user is in
-        let playerToManage = null; // Stores UID/name of player selected for kicking/banning
+        let kickedPlayerToProcess = null; // Stores UID/name of player selected for kicking
         let lobbyToJoin = null; // To store data of private lobby user wants to join
         let isRefreshing = false; // NEW: State for refresh button
-        let banCountdownInterval = null; // Global timer for ban countdown
 
         // Promise resolver for custom confirmation modal
         let resolveCustomConfirm;
@@ -1625,12 +1604,6 @@
             // Game related cleanups
             clearGameIntervals();
             resetGameUI();
-            // Ban screen related cleanup
-            if (banCountdownInterval) {
-                clearInterval(banCountdownInterval);
-                banCountdownInterval = null;
-                console.log("Ban countdown interval cleared.");
-            }
 
 
             // Hide the current screen with transition
@@ -1704,92 +1677,21 @@
             }, 300);
         }
         
-        // RE-PURPOSED: openPlayerManagementModal (formerly openKickPlayerConfirmModal)
-        function openPlayerManagementModal(playerName, playerUid) {
-            console.log(`Open player management modal for: ${playerName} (UID: ${playerUid})`);
-            playerManagementName.textContent = playerName;
-            playerManagementModal.classList.remove('hidden');
-            void playerManagementModal.offsetWidth;
-            playerManagementModal.classList.add('profile-modal-enter-active');
-            playerToManage = { uid: playerUid, displayName: playerName };
-
-            // Clear previous dynamically added elements to prevent duplicates on reopen
-            const existingDynamicElements = playerManagementModal.querySelectorAll('#ban-duration-select, #ban-reason-input, #ban-player-actual-btn');
-            existingDynamicElements.forEach(el => el.remove());
-
-            // Create new elements for banning
-            const banDurationSelect = document.createElement('select');
-            banDurationSelect.id = 'ban-duration-select';
-            banDurationSelect.className = 'w-full focus:outline-none focus:ring-2 focus:ring-yellow-500 bg-gray-700 text-white p-3.5 rounded-xl mb-4 text-right'; // Added text-right
-            banDurationSelect.innerHTML = `
-                <option value="3600">1 ساعت</option>
-                <option value="86400">24 ساعت</option>
-                <option value="604800">7 روز</option>
-                <option value="2592000">30 روز</option>
-                <option value="3153600000">دائم</option>
-            `;
-
-            const banReasonInput = document.createElement('textarea');
-            banReasonInput.id = 'ban-reason-input';
-            banReasonInput.placeholder = 'علت مسدودسازی (اجباری)';
-            banReasonInput.className = 'w-full focus:outline-none focus:ring-2 focus:ring-yellow-500 bg-gray-700 text-white p-3.5 rounded-xl mb-4 h-24 text-right'; // Added text-right
-            banReasonInput.required = true;
-
-            const banPlayerActualBtn = document.createElement('button');
-            banPlayerActualBtn.id = 'ban-player-actual-btn';
-            banPlayerActualBtn.className = 'classic-btn btn-red-classic w-full'; // Full width for this button
-            banPlayerActualBtn.textContent = 'مسدودسازی اکانت';
-
-            // Insert new elements before the playerManagementActionsContainer
-            // The order here matters for how they appear in the DOM
-            playerManagementActionsContainer.parentNode.insertBefore(banPlayerActualBtn, playerManagementActionsContainer);
-            playerManagementActionsContainer.parentNode.insertBefore(banReasonInput, banPlayerActualBtn);
-            playerManagementActionsContainer.parentNode.insertBefore(banDurationSelect, banReasonInput);
-
-            // Re-assign event listeners for dynamically added elements
-            // **FIX**: Ensure the event listener is attached *after* the element is in the DOM
-            // And use addEventListener for consistency and better management.
-            banPlayerActualBtn.addEventListener('click', async () => {
-                console.log("Ban button clicked in modal.");
-                const durationSeconds = parseInt(banDurationSelect.value, 10);
-                const reason = banReasonInput.value.trim();
-                
-                if (!reason) {
-                    showCustomMessage(playerManagementModal.querySelector('.classic-card'), "لطفاً علت مسدودسازی را وارد کنید.", "error");
-                    return;
-                }
-                if (playerToManage && auth.currentUser) {
-                    console.log("Calling banUser with:", { uid: playerToManage.uid, displayName: playerToManage.displayName, reason: reason, duration: durationSeconds });
-                    await banUser(playerToManage.uid, playerToManage.displayName, reason, durationSeconds);
-                } else {
-                    console.error("Attempted to ban player without valid playerToManage or currentUser.");
-                    showCustomMessage(playerManagementModal.querySelector('.classic-card'), "خطا: اطلاعات بازیکن برای مسدودسازی موجود نیست.", "error");
-                }
-            });
-
-            // Adjust the existing kick button's display
-            kickPlayerOnlyBtn.textContent = 'اخراج فقط از لابی';
-            kickPlayerOnlyBtn.classList.remove('w-1/2'); // Tailwind w-1/2 from original HTML
-            kickPlayerOnlyBtn.classList.add('flex-grow'); // Make it flexible
+        function openKickPlayerConfirmModal(playerName, playerUid) {
+            kickPlayerConfirmName.textContent = playerName;
+            kickPlayerConfirmModal.classList.remove('hidden');
+            void kickPlayerConfirmModal.offsetWidth;
+            kickPlayerConfirmModal.classList.add('profile-modal-enter-active');
+            kickedPlayerToProcess = { uid: playerUid, displayName: playerName };
         }
 
-        // RE-PURPOSED: closePlayerManagementModal (formerly closeKickPlayerConfirmModal)
-        function closePlayerManagementModal() {
-            console.log("Closing player management modal.");
-            playerManagementModal.classList.remove('profile-modal-enter-active');
-            playerManagementModal.classList.add('profile-modal-leave-active');
+        function closeKickPlayerConfirmModal() {
+            kickPlayerConfirmModal.classList.remove('profile-modal-enter-active');
+            kickPlayerConfirmModal.classList.add('profile-modal-leave-active');
             setTimeout(() => {
-                playerManagementModal.classList.add('hidden');
-                playerManagementModal.classList.remove('profile-modal-leave-active');
-                playerToManage = null;
-                // Remove dynamically added elements
-                const existingDynamicElements = playerManagementModal.querySelectorAll('#ban-duration-select, #ban-reason-input, #ban-player-actual-btn');
-                existingDynamicElements.forEach(el => el.remove());
-                // Reset kick button text and style for next use
-                kickPlayerOnlyBtn.textContent = 'اخراج کردن'; // Restore original text
-                kickPlayerOnlyBtn.classList.remove('flex-grow');
-                kickPlayerOnlyBtn.classList.add('w-1/2');
-
+                kickPlayerConfirmModal.classList.add('hidden');
+                kickPlayerConfirmModal.classList.remove('profile-modal-leave-active');
+                kickedPlayerToProcess = null;
             }, 300);
         }
 
@@ -1835,48 +1737,21 @@
             }, 300);
         }
 
-        // NEW: Ban Screen functions
-        function setupBanCountdown(bannedUntil, reason, bannedByDisplayName, banTimestampFormatted) {
-            console.log("Setting up ban countdown:", { bannedUntil, reason, bannedByDisplayName, banTimestampFormatted });
-            banReason.textContent = reason;
-            bannedBy.textContent = bannedByDisplayName;
-            banTimestamp.textContent = banTimestampFormatted;
+        // NEW: Banned Message Modal Functions
+        function showBannedMessageModal(reason = 'بدون دلیل مشخص') {
+            bannedReasonText.textContent = `دلیل: ${reason}`;
+            bannedMessageModal.classList.remove('hidden');
+            void bannedMessageModal.offsetWidth; // Trigger reflow for transition
+            bannedMessageModal.classList.add('profile-modal-enter-active');
+        }
 
-            clearInterval(banCountdownInterval); // Clear any existing interval
-            
-            banCountdownInterval = setInterval(() => {
-                const now = Date.now();
-                const timeLeftMs = bannedUntil - now;
-
-                if (timeLeftMs <= 0) {
-                    console.log("Ban countdown reached zero for user:", auth.currentUser?.uid);
-                    clearInterval(banCountdownInterval);
-                    banCountdownInterval = null;
-                    banCountdown.textContent = "00:00:00";
-                    // Attempt to unban the user automatically
-                    if (auth.currentUser && currentUserData.banStatus?.isBanned) {
-                        unbanUser(auth.currentUser.uid); // Unban in Firestore
-                    } else {
-                        // If not banned in Firestore but somehow still on screen (e.g., manual refresh issue), force logout
-                        console.log("Forcing logout as user is not banned in Firestore but timer expired.");
-                        signOut(auth);
-                    }
-                    return;
-                }
-
-                const totalSeconds = Math.floor(timeLeftMs / 1000);
-                const days = Math.floor(totalSeconds / (3600 * 24));
-                const hours = Math.floor((totalSeconds % (3600 * 24)) / 3600);
-                const minutes = Math.floor((totalSeconds % 3600) / 60);
-                const seconds = totalSeconds % 60;
-
-                let countdownString = '';
-                if (days > 0) countdownString += `${days} روز و `;
-                countdownString += `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
-                
-                banCountdown.textContent = countdownString;
-
-            }, 1000);
+        function closeBannedMessageModal() {
+            bannedMessageModal.classList.remove('profile-modal-enter-active');
+            bannedMessageModal.classList.add('profile-modal-leave-active');
+            setTimeout(() => {
+                bannedMessageModal.classList.add('hidden');
+                bannedMessageModal.classList.remove('profile-modal-leave-active');
+            }, 300);
         }
 
 
@@ -1895,56 +1770,52 @@
                     const userDocRef = doc(db, `artifacts/${appId}/users/${user.uid}/profile/data`); 
                     const userDocSnap = await getDoc(userDocRef);
                     
+                    const profileData = userDocSnap.exists() ? userDocSnap.data() : {};
+                    
+                    // NEW: Load banStatus and isAdmin from user profile
+                    const isBanned = profileData.banStatus?.isBanned || false;
+                    const bannedReason = profileData.banStatus?.banReason || 'بدون دلیل مشخص';
+                    const isAdmin = profileData.isAdmin || false; // NEW: Get isAdmin status
+
+                    if (isBanned) {
+                        console.log(`کاربر ${user.uid} مسدود شده است.`);
+                        await signOut(auth); // Force sign out
+                        showBannedMessageModal(bannedReason); // Show banned message
+                        return; // Stop further processing
+                    }
+
                     currentUserData = {
                         uid: user.uid,
                         email: user.email,
-                        displayName: (userDocSnap.exists() && userDocSnap.data().displayName) ? userDocSnap.data().displayName : (user.displayName || (user.email ? user.email.split('@')[0] : 'کاربر ناشناس')),
-                        isAdmin: (userDocSnap.exists() && userDocSnap.data().isAdmin) || false, // NEW: isAdmin field
-                        banStatus: (userDocSnap.exists() && userDocSnap.data().banStatus) || { isBanned: false } // NEW: banStatus object
+                        displayName: profileData.displayName || (user.displayName || (user.email ? user.email.split('@')[0] : 'کاربر ناشناس')),
+                        isAdmin: isAdmin, // NEW: Store isAdmin status
+                        banStatus: profileData.banStatus || { isBanned: false } // NEW: Store ban status
                     };
-                    console.log("Current User Data:", currentUserData);
 
-                    // NEW: Handle Ban Status
-                    if (currentUserData.banStatus.isBanned) {
-                        const bannedUntil = currentUserData.banStatus.bannedUntil?.toMillis();
-                        const now = Date.now();
-                        if (bannedUntil === null || (bannedUntil && bannedUntil > now)) { // Permanent ban or temporary active ban
-                            // Still banned, show ban screen
-                            console.log("User is banned, showing ban screen.");
-                            setActiveScreen(banScreen);
-                            const banTimestampDate = currentUserData.banStatus.banTimestamp?.toDate();
-                            const banTimestampFormatted = banTimestampDate ? banTimestampDate.toLocaleString('fa-IR', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'نامشخص';
-                            setupBanCountdown(bannedUntil, currentUserData.banStatus.banReason, currentUserData.banStatus.bannedBy, banTimestampFormatted);
-                            return; // Stop further processing, user is banned
-                        } else if (bannedUntil && bannedUntil <= now) {
-                            // Ban expired, unban user in Firestore
-                            console.log("Ban expired, unbanning user:", user.uid);
-                            await unbanUser(user.uid);
-                            // After unban, re-evaluate and proceed to main screen
-                            currentUserData.banStatus = { isBanned: false }; // Update local state
-                        }
-                    }
-
+                    // Only update displayName if it wasn't set or if it's a new registration and displayName was provided
                     if (!userDocSnap.exists() && authMode === 'register' && displayNameInput.value.trim() !== '') {
-                        console.log("Registering new user profile data for:", user.uid);
-                        await setDoc(userDocRef, { displayName: displayNameInput.value.trim(), email: user.email, isAdmin: false, banStatus: { isBanned: false } }, { merge: true });
+                        // For new users registering, set isAdmin to false by default
+                        await setDoc(userDocRef, { displayName: displayNameInput.value.trim(), email: user.email, isAdmin: false }, { merge: true }); 
                         currentUserData.displayName = displayNameInput.value.trim();
                     }
+                    
                     headerDisplayName.textContent = currentUserData.displayName;
                     headerUserId.textContent = `شناسه: ${currentUserData.uid.substring(0, 8)}...`;
                     
-                    // Only transition if we are coming from loading or auth screen (and not banned)
-                    if(currentActiveScreen === loadingScreen || currentActiveScreen === authScreen || currentActiveScreen === banScreen) {
+                    // Only transition if we are coming from loading or auth screen
+                    if(currentActiveScreen === loadingScreen || currentActiveScreen === authScreen) {
                         setActiveScreen(mainScreen);
                     }
 
-                } catch (firestoreError) {
-                    console.error("Firestore profile error on onAuthStateChanged:", firestoreError);
+                } // END try
+                catch (firestoreError) {
+                    console.error("Firestore profile error:", firestoreError);
+                    // Fallback in case of Firestore error, but user can still proceed
                     currentUserData = { 
                         uid: user.uid, 
                         email: user.email, 
                         displayName: user.displayName || (user.email ? user.email.split('@')[0] : 'کاربر ناشناس'),
-                        isAdmin: false,
+                        isAdmin: false, // Assume not admin if profile load fails
                         banStatus: { isBanned: false }
                     };
                     headerDisplayName.textContent = currentUserData.displayName;
@@ -1954,7 +1825,6 @@
                 }
             } else {
                 // User is logged out
-                console.log("User logged out, transitioning to auth screen.");
                 setActiveScreen(authScreen);
                 authForm.reset();
                 displayNameField.classList.add('hidden');
@@ -1972,11 +1842,6 @@
                 unsubscribeLobbies = unsubscribeLobbyDetail = unsubscribeKickedPlayers = unsubscribeLobbyChat = null;
                 currentLobbyId = null;
                 resetGameUI(); // Ensure game UI is reset
-                // Clear ban interval too if any
-                if (banCountdownInterval) {
-                    clearInterval(banCountdownInterval);
-                    banCountdownInterval = null;
-                }
             }
         });
 
@@ -2031,6 +1896,11 @@
         // --- Firebase Lobby Functions ---
         async function createLobby(lobbyName, userId, displayName, lobbyType, password, gameDurationMinutes) {
             try {
+                // NEW: Prevent banned users from creating lobbies
+                if (currentUserData && currentUserData.banStatus?.isBanned) {
+                    throw new Error("شما مسدود شده‌اید و نمی‌توانید لابی ایجاد کنید.");
+                }
+
                 const creatorDisplayName = displayName && displayName.trim() !== '' ? displayName : 'ناشناس';
         
                 const userLobbiesQuery = query(
@@ -2080,19 +1950,10 @@
         async function closeLobby(lobbyId, userId) {
             const lobbyRef = doc(db, `global_lobbies`, lobbyId);
             try {
-                console.log(`Attempting to close lobby ${lobbyId} by user ${userId}`);
                 const lobbySnap = await getDoc(lobbyRef);
-                if (!lobbySnap.exists()) { 
-                    showMessageBox("لابی مورد نظر یافت نشد.", "error"); 
-                    console.warn(`Lobby ${lobbyId} not found for closing.`);
-                    return; 
-                }
+                if (!lobbySnap.exists()) { showMessageBox("لابی مورد نظر یافت نشد.", "error"); return; }
                 const lobbyData = lobbySnap.data();
-                if (lobbyData.hostId !== userId) { 
-                    showMessageBox("شما اجازه بستن این لابی را ندارید.", "error"); 
-                    console.warn(`User ${userId} attempted to close lobby ${lobbyId} but is not host.`);
-                    return; 
-                }
+                if (lobbyData.hostId !== userId) { showMessageBox("شما اجازه بستن این لابی را ندارید.", "error"); return; }
 
                 const lobbyElement = document.querySelector(`[data-lobby-id="${lobbyId}"]`);
                 if (lobbyElement) {
@@ -2101,7 +1962,6 @@
                 }
 
                 await deleteDoc(lobbyRef);
-                console.log(`Lobby ${lobbyId} successfully deleted.`);
                 showMessageBox(`لابی "${lobbyData.name}" با موفقیت بسته شد.`, "success");
                 userHasActiveLobby = false;
                 if (currentLobbyId === lobbyId) currentLobbyId = null;
@@ -2175,7 +2035,7 @@
                         const isCurrentUserHostOfThisLobby = auth.currentUser && lobby.hostId === auth.currentUser.uid;
                         const isCurrentUserKicked = auth.currentUser && lobby.kickedPlayers?.some(p => p.uid === auth.currentUser.uid);
                         // NEW: Check if current user is banned
-                        const isCurrentUserBanned = currentUserData?.banStatus?.isBanned || false;
+                        const isCurrentUserBanned = currentUserData && currentUserData.banStatus?.isBanned;
 
                         const canJoinThisLobby = auth.currentUser && !currentUserIsInAnyLobby && playerCount < maxPlayers && !isCurrentUserKicked && !isCurrentUserBanned;
         
@@ -2185,7 +2045,7 @@
         
                         let joinButtonHtml = '';
                         if (isCurrentUserBanned) { // NEW: Banned users cannot join
-                            joinButtonHtml = `<button class="join-lobby-btn classic-btn btn-red-classic opacity-50 cursor-not-allowed" disabled>مسدود هستید</button>`;
+                             joinButtonHtml = `<button class="join-lobby-btn classic-btn btn-red-classic opacity-50 cursor-not-allowed" disabled>مسدود شده‌اید</button>`;
                         } else if (isCurrentUserKicked) {
                              joinButtonHtml = `<button class="join-lobby-btn classic-btn btn-red-classic opacity-50 cursor-not-allowed" disabled>اخراج شده‌اید</button>`;
                         } else if (isCurrentUserHostOfThisLobby) {
@@ -2268,10 +2128,14 @@
             return unsubscribe;
         }
 
-        async function joinLobby(lobbyId, userId, displayName) {
+        async function joinLobby(lobbyId, userId, displayName, password = null) { // Added password parameter
+            // NEW: Prevent banned users from joining lobbies
+            if (currentUserData && currentUserData.banStatus?.isBanned) {
+                throw new Error("شما مسدود شده‌اید و نمی‌توانید وارد لابی شوید.");
+            }
+
             const lobbyRef = doc(db, `global_lobbies`, lobbyId);
             try {
-                console.log(`Attempting to join lobby ${lobbyId} for user ${userId}`);
                 const lobbySnap = await getDoc(lobbyRef);
                 if (!lobbySnap.exists()) { throw new Error("لابی یافت نشد."); }
                 
@@ -2280,11 +2144,15 @@
                 const maxPlayers = lobbyData.gameSettings?.maxPlayers || 4;
                 const kickedPlayers = lobbyData.kickedPlayers || [];
 
+                // NEW: If it's a private lobby, check password
+                if (lobbyData.type === 'private' && password !== lobbyData.password) {
+                    throw new Error("رمز عبور اشتباه است.");
+                }
+
                 if (kickedPlayers.some(p => p.uid === userId)) {
                     throw new Error("شما از این لابی اخراج شده‌اید.");
                 }
                 if (playersMap[userId]) { // Player is already in
-                    console.log(`User ${userId} is already in lobby ${lobbyId}. Redirecting.`);
                     currentLobbyId = lobbyId;
                     setActiveScreen(lobbyDetailScreen);
                     unsubscribeLobbyDetail = setupLobbyDetailListener(lobbyId);
@@ -2296,7 +2164,7 @@
                 await updateDoc(lobbyRef, {
                     [`players.${userId}`]: displayName
                 });
-                console.log(`User ${userId} successfully joined lobby ${lobbyId}.`);
+                
                 showMessageBox(`شما به لابی "${lobbyData.name}" وارد شدید.`, "success");
                 
                 currentLobbyId = lobbyId;
@@ -2329,37 +2197,17 @@
                 
                 const lobbyData = docSnap.data();
                 const isCurrentUserHost = auth.currentUser && lobbyData.hostId === auth.currentUser.uid;
-                // NEW: Check if current user is an admin
-                const isCurrentUserAdmin = currentUserData?.isAdmin || false;
-                console.log("Lobby Data:", lobbyData);
-                console.log("Current user is host:", isCurrentUserHost, "Admin:", isCurrentUserAdmin);
+                // NEW: Check if current user is admin
+                const isCurrentUserAdmin = currentUserData && currentUserData.isAdmin;
 
-                // NEW: If current user is banned, force them out of the lobby
-                if (auth.currentUser && currentUserData.banStatus?.isBanned && currentUserData.banStatus.bannedUntil?.toMillis() > Date.now()) {
-                    console.log(`User ${auth.currentUser.uid} is banned, removing from lobby ${lobbyId} and redirecting.`);
-                    showMessageBox("حساب شما مسدود شده است.", "error");
-                    // Remove player from lobby document (if they somehow bypassed initial check)
-                    const playerRef = doc(db, `global_lobbies`, lobbyId);
-                    await updateDoc(playerRef, {
-                        [`players.${auth.currentUser.uid}`]: deleteField()
-                    });
-                    // Then redirect to ban screen
-                    setActiveScreen(banScreen);
-                    const banTimestampDate = currentUserData.banStatus.banTimestamp?.toDate();
-                    const banTimestampFormatted = banTimestampDate ? banTimestampDate.toLocaleString('fa-IR', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'نامشخص';
-                    setupBanCountdown(currentUserData.banStatus.bannedUntil.toMillis(), currentUserData.banStatus.banReason, currentUserData.banStatus.bannedBy, banTimestampFormatted);
-                    return;
-                }
 
                 // NEW: Check if game has started
                 if (lobbyData.status === 'playing') {
                     // Game is active, switch to game mode UI within lobby detail screen
-                    console.log("Game is playing, setting up game UI.");
                     setupGameUI(lobbyId, lobbyData); // Call game UI setup function
                     return; // Stop processing lobby details as game is active
                 } else {
                     // Lobby is in waiting state, ensure game UI is hidden
-                    console.log("Lobby is in waiting state, resetting game UI elements.");
                     resetGameUI();
                     // Show host actions
                     if (isCurrentUserHost) {
@@ -2385,7 +2233,6 @@
                 detailPlayerCount.textContent = `بازیکنان: ${playerCount}/${maxPlayers}`;
 
                 if (auth.currentUser && lobbyData.kickedPlayers?.some(p => p.uid === auth.currentUser.uid)) {
-                    console.log(`Current user ${auth.currentUser.uid} is kicked from lobby ${lobbyId}.`);
                     showKickedMessageModal(lobbyData.name);
                     return;
                 }
@@ -2401,18 +2248,11 @@
                     playerItem.className = 'player-list-item';
                     if (isHost) playerItem.classList.add('is-host');
 
-                    // NEW: Player Management Buttons for Admins
-                    let managementButtonsHtml = '';
-                    if (auth.currentUser && isCurrentUserAdmin && player.uid !== auth.currentUser.uid) { // Admins can manage others, not self
-                        managementButtonsHtml = `
-                            <div class="management-btns">
-                                <button class="kick-player-btn" data-player-uid="${player.uid}" data-player-name="${player.displayName}">اخراج</button>
-                                <button class="ban-player-list-btn" data-player-uid="${player.uid}" data-player-name="${player.displayName}">مسدودسازی</button>
-                            </div>
-                        `;
-                    } else if (auth.currentUser && isCurrentUserHost && !isHost) { // Host can only kick
-                        managementButtonsHtml = `<button class="kick-player-btn" data-player-uid="${player.uid}" data-player-name="${player.displayName}">اخراج</button>`;
-                    }
+                    // NEW: Kick button visible to host OR admin, but not for self
+                    const canKick = (isCurrentUserHost || isCurrentUserAdmin) && player.uid !== auth.currentUser.uid;
+                    const kickButtonHtml = canKick
+                        ? `<button class="kick-player-btn" data-player-uid="${player.uid}" data-player-name="${player.displayName}">اخراج</button>` 
+                        : '';
                     
                     const hostLabelHtml = isHost ? '<span class="host-label">(سازنده)</span>' : '';
 
@@ -2422,30 +2262,14 @@
                             <span class="player-name">${player.displayName}</span>
                             ${hostLabelHtml}
                         </div>
-                        ${managementButtonsHtml}
+                        ${kickButtonHtml}
                     `;
                     playerListContainer.appendChild(playerItem);
                 }
 
                 playerListContainer.querySelectorAll('.kick-player-btn').forEach(button => {
-                    button.addEventListener('click', async (e) => {
-                        // Original kick functionality (for host or admin)
-                       const playerUid = e.currentTarget.dataset.playerUid;
-                       const playerName = e.currentTarget.dataset.playerName;
-                       console.log(`Kick button clicked for player: ${playerName} (UID: ${playerUid}) from lobby list.`);
-                       const confirmed = await showCustomConfirm(`آیا مطمئن هستید که می‌خواهید ${playerName} را فقط از این لابی اخراج کنید؟`, "اخراج بازیکن");
-                        if (confirmed) {
-                            await kickPlayer(currentLobbyId, playerUid, playerName);
-                        }
-                    });
-                });
-
-                // NEW: Ban Player Button listener
-                playerListContainer.querySelectorAll('.ban-player-list-btn').forEach(button => {
                     button.addEventListener('click', (e) => {
-                       // Open the more detailed player management modal for banning
-                       console.log(`Ban button clicked for player: ${e.currentTarget.dataset.playerName} (UID: ${e.currentTarget.dataset.playerUid}) from lobby list.`);
-                       openPlayerManagementModal(e.currentTarget.dataset.playerName, e.currentTarget.dataset.playerUid);
+                       openKickPlayerConfirmModal(e.currentTarget.dataset.playerName, e.currentTarget.dataset.playerUid);
                     });
                 });
 
@@ -2482,10 +2306,8 @@
             const lobbyRef = doc(db, `global_lobbies`, currentLobbyId);
             const userId = auth.currentUser.uid;
             try {
-                console.log(`User ${userId} attempting to leave lobby ${currentLobbyId}.`);
                 const lobbySnap = await getDoc(lobbyRef);
                 if (!lobbySnap.exists()) {
-                    console.warn(`Lobby ${currentLobbyId} no longer exists when user ${userId} tried to leave.`);
                     setActiveScreen(lobbyScreen);
                     unsubscribeLobbies = setupLobbyListener('');
                     return;
@@ -2495,14 +2317,13 @@
                 if (isHost) {
                     const confirmed = await showCustomConfirm("شما سازنده لابی هستید. خروج شما باعث بسته شدن لابی برای همه می‌شود. آیا مطمئن هستید؟", "بستن لابی");
                     if (confirmed) {
-                        console.log(`Host ${userId} confirmed closing lobby ${currentLobbyId}.`);
                         await deleteDoc(lobbyRef);
                         // The onSnapshot listener will handle screen transition for all players.
                     }
                 } else {
                     // This block is now unreachable via the UI as per the new requirement, but the logic is kept for safety.
                     // If a player somehow manages to trigger this, they would leave the lobby.
-                    console.warn("A non-host tried to leave the lobby using the 'close lobby' button (should be hidden). Removing them as a player.");
+                    console.warn("A non-host tried to leave the lobby. This path should not be reachable via UI button.");
                     await updateDoc(lobbyRef, {
                         [`players.${userId}`]: deleteField()
                     });
@@ -2510,143 +2331,91 @@
                     setActiveScreen(lobbyScreen);
                     unsubscribeLobbies = setupLobbyListener('');
                 }
-            } catch (e) { 
-                console.error("Error leaving lobby:", e); 
-                showMessageBox("خطا در ترک لابی.", "error"); 
-            }
+            } catch (e) { console.error("Error leaving lobby:", e); showMessageBox("خطا در ترک لابی.", "error"); }
         }
 
         async function kickPlayer(lobbyId, playerToKickUid, playerToKickDisplayName) {
             const lobbyRef = doc(db, `global_lobbies`, lobbyId);
-            console.log(`Attempting to kick player ${playerToKickDisplayName} (UID: ${playerToKickUid}) from lobby ${lobbyId}.`);
+            const userProfileRef = doc(db, `artifacts/${appId}/users/${playerToKickUid}/profile/data`); // Reference to kicked user's profile
+
             try {
-                // Ensure current user has permission
+                // Ensure current user is indeed the host or an admin
                 const lobbySnap = await getDoc(lobbyRef);
                 if (!lobbySnap.exists()) {
-                    console.error(`Kick failed: Lobby ${lobbyId} not found.`);
-                    showMessageBox("خطا: لابی یافت نشد.", "error");
+                    showMessageBox("لابی یافت نشد.", "error");
+                    closeKickPlayerConfirmModal();
                     return;
                 }
                 const lobbyData = lobbySnap.data();
                 const isCurrentUserHost = auth.currentUser.uid === lobbyData.hostId;
-                const isCurrentUserAdmin = currentUserData?.isAdmin || false;
+                const isCurrentUserAdmin = currentUserData && currentUserData.isAdmin;
 
                 if (!isCurrentUserHost && !isCurrentUserAdmin) {
-                    console.warn(`Kick attempt by non-host/non-admin user ${auth.currentUser.uid}. Permission denied.`);
-                    showMessageBox("شما اجازه اخراج بازیکن را ندارید.", "error");
-                    return;
-                }
-                if (playerToKickUid === auth.currentUser.uid) {
-                    showMessageBox("شما نمی‌توانید خودتان را اخراج کنید.", "error");
+                    showMessageBox("شما اجازه اخراج یا مسدودسازی این بازیکن را ندارید.", "error");
+                    closeKickPlayerConfirmModal();
                     return;
                 }
 
-                // Remove player from lobby players map
-                await updateDoc(lobbyRef, {
-                    [`players.${playerToKickUid}`]: deleteField(),
-                    kickedPlayers: arrayUnion({ uid: playerToKickUid, displayName: playerToKickDisplayName })
-                });
-                console.log(`Player ${playerToKickDisplayName} (UID: ${playerToKickUid}) successfully kicked from lobby ${lobbyId}.`);
-                showMessageBox(`بازیکن "${playerToKickDisplayName}" از لابی اخراج شد.`, "success");
-                closePlayerManagementModal(); // Use the general close function
-            } catch (e) { 
-                console.error("Error kicking player:", e); 
-                showMessageBox(`خطا در اخراج بازیکن: ${e.message}`, "error"); 
-            }
-        }
+                const isKickedPlayerHost = lobbyData.hostId === playerToKickUid;
+                const isKickerAdmin = currentUserData.isAdmin; // Current user's admin status
 
-        // NEW: Function to ban a user
-        async function banUser(targetUid, targetDisplayName, reason, durationSeconds) {
-            console.log(`Attempting to ban user ${targetDisplayName} (UID: ${targetUid}) with reason: "${reason}" for ${durationSeconds} seconds.`);
-            console.log("Current user's isAdmin status:", currentUserData?.isAdmin);
+                let confirmed;
+                if (isKickerAdmin && !isKickedPlayerHost) { // Admin banning a regular player
+                    confirmed = await showCustomConfirm(
+                        `آیا مطمئن هستید که می‌خواهید ${playerToKickDisplayName} را از لابی اخراج کرده و او را از سرور مسدود کنید؟ این عمل غیرقابل بازگشت است.`,
+                        "مسدودسازی و اخراج بازیکن"
+                    );
+                } else if (isKickerAdmin && isKickedPlayerHost) { // Admin banning the host
+                    confirmed = await showCustomConfirm(
+                        `آیا مطمئن هستید که می‌خواهید ${playerToKickDisplayName} (میزبان) را از لابی اخراج کرده و او را از سرور مسدود کنید؟ این عمل منجر به بسته شدن کامل لابی برای همه خواهد شد و غیرقابل بازگشت است.`,
+                        "مسدودسازی میزبان و بستن لابی"
+                    );
+                } else { // Host kicking a player (not admin, so no ban)
+                    confirmed = await showCustomConfirm(
+                        `آیا مطمئن هستید که می‌خواهید ${playerToKickDisplayName} را از لابی اخراج کنید؟`,
+                        "اخراج بازیکن"
+                    );
+                }
+                if (!confirmed) {
+                    closeKickPlayerConfirmModal();
+                    return;
+                }
 
-            if (!auth.currentUser || !currentUserData?.isAdmin) {
-                console.warn(`Ban attempt by non-admin user ${auth.currentUser?.uid}. Permission denied.`);
-                showMessageBox("شما مجوز مسدودسازی را ندارید.", "error");
-                closePlayerManagementModal();
-                return;
-            }
+                // First, perform the ban action if the kicker is an admin
+                if (isKickerAdmin) {
+                    await setDoc(userProfileRef, {
+                        banStatus: {
+                            isBanned: true,
+                            bannedBy: auth.currentUser.uid,
+                            banReason: `مسدود شده توسط ادمین (${currentUserData.displayName}) از لابی: ${lobbyData.name}`,
+                            bannedAt: serverTimestamp()
+                        }
+                    }, { merge: true }); // Merge to not overwrite other profile data
+                    showMessageBox(`بازیکن "${playerToKickDisplayName}" با موفقیت مسدود شد.`, "success");
+                }
 
-            if (targetUid === auth.currentUser.uid) {
-                console.warn("Attempted to ban self. Operation denied.");
-                showMessageBox("شما نمی‌توانید خودتان را مسدود کنید.", "error");
-                closePlayerManagementModal();
-                return;
-            }
-
-            const targetUserDocRef = doc(db, `artifacts/${appId}/users/${targetUid}/profile/data`);
-            const bannedUntil = durationSeconds === 3153600000 // "دائم" (100 years)
-                ? null // Permanent ban, no specific end time
-                : new Date(Date.now() + durationSeconds * 1000);
-
-            try {
-                console.log(`Updating Firestore document for banned user ${targetUid} at path: ${targetUserDocRef.path}`);
-                await updateDoc(targetUserDocRef, {
-                    banStatus: {
-                        isBanned: true,
-                        bannedBy: currentUserData.displayName,
-                        bannedByUid: auth.currentUser.uid,
-                        banReason: reason,
-                        banTimestamp: serverTimestamp(),
-                        bannedUntil: bannedUntil // Store as Firestore Timestamp or null
-                    }
-                });
-                console.log(`Successfully updated banStatus for user ${targetUid}.`);
-
-                // Immediately remove banned user from their current lobby if they are in one
-                console.log(`Checking for active lobbies to remove banned user ${targetUid}.`);
-                const userLobbiesQuery = query(
-                    collection(db, `global_lobbies`),
-                    where(`players.${targetUid}`, "!=", null) // Check if player exists in any lobby's players map
-                );
-                const userLobbiesSnapshot = await getDocs(userLobbiesQuery);
-
-                for (const lobbyDoc of userLobbiesSnapshot.docs) {
-                    const lobbyRef = doc(db, `global_lobbies`, lobbyDoc.id);
-                    console.log(`Removing banned user ${targetUid} from lobby ${lobbyDoc.id}.`);
+                // Then, perform the kick from lobby action
+                if (isKickedPlayerHost && isKickerAdmin) {
+                    // If kicked player is host and kicker is admin, delete the lobby
+                    await deleteDoc(lobbyRef);
+                    showMessageBox(`لابی "${lobbyData.name}" بسته شد و میزبان آن نیز مسدود گردید.`, "success");
+                } else {
+                    // If kicked player is not host, or kicker is not admin, just remove player from lobby
                     await updateDoc(lobbyRef, {
-                        [`players.${targetUid}`]: deleteField()
+                        [`players.${playerToKickUid}`]: deleteField(),
+                        kickedPlayers: arrayUnion({ uid: playerToKickUid, displayName: playerToKickDisplayName })
                     });
-                    console.log(`Banned user ${targetDisplayName} removed from lobby ${lobbyDoc.id}`);
+                    showMessageBox(`بازیکن "${playerToKickDisplayName}" از لابی اخراج شد.`, "success");
                 }
-
-                showMessageBox(`کاربر "${targetDisplayName}" با موفقیت مسدود شد.`, "success");
-                closePlayerManagementModal();
+                closeKickPlayerConfirmModal();
             } catch (e) {
-                console.error("Error banning user:", e);
-                showMessageBox(`خطا در مسدودسازی کاربر: ${e.message}`, "error");
+                console.error("خطا در اخراج/مسدودسازی بازیکن: ", e);
+                showMessageBox(`خطا در اخراج/مسدودسازی بازیکن: ${e.message}`, "error");
             }
         }
-
-        // NEW: Function to unban a user (primarily for automatic unban on expired time, or manual admin action)
-        async function unbanUser(targetUid) {
-            console.log(`Attempting to unban user ${targetUid}.`);
-            const targetUserDocRef = doc(db, `artifacts/${appId}/users/${targetUid}/profile/data`);
-            try {
-                // Clear the banStatus object. Using deleteField() for the whole object is cleaner.
-                // Or you can set isBanned to false and clear other fields.
-                await updateDoc(targetUserDocRef, {
-                    banStatus: deleteField() // This removes the entire banStatus object
-                });
-                console.log(`User ${targetUid} unbanned successfully.`);
-                // If it's the current user being unbanned, update their local data
-                if (auth.currentUser && auth.currentUser.uid === targetUid) {
-                    currentUserData.banStatus = { isBanned: false };
-                    // If they were on the ban screen, transition them out
-                    if (currentActiveScreen === banScreen) {
-                        setActiveScreen(mainScreen); // Or lobby screen, depending on desired flow
-                    }
-                }
-            } catch (e) {
-                console.error("Error unbanning user:", e);
-                // Not showing message box here, as it might be an automatic process or background task.
-            }
-        }
-
 
         async function unkickPlayer(lobbyId, playerToUnkickUid) {
             const lobbyRef = doc(db, `global_lobbies`, lobbyId);
-            console.log(`Attempting to unkick player ${playerToUnkickUid} from lobby ${lobbyId}.`);
             try {
                 const lobbySnap = await getDoc(lobbyRef);
                 if (lobbySnap.exists()) {
@@ -2654,22 +2423,13 @@
                     const playerToUnkick = kickedPlayers.find(p => p.uid === playerToUnkickUid);
                     if (playerToUnkick) {
                         await updateDoc(lobbyRef, { kickedPlayers: arrayRemove(playerToUnkick) });
-                        console.log(`Player ${playerToUnkick.displayName} (UID: ${playerToUnkickUid}) successfully unkicked from lobby ${lobbyId}.`);
                         showMessageBox(`بازیکن "${playerToUnkick.displayName}" می‌تواند دوباره وارد شود.`, "success");
-                    } else {
-                        console.warn(`Player ${playerToUnkickUid} not found in kickedPlayers list for lobby ${lobbyId}.`);
                     }
-                } else {
-                    console.warn(`Lobby ${lobbyId} not found when trying to unkick player ${playerToUnkickUid}.`);
                 }
-            } catch (e) { 
-                console.error("Error unkicking player:", e); 
-                showMessageBox("خطا در بازگرداندن بازیکن.", "error"); 
-            }
+            } catch (e) { console.error("Error unkicking player:", e); showMessageBox("خطا در بازگرداندن بازیکن.", "error"); }
         }
 
         function setupKickedPlayersListListener(lobbyId) {
-            console.log(`Setting up kicked players list listener for lobby ${lobbyId}.`);
             const lobbyRef = doc(db, `global_lobbies`, lobbyId);
             return onSnapshot(lobbyRef, (docSnap) => {
                 kickedPlayersListContent.innerHTML = '';
@@ -2689,24 +2449,17 @@
                         });
                     }
                 }
-            }, (error) => {
-                console.error("Error listening to kicked players list:", error);
-                kickedPlayersListContent.innerHTML = `<p class="text-red-400 text-center">خطا در بارگذاری لیست اخراجی‌ها.</p>`;
             });
         }
         
         async function sendLobbyMessage(lobbyId, text) {
-            if (!text.trim() || !auth.currentUser || !currentUserData) {
-                console.warn("Attempted to send empty message or no user data.");
-                return;
-            }
+            if (!text.trim() || !auth.currentUser || !currentUserData) return;
             
             // NEW: AI Chat Style Check for text-based game
             // This applies if the game is active within the lobby.
             const lobbyDocRef = doc(db, `global_lobbies`, lobbyId);
             const lobbySnap = await getDoc(lobbyDocRef);
             if (lobbySnap.exists() && lobbySnap.data().status === 'playing') {
-                console.log("Game is active, performing AI chat style check.");
                 const moderationResult = await checkMessageForLiteraryAIStyle(text);
                 if (!moderationResult.is_literary) {
                     showMessageBox(`پیام شما به دلیل لحن نامناسب ارسال نشد: ${moderationResult.reason}`, "error");
@@ -2724,7 +2477,6 @@
                     timestamp: serverTimestamp(),
                     isDeleted: false
                 });
-                console.log(`Message sent to lobby ${lobbyId}: "${text}" by ${currentUserData.displayName}`);
                 lobbyChatInput.value = ''; // Clear input after sending
             } catch (error) {
                 console.error("Error sending chat message:", error);
@@ -2735,13 +2487,11 @@
         // NEW: Soft-deletes a message
         async function deleteLobbyMessage(lobbyId, messageId) {
             const messageRef = doc(db, `global_lobbies/${lobbyId}/messages`, messageId);
-            console.log(`Attempting to soft-delete message ${messageId} in lobby ${lobbyId}.`);
             try {
                 await updateDoc(messageRef, {
                     text: "[این پیام حذف شده است]",
                     isDeleted: true
                 });
-                console.log(`Message ${messageId} successfully marked as deleted.`);
             } catch (error) {
                 console.error("Error deleting message:", error);
                 showMessageBox("خطا در حذف پیام.", "error");
@@ -2749,7 +2499,6 @@
         }
 
         function setupLobbyChatListener(lobbyId, hostId) {
-            console.log(`Setting up chat listener for lobby ${lobbyId}.`);
             const messagesRef = collection(db, `global_lobbies/${lobbyId}/messages`);
             const q = query(messagesRef, orderBy("timestamp", "asc"));
 
@@ -2760,9 +2509,9 @@
                     const messageId = doc.id;
                     const isCurrentUserMsg = messageData.senderUid === auth.currentUser.uid;
                     const isCurrentUserHost = auth.currentUser.uid === hostId;
-                    // NEW: Admins can delete any message
-                    const isCurrentUserAdmin = currentUserData?.isAdmin || false; 
+                    const isCurrentUserAdmin = currentUserData && currentUserData.isAdmin; // NEW: check admin status
 
+                    // NEW: Admin can delete any message, host can delete any, user can delete their own
                     const canDelete = !messageData.isDeleted && (isCurrentUserMsg || isCurrentUserHost || isCurrentUserAdmin);
 
                     const messageDiv = document.createElement('div');
@@ -2803,7 +2552,6 @@
         // --- Game Logic Functions (NEW) ---
 
         async function initializeGameInFirestore(lobbyId, lobbyData) {
-            console.log(`Initializing game state for lobby ${lobbyId}.`);
             const playerUIDs = Object.keys(lobbyData.players);
             const playerNames = lobbyData.players;
 
@@ -2833,8 +2581,6 @@
                 gameDurationSeconds: gameDurationMinutes * 60,
                 countdownEndTime: Date.now() + countdownDurationSeconds * 1000 + 500, // +500ms buffer
                 votes: {}, // { voterUid: votedForUid }
-                aiScore: 0, // Initialize scores
-                humanScore: 0
             };
 
             const lobbyRef = doc(db, 'global_lobbies', lobbyId);
@@ -2873,27 +2619,30 @@
 
             // Render Player Status Pods
             gamePlayerStatus.innerHTML = '';
-            gameState.players.forEach(pUid => {
-                const playerPod = document.createElement('div');
-                playerPod.className = `game-player-pod flex-grow`;
-                const isAI = gameState.roles[pUid] === 'AI';
-                playerPod.classList.add(isAI ? 'is-ai' : 'is-human');
-                if (pUid === myUid) {
-                    myRole.textContent = isAI ? 'هوش مصنوعی' : 'انسان';
-                    gameRoleDisplay.classList.remove('hidden');
-                }
-                
-                // Check if player has left (not in current lobby.players)
-                const isPlayerInLobby = lobbyData.players && lobbyData.players[pUid];
-                const playerStatusText = isPlayerInLobby ? 'آنلاین' : 'ترک کرده';
-                
-                playerPod.innerHTML = `
-                    <span class="player-name">${gameState.playerNames[pUid]}</span>
-                    <span class="player-role">${isAI ? 'هوش مصنوعی' : 'انسان'}</span>
-                    <span class="player-status">${playerStatusText}</span>
-                `;
-                gamePlayerStatus.appendChild(playerPod);
-            });
+            // Ensure gameState.players and gameState.playerNames are valid before iterating
+            if (gameState.players && gameState.playerNames) {
+                gameState.players.forEach(pUid => {
+                    const playerPod = document.createElement('div');
+                    playerPod.className = `game-player-pod flex-grow`;
+                    const isAI = gameState.roles[pUid] === 'AI';
+                    playerPod.classList.add(isAI ? 'is-ai' : 'is-human');
+                    if (pUid === myUid) {
+                        myRole.textContent = isAI ? 'هوش مصنوعی' : 'انسان';
+                        gameRoleDisplay.classList.remove('hidden');
+                    }
+                    
+                    // Check if player has left (not in current lobby.players)
+                    const isPlayerInLobby = lobbyData.players && lobbyData.players[pUid];
+                    const playerStatusText = isPlayerInLobby ? 'آنلاین' : 'ترک کرده';
+                    
+                    playerPod.innerHTML = `
+                        <span class="player-name">${gameState.playerNames[pUid]}</span>
+                        <span class="player-role">${isAI ? 'هوش مصنوعی' : 'انسان'}</span>
+                        <span class="player-status">${playerStatusText}</span>
+                    `;
+                    gamePlayerStatus.appendChild(playerPod);
+                });
+            }
 
 
             const currentTime = Date.now();
@@ -2929,9 +2678,7 @@
                         gameCountdownInterval = null;
                         gameCountdownOverlay.classList.add('hidden');
                         // Update game state to 'active' after countdown
-                        // Only host should update to prevent race conditions
                         if (auth.currentUser && lobbyData.hostId === auth.currentUser.uid) {
-                            console.log("Countdown finished, host setting game status to active.");
                             await updateDoc(lobbyRef, {
                                 'gameState.status': 'active',
                                 'gameState.gameStartTimestamp': serverTimestamp()
@@ -2954,27 +2701,18 @@
 
                 if (!gameTimerInterval) {
                     gameTimerInterval = setInterval(async () => {
-                        // Re-fetch lobby data to get updated gameStartTimestamp, if any (e.g., if host changed mid-game)
-                        const latestLobbySnap = await getDoc(lobbyRef);
-                        const latestGameState = latestLobbySnap.data()?.gameState;
-                        if (!latestGameState || latestGameState.status !== 'active' || !latestGameState.gameStartTimestamp) {
-                            clearInterval(gameTimerInterval);
-                            gameTimerInterval = null;
-                            console.log("Game timer stopped: game state no longer active or start timestamp missing.");
-                            return;
-                        }
+                        // Ensure gameStartTimestamp is a Firestore Timestamp object
+                        const gameStartTimeMillis = gameState.gameStartTimestamp.toMillis ? gameState.gameStartTimestamp.toMillis() : gameState.gameStartTimestamp;
 
                         const currentServerTime = Date.now(); // Simulate server time
-                        const elapsedMs = currentServerTime - latestGameState.gameStartTimestamp.toMillis();
-                        const remainingMs = latestGameState.gameDurationSeconds * 1000 - elapsedMs;
+                        const elapsedMs = currentServerTime - gameStartTimeMillis;
+                        const remainingMs = gameState.gameDurationSeconds * 1000 - elapsedMs;
 
                         if (remainingMs <= 0) {
                             clearInterval(gameTimerInterval);
                             gameTimerInterval = null;
                             gameTimerDisplay.textContent = "00:00";
-                            // Only host should trigger this state change
                             if (auth.currentUser && lobbyData.hostId === auth.currentUser.uid) {
-                                console.log("Game time expired, host setting game status to voting.");
                                 await updateDoc(lobbyRef, { 'gameState.status': 'voting' }); // Move to voting phase
                             }
                             return;
@@ -2992,7 +2730,7 @@
                 gameCountdownOverlay.classList.add('hidden');
                 gameVotingOverlay.classList.remove('hidden');
                 gameResultDisplay.classList.add('hidden');
-                gameTimerDisplay.classList.add('hidden'); // Hide game timer
+                gameTimerDisplay.classList.add('hidden');
                 
                 // Disable chat inputs
                 lobbyChatInput.disabled = true;
@@ -3013,7 +2751,7 @@
                 
                 // Disable chat inputs
                 lobbyChatInput.disabled = true;
-                lobbyChatSendBtn.disabled = true;
+                lobbyChatSendBtn.disabled = false; // Keep send button enabled for now if it needs to trigger something else? (was disabled before, now consistent with placeholder)
                 lobbyChatInput.placeholder = "بازی به پایان رسید.";
 
                 winnerText.textContent = gameState.winner === 'Human' ? 'تیم انسان‌ها برنده شد!' : 'هوش مصنوعی برنده شد!';
@@ -3065,7 +2803,6 @@
 
         async function castVote(lobbyId, voterUid, votedForUid) {
             const lobbyRef = doc(db, 'global_lobbies', lobbyId);
-            console.log(`User ${voterUid} casting vote for ${votedForUid} in lobby ${lobbyId}.`);
             try {
                 await updateDoc(lobbyRef, {
                     [`gameState.votes.${voterUid}`]: votedForUid
@@ -3075,24 +2812,18 @@
                 // After casting a vote, check if all human players have voted to resolve the game
                 const lobbySnap = await getDoc(lobbyRef);
                 if (lobbySnap.exists() && lobbySnap.data().gameState.status === 'voting') {
-                    const updatedGameState = lobbySnap.data().gameState;
-                    const updatedLobbyData = lobbySnap.data(); // Pass full lobbyData to resolveVotes
+                    const updatedLobbyData = lobbySnap.data(); // Get full lobbyData
+                    const updatedGameState = updatedLobbyData.gameState;
 
-                    // Only consider living human players for vote count
                     const livingHumanPlayers = updatedGameState.players.filter(uid => 
-                        updatedGameState.roles[uid] === 'Human' && updatedLobbyData.players && updatedLobbyData.players[uid]
+                        updatedGameState.roles[uid] === 'Human' && updatedLobbyData.players && updatedLobbyData.players[uid] && uid !== voterUid // Ensure voter is not counted if their vote is processed here, and check if still in lobby
                     );
-                    const totalVotesExpected = livingHumanPlayers.length;
+                    const totalVotesExpected = livingHumanPlayers.length; // Count only living humans who are supposed to vote
                     const actualVotesCount = Object.keys(updatedGameState.votes || {}).length;
 
-                    console.log(`Votes cast: ${actualVotesCount} / ${totalVotesExpected} expected human votes.`);
-
-                    if (actualVotesCount >= totalVotesExpected) {
-                        // Only host should trigger this to avoid race conditions and multiple updates
-                        if (auth.currentUser && updatedLobbyData.hostId === auth.currentUser.uid) {
-                            console.log("All human players have voted or left. Host triggering vote resolution.");
-                            await resolveVotes(lobbyId, updatedGameState, updatedLobbyData);
-                        }
+                    // If all expected votes are in and I am the host, resolve the game
+                    if (actualVotesCount >= totalVotesExpected && auth.currentUser && updatedLobbyData.hostId === auth.currentUser.uid) {
+                        await resolveVotes(lobbyId, updatedGameState, updatedLobbyData);
                     }
                 }
 
@@ -3104,7 +2835,6 @@
 
         // Function to resolve votes (called by host, or implicitly by vote counter)
         async function resolveVotes(lobbyId, gameState, lobbyData) {
-            console.log(`Resolving votes for lobby ${lobbyId}.`);
             const lobbyRef = doc(db, 'global_lobbies', lobbyId);
             const votes = gameState.votes || {};
             const playerUids = gameState.players || [];
@@ -3114,14 +2844,12 @@
             const livingHumanPlayers = livingPlayers.filter(uid => roles[uid] === 'Human');
             const livingAIPlayers = livingPlayers.filter(uid => roles[uid] === 'AI');
 
-            // WIN CONDITION 1: AI vs Human (1v1) -> AI wins
+            // WIN CONDITION 1: AI vs Human (1v1) -> AI wins (this applies if only two players are left and one is AI)
             if (livingAIPlayers.length === 1 && livingHumanPlayers.length === 1) {
-                console.log("Only one AI and one Human remaining. AI wins.");
                 await updateDoc(lobbyRef, {
                     'gameState.status': 'ended',
                     'gameState.winner': 'AI',
-                    'gameState.winReason': `فقط هوش مصنوعی و یک انسان باقی ماندند. هوش مصنوعی برنده است.`,
-                    'gameState.aiScore': (gameState.aiScore || 0) + 1 // Increment AI score
+                    'gameState.winReason': `فقط هوش مصنوعی و یک انسان باقی ماندند. هوش مصنوعی برنده است.`
                 });
                 return;
             }
@@ -3130,34 +2858,27 @@
             if (livingAIPlayers.length > 0) {
                 const aiPlayerUid = livingAIPlayers[0]; // Assuming only one AI
                 const votesForAI = Object.values(votes).filter(votedUid => votedUid === aiPlayerUid).length;
-                console.log(`AI player UID: ${aiPlayerUid}, Votes for AI: ${votesForAI}, Living Human Players: ${livingHumanPlayers.length}`);
                 
                 // If more than half of living human players voted for AI
-                if (votesForAI > livingHumanPlayers.length / 2) {
-                    console.log("More than half of human players voted for AI. AI wins.");
+                if (votesForAI > (livingHumanPlayers.length / 2)) { // Strict majority
                      await updateDoc(lobbyRef, {
                         'gameState.status': 'ended',
                         'gameState.winner': 'AI',
-                        'gameState.winReason': `بیشتر بازیکنان به هوش مصنوعی رای دادند.`,
-                        'gameState.aiScore': (gameState.aiScore || 0) + 1 // Increment AI score
+                        'gameState.winReason': `بیشتر بازیکنان به هوش مصنوعی رای دادند.`
                     });
                 } else {
-                    console.log("Humans did not identify the AI. Humans win.");
                      await updateDoc(lobbyRef, {
                         'gameState.status': 'ended',
                         'gameState.winner': 'Human',
-                        'gameState.winReason': `بازیکنان هوش مصنوعی را تشخیص ندادند. انسان‌ها برنده شدند.`,
-                        'gameState.humanScore': (gameState.humanScore || 0) + 1 // Increment Human score
+                        'gameState.winReason': `بازیکنان هوش مصنوعی را تشخیص ندادند. انسان‌ها برنده شدند.`
                     });
                 }
             } else {
                 // If no AI left (e.g., AI disconnected earlier), humans win by default in voting phase
-                console.log("No AI player remaining. Humans win by default.");
                 await updateDoc(lobbyRef, {
                     'gameState.status': 'ended',
                     'gameState.winner': 'Human',
-                    'gameState.winReason': `هوش مصنوعی از بازی خارج شد. انسان‌ها برنده شدند.`,
-                    'gameState.humanScore': (gameState.humanScore || 0) + 1 // Increment Human score
+                    'gameState.winReason': `هوش مصنوعی از بازی خارج شد. انسان‌ها برنده شدند.`
                 });
             }
         }
@@ -3174,6 +2895,7 @@
             registerToggleBtn.classList.remove('hidden');
             emailInput.focus();
             authForm.reset();
+            messageBox.classList.add('hidden'); // Clear auth message box
         });
 
         registerToggleBtn.addEventListener('click', () => {
@@ -3185,6 +2907,7 @@
             loginToggleBtn.classList.remove('hidden');
             emailInput.focus();
             authForm.reset();
+            messageBox.classList.add('hidden'); // Clear auth message box
         });
 
         authForm.addEventListener('submit', async (e) => {
@@ -3197,28 +2920,20 @@
             if (authMode === 'register' && !displayName) { showMessageBox("لطفاً نام نمایشی را وارد کنید.", 'error'); return; }
             if (authMode === 'register' && password.length < 6) { showMessageBox("رمز عبور باید حداقل ۶ کاراکتر باشد.", "error"); return; }
 
+            // NEW: Check if user trying to log in is banned
             try {
+                // This will attempt to get user data to check ban status *before* authentication
+                // A more robust check might involve Cloud Functions or a quick Firestore query.
+                // For client-side, relying on `onAuthStateChanged` after login attempt is simpler.
+                // The onAuthStateChanged listener handles the banned user immediately after sign-in.
                 if (authMode === 'login') {
-                    console.log("Attempting login...");
                     await signInWithEmailAndPassword(auth, email, password);
-                    console.log("Login successful.");
                 } else {
-                    console.log("Attempting registration...");
                     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-                    console.log("Registration successful. Setting profile data for new user.");
-                    // NEW: Set isAdmin: false and initial banStatus for new users
-                    await setDoc(doc(db, `artifacts/${appId}/users/${userCredential.user.uid}/profile/data`), { 
-                        displayName: displayName, 
-                        email: email,
-                        isAdmin: false, 
-                        banStatus: { isBanned: false } 
-                    }, { merge: true });
-                    console.log("Profile data set for new user.");
+                    const userDocRef = doc(db, `artifacts/${appId}/users/${userCredential.user.uid}/profile/data`);
+                    await setDoc(userDocRef, { displayName: displayName, email: email, isAdmin: false, banStatus: { isBanned: false } }, { merge: true }); // NEW: Set default banStatus for new users
                 }
-            } catch (error) { 
-                console.error("Auth error:", error.code, error.message);
-                showMessageBox(getFirebaseErrorMessage(error.code), 'error'); 
-            }
+            } catch (error) { showMessageBox(getFirebaseErrorMessage(error.code), 'error'); }
         });
 
         menuBtn.addEventListener('click', openProfileModal);
@@ -3227,27 +2942,14 @@
         profileModal.addEventListener('click', (e) => e.target === profileModal && closeProfileModal());
         
         profileLogoutBtn.addEventListener('click', async () => {
-            console.log("Logging out from profile modal.");
             try { await signOut(auth); closeProfileModal(); } catch (error) { showMessageBox(getFirebaseErrorMessage(error.code), 'error'); }
         });
 
-        // NEW: Ban Screen Logout Button
-        banLogoutBtn.addEventListener('click', async () => {
-            console.log("Logging out from ban screen.");
-            try { await signOut(auth); } catch (error) { console.error("Error logging out from ban screen:", error); }
-        });
-
-
         friendlyGameBtn.addEventListener('click', () => {
-            console.log("Friendly game button clicked.");
             if (!auth.currentUser) { showMessageBox("برای مشاهده لابی‌ها، ابتدا وارد شوید.", "error"); return; }
-            // NEW: Check if current user is banned
-            if (currentUserData?.banStatus?.isBanned && (currentUserData.banStatus.bannedUntil === null || currentUserData.banStatus.bannedUntil?.toMillis() > Date.now())) {
-                showMessageBox("شما مسدود هستید و نمی‌توانید وارد لابی‌ها شوید.", "error");
-                setActiveScreen(banScreen); // Ensure they are on the ban screen
-                const banTimestampDate = currentUserData.banStatus.banTimestamp?.toDate();
-                const banTimestampFormatted = banTimestampDate ? banTimestampDate.toLocaleString('fa-IR', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'نامشخص';
-                setupBanCountdown(currentUserData.banStatus.bannedUntil?.toMillis(), currentUserData.banStatus.banReason, currentUserData.banStatus.bannedBy, banTimestampFormatted);
+            // NEW: Prevent banned users from accessing lobbies
+            if (currentUserData && currentUserData.banStatus?.isBanned) {
+                showBannedMessageModal(currentUserData.banStatus.banReason);
                 return;
             }
             setActiveScreen(lobbyScreen);
@@ -3257,30 +2959,23 @@
         ratedGameBtn.addEventListener('click', () => showMessageBox("بازی امتیازی به زودی!", "info"));
 
         backToMainBtn.addEventListener('click', () => {
-            console.log("Back to main button clicked.");
             setActiveScreen(mainScreen);
             // These cleanups are now handled by setActiveScreen
         });
 
         addIconBtn.addEventListener('click', () => {
-            console.log("Add lobby button clicked.");
             if (!auth.currentUser) { showMessageBox("برای ساخت لابی، ابتدا وارد شوید.", "error"); return; }
-            if (userHasActiveLobby) { showMessageBox("شما از قبل در یک لابی فعال هستید.", "info"); return; }
-            // NEW: Check if current user is banned
-            if (currentUserData?.banStatus?.isBanned && (currentUserData.banStatus.bannedUntil === null || currentUserData.banStatus.bannedUntil?.toMillis() > Date.now())) {
-                showMessageBox("شما مسدود هستید و نمی‌توانید لابی ایجاد کنید.", "error");
-                setActiveScreen(banScreen);
-                const banTimestampDate = currentUserData.banStatus.banTimestamp?.toDate();
-                const banTimestampFormatted = banTimestampDate ? banTimestampDate.toLocaleString('fa-IR', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'نامشخص';
-                setupBanCountdown(currentUserData.banStatus.bannedUntil?.toMillis(), currentUserData.banStatus.banReason, currentUserData.banStatus.bannedBy, banTimestampFormatted);
+            // NEW: Prevent banned users from creating lobbies
+            if (currentUserData && currentUserData.banStatus?.isBanned) {
+                showBannedMessageModal(currentUserData.banStatus.banReason);
                 return;
             }
+            if (userHasActiveLobby) { showMessageBox("شما از قبل در یک لابی فعال هستید.", "info"); return; }
             openCreateLobbyModal();
         });
         
         createLobbyForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            console.log("Create lobby form submitted.");
             const lobbyName = newLobbyNameInput.value.trim();
             const lobbyType = document.querySelector('input[name="lobby-type"]:checked').value;
             const password = newLobbyPasswordInput.value;
@@ -3291,17 +2986,13 @@
             if (isNaN(gameDuration) || gameDuration < 1 || gameDuration > 60) { showCreateLobbyMessageBox("مدت زمان بازی باید بین ۱ تا ۶۰ دقیقه باشد.", "error"); return; }
             if (!auth.currentUser || !currentUserData?.displayName) { showCreateLobbyMessageBox("مشکلی در اطلاعات کاربری شما وجود دارد.", "error"); return; }
             if (userHasActiveLobby) { showCreateLobbyMessageBox("شما از قبل در یک لابی فعال هستید.", "info"); closeCreateLobbyModal(); return; }
-            // NEW: Check if current user is banned before creating lobby
-            if (currentUserData?.banStatus?.isBanned && (currentUserData.banStatus.bannedUntil === null || currentUserData.banStatus.bannedUntil?.toMillis() > Date.now())) {
-                showCreateLobbyMessageBox("شما مسدود هستید و نمی‌توانید لابی ایجاد کنید.", "error");
+            // NEW: Re-check ban status before creating lobby (redundant if friendlyGameBtn handles, but safer)
+            if (currentUserData && currentUserData.banStatus?.isBanned) {
+                showCreateLobbyMessageBox("شما مسدود شده‌اید و نمی‌توانید لابی ایجاد کنید.", "error");
                 closeCreateLobbyModal();
-                setActiveScreen(banScreen);
-                const banTimestampDate = currentUserData.banStatus.banTimestamp?.toDate();
-                const banTimestampFormatted = banTimestampDate ? banTimestampDate.toLocaleString('fa-IR', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'نامشخص';
-                setupBanCountdown(currentUserData.banStatus.bannedUntil?.toMillis(), currentUserData.banStatus.banReason, currentUserData.banStatus.bannedBy, banTimestampFormatted);
                 return;
             }
-
+        
             showCreateLobbyMessageBox("در حال بررسی نام لابی...", "info");
             try {
                 const moderationResult = await checkLobbyNameWithAI(lobbyName);
@@ -3329,21 +3020,14 @@
         createLobbyModal.addEventListener('click', (e) => e.target === createLobbyModal && closeCreateLobbyModal());
         
         refreshLobbiesBtn.addEventListener('click', () => {
-            console.log("Refresh lobbies button clicked.");
-            if (isRefreshing) {
-                console.log("Already refreshing, ignoring click.");
-                return;
-            }
+            if (isRefreshing) return;
             if (!auth.currentUser) { showMessageBox("برای بروزرسانی لابی‌ها، ابتدا وارد شوید.", "info"); return; }
-            // NEW: Check if current user is banned
-            if (currentUserData?.banStatus?.isBanned && (currentUserData.banStatus.bannedUntil === null || currentUserData.banStatus.bannedUntil?.toMillis() > Date.now())) {
-                showMessageBox("شما مسدود هستید و نمی‌توانید لیست لابی‌ها را بروزرسانی کنید.", "error");
-                setActiveScreen(banScreen);
-                const banTimestampDate = currentUserData.banStatus.banTimestamp?.toDate();
-                const banTimestampFormatted = banTimestampDate ? banTimestampDate.toLocaleString('fa-IR', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'نامشخص';
-                setupBanCountdown(currentUserData.banStatus.bannedUntil?.toMillis(), currentUserData.banStatus.banReason, currentUserData.banStatus.bannedBy, banTimestampFormatted);
+            // NEW: Prevent banned users from accessing lobbies (redundant if friendlyGameBtn handles, but safer)
+            if (currentUserData && currentUserData.banStatus?.isBanned) {
+                showBannedMessageModal(currentUserData.banStatus.banReason);
                 return;
             }
+
             isRefreshing = true;
             refreshLobbiesBtn.disabled = true;
             const refreshIconSvg = refreshLobbiesBtn.querySelector('svg');
@@ -3374,25 +3058,12 @@
         leaveLobbyBtn.addEventListener('click', leaveLobby);
 
         startGameBtn.addEventListener('click', async () => {
-            console.log("Start game button clicked.");
             if (currentLobbyId && auth.currentUser) {
-                // NEW: Prevent game start if host is banned
-                if (currentUserData?.banStatus?.isBanned && (currentUserData.banStatus.bannedUntil === null || currentUserData.banStatus.bannedUntil?.toMillis() > Date.now())) {
-                    showMessageBox("شما مسدود هستید و نمی‌توانید بازی را شروع کنید.", "error");
-                    setActiveScreen(banScreen);
-                    const banTimestampDate = currentUserData.banStatus.banTimestamp?.toDate();
-                    const banTimestampFormatted = banTimestampDate ? banTimestampDate.toLocaleString('fa-IR', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'نامشخص';
-                    setupBanCountdown(currentUserData.banStatus.bannedUntil?.toMillis(), currentUserData.banStatus.banReason, currentUserData.banStatus.bannedBy, banTimestampFormatted);
-                    return;
-                }
                 try {
                     const lobbyRef = doc(db, 'global_lobbies', currentLobbyId);
                     const lobbySnap = await getDoc(lobbyRef);
                     if (lobbySnap.exists()) {
                         await initializeGameInFirestore(currentLobbyId, lobbySnap.data());
-                    } else {
-                        console.warn(`Lobby ${currentLobbyId} not found when trying to start game.`);
-                        showMessageBox("لابی یافت نشد. بازی قابل شروع نیست.", "error");
                     }
                 } catch (error) {
                     console.error("Error starting game:", error);
@@ -3403,28 +3074,13 @@
         
         // NEW: Toggle Chat Lock Listener
         toggleChatLockBtn.addEventListener('click', async () => {
-            console.log("Toggle chat lock button clicked.");
             if (!currentLobbyId || !auth.currentUser) return;
-            // NEW: Prevent action if host is banned
-            if (currentUserData?.banStatus?.isBanned && (currentUserData.banStatus.bannedUntil === null || currentUserData.banStatus.bannedUntil?.toMillis() > Date.now())) {
-                showMessageBox("شما مسدود هستید و نمی‌توانید چت را قفل/باز کنید.", "error");
-                setActiveScreen(banScreen);
-                const banTimestampDate = currentUserData.banStatus.banTimestamp?.toDate();
-                const banTimestampFormatted = banTimestampDate ? banTimestampDate.toLocaleString('fa-IR', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'نامشخص';
-                setupBanCountdown(currentUserData.banStatus.bannedUntil?.toMillis(), currentUserData.banStatus.banReason, currentUserData.banStatus.bannedBy, banTimestampFormatted);
-                return;
-            }
-
             const lobbyRef = doc(db, 'global_lobbies', currentLobbyId);
             try {
                 const lobbySnap = await getDoc(lobbyRef);
                 if (lobbySnap.exists() && lobbySnap.data().hostId === auth.currentUser.uid) {
                     const currentLockState = lobbySnap.data().isChatLocked || false;
                     await updateDoc(lobbyRef, { isChatLocked: !currentLockState });
-                    console.log(`Chat lock toggled to: ${!currentLockState} for lobby ${currentLobbyId}.`);
-                } else {
-                    console.warn(`User ${auth.currentUser.uid} attempted to toggle chat lock for lobby ${currentLobbyId} but is not host or lobby not found.`);
-                    showMessageBox("فقط سازنده لابی می‌تواند وضعیت چت را تغییر دهد.", "error");
                 }
             } catch (error) {
                 console.error("Error toggling chat lock:", error);
@@ -3432,37 +3088,16 @@
             }
         });
 
-        // Kick/Unkick/Ban related buttons (UPDATED)
-        // **FIX**: Removed direct addEventListener for kickPlayerOnlyBtn from this section
-        // because it is dynamically handled inside openPlayerManagementModal
-        // The global listener was redundant and could be confusing.
-        // The logic is now inside the openPlayerManagementModal for the dynamically created/modified buttons.
-
-        // **FIX**: Moved the kickPlayerOnlyBtn listener directly to the openPlayerManagementModal function
-        // as `kickPlayerOnlyBtn.addEventListener('click', ...)` for clearer scope and to avoid any potential re-assignment issues.
-        // It already implicitly works through its ID when placed directly in HTML.
-        // To be explicit, I'll ensure the listener is applied to the element (even if it's statically defined).
-
-        // Here, we re-attach the event listener to kickPlayerOnlyBtn (which is static)
-        // every time the player management modal is opened. This is more explicit and safer.
-        playerManagementModal.querySelector('#kick-player-confirm-btn').addEventListener('click', async () => {
-            console.log("Kick player only button clicked in modal.");
-            if (playerToManage && auth.currentUser && currentLobbyId) {
-                const confirmed = await showCustomConfirm(`آیا مطمئن هستید که می‌خواهید ${playerToManage.displayName} را فقط از این لابی اخراج کنید؟`, "اخراج بازیکن");
-                if (confirmed) {
-                    await kickPlayer(currentLobbyId, playerToManage.uid, playerToManage.displayName);
-                }
-            } else {
-                console.error("Attempted to kick player without valid playerToManage, currentUser, or currentLobbyId.");
-                showMessageBox("خطا: اطلاعات بازیکن برای اخراج موجود نیست.", "error");
+        // Kick/Unkick related
+        // The kickPlayer function itself now handles the confirmation, so this button will just trigger the process
+        kickPlayerConfirmBtn.addEventListener('click', () => {
+            if (kickedPlayerToProcess && currentLobbyId) {
+                kickPlayer(currentLobbyId, kickedPlayerToProcess.uid, kickedPlayerToProcess.displayName);
             }
         });
-        
-        cancelPlayerManagementBtn.addEventListener('click', closePlayerManagementModal);
-        closePlayerManagementModalBtn.addEventListener('click', closePlayerManagementModal);
-        playerManagementModal.addEventListener('click', (e) => e.target === playerManagementModal && closePlayerManagementModal());
-
-
+        cancelKickPlayerBtn.addEventListener('click', closeKickPlayerConfirmModal);
+        closeKickPlayerConfirmModalBtn.addEventListener('click', closeKickPlayerConfirmModal);
+        kickPlayerConfirmModal.addEventListener('click', (e) => e.target === kickPlayerConfirmModal && closeKickPlayerConfirmModal());
         kickedMessageOkBtn.addEventListener('click', closeKickedMessageModal);
         viewKickedPlayersBtn.addEventListener('click', openKickedPlayersListModal);
         closeKickedPlayersListModalBtn.addEventListener('click', closeKickedPlayersListModal);
@@ -3479,7 +3114,6 @@
         }
 
         function openEnterPasswordModal(lobbyId, lobbyName) {
-            console.log(`Opening password modal for lobby ${lobbyName} (${lobbyId}).`);
             lobbyToJoin = { id: lobbyId, name: lobbyName };
             passwordPromptLobbyName.textContent = lobbyName;
             enterPasswordForm.reset();
@@ -3491,7 +3125,6 @@
         }
 
         function closeEnterPasswordModal() {
-            console.log("Closing password modal.");
             enterPasswordModal.classList.remove('profile-modal-enter-active');
             enterPasswordModal.classList.add('profile-modal-leave-active');
             setTimeout(() => {
@@ -3523,11 +3156,7 @@
 
         enterPasswordForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            console.log("Enter password form submitted.");
-            if (!lobbyToJoin) {
-                console.error("No lobby selected for password entry.");
-                return;
-            }
+            if (!lobbyToJoin) return;
             const enteredPassword = joinLobbyPasswordInput.value;
             if (!enteredPassword) { showPasswordPromptMessage('لطفاً رمز عبور را وارد کنید.'); return; }
 
@@ -3541,19 +3170,14 @@
                     closeEnterPasswordModal();
                     return;
                 }
-                if (enteredPassword === lobbySnap.data().password) {
-                    console.log(`Password correct for lobby ${lobbyToJoin.id}. Joining...`);
-                    closeEnterPasswordModal();
-                    await joinLobby(lobbyToJoin.id, auth.currentUser.uid, currentUserData.displayName);
-                } else {
-                    console.log("Incorrect password entered.");
-                    showPasswordPromptMessage('رمز عبور اشتباه است.');
-                    joinLobbyPasswordInput.value = '';
-                    joinLobbyPasswordInput.focus();
-                }
+                // Call joinLobby with the password
+                await joinLobby(lobbyToJoin.id, auth.currentUser.uid, currentUserData.displayName, enteredPassword);
+                closeEnterPasswordModal(); // Close only on successful join
             } catch (error) {
                 console.error("Error verifying lobby password:", error);
-                showPasswordPromptMessage('خطا در بررسی رمز عبور.');
+                showPasswordPromptMessage(error.message); // Show specific error message from joinLobby
+                joinLobbyPasswordInput.value = '';
+                joinLobbyPasswordInput.focus();
             } finally {
                 submitJoinPasswordBtn.disabled = false;
                 submitJoinPasswordBtn.textContent = 'ورود';
@@ -3564,12 +3188,6 @@
         lobbyChatForm.addEventListener('submit', (e) => {
             e.preventDefault();
             if (currentLobbyId) {
-                // NEW: Prevent banned users from chatting
-                if (currentUserData?.banStatus?.isBanned && (currentUserData.banStatus.bannedUntil === null || currentUserData.banStatus.bannedUntil?.toMillis() > Date.now())) {
-                    showMessageBox("شما مسدود هستید و نمی‌توانید چت کنید.", "error");
-                    lobbyChatInput.value = ''; // Clear input
-                    return;
-                }
                 sendLobbyMessage(currentLobbyId, lobbyChatInput.value);
             }
         });
@@ -3587,21 +3205,7 @@
 
         // NEW: Game Screen Event Listeners (using leaveGameFromLobbyBtn)
         leaveGameFromLobbyBtn.addEventListener('click', async () => {
-            console.log("Leave game button clicked.");
-            if (!currentLobbyId || !auth.currentUser) {
-                console.warn("No current lobby or user to leave game.");
-                return;
-            }
-
-            // NEW: Prevent action if user is banned
-            if (currentUserData?.banStatus?.isBanned && (currentUserData.banStatus.bannedUntil === null || currentUserData.banStatus.bannedUntil?.toMillis() > Date.now())) {
-                showMessageBox("شما مسدود هستید و نمی‌توانید از بازی خارج شوید.", "error"); // Though they are already banned, they might try
-                setActiveScreen(banScreen);
-                const banTimestampDate = currentUserData.banStatus.banTimestamp?.toDate();
-                const banTimestampFormatted = banTimestampDate ? banTimestampDate.toLocaleString('fa-IR', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'نامشخص';
-                setupBanCountdown(currentUserData.banStatus.bannedUntil?.toMillis(), currentUserData.banStatus.banReason, currentUserData.banStatus.bannedBy, banTimestampFormatted);
-                return;
-            }
+            if (!currentLobbyId || !auth.currentUser) return;
 
             const confirmed = await showCustomConfirm("آیا مطمئن هستید که می‌خواهید بازی را ترک کنید؟"); // Updated message
             if (!confirmed) return;
@@ -3616,16 +3220,13 @@
                 const isHost = lobbyData.hostId === auth.currentUser.uid;
 
                 if (myRoleInGame === 'AI') {
-                    console.log(`AI player ${auth.currentUser.uid} leaving. Human team wins.`);
                     // If AI leaves, Human team wins
                     await updateDoc(lobbyRef, {
                         'gameState.status': 'ended',
                         'gameState.winner': 'Human',
-                        'gameState.winReason': 'هوش مصنوعی بازی را ترک کرد.',
-                        'gameState.humanScore': (gameState.humanScore || 0) + 1 // Increment Human score
+                        'gameState.winReason': 'هوش مصنوعی بازی را ترک کرد.'
                     });
                 } else {
-                    console.log(`Human player ${auth.currentUser.uid} leaving.`);
                     // Human player leaves
                     // Remove the player from the game's gameState players list
                     // AND from the main lobby.players map (which also tracks presence)
@@ -3650,25 +3251,20 @@
 
                         if (remainingAIPlayers.length === 0 && remainingHumanPlayers.length > 0) {
                             // No AI left, humans automatically win
-                            console.log("No AI left, humans automatically win.");
                             await updateDoc(lobbyRef, {
                                 'gameState.status': 'ended',
                                 'gameState.winner': 'Human',
-                                'gameState.winReason': 'هوش مصنوعی از بازی خارج شد.',
-                                'gameState.humanScore': (gameState.humanScore || 0) + 1
+                                'gameState.winReason': 'هوش مصنوعی از بازی خارج شد.'
                             });
                         } else if (remainingAIPlayers.length === 1 && remainingHumanPlayers.length === 1) {
                             // One AI and one Human remaining, AI wins (if they are the last two)
-                            console.log("One AI and one Human remaining, AI wins.");
                             await updateDoc(lobbyRef, {
                                 'gameState.status': 'ended',
                                 'gameState.winner': 'AI',
-                                'gameState.winReason': 'فقط هوش مصنوعی و یک انسان باقی ماندند. هوش مصنوعی برنده است.',
-                                'gameState.aiScore': (gameState.aiScore || 0) + 1
+                                'gameState.winReason': 'فقط هوش مصنوعی و یک انسان باقی ماندند. هوش مصنوعی برنده است.'
                             });
                         } else if (remainingActivePlayers.length < 2) {
                             // If only one active player left or no active players left, end game (no clear winner)
-                            console.log("Not enough players left to continue. Game ended with no clear winner.");
                             await updateDoc(lobbyRef, {
                                 'gameState.status': 'ended',
                                 'gameState.winner': null, // No clear winner if everyone left
@@ -3680,7 +3276,6 @@
                 
                 // If host leaves, delete the entire lobby for everyone
                 if (isHost) { 
-                    console.log(`Host ${auth.currentUser.uid} leaving game. Deleting lobby ${currentLobbyId}.`);
                      await deleteDoc(lobbyRef); // This will trigger onSnapshot for other players
                 }
             } else {
@@ -3694,11 +3289,14 @@
         });
 
         returnToLobbiesBtn.addEventListener('click', () => {
-            console.log("Return to lobbies button clicked.");
             currentLobbyId = null;
             setActiveScreen(lobbyScreen);
             unsubscribeLobbies = setupLobbyListener('');
         });
+
+        // NEW: Event listener for Banned Message Modal
+        bannedMessageOkBtn.addEventListener('click', closeBannedMessageModal);
+        bannedMessageModal.addEventListener('click', (e) => e.target === bannedMessageModal && closeBannedMessageModal());
 
 
         // Initialize the app when the window loads
