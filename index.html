@@ -1009,6 +1009,7 @@
                     <p><strong>شناسه کاربر (UID):</strong> <span id="profile-uid" class="break-all text-sm text-gray-400">---</span></p>
                     <p><strong>سکه‌ها:</strong> <span id="profile-coins" class="font-bold text-yellow-300">---</span></p>
                     <!-- Add more profile stats here later (e.g., wins, losses) -->
+                    <p id="profile-ban-status" class="text-red-400 font-bold hidden">وضعیت: مسدود شده!</p>
                 </div>
                 <button id="profile-logout-btn"
                         class="w-full classic-btn btn-red-classic text-lg sm:text-xl">
@@ -1082,7 +1083,7 @@
                     </div>
 
                     <button type="submit" id="submit-create-lobby-btn"
-                            class="w-full mt-4 classic-btn btn-green-classic text-xl sm:text-2xl hidden">
+                            class="w-full mt-4 classic-btn btn-green-classic text-xl sm:text-2xl hidden" disabled>
                         ساخت لابی
                     </button>
                 </form>
@@ -1337,6 +1338,7 @@
         const profileEmail = document.getElementById('profile-email');
         const profileUid = document.getElementById('profile-uid');
         const profileCoins = document.getElementById('profile-coins'); // NEW
+        const profileBanStatus = document.getElementById('profile-ban-status'); // NEW
         const profileLogoutBtn = document.getElementById('profile-logout-btn');
 
         // Create Lobby Modal Elements
@@ -1402,7 +1404,7 @@
         const votingInstructions = document.getElementById('voting-instructions');
         const votingOptions = document.getElementById('voting-options');
         const gameResultDisplay = document.getElementById('game-result-display');
-        const winnerText = document.getElementById('winner-text'); 
+        const winnerText = document.getElementById('winnerText'); 
         const reasonText = document.getElementById('reason-text');
         const returnToLobbiesBtn = document.getElementById('return-to-lobbies-btn');
 
@@ -1719,6 +1721,11 @@
                 profileEmail.textContent = currentUserData.email || 'ناشناس';
                 profileUid.textContent = currentUserData.uid || 'ناشناس';
                 profileCoins.textContent = currentUserData.coins !== undefined ? currentUserData.coins.toLocaleString('fa-IR') : '---'; // NEW
+                if (currentUserData.banStatus && currentUserData.banStatus.isBanned) { // NEW: Display ban status
+                    profileBanStatus.classList.remove('hidden');
+                } else {
+                    profileBanStatus.classList.add('hidden');
+                }
             }
         }
 
@@ -1738,7 +1745,9 @@
                 lobbyNameSelectionArea.classList.add('hidden');
                 lobbyNameProposalArea.classList.add('hidden');
                 submitCreateLobbyBtn.classList.add('hidden');
+                submitCreateLobbyBtn.disabled = true; // Ensure disabled
                 submitLobbyNameForApprovalBtn.classList.add('hidden');
+                approvedLobbyNamesSelect.onchange = null; // Clear event listener
                 return;
             }
 
@@ -1756,12 +1765,19 @@
                 });
                 lobbyNameSelectionArea.classList.remove('hidden');
                 submitCreateLobbyBtn.classList.remove('hidden'); // Enable 'Create Lobby' button
+                submitCreateLobbyBtn.disabled = (approvedLobbyNamesSelect.value === ''); // Disable if no selection
+                approvedLobbyNamesSelect.onchange = () => { // Add listener for dropdown change
+                    submitCreateLobbyBtn.disabled = (approvedLobbyNamesSelect.value === '');
+                };
+
                 lobbyNameProposalArea.classList.add('hidden'); // Hide proposal area
                 submitLobbyNameForApprovalBtn.classList.add('hidden'); // Hide proposal button
                 approvedLobbyNamesSelect.focus();
             } else {
                 lobbyNameSelectionArea.classList.add('hidden');
                 submitCreateLobbyBtn.classList.add('hidden'); // Disable 'Create Lobby' button
+                submitCreateLobbyBtn.disabled = true; // Ensure disabled
+                approvedLobbyNamesSelect.onchange = null; // Clear event listener
                 
                 if (mode === 'create') {
                     lobbyNameProposalArea.classList.remove('hidden');
@@ -1777,7 +1793,7 @@
                     const pendingSnapshot = await getDocs(qPending);
                     const pendingCount = pendingSnapshot.size;
 
-                    if (pendingCount >= 5) {
+                    if (pendingCount >= 5) { // Limit to 5 pending requests
                         lobbyProposalMessage.textContent = `شما ${pendingCount} درخواست نام لابی در انتظار تایید دارید. تا زمانی که درخواست‌های شما بررسی نشوند، نمی‌توانید درخواست جدیدی ارسال کنید.`;
                         lobbyProposalMessage.classList.remove('text-gray-400');
                         lobbyProposalMessage.classList.add('text-red-400');
@@ -1794,9 +1810,10 @@
                     }
                     proposedLobbyNameInput.focus();
                 } else if (mode === 'myLobbies') {
+                    // This mode means the user specifically wanted to manage their lobbies, but has none approved.
                     createLobbyMessageBox.classList.remove('hidden');
                     createLobbyMessageBox.classList.add('bg-blue-500', 'text-white');
-                    createLobbyMessageBox.textContent = "شما هیچ نام لابی تأیید شده‌ای ندارید. می‌توانید از بخش 'ایجاد لابی' یک نام جدید برای تأیید ارسال کنید.";
+                    createLobbyMessageBox.textContent = "شما هیچ نام لابی تأیید شده‌ای برای ساخت لابی جدید ندارید. می‌توانید از بخش 'ایجاد لابی' یک نام جدید برای تأیید ارسال کنید.";
                     lobbyNameProposalArea.classList.add('hidden'); // Hide proposal area in 'myLobbies' mode if no approved names
                     submitLobbyNameForApprovalBtn.classList.add('hidden'); // Hide proposal button
                 }
@@ -1807,6 +1824,11 @@
         async function openCreateLobbyModal(mode = 'create') {
             if (!currentUserData) {
                 showCreateLobbyMessageBox("ابتدا وارد حساب کاربری خود شوید.", "error");
+                return;
+            }
+            // NEW: Check if user is banned
+            if (currentUserData.banStatus && currentUserData.banStatus.isBanned) {
+                showCreateLobbyMessageBox(`شما به دلیل "${currentUserData.banStatus.reason || 'تخلف از قوانین'}" از ایجاد لابی منع شده‌اید.`, "error");
                 return;
             }
 
@@ -1864,6 +1886,9 @@
                 gameDurationInput.value = 5; // Reset game duration
                 lobbyProposalMessage.classList.remove('text-red-400'); // Reset message color
                 lobbyProposalMessage.classList.add('text-gray-400');
+                // Ensure the create lobby button is disabled after closing
+                submitCreateLobbyBtn.disabled = true;
+                approvedLobbyNamesSelect.onchange = null; // Clear listener
             }, 300);
         }
         
@@ -1964,6 +1989,10 @@
                         headerUserId.textContent = `شناسه: ${currentUserData.uid.substring(0, 8)}...`;
                         updateUserCoinsDisplay(); // NEW
 
+                        // Update profile modal if open
+                        if (!profileModal.classList.contains('hidden') && !profileModal.classList.contains('profile-modal-leave-active')) {
+                             openProfileModal(); // Re-open to refresh data including ban status
+                        }
                         // If the create lobby modal is currently open, refresh its dropdown
                         if (!createLobbyModal.classList.contains('hidden') && !createLobbyModal.classList.contains('profile-modal-leave-active')) {
                             // Determine the current mode of the modal (create or myLobbies) to pass to the update function
@@ -2296,6 +2325,11 @@
                         const lobbyId = e.currentTarget.dataset.lobbyId;
                         const lobbyType = e.currentTarget.dataset.lobbyType;
                         const lobbyName = e.currentTarget.dataset.lobbyName;
+
+                        if (currentUserData.banStatus && currentUserData.banStatus.isBanned) { // NEW: Check ban status
+                            showMessageBox(`شما به دلیل "${currentUserData.banStatus.reason || 'تخلف از قوانین'}" از ورود به لابی منع شده‌اید.`, "error");
+                            return;
+                        }
                         
                         if (lobbyType === 'private') {
                             openEnterPasswordModal(lobbyId, lobbyName);
@@ -2790,6 +2824,8 @@
 
             // Render Player Status Pods
             gamePlayerStatus.innerHTML = '';
+            // It's possible that gameState.players is more up-to-date than lobbyData.players in some race conditions
+            // So we use gameState.players for who *should* be in the game, and lobbyData.players for actual connection.
             gameState.players.forEach(pUid => {
                 const playerPod = document.createElement('div');
                 playerPod.className = `game-player-pod flex-grow`;
@@ -2801,8 +2837,8 @@
                 }
                 
                 // Check if player has left (not in current lobby.players)
-                const isPlayerInLobby = lobbyData.players && lobbyData.players[pUid];
-                const playerStatusText = isPlayerInLobby ? 'آنلاین' : 'ترک کرده';
+                const isPlayerCurrentlyConnectedToLobby = lobbyData.players && lobbyData.players[pUid];
+                const playerStatusText = isPlayerCurrentlyConnectedToLobby ? 'آنلاین' : 'ترک کرده';
                 
                 playerPod.innerHTML = `
                     <span class="player-name">${gameState.playerNames[pUid]}</span>
@@ -3127,6 +3163,10 @@
                 console.log(`Friendly game click prevented: Insufficient coins. User coins: ${currentUserData.coins}, Required: ${gameEntryCost}`);
                 return;
             }
+            if (currentUserData.banStatus && currentUserData.banStatus.isBanned) { // NEW: Check ban status
+                showMessageBox(`شما به دلیل "${currentUserData.banStatus.reason || 'تخلف از قوانین'}" از ورود به لابی منع شده‌اید.`, "error");
+                return;
+            }
             console.log("Friendly game button conditions met. Transitioning to lobby screen.");
             setActiveScreen(lobbyScreen);
             unsubscribeLobbies = setupLobbyListener('');
@@ -3442,9 +3482,10 @@
 
         // NEW: Event Delegation for Message Deletion
         lobbyChatMessages.addEventListener('click', (e) => {
+            // Corrected: Use dataset.messageId for camelCase conversion
             const deleteButton = e.target.closest('.delete-message-btn');
             if (deleteButton) {
-                const messageId = deleteButton.dataset.message-id; 
+                const messageId = deleteButton.dataset.messageId; 
                 if (currentLobbyId && messageId) {
                     deleteLobbyMessage(currentLobbyId, messageId);
                 }
