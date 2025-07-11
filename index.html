@@ -204,22 +204,19 @@
             z-index: 40;
             padding: 0.75rem 1rem; /* Adjust padding */
             display: flex;
-            justify-content: space-between;
+            justify-content: space-between; /* Spreads items */
             align-items: center;
         }
 
-        /* NEW: Coin display container in header */
+        /* NEW: Coin display container in header (positioned on the left for RTL) */
         #header-user-coins-container {
-            /* For RTL, this should be on the right. Tailwind's flex-row-reverse usually handles this. */
-            /* But given it's a fixed position and you want it on "top left" (which is top right in RTL),
-               we set order and auto margin to push it. */
-            order: -1; /* Place it first (left in RTL, right in LTR) */
-            margin-right: auto; /* Push it to the right (start) in RTL. If LTR, this pushes it left. */
+            /* flex-grow added directly in HTML to push it rightwards */
             background-color: rgba(0,0,0,0.3);
             border-radius: 10px;
             padding: 0.5rem 1rem;
             box-shadow: 0 4px 8px rgba(0,0,0,0.3);
             transition: all 0.3s ease;
+            margin-left: 1rem; /* Space between coins and menu button */
         }
         #header-user-coins-container:hover {
             transform: translateY(-2px);
@@ -897,11 +894,16 @@
                         <span id="header-user-id" class="text-xs text-gray-300 break-all">ID: ---</span>
                     </div>
                 </div>
-                <!-- NEW LOCATION FOR COINS - PROMINENT -->
+
+                <!-- Spacer to push elements to ends -->
+                <div class="flex-grow"></div> 
+
+                <!-- NEW LOCATION FOR COINS - Near the menu button (left for RTL) -->
                 <div id="header-user-coins-container" class="flex items-center text-xl sm:text-2xl font-extrabold text-yellow-300">
                     <svg class="coin-icon w-6 h-6 sm:w-8 sm:h-8 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm0 18a8 8 0 1 1 8-8 8 8 0 0 1-8 8zm-2-10h4a1 1 0 0 0 0-2h-4a1 1 0 0 0 0 2zm0 4h4a1 1 0 0 0 0-2h-4a1 1 0 0 0 0 2z"/></svg>
                     <span id="header-user-coins">---</span>
                 </div>
+
                 <!-- Hamburger Menu Icon - Aligned Left (for RTL) -->
                 <button id="menu-btn" class="text-white text-3xl p-2 rounded-full hover:bg-gray-700 transition-colors duration-200">
                     <!-- Hamburger icon SVG -->
@@ -922,7 +924,7 @@
             <footer class="app-footer flex justify-center items-center gap-4">
                 <button id="friendly-game-btn"
                         class="classic-btn btn-purple-classic text-base sm:text-lg flex-grow flex items-center justify-center whitespace-nowrap">
-                        <svg class="coin-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm0 18a8 8 0 1 1 8-8 8 8 0 0 1-8 8zm-2-10h4a1 1 0 0 0 0-2h-4a1 1 0 0 0 0 2zm0 4h4a1 1 0 0 0 0-2h-4a1 1 0 0 0 0 2z"/></svg>
+                        <svg class="coin-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm0 18a8 8 0 1 1 8-8 8 8 0 0 1-8 8zm-2-10h4a1 1 0 0 0 0-2h-4a1 1 0 /0 0 0 2zm0 4h4a1 1 0 0 0 0-2h-4a1 1 0 0 0 0 2z"/></svg>
                     <span>بازی دوستانه (<span id="friendly-game-cost">100</span>)</span>
                 </button>
                 <!-- Placeholder for other main buttons like 'Rated Game' -->
@@ -2010,7 +2012,7 @@
             // with a user from a cached session, which is the correct behavior.
             
             if (initialAuthToken) {
-                console.log("Initial auth token found. Attempting to sign in...");
+                console.log("Initial auth token found. Attempting to sign in with custom token...");
                 try {
                     // Signing in with the custom token will trigger onAuthStateChanged.
                     // We don't need to do anything else here. The listener will handle the screen transition.
@@ -2022,10 +2024,11 @@
                     console.error("Error signing in with initial custom token:", error);
                 }
             } else {
-                console.log("No initial auth token. Waiting for onAuthStateChanged to resolve session.");
+                console.log("No initial auth token. Waiting for onAuthStateChanged to resolve session or prompt login.");
                 // No token, so Firebase will check for a cached user.
                 // onAuthStateChanged will handle the result automatically.
             }
+            console.log("initializeFirebaseAndAuth finished.");
         }
         // --- FIX END ---
 
@@ -3037,11 +3040,23 @@
         });
 
         friendlyGameBtn.addEventListener('click', () => {
-            if (!auth.currentUser) { showMessageBox("برای مشاهده لابی‌ها، ابتدا وارد شوید.", "error"); return; }
-            if (currentUserData && currentUserData.coins < gameEntryCost) {
-                showMessageBox(`سکه شما برای ورود به بازی دوستانه کافی نیست. (نیاز: ${gameEntryCost} سکه، موجودی شما: ${currentUserData.coins})`, "error");
+            console.log("Friendly game button clicked.");
+            if (!auth.currentUser) {
+                showMessageBox("برای مشاهده لابی‌ها، ابتدا وارد شوید.", "error");
+                console.log("Friendly game click prevented: User not authenticated.");
                 return;
             }
+            if (!currentUserData) {
+                showMessageBox("در حال بارگذاری اطلاعات کاربری، لطفاً کمی صبر کنید.", "info");
+                console.log("Friendly game click prevented: currentUserData not loaded yet.");
+                return;
+            }
+            if (currentUserData.coins < gameEntryCost) {
+                showMessageBox(`سکه شما برای ورود به بازی دوستانه کافی نیست. (نیاز: ${gameEntryCost} سکه، موجودی شما: ${currentUserData.coins})`, "error");
+                console.log(`Friendly game click prevented: Insufficient coins. User coins: ${currentUserData.coins}, Required: ${gameEntryCost}`);
+                return;
+            }
+            console.log("Friendly game button conditions met. Transitioning to lobby screen.");
             setActiveScreen(lobbyScreen);
             unsubscribeLobbies = setupLobbyListener('');
         });
@@ -3446,6 +3461,7 @@
 
         // Initialize the app when the window loads
         window.onload = initializeFirebaseAndAuth;
+        console.log("Script execution finished."); // Added for debugging
     </script>
 </body>
 </html>
