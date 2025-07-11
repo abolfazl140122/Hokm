@@ -8,7 +8,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Google Fonts for Classic Look -->
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Merriweather:wght@400;700&display=swap" rel="stylesheet">
-    <style>
+    <sقtyle>
         /* General Classic Theme Background and Fonts */
         html, body, #app { /* Ensure these take full viewport height */
             height: 100%;
@@ -177,7 +177,7 @@
 
 
         /* Input Field Styles - More refined Classic Look */
-        input {
+        input, select { /* Added select for lobby names dropdown */
             background-color: #202020; /* Even darker input background */
             border: 2px solid #5A5A5A; /* Dark gray border */
             color: #E0E0E0; /* Light text color */
@@ -188,7 +188,7 @@
         input::placeholder {
             color: #A0A0A0; /* Lighter placeholder text */
         }
-        input:focus {
+        input:focus, select:focus {
             border-color: #DAA520 !important; /* Gold border on focus */
             box-shadow: 0 0 0 4px rgba(218, 165, 32, 0.5) !important, inset 0 2px 4px rgba(0,0,0,0.5) !important; /* Gold focus ring with inner shadow */
         }
@@ -786,6 +786,16 @@
             opacity: 0.5;
             cursor: not-allowed;
         }
+
+        /* Coin Icon for Buttons */
+        .coin-icon {
+            width: 1.25rem; /* Equivalent to w-5 */
+            height: 1.25rem; /* Equivalent to h-5 */
+            display: inline-block;
+            vertical-align: middle;
+            margin-right: 0.25rem; /* Equivalent to mr-1 */
+            fill: #FFD700; /* Gold color for coins */
+        }
     </style>
 </head>
 <body>
@@ -854,6 +864,7 @@
                     <div class="flex flex-col text-right">
                         <span id="header-display-name" class="font-bold text-lg text-white">نام کاربری</span>
                         <span id="header-user-id" class="text-xs text-gray-300 break-all">ID: ---</span>
+                        <span id="header-user-coins" class="text-sm font-bold text-yellow-300"></span>
                     </div>
                 </div>
                 <!-- Hamburger Menu Icon - Aligned Left (for RTL) -->
@@ -876,7 +887,8 @@
             <footer class="app-footer">
                 <button id="friendly-game-btn"
                         class="classic-btn btn-purple-classic text-base sm:text-lg w-1/2 mx-2 py-3.5 px-4">
-                    بازی دوستانه
+                        <svg class="coin-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm0 18a8 8 0 1 1 8-8 8 8 0 0 1-8 8zm-2-10h4a1 1 0 0 0 0-2h-4a1 1 0 0 0 0 2zm0 4h4a1 1 0 0 0 0-2h-4a1 1 0 0 0 0 2z"/></svg>
+                    بازی دوستانه (<span id="friendly-game-cost">100</span>)
                 </button>
                 <!-- Placeholder for other main buttons like 'Rated Game' -->
                 <button id="rated-game-btn"
@@ -958,6 +970,7 @@
                     <p><strong>نام نمایشی:</strong> <span id="profile-display-name">---</span></p>
                     <p><strong>ایمیل:</strong> <span id="profile-email">---</span></p>
                     <p><strong>شناسه کاربر (UID):</strong> <span id="profile-uid" class="break-all text-sm text-gray-400">---</span></p>
+                    <p><strong>سکه‌ها:</strong> <span id="profile-coins" class="font-bold text-yellow-300">---</span></p>
                     <!-- Add more profile stats here later (e.g., wins, losses) -->
                 </div>
                 <button id="profile-logout-btn"
@@ -977,11 +990,29 @@
                     </svg>
                 </button>
                 <form id="create-lobby-form" class="space-y-5">
-                    <div>
-                        <input type="text" id="new-lobby-name-input" placeholder="نام لابی شما"
-                               class="w-full focus:outline-none focus:ring-2 focus:ring-green-500"
-                               required>
+
+                    <!-- NEW: Lobby Name Selection/Proposal Area -->
+                    <div id="lobby-name-selection-area">
+                        <label for="approved-lobby-names-select" class="block text-right text-sm text-gray-300 mb-1">نام لابی تأیید شده خود را انتخاب کنید:</label>
+                        <select id="approved-lobby-names-select" class="w-full focus:outline-none focus:ring-2 focus:ring-green-500">
+                            <!-- Options will be dynamically loaded here -->
+                            <option value="">نام لابی را انتخاب کنید</option>
+                        </select>
+                        <p class="text-gray-400 text-sm mt-2">اگر نام لابی تأیید شده ندارید، می‌توانید در ادامه درخواست تأیید دهید.</p>
                     </div>
+
+                    <div id="lobby-name-proposal-area" class="hidden">
+                        <label for="proposed-lobby-name-input" class="block text-right text-sm text-gray-300 mb-1">نام لابی جدید را برای تأیید ارسال کنید (می‌توانید از کد رنگی [#RRGGBB] در ابتدای نام استفاده کنید):</label>
+                        <input type="text" id="proposed-lobby-name-input" placeholder="مثال: [#FFD700]لابی طلایی من"
+                               class="w-full focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <button type="button" id="submit-lobby-name-for-approval-btn"
+                                class="w-full mt-4 classic-btn btn-blue-classic text-lg sm:text-xl">
+                            ارسال برای تأیید
+                        </button>
+                        <p class="text-gray-400 text-sm mt-2">بعد از ارسال، ادمین نام لابی شما را بررسی و تأیید می‌کند. سپس می‌توانید از آن نام استفاده کنید.</p>
+                    </div>
+                    
+                    <div class="w-full h-px bg-yellow-600 my-4"></div> <!-- Divider -->
 
                     <!-- NEW: Lobby Type Toggle (Public/Private) -->
                     <div class="flex justify-center space-x-2 space-x-reverse my-4" id="lobby-type-toggle">
@@ -1197,7 +1228,7 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, signInWithCustomToken, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         // REVISED: Imported deleteField for updating player maps
-        import { getFirestore, doc, setDoc, getDoc, collection, addDoc, serverTimestamp, query, where, onSnapshot, updateDoc, arrayUnion, arrayRemove, deleteDoc, getDocs, orderBy, deleteField } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js"; 
+        import { getFirestore, doc, setDoc, getDoc, collection, addDoc, serverTimestamp, query, where, onSnapshot, updateDoc, arrayUnion, arrayRemove, deleteDoc, getDocs, orderBy, deleteField, increment } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js"; 
 
         // Firebase Configuration (from user's input)
         // **IMPORTANT**: You should replace these with your actual Firebase project configuration.
@@ -1246,7 +1277,9 @@
         const profileSummary = document.getElementById('profile-summary');
         const headerDisplayName = document.getElementById('header-display-name');
         const headerUserId = document.getElementById('header-user-id');
+        const headerUserCoins = document.getElementById('header-user-coins'); // NEW
         const friendlyGameBtn = document.getElementById('friendly-game-btn');
+        const friendlyGameCostSpan = document.getElementById('friendly-game-cost'); // NEW
         const ratedGameBtn = document.getElementById('rated-game-btn');
 
         // Lobby Screen UI Elements
@@ -1266,6 +1299,7 @@
         const profileDisplayName = document.getElementById('profile-display-name');
         const profileEmail = document.getElementById('profile-email');
         const profileUid = document.getElementById('profile-uid');
+        const profileCoins = document.getElementById('profile-coins'); // NEW
         const profileLogoutBtn = document.getElementById('profile-logout-btn');
 
         // Create Lobby Modal Elements
@@ -1282,6 +1316,14 @@
         const eyeIconOpen = document.getElementById('eye-icon-open');
         const eyeIconClosed = document.getElementById('eye-icon-closed');
         const gameDurationInput = document.getElementById('game-duration-input'); // NEW
+
+        // NEW: Lobby Name Selection/Proposal specific elements
+        const lobbyNameSelectionArea = document.getElementById('lobby-name-selection-area');
+        const approvedLobbyNamesSelect = document.getElementById('approved-lobby-names-select');
+        const lobbyNameProposalArea = document.getElementById('lobby-name-proposal-area');
+        const proposedLobbyNameInput = document.getElementById('proposed-lobby-name-input');
+        const submitLobbyNameForApprovalBtn = document.getElementById('submit-lobby-name-for-approval-btn');
+
 
         // Custom Confirmation Modal Elements
         const customConfirmModal = document.getElementById('custom-confirm-modal');
@@ -1370,6 +1412,7 @@
         let kickedPlayerToProcess = null; // Stores UID/name of player selected for kicking
         let lobbyToJoin = null; // To store data of private lobby user wants to join
         let isRefreshing = false; // NEW: State for refresh button
+        let gameEntryCost = 100; // NEW: Default game entry cost, will be fetched from Firebase
 
         // Promise resolver for custom confirmation modal
         let resolveCustomConfirm;
@@ -1575,6 +1618,19 @@
             }
         }
 
+        // Function to apply color to lobby names
+        function formatLobbyNameWithColor(name) {
+            const regex = /^\[#([0-9A-Fa-f]{6})\](.*)/; // Matches [#RRGGBB] at the start
+            const match = name.match(regex);
+            if (match) {
+                const colorCode = match[1];
+                const cleanName = match[2].trim();
+                return `<span style="color:#${colorCode};">${cleanName}</span>`;
+            }
+            return name;
+        }
+
+
         // Function to transition between screens
         function setActiveScreen(newScreen) {
             console.log(`درخواست تغییر صفحه به: ${newScreen.id}. صفحه فعلی: ${currentActiveScreen.id}`);
@@ -1626,6 +1682,7 @@
                 profileDisplayName.textContent = currentUserData.displayName || 'ناشناس';
                 profileEmail.textContent = currentUserData.email || 'ناشناس';
                 profileUid.textContent = currentUserData.uid || 'ناشناس';
+                profileCoins.textContent = currentUserData.coins !== undefined ? currentUserData.coins.toLocaleString('fa-IR') : '---'; // NEW
             }
         }
 
@@ -1638,12 +1695,43 @@
             }, 300);
         }
 
-        function openCreateLobbyModal() {
+        async function openCreateLobbyModal() {
+            if (!currentUserData) {
+                showCreateLobbyMessageBox("ابتدا وارد حساب کاربری خود شوید.", "error");
+                return;
+            }
+
+            // Populate approved lobby names dropdown
+            approvedLobbyNamesSelect.innerHTML = '<option value="">نام لابی را انتخاب کنید</option>';
+            if (currentUserData.approvedLobbyNames && currentUserData.approvedLobbyNames.length > 0) {
+                currentUserData.approvedLobbyNames.forEach(name => {
+                    const option = document.createElement('option');
+                    option.value = name;
+                    option.innerHTML = formatLobbyNameWithColor(name); // Display with color
+                    approvedLobbyNamesSelect.appendChild(option);
+                });
+                lobbyNameSelectionArea.classList.remove('hidden');
+                lobbyNameProposalArea.classList.add('hidden');
+                submitCreateLobbyBtn.classList.remove('hidden');
+                submitLobbyNameForApprovalBtn.classList.add('hidden');
+            } else {
+                lobbyNameSelectionArea.classList.add('hidden');
+                lobbyNameProposalArea.classList.remove('hidden');
+                submitCreateLobbyBtn.classList.add('hidden'); // Cannot create lobby yet
+                submitLobbyNameForApprovalBtn.classList.remove('hidden');
+            }
+
             createLobbyModal.classList.remove('hidden');
             void createLobbyModal.offsetWidth;
             createLobbyModal.classList.add('profile-modal-enter-active');
-            newLobbyNameInput.focus();
             createLobbyMessageBox.classList.add('hidden');
+            
+            // Set focus based on what's visible
+            if (!lobbyNameSelectionArea.classList.contains('hidden')) {
+                approvedLobbyNamesSelect.focus();
+            } else {
+                proposedLobbyNameInput.focus();
+            }
         }
 
         function closeCreateLobbyModal() {
@@ -1721,6 +1809,14 @@
             }, 300);
         }
 
+        // NEW: Function to update coins display in header
+        function updateUserCoinsDisplay() {
+            if (currentUserData && currentUserData.coins !== undefined) {
+                headerUserCoins.textContent = `سکه‌ها: ${currentUserData.coins.toLocaleString('fa-IR')}`;
+            } else {
+                headerUserCoins.textContent = `سکه‌ها: ---`;
+            }
+        }
 
         // Firebase Authentication State Listener
         onAuthStateChanged(auth, async (user) => {
@@ -1736,18 +1832,36 @@
                 try {
                     const userDocRef = doc(db, `artifacts/${appId}/users/${user.uid}/profile/data`); 
                     const userDocSnap = await getDoc(userDocRef);
+                    
+                    let userDataFromFirestore = userDocSnap.exists() ? userDocSnap.data() : {};
+                    
+                    // Initialize coins if not present
+                    if (userDataFromFirestore.coins === undefined) {
+                        userDataFromFirestore.coins = 500; // Default coins
+                        await setDoc(userDocRef, { coins: userDataFromFirestore.coins }, { merge: true });
+                    }
+                    // Initialize approvedLobbyNames if not present
+                    if (userDataFromFirestore.approvedLobbyNames === undefined) {
+                        userDataFromFirestore.approvedLobbyNames = [];
+                        await setDoc(userDocRef, { approvedLobbyNames: userDataFromFirestore.approvedLobbyNames }, { merge: true });
+                    }
+
                     currentUserData = {
                         uid: user.uid,
                         email: user.email,
-                        displayName: (userDocSnap.exists() && userDocSnap.data().displayName) ? userDocSnap.data().displayName : (user.displayName || (user.email ? user.email.split('@')[0] : 'کاربر ناشناس'))
+                        displayName: userDataFromFirestore.displayName || user.displayName || (user.email ? user.email.split('@')[0] : 'کاربر ناشناس'),
+                        coins: userDataFromFirestore.coins, // NEW
+                        approvedLobbyNames: userDataFromFirestore.approvedLobbyNames // NEW
                     };
+
                     if (!userDocSnap.exists() && authMode === 'register' && displayNameInput.value.trim() !== '') {
                         await setDoc(userDocRef, { displayName: displayNameInput.value.trim(), email: user.email }, { merge: true });
                         currentUserData.displayName = displayNameInput.value.trim();
                     }
                     headerDisplayName.textContent = currentUserData.displayName;
                     headerUserId.textContent = `شناسه: ${currentUserData.uid.substring(0, 8)}...`;
-                    
+                    updateUserCoinsDisplay(); // NEW
+
                     // Only transition if we are coming from loading or auth screen
                     if(currentActiveScreen === loadingScreen || currentActiveScreen === authScreen) {
                         setActiveScreen(mainScreen);
@@ -1755,9 +1869,10 @@
 
                 } catch (firestoreError) {
                     console.error("Firestore profile error:", firestoreError);
-                    currentUserData = { uid: user.uid, email: user.email, displayName: user.displayName || (user.email ? user.email.split('@')[0] : 'کاربر ناشناس') };
+                    currentUserData = { uid: user.uid, email: user.email, displayName: user.displayName || (user.email ? user.email.split('@')[0] : 'کاربر ناشناس'), coins: 0, approvedLobbyNames: [] }; // Fallback
                     headerDisplayName.textContent = currentUserData.displayName;
                     headerUserId.textContent = `شناسه: ${currentUserData.uid.substring(0, 8)}...`;
+                    updateUserCoinsDisplay(); // NEW
                     setActiveScreen(mainScreen);
                     showMessageBox("مشکل در بارگذاری پروفایل.", "error");
                 }
@@ -1780,6 +1895,7 @@
                 unsubscribeLobbies = unsubscribeLobbyDetail = unsubscribeKickedPlayers = unsubscribeLobbyChat = null;
                 currentLobbyId = null;
                 resetGameUI(); // Ensure game UI is reset
+                updateUserCoinsDisplay(); // Clear coin display
             }
         });
 
@@ -1789,6 +1905,25 @@
         async function initializeFirebaseAndAuth() {
             console.log("Initializing Firebase Auth...");
             
+            // Ensure game settings config exists
+            const configRef = doc(db, `artifacts/${appId}/config/game_settings`);
+            try {
+                const configSnap = await getDoc(configRef);
+                if (!configSnap.exists()) {
+                    await setDoc(configRef, { gameEntryCost: 100 }); // Default cost
+                    console.log("Default game_settings config created.");
+                } else {
+                    gameEntryCost = configSnap.data().gameEntryCost || 100;
+                }
+                friendlyGameCostSpan.textContent = gameEntryCost; // Update display
+            } catch (error) {
+                console.error("Error initializing game settings config:", error);
+                // Fallback to default in case of error
+                gameEntryCost = 100;
+                friendlyGameCostSpan.textContent = gameEntryCost;
+            }
+
+
             // The onAuthStateChanged listener is already set up globally.
             // We just need to trigger the sign-in process if a token is available.
             // If no token is available, onAuthStateChanged will still fire with `null` or
@@ -1972,6 +2107,8 @@
                         const lockIconHtml = lobby.type === 'private' 
                             ? `<svg xmlns="http://www.w3.org/2000/svg" class="lobby-lock-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>` 
                             : '';
+                        
+                        const formattedLobbyName = formatLobbyNameWithColor(lobby.name); // Apply color formatting
         
                         let joinButtonHtml = '';
                         if (isCurrentUserKicked) {
@@ -1992,7 +2129,7 @@
                         lobbyItem.dataset.lobbyId = lobby.id;
                         lobbyItem.innerHTML = `
                             <div class="mb-2 sm:mb-0 text-center sm:text-right">
-                                <h3 class="text-xl font-bold">${lockIconHtml}${lobby.name}</h3>
+                                <h3 class="text-xl font-bold">${lockIconHtml}${formattedLobbyName}</h3>
                                 <p class="text-sm">سازنده: ${hostDisplayName}</p>
                                 <p class="text-sm">بازیکنان: ${playerCount}/${maxPlayers}</p>
                             </div>
@@ -2039,8 +2176,9 @@
                     button.addEventListener('click', async (e) => {
                         const lobbyId = e.target.dataset.lobbyId;
                         if (lobbyId && auth.currentUser) {
-                            const lobbyName = e.target.closest('.lobby-item').querySelector('h3').textContent;
-                            const confirmed = await showCustomConfirm(`آیا مطمئن هستید که می‌خواهید لابی "${lobbyName}" را ببندید؟`);
+                            const lobbyName = e.target.closest('.lobby-item').querySelector('h3').textContent; // Get formatted name
+                            const cleanLobbyName = lobbyName.replace(/<[^>]*>/g, ''); // Remove HTML tags for prompt
+                            const confirmed = await showCustomConfirm(`آیا مطمئن هستید که می‌خواهید لابی "${cleanLobbyName}" را ببندید؟`);
                             if (confirmed) {
                                 await closeLobby(lobbyId, auth.currentUser.uid);
                             }
@@ -2143,7 +2281,7 @@
                 if (unsubscribeLobbyChat) unsubscribeLobbyChat();
                 unsubscribeLobbyChat = setupLobbyChatListener(lobbyId, lobbyData.hostId);
 
-                detailLobbyName.textContent = lobbyData.name;
+                detailLobbyName.innerHTML = formatLobbyNameWithColor(lobbyData.name); // Apply color formatting
                 detailHostName.textContent = `سازنده: ${playersMap[lobbyData.hostId] || 'ناشناس'}`;
                 detailPlayerCount.textContent = `بازیکنان: ${playerCount}/${maxPlayers}`;
 
@@ -2401,6 +2539,41 @@
             if (playerUIDs.length !== 4) { // Enforce 4 players
                 throw new Error("برای شروع بازی باید 4 بازیکن در لابی باشند.");
             }
+
+            const configRef = doc(db, `artifacts/${appId}/config/game_settings`);
+            let currentEntryCost = 100;
+            try {
+                const configSnap = await getDoc(configRef);
+                if (configSnap.exists()) {
+                    currentEntryCost = configSnap.data().gameEntryCost || 100;
+                }
+            } catch (error) {
+                console.error("Error fetching game entry cost:", error);
+            }
+
+            // Check if all players can afford
+            for (const playerId of playerUIDs) {
+                const playerProfileRef = doc(db, `artifacts/${appId}/users/${playerId}/profile/data`);
+                const playerProfileSnap = await getDoc(playerProfileRef);
+                if (!playerProfileSnap.exists() || playerProfileSnap.data().coins < currentEntryCost) {
+                    throw new Error(`بازیکن ${playerNames[playerId]} سکه کافی برای شروع بازی ندارد. (نیاز: ${currentEntryCost} سکه)`);
+                }
+            }
+
+            // Deduct coins from all players
+            const batch = db.batch(); // Use batch for atomic updates
+            for (const playerId of playerUIDs) {
+                const playerProfileRef = doc(db, `artifacts/${appId}/users/${playerId}/profile/data`);
+                batch.update(playerProfileRef, { coins: increment(-currentEntryCost) });
+            }
+            await batch.commit();
+            console.log(`Successfully deducted ${currentEntryCost} coins from all players.`);
+            // Update local user's coin balance immediately if they are among players
+            if (currentUserData && playerUIDs.includes(currentUserData.uid)) {
+                currentUserData.coins -= currentEntryCost;
+                updateUserCoinsDisplay();
+            }
+
 
             // Role assignment: Randomly pick one AI, three Humans
             const shuffledPlayers = [...playerUIDs].sort(() => Math.random() - 0.5);
@@ -2763,7 +2936,8 @@
                 } else {
                     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
                     const userDocRef = doc(db, `artifacts/${appId}/users/${userCredential.user.uid}/profile/data`);
-                    await setDoc(userDocRef, { displayName: displayName, email: email }, { merge: true });
+                    // Initialize with default coins and empty approved lobby names
+                    await setDoc(userDocRef, { displayName: displayName, email: email, coins: 500, approvedLobbyNames: [] }, { merge: true });
                 }
             } catch (error) { showMessageBox(getFirebaseErrorMessage(error.code), 'error'); }
         });
@@ -2779,6 +2953,10 @@
 
         friendlyGameBtn.addEventListener('click', () => {
             if (!auth.currentUser) { showMessageBox("برای مشاهده لابی‌ها، ابتدا وارد شوید.", "error"); return; }
+            if (currentUserData && currentUserData.coins < gameEntryCost) {
+                showMessageBox(`سکه شما برای ورود به بازی دوستانه کافی نیست. (نیاز: ${gameEntryCost} سکه، موجودی شما: ${currentUserData.coins})`, "error");
+                return;
+            }
             setActiveScreen(lobbyScreen);
             unsubscribeLobbies = setupLobbyListener('');
         });
@@ -2792,28 +2970,60 @@
 
         addIconBtn.addEventListener('click', () => {
             if (!auth.currentUser) { showMessageBox("برای ساخت لابی، ابتدا وارد شوید.", "error"); return; }
-            if (userHasActiveLobby) { showMessageBox("شما از قبل در یک لابی فعال هستید.", "info"); return; }
+            if (userHasActiveLobby) { showMessageBox("شما از قبل در یک لابی فعال هستید. لطفاً ابتدا لابی قبلی خود را ببندید.", "info"); return; }
             openCreateLobbyModal();
+        });
+
+        // NEW: Submit Lobby Name for Approval Button
+        submitLobbyNameForApprovalBtn.addEventListener('click', async () => {
+            const proposedName = proposedLobbyNameInput.value.trim();
+            if (!proposedName) { showCreateLobbyMessageBox("لطفاً نام لابی پیشنهادی خود را وارد کنید.", "error"); return; }
+            if (!auth.currentUser || !currentUserData) { showCreateLobbyMessageBox("خطا: اطلاعات کاربری در دسترس نیست.", "error"); return; }
+
+            showCreateLobbyMessageBox("در حال بررسی و ارسال نام لابی برای تأیید...", "info");
+            try {
+                const moderationResult = await checkLobbyNameWithAI(proposedName);
+                if (!moderationResult.is_appropriate) {
+                    showCreateLobbyMessageBox(`نام لابی نامناسب: ${moderationResult.reason}`, "error");
+                    return;
+                }
+
+                const proposedLobbyRef = collection(db, `artifacts/${appId}/proposedLobbyNames`);
+                await addDoc(proposedLobbyRef, {
+                    name: proposedName,
+                    userId: auth.currentUser.uid,
+                    displayName: currentUserData.displayName,
+                    isApproved: false,
+                    createdAt: serverTimestamp()
+                });
+                showCreateLobbyMessageBox("نام لابی شما با موفقیت برای تأیید ارسال شد. لطفاً منتظر تأیید ادمین باشید.", "success");
+                proposedLobbyNameInput.value = ''; // Clear input
+                setTimeout(closeCreateLobbyModal, 3000); // Close after a delay
+            } catch (error) {
+                console.error("خطا در ارسال نام لابی برای تأیید:", error);
+                showCreateLobbyMessageBox(`خطا در ارسال نام لابی: ${error.message}`, "error");
+            }
         });
         
         createLobbyForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            const lobbyName = newLobbyNameInput.value.trim();
+            let lobbyName;
+            if (lobbyNameSelectionArea.classList.contains('hidden')) {
+                showCreateLobbyMessageBox("لطفاً ابتدا نام لابی خود را برای تأیید ارسال کنید و منتظر تأیید بمانید.", "error");
+                return;
+            } else {
+                lobbyName = approvedLobbyNamesSelect.value;
+                if (!lobbyName) { showCreateLobbyMessageBox("لطفاً یک نام لابی تأیید شده را انتخاب کنید.", "error"); return; }
+            }
+
             const lobbyType = document.querySelector('input[name="lobby-type"]:checked').value;
             const password = newLobbyPasswordInput.value;
             const gameDuration = parseInt(gameDurationInput.value, 10);
         
-            if (!lobbyName) { showCreateLobbyMessageBox("لطفاً نام لابی را وارد کنید.", "error"); return; }
             if (lobbyType === 'private' && password.length < 4) { showCreateLobbyMessageBox("رمز عبور برای لابی خصوصی باید حداقل ۴ کاراکتر باشد.", "error"); return; }
             if (isNaN(gameDuration) || gameDuration < 1 || gameDuration > 60) { showCreateLobbyMessageBox("مدت زمان بازی باید بین ۱ تا ۶۰ دقیقه باشد.", "error"); return; }
             if (!auth.currentUser || !currentUserData?.displayName) { showCreateLobbyMessageBox("مشکلی در اطلاعات کاربری شما وجود دارد.", "error"); return; }
             if (userHasActiveLobby) { showCreateLobbyMessageBox("شما از قبل در یک لابی فعال هستید.", "info"); closeCreateLobbyModal(); return; }
-        
-            showCreateLobbyMessageBox("در حال بررسی نام لابی...", "info");
-            try {
-                const moderationResult = await checkLobbyNameWithAI(lobbyName);
-                if (!moderationResult.is_appropriate) { showCreateLobbyMessageBox(`نام لابی نامناسب: ${moderationResult.reason}`, "error");  return; }
-            } catch (aiError) { console.error("خطا در بررسی AI نام لابی:", aiError); showCreateLobbyMessageBox("خطایی در بررسی نام لابی پیش آمد.", "error"); return; }
         
             try {
                 const newLobbyId = await createLobby(lobbyName, auth.currentUser.uid, currentUserData.displayName, lobbyType, password, gameDuration);
@@ -3004,7 +3214,7 @@
         lobbyChatMessages.addEventListener('click', (e) => {
             const deleteButton = e.target.closest('.delete-message-btn');
             if (deleteButton) {
-                const messageId = deleteButton.dataset.messageId;
+                const messageId = deleteButton.dataset.message-id;
                 if (currentLobbyId && messageId) {
                     deleteLobbyMessage(currentLobbyId, messageId);
                 }
