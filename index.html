@@ -1443,6 +1443,7 @@
         let unsubscribeLobbyDetail = null; // Global variable for single lobby detail listener
         let unsubscribeKickedPlayers = null; // Listener for kicked players list
         let unsubscribeLobbyChat = null; // NEW: Listener for lobby chat messages
+        let unsubscribeUserProfile = null; // NEW: Listener for real-time user profile updates
         let isAuthResolved = false; // Flag to indicate if onAuthStateChanged has run at least once
         let userHasActiveLobby = false; // Track if the current user has an active lobby (created or joined)
         let currentLobbyId = null; // Stores the ID of the lobby the current user is in
@@ -1677,7 +1678,6 @@
             if (unsubscribeLobbyDetail) { unsubscribeLobbyDetail(); unsubscribeLobbyDetail = null; }
             if (unsubscribeKickedPlayers) { unsubscribeKickedPlayers(); unsubscribeKickedPlayers = null; }
             if (unsubscribeLobbyChat) { unsubscribeLobbyChat(); unsubscribeLobbyChat = null; }
-            // Game related cleanups
             clearGameIntervals();
             resetGameUI();
 
@@ -1731,6 +1731,79 @@
             }, 300);
         }
 
+        // NEW: Function to update the approved lobby names dropdown and visibility of related areas
+        async function updateApprovedLobbyNamesDropdownOnModalOpen(mode) {
+            if (!currentUserData) {
+                approvedLobbyNamesSelect.innerHTML = '<option value="">در حال بارگذاری اطلاعات...</option>';
+                lobbyNameSelectionArea.classList.add('hidden');
+                lobbyNameProposalArea.classList.add('hidden');
+                submitCreateLobbyBtn.classList.add('hidden');
+                submitLobbyNameForApprovalBtn.classList.add('hidden');
+                return;
+            }
+
+            const approvedNames = currentUserData.approvedLobbyNames || [];
+            
+            // Clear existing options first
+            approvedLobbyNamesSelect.innerHTML = '<option value="">نام لابی را انتخاب کنید</option>';
+            
+            if (approvedNames.length > 0) {
+                approvedNames.forEach(name => {
+                    const option = document.createElement('option');
+                    option.value = name;
+                    option.innerHTML = formatLobbyNameWithColor(name);
+                    approvedLobbyNamesSelect.appendChild(option);
+                });
+                lobbyNameSelectionArea.classList.remove('hidden');
+                submitCreateLobbyBtn.classList.remove('hidden'); // Enable 'Create Lobby' button
+                lobbyNameProposalArea.classList.add('hidden'); // Hide proposal area
+                submitLobbyNameForApprovalBtn.classList.add('hidden'); // Hide proposal button
+                approvedLobbyNamesSelect.focus();
+            } else {
+                lobbyNameSelectionArea.classList.add('hidden');
+                submitCreateLobbyBtn.classList.add('hidden'); // Disable 'Create Lobby' button
+                
+                if (mode === 'create') {
+                    lobbyNameProposalArea.classList.remove('hidden');
+                    submitLobbyNameForApprovalBtn.classList.remove('hidden'); // Enable 'Submit for Approval' button
+
+                    // Fetch pending requests
+                    const proposedLobbyNamesRef = collection(db, `artifacts/${appId}/proposedLobbyNames`);
+                    const qPending = query(
+                        proposedLobbyNamesRef,
+                        where("userId", "==", auth.currentUser.uid),
+                        where("status", "==", "pending")
+                    );
+                    const pendingSnapshot = await getDocs(qPending);
+                    const pendingCount = pendingSnapshot.size;
+
+                    if (pendingCount >= 5) {
+                        lobbyProposalMessage.textContent = `شما ${pendingCount} درخواست نام لابی در انتظار تایید دارید. تا زمانی که درخواست‌های شما بررسی نشوند، نمی‌توانید درخواست جدیدی ارسال کنید.`;
+                        lobbyProposalMessage.classList.remove('text-gray-400');
+                        lobbyProposalMessage.classList.add('text-red-400');
+                        submitLobbyNameForApprovalBtn.disabled = true;
+                        proposedLobbyNameInput.disabled = true;
+                        proposedLobbyNameInput.placeholder = "تعداد درخواست‌های شما به حداکثر رسیده است.";
+                    } else {
+                        lobbyProposalMessage.textContent = "بعد از ارسال، ادمین نام لابی شما را بررسی و تأیید می‌کند. سپس می‌توانید از آن نام استفاده کنید.";
+                        lobbyProposalMessage.classList.remove('text-red-400');
+                        lobbyProposalMessage.classList.add('text-gray-400');
+                        submitLobbyNameForApprovalBtn.disabled = false;
+                        proposedLobbyNameInput.disabled = false;
+                        proposedLobbyNameInput.placeholder = "مثال: [#FFD700]لابی طلایی من";
+                    }
+                    proposedLobbyNameInput.focus();
+                } else if (mode === 'myLobbies') {
+                    createLobbyMessageBox.classList.remove('hidden');
+                    createLobbyMessageBox.classList.add('bg-blue-500', 'text-white');
+                    createLobbyMessageBox.textContent = "شما هیچ نام لابی تأیید شده‌ای ندارید. می‌توانید از بخش 'ایجاد لابی' یک نام جدید برای تأیید ارسال کنید.";
+                    lobbyNameProposalArea.classList.add('hidden'); // Hide proposal area in 'myLobbies' mode if no approved names
+                    submitLobbyNameForApprovalBtn.classList.add('hidden'); // Hide proposal button
+                }
+            }
+        }
+
+
         async function openCreateLobbyModal(mode = 'create') {
             if (!currentUserData) {
                 showCreateLobbyMessageBox("ابتدا وارد حساب کاربری خود شوید.", "error");
@@ -1770,72 +1843,11 @@
             newLobbyPasswordField.classList.add('hidden');
             gameDurationInput.value = 5;
 
-            // Hide all dynamic elements by default
-            lobbyNameSelectionArea.classList.add('hidden');
-            lobbyNameProposalArea.classList.add('hidden');
-            submitCreateLobbyBtn.classList.add('hidden');
-            submitLobbyNameForApprovalBtn.classList.add('hidden');
-            
             // Set modal title based on mode
             createLobbyModalTitle.textContent = (mode === 'myLobbies' ? 'لابی‌های من' : 'ساخت لابی جدید');
 
-
-            const approvedNames = currentUserData.approvedLobbyNames || [];
-            
-            if (approvedNames.length > 0) {
-                // User has approved names: show selection dropdown
-                approvedLobbyNamesSelect.innerHTML = '<option value="">نام لابی را انتخاب کنید</option>';
-                approvedNames.forEach(name => {
-                    const option = document.createElement('option');
-                    option.value = name;
-                    option.innerHTML = formatLobbyNameWithColor(name);
-                    approvedLobbyNamesSelect.appendChild(option);
-                });
-                lobbyNameSelectionArea.classList.remove('hidden');
-                submitCreateLobbyBtn.classList.remove('hidden'); // Enable 'Create Lobby' button
-                approvedLobbyNamesSelect.focus();
-            } else {
-                // User has no approved names
-                if (mode === 'create') {
-                    // In 'create' mode, allow proposing new names
-                    lobbyNameProposalArea.classList.remove('hidden');
-                    submitLobbyNameForApprovalBtn.classList.remove('hidden'); // Enable 'Submit for Approval' button
-
-                    // Fetch pending requests for 'create' mode
-                    const proposedLobbyNamesRef = collection(db, `artifacts/${appId}/proposedLobbyNames`);
-                    const qPending = query(
-                        proposedLobbyNamesRef,
-                        where("userId", "==", auth.currentUser.uid),
-                        where("status", "==", "pending")
-                    );
-                    const pendingSnapshot = await getDocs(qPending);
-                    const pendingCount = pendingSnapshot.size;
-
-                    if (pendingCount >= 5) {
-                        lobbyProposalMessage.textContent = `شما ${pendingCount} درخواست نام لابی در انتظار تایید دارید. تا زمانی که درخواست‌های شما بررسی نشوند، نمی‌توانید درخواست جدیدی ارسال کنید.`;
-                        lobbyProposalMessage.classList.remove('text-gray-400');
-                        lobbyProposalMessage.classList.add('text-red-400');
-                        submitLobbyNameForApprovalBtn.disabled = true;
-                        proposedLobbyNameInput.disabled = true;
-                        proposedLobbyNameInput.placeholder = "تعداد درخواست‌های شما به حداکثر رسیده است.";
-                    } else {
-                        lobbyProposalMessage.textContent = "بعد از ارسال، ادمین نام لابی شما را بررسی و تأیید می‌کند. سپس می‌توانید از آن نام استفاده کنید.";
-                        lobbyProposalMessage.classList.remove('text-red-400');
-                        lobbyProposalMessage.classList.add('text-gray-400');
-                        submitLobbyNameForApprovalBtn.disabled = false;
-                        proposedLobbyNameInput.disabled = false;
-                        proposedLobbyNameInput.placeholder = "مثال: [#FFD700]لابی طلایی من";
-                    }
-                    proposedLobbyNameInput.focus();
-                } else if (mode === 'myLobbies') {
-                    // In 'myLobbies' mode, if no approved names, display a message
-                    createLobbyMessageBox.classList.remove('hidden');
-                    createLobbyMessageBox.classList.add('bg-blue-500', 'text-white');
-                    createLobbyMessageBox.textContent = "شما هیچ نام لابی تأیید شده‌ای ندارید. می‌توانید از بخش 'ایجاد لابی' یک نام جدید برای تأیید ارسال کنید.";
-                    // No buttons for creation/proposal should be visible in this specific 'myLobbies' mode, no approved names case.
-                    // The submit-create-lobby-btn is already hidden by default, which is correct.
-                }
-            }
+            // NEW: Call the dedicated function to populate dropdown and manage area visibility
+            await updateApprovedLobbyNamesDropdownOnModalOpen(mode); 
         }
 
         function closeCreateLobbyModal() {
@@ -1931,59 +1943,80 @@
             let shouldTransition = false;
 
             if (user) {
-                try {
-                    const userDocRef = doc(db, `artifacts/${appId}/users/${user.uid}/profile/data`); 
-                    const userDocSnap = await getDoc(userDocRef);
-                    
-                    let userDataFromFirestore = userDocSnap.exists() ? userDocSnap.data() : {};
-                    
-                    // Initialize coins if not present
-                    if (userDataFromFirestore.coins === undefined) {
-                        userDataFromFirestore.coins = 500; // Default coins
-                        await setDoc(userDocRef, { coins: userDataFromFirestore.coins }, { merge: true });
-                    }
-                    // Initialize approvedLobbyNames if not present
-                    if (userDataFromFirestore.approvedLobbyNames === undefined) {
-                        userDataFromFirestore.approvedLobbyNames = [];
-                        await setDoc(userDocRef, { approvedLobbyNames: userDataFromFirestore.approvedLobbyNames }, { merge: true });
-                    }
-                    // Initialize banStatus if not present (optional, for safety)
-                    if (userDataFromFirestore.banStatus === undefined) {
-                        await setDoc(userDocRef, { banStatus: { isBanned: false } }, { merge: true });
-                        userDataFromFirestore.banStatus = { isBanned: false };
-                    }
+                const userDocRef = doc(db, `artifacts/${appId}/users/${user.uid}/profile/data`); 
 
-
-                    currentUserData = {
-                        uid: user.uid,
-                        email: user.email,
-                        displayName: userDataFromFirestore.displayName || user.displayName || (user.email ? user.email.split('@')[0] : 'کاربر ناشناس'),
-                        coins: userDataFromFirestore.coins, // NEW
-                        approvedLobbyNames: userDataFromFirestore.approvedLobbyNames, // NEW
-                        banStatus: userDataFromFirestore.banStatus || { isBanned: false } // NEW
-                    };
-
-                    if (!userDocSnap.exists() && authMode === 'register' && displayNameInput.value.trim() !== '') {
-                        await setDoc(userDocRef, { displayName: displayNameInput.value.trim(), email: user.email }, { merge: true });
-                        currentUserData.displayName = displayNameInput.value.trim();
-                    }
-                    headerDisplayName.textContent = currentUserData.displayName;
-                    headerUserId.textContent = `شناسه: ${currentUserData.uid.substring(0, 8)}...`;
-                    updateUserCoinsDisplay(); // NEW
-
-                    shouldTransition = true;
-
-                } catch (firestoreError) {
-                    console.error("Firestore profile error:", firestoreError);
-                    currentUserData = { uid: user.uid, email: user.email, displayName: user.displayName || (user.email ? user.email.split('@')[0] : 'کاربر ناشناس'), coins: 0, approvedLobbyNames: [], banStatus: { isBanned: false } }; // Fallback
-                    headerDisplayName.textContent = currentUserData.displayName;
-                    headerUserId.textContent = `شناسه: ${currentUserData.uid.substring(0, 8)}...`;
-                    updateUserCoinsDisplay(); // NEW
-                    shouldTransition = true; // Still attempt to transition
-                    showMessageBox("مشکل در بارگذاری پروفایل.", "error");
+                // NEW: Set up real-time listener for user profile data
+                if (unsubscribeUserProfile) {
+                    unsubscribeUserProfile(); // Clean up old listener if exists
                 }
+                unsubscribeUserProfile = onSnapshot(userDocRef, (docSnap) => {
+                    if (docSnap.exists()) {
+                        const latestUserData = docSnap.data();
+                        currentUserData = {
+                            uid: user.uid,
+                            email: user.email,
+                            displayName: latestUserData.displayName || user.displayName || (user.email ? user.email.split('@')[0] : 'کاربر ناشناس'),
+                            coins: latestUserData.coins, // NEW
+                            approvedLobbyNames: latestUserData.approvedLobbyNames, // NEW
+                            banStatus: latestUserData.banStatus || { isBanned: false } // NEW
+                        };
+                        headerDisplayName.textContent = currentUserData.displayName;
+                        headerUserId.textContent = `شناسه: ${currentUserData.uid.substring(0, 8)}...`;
+                        updateUserCoinsDisplay(); // NEW
+
+                        // If the create lobby modal is currently open, refresh its dropdown
+                        if (!createLobbyModal.classList.contains('hidden') && !createLobbyModal.classList.contains('profile-modal-leave-active')) {
+                            // Determine the current mode of the modal (create or myLobbies) to pass to the update function
+                            const currentMode = createLobbyModalTitle.textContent.includes('لابی‌های من') ? 'myLobbies' : 'create';
+                            updateApprovedLobbyNamesDropdownOnModalOpen(currentMode);
+                        }
+                        
+                        console.log("User profile data updated by real-time listener:", currentUserData);
+
+                        // Only transition screens on the very first auth state resolution
+                        if (!isAuthResolved) {
+                            isAuthResolved = true;
+                            setActiveScreen(mainScreen);
+                        }
+
+                    } else {
+                        console.warn("User profile document not found during snapshot. User might be new or document deleted.");
+                        // Handle case where profile doc doesn't exist for a logged-in user
+                        currentUserData = { uid: user.uid, email: user.email, displayName: user.displayName || (user.email ? user.email.split('@')[0] : 'کاربر ناشناس'), coins: 0, approvedLobbyNames: [], banStatus: { isBanned: false } }; // Fallback
+                        headerDisplayName.textContent = currentUserData.displayName;
+                        headerUserId.textContent = `شناسه: ${currentUserData.uid.substring(0, 8)}...`;
+                        updateUserCoinsDisplay();
+                        if (!isAuthResolved) {
+                            isAuthResolved = true;
+                            setActiveScreen(mainScreen);
+                        }
+                    }
+                }, (error) => {
+                    console.error("Error listening to user profile:", error);
+                    showMessageBox("خطا در بارگذاری پروفایل به صورت لحظه‌ای.", "error");
+                });
+
+                // This part ensures that if display name needs to be set immediately after registration, it happens.
+                // This logic is separate from the onSnapshot which handles *subsequent* updates.
+                try {
+                    const userDocSnap = await getDoc(userDocRef); // Get once for initial check
+                    if (!userDocSnap.exists() && authMode === 'register' && displayNameInput.value.trim() !== '') {
+                        // Set initial data if registering and document doesn't exist
+                        await setDoc(userDocRef, { displayName: displayNameInput.value.trim(), email: user.email, coins: 500, approvedLobbyNames: [], banStatus: { isBanned: false } }, { merge: true });
+                        // The onSnapshot will pick this up and update currentUserData
+                    }
+                } catch (firestoreError) {
+                    console.error("Firestore initial profile check/set error:", firestoreError);
+                    showMessageBox("مشکل در تنظیم پروفایل اولیه.", "error");
+                }
+
+
             } else {
                 // User is logged out
+                if (unsubscribeUserProfile) {
+                    unsubscribeUserProfile(); // Clean up profile listener on logout
+                    unsubscribeUserProfile = null;
+                }
                 shouldTransition = true;
                 authForm.reset();
                 displayNameField.classList.add('hidden');
@@ -1992,7 +2025,7 @@
                 registerToggleBtn.classList.remove('hidden');
                 authMode = 'login';
                 currentUserData = null;
-                // Clean up all listeners and game intervals
+                // Clean up all other listeners and game intervals
                 if (unsubscribeLobbies) unsubscribeLobbies();
                 if (unsubscribeLobbyDetail) unsubscribeLobbyDetail();
                 if (unsubscribeKickedPlayers) unsubscribeKickedPlayers();
@@ -2004,15 +2037,8 @@
                 updateUserCoinsDisplay(); // Clear coin display
             }
 
-            // Centralized screen transition logic
-            if (!isAuthResolved) {
-                isAuthResolved = true; // Mark auth state as resolved for the first time
-                if (user) {
-                    setActiveScreen(mainScreen);
-                } else {
-                    setActiveScreen(authScreen);
-                }
-            } else if (shouldTransition) { // For subsequent state changes (e.g., login/logout from auth/profile screen)
+            // Centralized screen transition logic for non-initial state changes
+            if (isAuthResolved) { 
                 if (user && currentActiveScreen !== mainScreen) {
                     setActiveScreen(mainScreen);
                 } else if (!user && currentActiveScreen !== authScreen) {
@@ -2432,7 +2458,7 @@
 
                     playerItem.innerHTML = `
                         <div class="flex items-center">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="mr-2 lucide lucide-user"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="mr-2 lucide lucude-user"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
                             <span class="player-name">${player.displayName}</span>
                             ${hostLabelHtml}
                         </div>
@@ -2543,8 +2569,14 @@
                     const kickedPlayers = docSnap.data().kickedPlayers || [];
                     if (kickedPlayers.length === 0) {
                         kickedPlayersListContent.innerHTML = '<p class="text-gray-400 text-center">هیچ بازیکنی اخراج نشده است.</p>';
+                    }
+                    // Filter out any undefined or null entries if they somehow exist
+                    const validKickedPlayers = kickedPlayers.filter(p => p && p.displayName && p.uid);
+
+                    if (validKickedPlayers.length === 0) {
+                        kickedPlayersListContent.innerHTML = '<p class="text-gray-400 text-center">هیچ بازیکنی اخراج نشده است.</p>';
                     } else {
-                        kickedPlayers.forEach(player => {
+                        validKickedPlayers.forEach(player => {
                             const playerDiv = document.createElement('div');
                             playerDiv.className = 'flex items-center justify-between bg-gray-700 p-3 rounded-lg mb-2';
                             playerDiv.innerHTML = `<span>${player.displayName}</span><button data-player-uid="${player.uid}" class="unkick-player-btn classic-btn btn-green-classic text-sm py-1 px-3">بازگرداندن</button>`;
@@ -3062,10 +3094,9 @@
                 if (authMode === 'login') {
                     await signInWithEmailAndPassword(auth, email, password);
                 } else {
-                    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-                    const userDocRef = doc(db, `artifacts/${appId}/users/${userCredential.user.uid}/profile/data`);
-                    // Initialize with default coins and empty approved lobby names
-                    await setDoc(userDocRef, { displayName: displayName, email: email, coins: 500, approvedLobbyNames: [], banStatus: { isBanned: false } }, { merge: true });
+                    await createUserWithEmailAndPassword(auth, email, password);
+                    // The onAuthStateChanged listener now sets up the profile document with default values
+                    // when it's first observed for a new user.
                 }
             } catch (error) { showMessageBox(getFirebaseErrorMessage(error.code), 'error'); }
         });
@@ -3216,8 +3247,9 @@
                 await updateDoc(userDocRef, {
                     approvedLobbyNames: arrayRemove(lobbyName)
                 });
-                // Update local currentUserData immediately
-                currentUserData.approvedLobbyNames = currentUserData.approvedLobbyNames.filter(name => name !== lobbyName);
+                // Note: The onSnapshot listener on `userDocRef` will automatically update `currentUserData.approvedLobbyNames`
+                // and trigger `updateApprovedLobbyNamesDropdownOnModalOpen` if the modal is open.
+                // So, no need to manually update `currentUserData.approvedLobbyNames` here.
 
                 setTimeout(() => {
                     closeCreateLobbyModal();
