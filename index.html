@@ -994,7 +994,7 @@
                 <form id="create-lobby-form" class="space-y-5">
 
                     <!-- NEW: Lobby Name Selection/Proposal Area -->
-                    <div id="lobby-name-selection-area">
+                    <div id="lobby-name-selection-area" class="hidden">
                         <label for="approved-lobby-names-select" class="block text-right text-sm text-gray-300 mb-1">نام لابی تأیید شده خود را انتخاب کنید:</label>
                         <select id="approved-lobby-names-select" class="w-full focus:outline-none focus:ring-2 focus:ring-green-500">
                             <!-- Options will be dynamically loaded here -->
@@ -1034,7 +1034,7 @@
                                class="w-full focus:outline-none focus:ring-2 focus:ring-green-500 pr-10">
                         <button type="button" id="toggle-password-visibility" class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white">
                             <svg id="eye-icon-open" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-eye"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
-                            <svg id="eye-icon-closed" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-eye-off" style="display: none;"><path d="M9.88 9.88a3 3 0 1 0 4.24 4.24"/><path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"/><path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61"/><line x1="2" x2="22" y1="2" y2="22"/></svg>
+                            <svg id="eye-icon-closed" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-eye-off" style="display: none;"><path d="M9.88 9.88a3 3 0 1 0 4.24 4.24"/><path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"/><path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9 0 0 0 5.39-1.61"/><line x1="2" x2="22" y1="2" y2="22"/></svg>
                         </button>
                     </div>
                     
@@ -1047,7 +1047,7 @@
                     </div>
 
                     <button type="submit" id="submit-create-lobby-btn"
-                            class="w-full mt-4 classic-btn btn-green-classic text-xl sm:text-2xl">
+                            class="w-full mt-4 classic-btn btn-green-classic text-xl sm:text-2xl hidden">
                         ساخت لابی
                     </button>
                 </form>
@@ -1308,12 +1308,12 @@
         const createLobbyModal = document.getElementById('create-lobby-modal');
         const closeCreateLobbyModalBtn = document.getElementById('close-create-lobby-modal-btn'); 
         const createLobbyForm = document.getElementById('create-lobby-form');
-        const newLobbyNameInput = document.getElementById('new-lobby-name-input'); // This is actually proposed-lobby-name-input now
+        // const newLobbyNameInput = document.getElementById('new-lobby-name-input'); // This is actually proposed-lobby-name-input now
         const submitCreateLobbyBtn = document.getElementById('submit-create-lobby-btn');
         const createLobbyMessageBox = document.getElementById('create-lobby-message-box');
         const lobbyTypeToggle = document.getElementById('lobby-type-toggle');
-        const newLobbyPasswordField = document.getElementById('new-lobby-password-field');
-        const newLobbyPasswordInput = document.getElementById('new-lobby-password-input');
+        const newLobbyPasswordField = document.getElementById('newLobby-password-field');
+        const newLobbyPasswordInput = document.getElementById('newLobby-password-input');
         const togglePasswordVisibilityBtn = document.getElementById('toggle-password-visibility');
         const eyeIconOpen = document.getElementById('eye-icon-open');
         const eyeIconClosed = document.getElementById('eye-icon-closed');
@@ -3221,7 +3221,7 @@
         lobbyChatMessages.addEventListener('click', (e) => {
             const deleteButton = e.target.closest('.delete-message-btn');
             if (deleteButton) {
-                const messageId = deleteButton.dataset.messageId;
+                const messageId = deleteButton.dataset.message-id;
                 if (currentLobbyId && messageId) {
                     deleteLobbyMessage(currentLobbyId, messageId);
                 }
@@ -3231,231 +3231,6 @@
         // NEW: Game Screen Event Listeners (using leaveGameFromLobbyBtn)
         leaveGameFromLobbyBtn.addEventListener('click', async () => {
             if (!currentLobbyId || !auth.currentUser) return;
-
-            const confirmed = await showCustomConfirm("آیا مطمئن هستید که می‌خواهید بازی را ترک کنید؟"); // Updated message
-            if (!confirmed) return;
-
-            const lobbyRef = doc(db, `global_lobbies`, currentLobbyId);
-            const lobbySnap = await getDoc(lobbyRef);
-
-            if (lobbySnap.exists()) {
-                const lobbyData = lobbySnap.data();
-                const gameState = lobbyData.gameState;
-                const myRoleInGame = gameState.roles[auth.currentUser.uid];
-                const isHost = lobbyData.hostId === auth.currentUser.uid;
-
-                if (myRoleInGame === 'AI') {
-                    // If AI leaves, Human team wins
-                    await updateDoc(lobbyRef, {
-                        'gameState.status': 'ended',
-                        'gameState.winner': 'Human',
-                        'gameState.winReason': 'هوش مصنوعی بازی را ترک کرد.'
-                    });
-                } else {
-                    // Human player leaves
-                    // Remove the player from the game's gameState players list
-                    // AND from the main lobby.players map (which also tracks presence)
-                    await updateDoc(lobbyRef, {
-                        [`gameState.players`]: arrayRemove(auth.currentUser.uid),
-                        [`gameState.playerNames.${auth.currentUser.uid}`]: deleteField(), // Remove from playerNames map
-                        [`players.${auth.currentUser.uid}`]: deleteField() // Remove from current lobby players map
-                    });
-                    showMessageBox("شما از بازی خارج شدید.", "info");
-
-                    // Check remaining players to see if game needs to end due to departures
-                    const updatedLobbySnap = await getDoc(lobbyRef);
-                    if(updatedLobbySnap.exists() && updatedLobbySnap.data().gameState) {
-                        const updatedGameState = updatedLobbySnap.data().gameState;
-                        const currentLobbyPlayers = updatedLobbySnap.data().players; // Players still connected to lobby
-                        
-                        // Filter remaining players based on those still in the lobby AND in gameState players list
-                        const remainingActivePlayers = updatedGameState.players.filter(uid => currentLobbyPlayers && currentLobbyPlayers[uid]);
-
-                        const remainingHumanPlayers = remainingActivePlayers.filter(uid => updatedGameState.roles[uid] === 'Human');
-                        const remainingAIPlayers = remainingActivePlayers.filter(uid => updatedGameState.roles[uid] === 'AI');
-
-                        if (remainingAIPlayers.length === 0 && remainingHumanPlayers.length > 0) {
-                            // No AI left, humans automatically win
-                            await updateDoc(lobbyRef, {
-                                'gameState.status': 'ended',
-                                'gameState.winner': 'Human',
-                                'gameState.winReason': 'هوش مصنوعی از بازی خارج شد.'
-                            });
-                        } else if (remainingAIPlayers.length === 1 && remainingHumanPlayers.length === 1) {
-                            // One AI and one Human remaining, AI wins (if they are the last two)
-                            await updateDoc(lobbyRef, {
-                                'gameState.status': 'ended',
-                                'gameState.winner': 'AI',
-                                'gameState.winReason': 'فقط هوش مصنوعی و یک انسان باقی ماندند. هوش مصنوعی برنده است.'
-                            });
-                        } else if (remainingActivePlayers.length < 2) {
-                            // If only one active player left or no active players left, end game (no clear winner)
-                            await updateDoc(lobbyRef, {
-                                'gameState.status': 'ended',
-                                'gameState.winner': null, // No clear winner if everyone left
-                                'gameState.winReason': 'تعداد بازیکنان کافی برای ادامه بازی نیست.'
-                            });
-                        }
-                    }
-                }
-                
-                // If host leaves, delete the entire lobby for everyone
-                if (isHost) { 
-                     await deleteDoc(lobbyRef); // This will trigger onSnapshot for other players
-                }
-            } else {
-                // If lobby doesn't exist, just go back to lobbies screen
-                console.warn("Lobby does not exist while trying to leave game.");
-            }
-            // All players will be kicked back to lobby screen by their listeners, or manually sent back here.
-            currentLobbyId = null;
-            setActiveScreen(lobbyScreen);
-            unsubscribeLobbies = setupLobbyListener('');
-        });
-
-        returnToLobbiesBtn.addEventListener('click', () => {
-            currentLobbyId = null;
-            setActiveScreen(lobbyScreen);
-            unsubscribeLobbies = setupLobbyListener('');
-        });
-
-
-        // Initialize the app when the window loads
-        window.onload = initializeFirebaseAndAuth;
-    </script>
-</body>
-</html> closePlayerManagementModal);
-        closePlayerManagementModalBtn.addEventListener('click', closePlayerManagementModal);
-        playerManagementModal.addEventListener('click', (e) => e.target === playerManagementModal && closePlayerManagementModal());
-
-
-        kickedMessageOkBtn.addEventListener('click', closeKickedMessageModal);
-        viewKickedPlayersBtn.addEventListener('click', openKickedPlayersListModal);
-        closeKickedPlayersListModalBtn.addEventListener('click', closeKickedPlayersListModal);
-        kickedListOkBtn.addEventListener('click', closeKickedPlayersListModal);
-        kickedPlayersListModal.addEventListener('click', (e) => e.target === kickedPlayersListModal && closeKickedPlayersListModal());
-        
-        // Private lobby password related
-        function showPasswordPromptMessage(message, type = 'error') {
-            passwordPromptMessageBox.textContent = message;
-            passwordPromptMessageBox.className = 'mt-5 p-3.5 rounded-xl text-base text-center';
-            passwordPromptMessageBox.classList.add(type === 'error' ? 'bg-red-500' : 'bg-blue-500', 'text-white');
-            passwordPromptMessageBox.classList.remove('hidden');
-            setTimeout(() => passwordPromptMessageBox.classList.add('hidden'), 4000);
-        }
-
-        function openEnterPasswordModal(lobbyId, lobbyName) {
-            lobbyToJoin = { id: lobbyId, name: lobbyName };
-            passwordPromptLobbyName.textContent = lobbyName;
-            enterPasswordForm.reset();
-            passwordPromptMessageBox.classList.add('hidden');
-            enterPasswordModal.classList.remove('hidden');
-            void enterPasswordModal.offsetWidth;
-            enterPasswordModal.classList.add('profile-modal-enter-active');
-            joinLobbyPasswordInput.focus();
-        }
-
-        function closeEnterPasswordModal() {
-            enterPasswordModal.classList.remove('profile-modal-enter-active');
-            enterPasswordModal.classList.add('profile-modal-leave-active');
-            setTimeout(() => {
-                enterPasswordModal.classList.add('hidden');
-                enterPasswordModal.classList.remove('profile-modal-leave-active');
-                lobbyToJoin = null;
-            }, 300);
-        }
-
-        lobbyTypeToggle.addEventListener('change', (e) => {
-            document.querySelectorAll('.lobby-type-btn').forEach(btn => btn.classList.remove('active'));
-            e.target.nextElementSibling.classList.add('active');
-            if (e.target.value === 'private') {
-                newLobbyPasswordField.classList.remove('hidden');
-            } else {
-                newLobbyPasswordField.classList.add('hidden');
-            }
-        });
-
-        togglePasswordVisibilityBtn.addEventListener('click', () => {
-            const isPassword = newLobbyPasswordInput.type === 'password';
-            newLobbyPasswordInput.type = isPassword ? 'text' : 'password';
-            eyeIconOpen.style.display = isPassword ? 'none' : 'block';
-            eyeIconClosed.style.display = isPassword ? 'block' : 'none';
-        });
-
-        cancelJoinPasswordBtn.addEventListener('click', closeEnterPasswordModal);
-        enterPasswordModal.addEventListener('click', (e) => e.target === enterPasswordModal && closeEnterPasswordModal());
-
-        enterPasswordForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            if (!lobbyToJoin) return;
-            const enteredPassword = joinLobbyPasswordInput.value;
-            if (!enteredPassword) { showPasswordPromptMessage('لطفاً رمز عبور را وارد کنید.'); return; }
-
-            submitJoinPasswordBtn.disabled = true;
-            submitJoinPasswordBtn.textContent = 'در حال بررسی...';
-            try {
-                const lobbyRef = doc(db, 'global_lobbies', lobbyToJoin.id);
-                const lobbySnap = await getDoc(lobbyRef);
-                if (!lobbySnap.exists() || lobbySnap.data().type !== 'private') {
-                    showPasswordPromptMessage('این لابی دیگر خصوصی نیست یا وجود ندارد.');
-                    closeEnterPasswordModal();
-                    return;
-                }
-                if (enteredPassword === lobbySnap.data().password) {
-                    closeEnterPasswordModal();
-                    await joinLobby(lobbyToJoin.id, auth.currentUser.uid, currentUserData.displayName);
-                } else {
-                    showPasswordPromptMessage('رمز عبور اشتباه است.');
-                    joinLobbyPasswordInput.value = '';
-                    joinLobbyPasswordInput.focus();
-                }
-            } catch (error) {
-                console.error("Error verifying lobby password:", error);
-                showPasswordPromptMessage('خطا در بررسی رمز عبور.');
-            } finally {
-                submitJoinPasswordBtn.disabled = false;
-                submitJoinPasswordBtn.textContent = 'ورود';
-            }
-        });
-        
-        // Chat Form Submission (for both lobby and in-game chat)
-        lobbyChatForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-            if (currentLobbyId) {
-                // NEW: Prevent banned users from chatting
-                if (currentUserData?.banStatus?.isBanned && currentUserData.banStatus.bannedUntil?.toMillis() > Date.now()) {
-                    showMessageBox("شما مسدود هستید و نمی‌توانید چت کنید.", "error");
-                    lobbyChatInput.value = ''; // Clear input
-                    return;
-                }
-                sendLobbyMessage(currentLobbyId, lobbyChatInput.value);
-            }
-        });
-
-        // NEW: Event Delegation for Message Deletion
-        lobbyChatMessages.addEventListener('click', (e) => {
-            const deleteButton = e.target.closest('.delete-message-btn');
-            if (deleteButton) {
-                const messageId = deleteButton.dataset.messageId;
-                if (currentLobbyId && messageId) {
-                    deleteLobbyMessage(currentLobbyId, messageId);
-                }
-            }
-        });
-
-        // NEW: Game Screen Event Listeners (using leaveGameFromLobbyBtn)
-        leaveGameFromLobbyBtn.addEventListener('click', async () => {
-            if (!currentLobbyId || !auth.currentUser) return;
-
-            // NEW: Prevent action if user is banned
-            if (currentUserData?.banStatus?.isBanned && currentUserData.banStatus.bannedUntil?.toMillis() > Date.now()) {
-                showMessageBox("شما مسدود هستید و نمی‌توانید از بازی خارج شوید.", "error"); // Though they are already banned, they might try
-                setActiveScreen(banScreen);
-                const banTimestampDate = currentUserData.banStatus.banTimestamp?.toDate();
-                const banTimestampFormatted = banTimestampDate ? banTimestampDate.toLocaleString('fa-IR', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'نامشخص';
-                setupBanCountdown(currentUserData.banStatus.bannedUntil.toMillis(), currentUserData.banStatus.banReason, currentUserData.banStatus.bannedBy, banTimestampFormatted);
-                return;
-            }
 
             const confirmed = await showCustomConfirm("آیا مطمئن هستید که می‌خواهید بازی را ترک کنید؟"); // Updated message
             if (!confirmed) return;
