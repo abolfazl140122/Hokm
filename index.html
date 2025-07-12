@@ -1090,7 +1090,7 @@
                                class="w-full focus:outline-none focus:ring-2 focus:ring-green-500 pr-10">
                         <button type="button" id="toggle-password-visibility" class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white">
                             <svg id="eye-icon-open" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-eye"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
-                            <svg id="eye-icon-closed" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-eye-off" style="display: none;"><path d="M9.88 9.88a3 3 0 1 0 4.24 4.24"/><path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"/><path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9 0 0 0 5.39-1.61"/><line x1="2" x2="22" y1="2" y2="22"/></svg>
+                            <svg id="eye-icon-closed" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-eye-off" style="display: none;"><path d="M9.88 9.88a3 3 0 1 0 4.24 4.24"/><path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"/><path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 4 0 0 0 5.39-1.61"/><line x1="2" x2="22" y1="2" y2="22"/></svg>
                         </button>
                     </div>
                     
@@ -1103,7 +1103,7 @@
                     </div>
 
                     <button type="submit" id="submit-create-lobby-btn"
-                            class="w-full mt-4 classic-btn btn-green-classic text-xl sm:text-2xl hidden">
+                            class="w-full mt-4 classic-btn btn-green-classic text-xl sm:text-2xl">
                         ساخت لابی
                     </button>
                 </form>
@@ -1713,7 +1713,7 @@
             if (unsubscribeLobbyDetail) { unsubscribeLobbyDetail(); unsubscribeLobbyDetail = null; }
             if (unsubscribeKickedPlayers) { unsubscribeKickedPlayers(); unsubscribeKickedPlayers = null; }
             if (unsubscribeLobbyChat) { unsubscribeLobbyChat(); unsubscribeLobbyChat = null; }
-            if (unsubscribePendingLobbyNames) { unsubscribePendingLobbyNames(); unsubscribePendingLobbyNames = null; } // NEW
+            if (unsubscribePendingLobbyNames) { unsubscribePendingLobbyNames(); unsubscribePendingLobbyNames = null; }
             clearGameIntervals();
             resetGameUI();
 
@@ -1769,9 +1769,6 @@
             }, 300);
         }
 
-        // =========================================================================
-        // === SOLUTION: New function to process admin-approved lobby names ===
-        // =========================================================================
         /**
          * Checks for lobby name proposals marked as "approved" by an admin,
          * adds them to the user's profile, and updates the proposal status to "processed".
@@ -1889,30 +1886,32 @@
         }
 
 
-        // NEW: Function to update the approved lobby names dropdown and visibility of related areas
-        async function updateApprovedLobbyNamesDropdownOnModalOpen(mode) {
+        // NEW: Function to update the UI of the Create Lobby modal based on mode and user data
+        async function updateCreateLobbyModalUI(mode) {
             // Clear any previous pending names listener from a prior modal opening
             if (unsubscribePendingLobbyNames) {
                 unsubscribePendingLobbyNames();
                 unsubscribePendingLobbyNames = null;
             }
 
-            if (!auth.currentUser || !currentUserData) { // Check for auth.currentUser too, as currentUserData might not be fully loaded initially
+            if (!auth.currentUser || !currentUserData) {
+                // Initial state if user data isn't loaded yet
                 approvedLobbyNamesSelect.innerHTML = '<option value="">در حال بارگذاری اطلاعات...</option>';
                 lobbyNameSelectionArea.classList.add('hidden');
                 lobbyNameProposalArea.classList.add('hidden');
                 pendingLobbyNamesArea.classList.add('hidden');
-                submitCreateLobbyBtn.classList.add('hidden');
+                approvedLobbyNamesManagementArea.classList.add('hidden'); // Also hide management area
+                submitCreateLobbyBtn.classList.add('hidden'); // Hide create button too
                 submitLobbyNameForApprovalBtn.classList.add('hidden');
                 return;
             }
 
-            // The `currentUserData` is now fresh because `processNewlyApprovedLobbyNames` was just called
             const approvedNames = currentUserData.approvedLobbyNames || [];
             
-            // Clear existing options first
+            // Clear existing options for the dropdown
             approvedLobbyNamesSelect.innerHTML = '<option value="">نام لابی را انتخاب کنید</option>';
             
+            // Populate dropdown if approved names exist
             if (approvedNames.length > 0) {
                 approvedNames.forEach(name => {
                     const option = document.createElement('option');
@@ -1920,25 +1919,28 @@
                     option.innerHTML = formatLobbyNameWithColor(name);
                     approvedLobbyNamesSelect.appendChild(option);
                 });
-                lobbyNameSelectionArea.classList.remove('hidden');
-                // The 'Create Lobby' button is enabled/disabled by the select's onchange listener below
+                lobbyNameSelectionArea.classList.remove('hidden'); // Show the dropdown
+                submitCreateLobbyBtn.disabled = true; // Still disabled until selection
+                submitCreateLobbyBtn.classList.remove('hidden'); // Make sure create button is visible
             } else {
-                lobbyNameSelectionArea.classList.add('hidden');
-                submitCreateLobbyBtn.disabled = true; // No approved names, so can't create lobby from dropdown
+                lobbyNameSelectionArea.classList.add('hidden'); // Hide the dropdown if no approved names
+                submitCreateLobbyBtn.disabled = true;
+                submitCreateLobbyBtn.classList.add('hidden'); // Hide create button if no approved names
             }
-            
-            // Ensure submitCreateLobbyBtn is disabled initially until a name is selected
-            submitCreateLobbyBtn.disabled = true; 
 
-
-            // Always show proposal area and its button by default for 'create' mode
+            // Manage visibility based on mode
             if (mode === 'create') {
-                lobbyNameProposalArea.classList.remove('hidden');
-                submitLobbyNameForApprovalBtn.classList.remove('hidden'); 
-            } else { // For 'myLobbies' view, hide proposal as user is just managing existing
-                lobbyNameProposalArea.classList.add('hidden');
-                submitLobbyNameForApprovalBtn.classList.add('hidden');
+                createLobbyModalTitle.textContent = 'ساخت لابی جدید';
+                lobbyNameProposalArea.classList.remove('hidden'); // Always show proposal area in create mode
+                submitLobbyNameForApprovalBtn.classList.remove('hidden'); // Always show its button
+            } else { // mode === 'myLobbies'
+                createLobbyModalTitle.textContent = 'مدیریت نام‌های لابی و ساخت لابی'; // More accurate title
+                lobbyNameProposalArea.classList.add('hidden'); // Hide proposal area in myLobbies mode
+                submitLobbyNameForApprovalBtn.classList.add('hidden'); // Hide its button
             }
+
+            // Render and manage approved names list for deletion (visible in both modes)
+            renderApprovedLobbyNamesManagementList();
 
             // Set up listener for PENDING requests for the current user
             const proposedLobbyNamesRef = collection(db, `artifacts/${appId}/proposedLobbyNames`);
@@ -1965,21 +1967,23 @@
                     });
                 }
 
-                // Control proposal input based on pending limit
-                if (pendingCount >= MAX_PENDING_PROPOSALS) {
-                    lobbyProposalMessage.textContent = `شما ${pendingCount} درخواست نام لابی در انتظار تایید دارید. تا زمانی که درخواست‌های شما بررسی نشوند، نمی‌توانید درخواست جدیدی ارسال کنید.`;
-                    lobbyProposalMessage.classList.remove('text-gray-400');
-                    lobbyProposalMessage.classList.add('text-red-400');
-                    submitLobbyNameForApprovalBtn.disabled = true;
-                    proposedLobbyNameInput.disabled = true;
-                    proposedLobbyNameInput.placeholder = "تعداد درخواست‌های شما به حداکثر رسیده است.";
-                } else {
-                    lobbyProposalMessage.textContent = "بعد از ارسال، ادمین نام لابی شما را بررسی و تأیید می‌کند. سپس می‌توانید از آن نام استفاده کنید.";
-                    lobbyProposalMessage.classList.remove('text-red-400');
-                    lobbyProposalMessage.classList.add('text-gray-400');
-                    submitLobbyNameForApprovalBtn.disabled = false;
-                    proposedLobbyNameInput.disabled = false;
-                    proposedLobbyNameInput.placeholder = "مثال: [#FFD700]لابی طلایی من";
+                // Control proposal input based on pending limit (only for 'create' mode)
+                if (mode === 'create') {
+                    if (pendingCount >= MAX_PENDING_PROPOSALS) {
+                        lobbyProposalMessage.textContent = `شما ${pendingCount} درخواست نام لابی در انتظار تایید دارید. تا زمانی که درخواست‌های شما بررسی نشوند، نمی‌توانید درخواست جدیدی ارسال کنید.`;
+                        lobbyProposalMessage.classList.remove('text-gray-400');
+                        lobbyProposalMessage.classList.add('text-red-400');
+                        submitLobbyNameForApprovalBtn.disabled = true;
+                        proposedLobbyNameInput.disabled = true;
+                        proposedLobbyNameInput.placeholder = "تعداد درخواست‌های شما به حداکثر رسیده است.";
+                    } else {
+                        lobbyProposalMessage.textContent = "بعد از ارسال، ادمین نام لابی شما را بررسی و تأیید می‌کند. سپس می‌توانید از آن نام استفاده کنید.";
+                        lobbyProposalMessage.classList.remove('text-red-400');
+                        lobbyProposalMessage.classList.add('text-gray-400');
+                        submitLobbyNameForApprovalBtn.disabled = false;
+                        proposedLobbyNameInput.disabled = false;
+                        proposedLobbyNameInput.placeholder = "مثال: [#FFD700]لابی طلایی من";
+                    }
                 }
             }, (error) => {
                 console.error("Error listening to pending lobby names:", error);
@@ -1987,9 +1991,9 @@
             });
 
             proposedLobbyNameInput.value = ''; // Clear proposed input field
-            if (mode === 'create' && approvedNames.length === 0) { // Focus only if no approved names to select from
+            if (mode === 'create' && approvedNames.length === 0) {
                 proposedLobbyNameInput.focus();
-            } else if (mode === 'create' && approvedNames.length > 0) {
+            } else if (approvedNames.length > 0) {
                  approvedLobbyNamesSelect.focus();
             }
         }
@@ -2001,11 +2005,8 @@
                 return;
             }
 
-            // SOLUTION: Process newly approved names FIRST, before showing the modal content
             await processNewlyApprovedLobbyNames();
-            // The `onSnapshot` for user profile will fire in the background and update `currentUserData`.
-            // The next function will use the now-updated data.
-
+            
             // Check if the user is already a host of an active lobby (only relevant for 'create' mode)
             if (userHasActiveLobby && currentLobbyId && mode === 'create') {
                 try {
@@ -2036,24 +2037,12 @@
             newLobbyPasswordField.classList.add('hidden');
             gameDurationInput.value = 5;
 
-            createLobbyModalTitle.textContent = (mode === 'myLobbies' ? 'مدیریت نام‌های لابی' : 'ساخت لابی جدید'); // Changed title for 'myLobbies' mode
-            submitCreateLobbyBtn.textContent = 'ساخت لابی'; // Reset button text
+            // Use the new helper function to manage UI visibility
+            await updateCreateLobbyModalUI(mode); 
 
-            // Render both approved name selection/proposal and approved name management lists
-            await updateApprovedLobbyNamesDropdownOnModalOpen(mode); 
-            renderApprovedLobbyNamesManagementList();
-
-            // Special handling for 'myLobbies' mode: hide lobby creation related forms, only show management
-            if (mode === 'myLobbies') {
-                lobbyNameSelectionArea.classList.add('hidden');
-                lobbyNameProposalArea.classList.add('hidden');
-                pendingLobbyNamesArea.classList.add('hidden');
-                submitCreateLobbyBtn.classList.add('hidden');
-                
-                // Show a message if no approved lobbies to manage
-                if (!currentUserData.approvedLobbyNames || currentUserData.approvedLobbyNames.length === 0) {
-                     showCreateLobbyMessageBox("شما هیچ نام لابی تایید شده‌ای برای مدیریت ندارید.", "info");
-                }
+            // Special handling for 'myLobbies' mode: show specific message if no approved lobbies to manage
+            if (mode === 'myLobbies' && (!currentUserData.approvedLobbyNames || currentUserData.approvedLobbyNames.length === 0)) {
+                 showCreateLobbyMessageBox("شما هیچ نام لابی تایید شده‌ای برای مدیریت یا ساخت لابی ندارید.", "info");
             }
         }
 
@@ -2077,7 +2066,8 @@
                 lobbyNameProposalArea.classList.add('hidden');
                 pendingLobbyNamesArea.classList.add('hidden');
                 approvedLobbyNamesManagementArea.classList.add('hidden');
-                submitCreateLobbyBtn.classList.add('hidden');
+                submitCreateLobbyBtn.classList.add('hidden'); // Hide it again on close
+                submitLobbyNameForApprovalBtn.classList.add('hidden'); // Hide it again on close
 
 
                 if (unsubscribePendingLobbyNames) {
@@ -2208,7 +2198,7 @@
                         if (!createLobbyModal.classList.contains('hidden')) { // Only if modal is open
                            renderApprovedLobbyNamesManagementList(); // Rerender management list
                            // Re-evaluate approved names dropdown & proposal area visibility
-                           updateApprovedLobbyNamesDropdownOnModalOpen(createLobbyModalTitle.textContent === 'مدیریت نام‌های لابی' ? 'myLobbies' : 'create');
+                           updateCreateLobbyModalUI(createLobbyModalTitle.textContent === 'مدیریت نام‌های لابی و ساخت لابی' ? 'myLobbies' : 'create'); // Use the new helper here
                         }
                     } else {
                         console.warn("User profile document not found. Creating a default one.");
