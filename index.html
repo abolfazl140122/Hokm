@@ -6,8 +6,8 @@
     <title>بازی متنی هوش مصنوعی و انسان</title>
     <!-- Tailwind CSS CDN for styling -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Google Fonts for Classic Look -->
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Merriweather:wght@400;700&display=swap" rel="stylesheet">
+    <!-- Google Fonts for Classic Look & New Themes -->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Merriweather:wght@400;700&family=Share+Tech+Mono&family=Orbitron:wght@400..900&family=Press+Start+2P&family=Inter:wght@400;700&display=swap" rel="stylesheet">
     <style>
         /* General Classic Theme Background and Fonts */
         html, body, #app { /* Ensure these take full viewport height */
@@ -15,10 +15,29 @@
             margin: 0;
             padding: 0;
             overflow: hidden; /* Prevent body scrollbars, including horizontal */
+            transition: background-color 0.8s ease-in-out, color 0.8s ease-in-out; /* Smooth overall transition */
         }
-        body {
+
+        /* Base transitions for elements that change color/background */
+        .classic-card,
+        .classic-btn,
+        input, select,
+        .app-header, .lobby-header,
+        .app-footer, .lobby-footer,
+        .lobby-item,
+        .lobby-chat-container,
+        .chat-message,
+        .game-player-pod,
+        .voting-btn,
+        .lobby-type-btn {
+            transition: background 0.8s ease-in-out, background-color 0.8s ease-in-out,
+                        color 0.8s ease-in-out, border-color 0.8s ease-in-out,
+                        box-shadow 0.8s ease-in-out, transform 0.3s ease; /* Keep transform faster */
+        }
+
+        /* === THEME: CLASSIC (Existing styles moved under this class) === */
+        body.theme-classic {
             font-family: 'Merriweather', serif; /* Default body font for readability */
-            /* Deep, rich, slightly textured background for classic feel */
             background: radial-gradient(ellipse at bottom, #100C08 0%, #000000 100%); /* Darker, more intense background */
             color: #E0E0E0; /* Softer white text for elegance */
             display: flex;
@@ -27,24 +46,1061 @@
             min-height: 100vh;
         }
 
-        h1, h2 {
+        body.theme-classic h1,
+        body.theme-classic h2 {
             font-family: 'Playfair Display', serif; /* Elegant headings */
             color: #FFD700; /* Gold color for titles */
             text-shadow: 2px 2px 4px rgba(0,0,0,0.5); /* Subtle text shadow for depth */
         }
 
-        /* Custom spinner for loading screen - Gold themed */
-        .spinner {
+        body.theme-classic .spinner {
             border: 4px solid rgba(255, 255, 255, 0.3);
             border-top: 4px solid #DAA520; /* Gold spinner */
-            border-radius: 50%;
-            width: 50px; /* Slightly larger spinner */
-            height: 50px;
-            animation: spin 1s linear infinite;
         }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+
+        body.theme-classic .classic-card {
+            background: linear-gradient(145deg, #4B0000 0%, #660000 60%, #800000 100%); /* Deeper ruby red velvet effect */
+            border: 4px solid #DAA520; /* Goldenrod border */
+            box-shadow: 0 15px 30px rgba(0,0,0,0.6), inset 0 0 15px rgba(255,255,255,0.1);
+        }
+        body.theme-classic .classic-card::before,
+        body.theme-classic .classic-card::after {
+            border-color: #FFD700;
+            box-shadow: 0 0 10px rgba(255,215,0,0.5);
+        }
+
+        body.theme-classic .classic-btn {
+            border: 2px solid #DAA520; /* Golden border for all buttons */
+            box-shadow: 0 8px 16px rgba(0,0,0,0.4), inset 0 0 8px rgba(255,255,255,0.1);
+            color: #FFFFFF;
+        }
+        body.theme-classic .classic-btn:hover {
+            box-shadow: 0 12px 24px rgba(0,0,0,0.6), inset 0 0 10px rgba(255,255,255,0.2);
+        }
+
+        body.theme-classic .btn-purple-classic { background: linear-gradient(145deg, #8A2BE2 0%, #6A0DAD 100%); }
+        body.theme-classic .btn-blue-classic { background: linear-gradient(145deg, #4682B4 0%, #2A52BE 100%); }
+        body.theme-classic .btn-green-classic { background: linear-gradient(145deg, #228B22 0%, #006400 100%); }
+        body.theme-classic .btn-red-classic { background: linear-gradient(145deg, #CD5C5C 0%, #B22222 100%); }
+        body.theme-classic .btn-gray-classic { background: linear-gradient(145deg, #A9A9A9 0%, #808080 100%); }
+        body.theme-classic .btn-brown-classic { background: linear-gradient(145deg, #8B4513 0%, #69320E 100%); }
+        body.theme-classic .btn-gold-classic { background: linear-gradient(145deg, #FFD700 0%, #DAA520 100%); border: none; }
+        body.theme-classic .btn-gold-classic:hover { box-shadow: 0 6px 12px rgba(0,0,0,0.5), inset 0 0 5px rgba(255,255,255,0.3); }
+
+
+        body.theme-classic input,
+        body.theme-classic select {
+            background-color: #202020;
+            border: 2px solid #5A5A5A;
+            color: #E0E0E0;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.5);
+        }
+        body.theme-classic input::placeholder { color: #A0A0A0; }
+        body.theme-classic input:focus,
+        body.theme-classic select:focus {
+            border-color: #DAA520 !important;
+            box-shadow: 0 0 0 4px rgba(218, 165, 32, 0.5) !important, inset 0 2px 4px rgba(0,0,0,0.5) !important;
+        }
+
+        body.theme-classic .app-header,
+        body.theme-classic .lobby-header {
+            background: linear-gradient(to right, #4A2B00 0%, #7A4C00 50%, #4A2B00 100%);
+            border-bottom: 3px solid #FFD700;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.7);
+        }
+        body.theme-classic #header-user-coins-container {
+            background-color: rgba(0,0,0,0.3);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+            color: #FFD700; /* Coin text color */
+        }
+        body.theme-classic .lobby-header .search-container {
+            background-color: #303030;
+            border: 2px solid #5A5A5A;
+        }
+        body.theme-classic .lobby-header .search-container svg { color: #DAA520; }
+
+
+        body.theme-classic .app-footer,
+        body.theme-classic .lobby-footer {
+            background: linear-gradient(to left, #4A2B00 0%, #7A4C00 50%, #4A2B00 100%);
+            border-top: 3px solid #FFD700;
+            box-shadow: 0 -8px 20px rgba(0,0,0,0.7);
+        }
+        body.theme-classic .lobby-footer .icon-btn { color: #FFD700; }
+        body.theme-classic .lobby-footer .games-running-text { color: #E0E0E0; }
+
+        body.theme-classic .main-content-area {
+            background: linear-gradient(180deg, #2C2C2C 0%, #1A1A1A 100%);
+        }
+
+        body.theme-classic .lobby-item {
+            background: linear-gradient(145deg, #2A2A2A 0%, #1A1A1A 100%);
+            border: 2px solid #DAA520;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.5), inset 0 0 10px rgba(255,215,0,0.1);
+        }
+        body.theme-classic .lobby-item:hover {
+            box-shadow: 0 15px 25px rgba(0,0,0,0.6), inset 0 0 12px rgba(255,215,0,0.2);
+        }
+        body.theme-classic .lobby-item h3 { color: #FFD700; }
+        body.theme-classic .lobby-item p { color: #C0C0C0; }
+
+        body.theme-classic .lobby-detail-screen-full {
+            background: linear-gradient(180deg, #2C2C2C 0%, #1A1A1A 100%);
+        }
+        body.theme-classic .lobby-detail-content {
+            background: linear-gradient(145deg, #1A1A1A 0%, #0D0D0D 100%);
+            border: 3px solid #DAA520;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.7);
+        }
+
+        body.theme-classic .lobby-sidebar {
+            background-color: rgba(0,0,0,0.3);
+            border: 1px solid #444;
+        }
+        body.theme-classic .player-list-item {
+            background-color: rgba(255, 255, 255, 0.05);
+            border: 1px solid transparent;
+        }
+        body.theme-classic .player-list-item.is-host { border-color: #FFD700; }
+        body.theme-classic .player-list-item .player-name { color: #E0E0E0; }
+        body.theme-classic .player-list-item .host-label { color: #FFD700; }
+        body.theme-classic .kick-player-btn { border: 1px solid #B22222; color: #B22222; }
+        body.theme-classic .kick-player-btn:hover { background: #B22222; color: white; }
+
+        body.theme-classic .lobby-chat-container {
+            background-color: rgba(0,0,0,0.4);
+            border: 2px solid #5A5A5A;
+        }
+        body.theme-classic .chat-message { background-color: #333; }
+        body.theme-classic .chat-message.current-user { background-color: #4682B4; }
+        body.theme-classic .chat-message .sender-name { color: #FFD700; }
+        body.theme-classic .chat-message .message-text-deleted { color: #999; }
+        body.theme-classic .delete-message-btn { color: #aaa; }
+        body.theme-classic .delete-message-btn:hover { color: #ff6b6b; }
+
+        body.theme-classic .start-game-btn { background: linear-gradient(145deg, #228B22 0%, #006400 100%); border: 2px solid #DAA520; }
+
+        body.theme-classic .lobby-sidebar::-webkit-scrollbar-track,
+        body.theme-classic #player-list-container::-webkit-scrollbar-track,
+        body.theme-classic .lobby-chat-messages::-webkit-scrollbar-track,
+        body.theme-classic .custom-scrollbar::-webkit-scrollbar-track { background: #202020; }
+        body.theme-classic .lobby-sidebar::-webkit-scrollbar-thumb,
+        body.theme-classic #player-list-container::-webkit-scrollbar-thumb,
+        body.theme-classic .lobby-chat-messages::-webkit-scrollbar-thumb,
+        body.theme-classic .custom-scrollbar::-webkit-scrollbar-thumb { background: #DAA520; }
+        body.theme-classic .lobby-sidebar::-webkit-scrollbar-thumb:hover,
+        body.theme-classic #player-list-container::-webkit-scrollbar-thumb:hover,
+        body.theme-classic .lobby-chat-messages::-webkit-scrollbar-thumb:hover,
+        body.theme-classic .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #FFD700; }
+
+        body.theme-classic .lobby-type-btn { border: 2px solid #DAA520; background-color: transparent; color: #DAA520; }
+        body.theme-classic .lobby-type-btn.active { background-color: #DAA520; color: #1A1A1A; box-shadow: 0 0 10px rgba(255,215,0,0.5); }
+        body.theme-classic .lobby-lock-icon { color: #FFD700; }
+
+        body.theme-classic .game-player-pod {
+            background-color: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+        }
+        body.theme-classic .game-player-pod.is-ai { background-color: rgba(255, 99, 71, 0.1); border-color: #FF6347; }
+        body.theme-classic .game-player-pod.is-human { background-color: rgba(100, 149, 237, 0.1); border-color: #6495ED; }
+        body.theme-classic .game-player-pod.current-active-player { border-color: #FFD700; box-shadow: 0 0 15px rgba(255,215,0,0.7); }
+        body.theme-classic .game-player-pod .player-name { color: #E0E0E0; }
+        body.theme-classic .game-player-pod .player-role { color: #DAA520; }
+        body.theme-classic .game-player-pod .player-status { color: #C0C0C0; }
+
+        body.theme-classic .voting-btn { border: 3px solid #FFD700; }
+        body.theme-classic .voting-btn.ai-vote { background: linear-gradient(145deg, #E24B4B 0%, #B22222 100%); color: white; }
+        body.theme-classic .voting-btn.human-vote { background: linear-gradient(145deg, #4BBEE2 0%, #2A52BE 100%); color: white; }
+
+        body.theme-classic .coin-icon { fill: #FFD700; }
+
+        /* === NEW THEME: CYBERPUNK === */
+        body.theme-cyberpunk {
+            background: linear-gradient(to bottom right, #0F0F1A, #1A0F1A);
+            color: #00FFFF; /* Cyan */
+            font-family: 'Share Tech Mono', monospace; /* More techy font */
+        }
+        body.theme-cyberpunk h1,
+        body.theme-cyberpunk h2 {
+            font-family: 'Orbitron', sans-serif; /* Futuristic heading */
+            color: #FF00FF; /* Magenta */
+            text-shadow: 0 0 5px #00FFFF, 0 0 10px #FF00FF;
+        }
+        body.theme-cyberpunk .spinner {
+            border-top-color: #00FFFF;
+        }
+        body.theme-cyberpunk .classic-card {
+            background: linear-gradient(145deg, #2A002A 0%, #4B004B 100%);
+            border: 3px solid #FF00FF;
+            box-shadow: 0 0 20px rgba(255,0,255,0.7), inset 0 0 10px rgba(0,255,255,0.5);
+        }
+        body.theme-cyberpunk .classic-card::before,
+        body.theme-cyberpunk .classic-card::after {
+            border-color: #00FFFF;
+            box-shadow: 0 0 10px rgba(0,255,255,0.7);
+        }
+        body.theme-cyberpunk .classic-btn {
+            border: 2px solid #00FFFF;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.5), inset 0 0 5px #FF00FF;
+            color: #FFF;
+        }
+        body.theme-cyberpunk .classic-btn:hover {
+            box-shadow: 0 8px 20px rgba(0,0,0,0.7), inset 0 0 8px #FF00FF;
+        }
+        body.theme-cyberpunk .btn-purple-classic { background: linear-gradient(145deg, #8A2BE2 0%, #6A0DAD 100%); } /* Keep same or adjust */
+        body.theme-cyberpunk .btn-blue-classic { background: linear-gradient(145deg, #00BFFF 0%, #008080 100%); } /* Deep Sky Blue to Teal */
+        body.theme-cyberpunk .btn-green-classic { background: linear-gradient(145deg, #39FF14 0%, #228B22 100%); } /* Neon Green */
+        body.theme-cyberpunk .btn-red-classic { background: linear-gradient(145deg, #FF0077 0%, #CC0055 100%); } /* Hot Pink */
+        body.theme-cyberpunk .btn-gray-classic { background: linear-gradient(145deg, #3A3A3A 0%, #202020 100%); }
+        body.theme-cyberpunk .btn-brown-classic { background: linear-gradient(145deg, #8B4513 0%, #69320E 100%); }
+        body.theme-cyberpunk .btn-gold-classic { background: linear-gradient(145deg, #FFD700 0%, #DAA520 100%); } /* Can still be gold */
+
+        body.theme-cyberpunk input,
+        body.theme-cyberpunk select {
+            background-color: #05050A;
+            border: 2px solid #00FFFF;
+            color: #00FFFF;
+            box-shadow: inset 0 0 5px #FF00FF;
+        }
+        body.theme-cyberpunk input::placeholder { color: #808080; }
+        body.theme-cyberpunk input:focus,
+        body.theme-cyberpunk select:focus {
+            border-color: #FF00FF !important;
+            box-shadow: 0 0 0 4px rgba(0,255,255,0.5) !important, inset 0 0 5px #FF00FF !important;
+        }
+
+        body.theme-cyberpunk .app-header,
+        body.theme-cyberpunk .lobby-header {
+            background: linear-gradient(to right, #001A1A, #003333);
+            border-bottom: 3px solid #00FFFF;
+            box-shadow: 0 5px 15px rgba(0,255,255,0.5);
+        }
+        body.theme-cyberpunk #header-user-coins-container {
+            background-color: rgba(0,255,255,0.1);
+            box-shadow: 0 2px 5px rgba(0,255,255,0.3);
+            color: #FF00FF; /* Coin text color */
+        }
+        body.theme-cyberpunk .lobby-header .search-container {
+            background-color: #10101A;
+            border: 2px solid #00FFFF;
+        }
+        body.theme-cyberpunk .lobby-header .search-container svg { color: #FF00FF; }
+
+        body.theme-cyberpunk .app-footer,
+        body.theme-cyberpunk .lobby-footer {
+            background: linear-gradient(to left, #001A1A, #003333);
+            border-top: 3px solid #00FFFF;
+            box-shadow: 0 -5px 15px rgba(0,255,255,0.5);
+        }
+        body.theme-cyberpunk .lobby-footer .icon-btn { color: #00FFFF; }
+        body.theme-cyberpunk .lobby-footer .games-running-text { color: #FF00FF; }
+
+        body.theme-cyberpunk .main-content-area {
+            background: linear-gradient(180deg, #100510 0%, #050005 100%);
+        }
+
+        body.theme-cyberpunk .lobby-item {
+            background: linear-gradient(145deg, #1A001A 0%, #2A002A 100%);
+            border: 2px solid #FF00FF;
+            box-shadow: 0 5px 10px rgba(0,255,255,0.3), inset 0 0 8px rgba(255,0,255,0.3);
+        }
+        body.theme-cyberpunk .lobby-item:hover {
+            box-shadow: 0 8px 15px rgba(0,255,255,0.5), inset 0 0 10px rgba(255,0,255,0.5);
+        }
+        body.theme-cyberpunk .lobby-item h3 { color: #00FFFF; }
+        body.theme-cyberpunk .lobby-item p { color: #C0C0C0; }
+
+        body.theme-cyberpunk .lobby-detail-screen-full {
+            background: linear-gradient(180deg, #100510 0%, #050005 100%);
+        }
+        body.theme-cyberpunk .lobby-detail-content {
+            background: linear-gradient(145deg, #1A001A 0%, #0D000D 100%);
+            border: 3px solid #00FFFF;
+            box-shadow: 0 8px 16px rgba(0,255,255,0.7);
+        }
+
+        body.theme-cyberpunk .lobby-sidebar {
+            background-color: rgba(0,0,0,0.5);
+            border: 1px solid #FF00FF;
+        }
+        body.theme-cyberpunk .player-list-item {
+            background-color: rgba(0,255,255,0.1);
+            border: 1px solid rgba(0,255,255,0.2);
+        }
+        body.theme-cyberpunk .player-list-item.is-host { border-color: #FF00FF; }
+        body.theme-cyberpunk .player-list-item .player-name { color: #00FFFF; }
+        body.theme-cyberpunk .player-list-item .host-label { color: #FF00FF; }
+        body.theme-cyberpunk .kick-player-btn { border: 1px solid #FF0077; color: #FF0077; }
+        body.theme-cyberpunk .kick-player-btn:hover { background: #FF0077; color: white; }
+
+        body.theme-cyberpunk .lobby-chat-container {
+            background-color: rgba(0,0,0,0.6);
+            border: 2px solid #FF00FF;
+        }
+        body.theme-cyberpunk .chat-message { background-color: #1A001A; }
+        body.theme-cyberpunk .chat-message.current-user { background-color: #004444; }
+        body.theme-cyberpunk .chat-message .sender-name { color: #00FFFF; }
+        body.theme-cyberpunk .chat-message .message-text-deleted { color: #777; }
+        body.theme-cyberpunk .delete-message-btn { color: #777; }
+        body.theme-cyberpunk .delete-message-btn:hover { color: #FF0077; }
+
+        body.theme-cyberpunk .start-game-btn { background: linear-gradient(145deg, #39FF14 0%, #228B22 100%); border: 2px solid #FF00FF; }
+
+        body.theme-cyberpunk .lobby-sidebar::-webkit-scrollbar-track,
+        body.theme-cyberpunk #player-list-container::-webkit-scrollbar-track,
+        body.theme-cyberpunk .lobby-chat-messages::-webkit-scrollbar-track,
+        body.theme-cyberpunk .custom-scrollbar::-webkit-scrollbar-track { background: #0A0A0A; }
+        body.theme-cyberpunk .lobby-sidebar::-webkit-scrollbar-thumb,
+        body.theme-cyberpunk #player-list-container::-webkit-scrollbar-thumb,
+        body.theme-cyberpunk .lobby-chat-messages::-webkit-scrollbar-thumb,
+        body.theme-cyberpunk .custom-scrollbar::-webkit-scrollbar-thumb { background: #00FFFF; }
+        body.theme-cyberpunk .lobby-sidebar::-webkit-scrollbar-thumb:hover,
+        body.theme-cyberpunk #player-list-container::-webkit-scrollbar-thumb:hover,
+        body.theme-cyberpunk .lobby-chat-messages::-webkit-scrollbar-thumb:hover,
+        body.theme-cyberpunk .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #FF00FF; }
+
+        body.theme-cyberpunk .lobby-type-btn { border: 2px solid #FF00FF; background-color: transparent; color: #FF00FF; }
+        body.theme-cyberpunk .lobby-type-btn.active { background-color: #FF00FF; color: #1A001A; box-shadow: 0 0 10px rgba(0,255,255,0.5); }
+        body.theme-cyberpunk .lobby-lock-icon { color: #FF00FF; }
+
+        body.theme-cyberpunk .game-player-pod {
+            background-color: rgba(0,255,255,0.1);
+            border: 1px solid rgba(0,255,255,0.3);
+        }
+        body.theme-cyberpunk .game-player-pod.is-ai { background-color: rgba(255, 0, 119, 0.1); border-color: #FF0077; }
+        body.theme-cyberpunk .game-player-pod.is-human { background-color: rgba(0, 191, 255, 0.1); border-color: #00BFFF; }
+        body.theme-cyberpunk .game-player-pod.current-active-player { border-color: #FF00FF; box-shadow: 0 0 15px rgba(255,0,255,0.7); }
+        body.theme-cyberpunk .game-player-pod .player-name { color: #00FFFF; }
+        body.theme-cyberpunk .game-player-pod .player-role { color: #FF00FF; }
+        body.theme-cyberpunk .game-player-pod .player-status { color: #AAA; }
+
+        body.theme-cyberpunk .voting-btn { border: 3px solid #00FFFF; }
+        body.theme-cyberpunk .voting-btn.ai-vote { background: linear-gradient(145deg, #FF0077 0%, #CC0055 100%); color: white; }
+        body.theme-cyberpunk .voting-btn.human-vote { background: linear-gradient(145deg, #00BFFF 0%, #008080 100%); color: white; }
+
+        body.theme-cyberpunk .coin-icon { fill: #00FFFF; } /* Cyan coin */
+
+        /* === NEW THEME: FOREST === */
+        body.theme-forest {
+            background: linear-gradient(to bottom, #1E3A24, #0A1C12); /* Dark forest greens */
+            color: #D4EDDA; /* Light green-white */
+            font-family: 'Merriweather', serif;
+        }
+        body.theme-forest h1,
+        body.theme-forest h2 {
+            color: #92B4A1; /* Muted teal-green */
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.4);
+        }
+        body.theme-forest .spinner { border-top-color: #79A3B1; }
+        body.theme-forest .classic-card {
+            background: linear-gradient(145deg, #2D4034 0%, #4D6454 100%);
+            border: 4px solid #79A3B1; /* Muted blue-green */
+            box-shadow: 0 10px 20px rgba(0,0,0,0.5), inset 0 0 10px rgba(212,237,218,0.2);
+        }
+        body.theme-forest .classic-card::before,
+        body.theme-forest .classic-card::after {
+            border-color: #92B4A1;
+            box-shadow: 0 0 10px rgba(146,180,161,0.5);
+        }
+        body.theme-forest .classic-btn {
+            border: 2px solid #79A3B1;
+            color: #FFF;
+        }
+        body.theme-forest .btn-purple-classic { background: linear-gradient(145deg, #6A5ACD 0%, #483D8B 100%); } /* Slate Blue */
+        body.theme-forest .btn-blue-classic { background: linear-gradient(145deg, #4682B4 0%, #2A52BE 100%); } /* Steel Blue */
+        body.theme-forest .btn-green-classic { background: linear-gradient(145deg, #2E8B57 0%, #3CB371 100%); } /* Sea Green */
+        body.theme-forest .btn-red-classic { background: linear-gradient(145deg, #B22222 0%, #8B0000 100%); } /* Firebrick */
+        body.theme-forest .btn-gray-classic { background: linear-gradient(145deg, #6C7A89 0%, #515B67 100%); } /* Cadet Gray */
+        body.theme-forest .btn-brown-classic { background: linear-gradient(145deg, #8B4513 0%, #69320E 100%); }
+        body.theme-forest .btn-gold-classic { background: linear-gradient(145deg, #DDA0DD 0%, #BA55D3 100%); } /* Plum-Purple */
+
+        body.theme-forest input,
+        body.theme-forest select {
+            background-color: #2F4F4F; /* Dark Slate Gray */
+            border: 2px solid #79A3B1;
+            color: #D4EDDA;
+        }
+        body.theme-forest input::placeholder { color: #A0B2A3; }
+        body.theme-forest input:focus,
+        body.theme-forest select:focus {
+            border-color: #92B4A1 !important;
+            box-shadow: 0 0 0 4px rgba(121,163,177,0.5) !important, inset 0 2px 4px rgba(0,0,0,0.5) !important;
+        }
+        body.theme-forest .app-header,
+        body.theme-forest .lobby-header {
+            background: linear-gradient(to right, #1E3A24, #2A5230);
+            border-bottom: 3px solid #92B4A1;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+        }
+        body.theme-forest #header-user-coins-container {
+            background-color: rgba(46,139,87,0.3); /* Sea Green tint */
+            box-shadow: 0 2px 5px rgba(46,139,87,0.3);
+            color: #92B4A1;
+        }
+        body.theme-forest .lobby-header .search-container {
+            background-color: #2F4F4F;
+            border: 2px solid #79A3B1;
+        }
+        body.theme-forest .lobby-header .search-container svg { color: #92B4A1; }
+
+        body.theme-forest .app-footer,
+        body.theme-forest .lobby-footer {
+            background: linear-gradient(to left, #1E3A24, #2A5230);
+            border-top: 3px solid #92B4A1;
+            box-shadow: 0 -5px 15px rgba(0,0,0,0.5);
+        }
+        body.theme-forest .lobby-footer .icon-btn { color: #D4EDDA; }
+        body.theme-forest .lobby-footer .games-running-text { color: #D4EDDA; }
+
+        body.theme-forest .main-content-area {
+            background: linear-gradient(180deg, #3A5F45 0%, #2D4C34 100%);
+        }
+
+        body.theme-forest .lobby-item {
+            background: linear-gradient(145deg, #3A5F45 0%, #2D4C34 100%);
+            border: 2px solid #79A3B1;
+            box-shadow: 0 5px 10px rgba(0,0,0,0.3), inset 0 0 8px rgba(146,180,161,0.3);
+        }
+        body.theme-forest .lobby-item h3 { color: #92B4A1; }
+        body.theme-forest .lobby-item p { color: #D4EDDA; }
+
+        body.theme-forest .lobby-detail-screen-full {
+            background: linear-gradient(180deg, #3A5F45 0%, #2D4C34 100%);
+        }
+        body.theme-forest .lobby-detail-content {
+            background: linear-gradient(145deg, #2D4C34 0%, #1E3A24 100%);
+            border: 3px solid #79A3B1;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.7);
+        }
+
+        body.theme-forest .lobby-sidebar {
+            background-color: rgba(46,139,87,0.2);
+            border: 1px solid #92B4A1;
+        }
+        body.theme-forest .player-list-item {
+            background-color: rgba(212,237,218,0.1);
+            border: 1px solid rgba(212,237,218,0.2);
+        }
+        body.theme-forest .player-list-item.is-host { border-color: #92B4A1; }
+        body.theme-forest .player-list-item .player-name { color: #D4EDDA; }
+        body.theme-forest .player-list-item .host-label { color: #92B4A1; }
+        body.theme-forest .kick-player-btn { border: 1px solid #B22222; color: #B22222; }
+        body.theme-forest .kick-player-btn:hover { background: #B22222; color: white; }
+
+        body.theme-forest .lobby-chat-container {
+            background-color: rgba(46,139,87,0.4);
+            border: 2px solid #79A3B1;
+        }
+        body.theme-forest .chat-message { background-color: #3A5F45; }
+        body.theme-forest .chat-message.current-user { background-color: #2F4F4F; }
+        body.theme-forest .chat-message .sender-name { color: #D4EDDA; }
+        body.theme-forest .chat-message .message-text-deleted { color: #A0B2A3; }
+        body.theme-forest .delete-message-btn { color: #A0B2A3; }
+        body.theme-forest .delete-message-btn:hover { color: #B22222; }
+
+        body.theme-forest .start-game-btn { background: linear-gradient(145deg, #2E8B57 0%, #3CB371 100%); border: 2px solid #79A3B1; }
+
+        body.theme-forest .lobby-sidebar::-webkit-scrollbar-track,
+        body.theme-forest #player-list-container::-webkit-scrollbar-track,
+        body.theme-forest .lobby-chat-messages::-webkit-scrollbar-track,
+        body.theme-forest .custom-scrollbar::-webkit-scrollbar-track { background: #2F4F4F; }
+        body.theme-forest .lobby-sidebar::-webkit-scrollbar-thumb,
+        body.theme-forest #player-list-container::-webkit-scrollbar-thumb,
+        body.theme-forest .lobby-chat-messages::-webkit-scrollbar-thumb,
+        body.theme-forest .custom-scrollbar::-webkit-scrollbar-thumb { background: #79A3B1; }
+        body.theme-forest .lobby-sidebar::-webkit-scrollbar-thumb:hover,
+        body.theme-forest #player-list-container::-webkit-scrollbar-thumb:hover,
+        body.theme-forest .lobby-chat-messages::-webkit-scrollbar-thumb:hover,
+        body.theme-forest .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #92B4A1; }
+
+        body.theme-forest .lobby-type-btn { border: 2px solid #79A3B1; background-color: transparent; color: #79A3B1; }
+        body.theme-forest .lobby-type-btn.active { background-color: #79A3B1; color: #2D4C34; box-shadow: 0 0 10px rgba(121,163,177,0.5); }
+        body.theme-forest .lobby-lock-icon { color: #92B4A1; }
+
+        body.theme-forest .game-player-pod {
+            background-color: rgba(212,237,218,0.1);
+            border: 1px solid rgba(212,237,218,0.2);
+        }
+        body.theme-forest .game-player-pod.is-ai { background-color: rgba(178, 34, 34, 0.1); border-color: #B22222; }
+        body.theme-forest .game-player-pod.is-human { background-color: rgba(70, 130, 180, 0.1); border-color: #4682B4; }
+        body.theme-forest .game-player-pod.current-active-player { border-color: #92B4A1; box-shadow: 0 0 15px rgba(146,180,161,0.7); }
+        body.theme-forest .game-player-pod .player-name { color: #D4EDDA; }
+        body.theme-forest .game-player-pod .player-role { color: #92B4A1; }
+        body.theme-forest .game-player-pod .player-status { color: #A0B2A3; }
+
+        body.theme-forest .voting-btn { border: 3px solid #92B4A1; }
+        body.theme-forest .voting-btn.ai-vote { background: linear-gradient(145deg, #B22222 0%, #8B0000 100%); color: white; }
+        body.theme-forest .voting-btn.human-vote { background: linear-gradient(145deg, #4682B4 0%, #2A52BE 100%); color: white; }
+
+        body.theme-forest .coin-icon { fill: #D4EDDA; }
+
+
+        /* === NEW THEME: OCEAN === */
+        body.theme-ocean {
+            background: linear-gradient(to bottom, #0A192F, #001F3F); /* Dark deep blue */
+            color: #BBDEFB; /* Light sky blue */
+            font-family: 'Merriweather', serif;
+        }
+        body.theme-ocean h1,
+        body.theme-ocean h2 {
+            color: #64B5F6; /* Medium blue */
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.4);
+        }
+        body.theme-ocean .spinner { border-top-color: #42A5F5; }
+        body.theme-ocean .classic-card {
+            background: linear-gradient(145deg, #0A192F 0%, #1A2E4F 100%);
+            border: 4px solid #42A5F5; /* Blue */
+            box-shadow: 0 10px 20px rgba(0,0,0,0.5), inset 0 0 10px rgba(187,222,251,0.2);
+        }
+        body.theme-ocean .classic-card::before,
+        body.theme-ocean .classic-card::after {
+            border-color: #64B5F6;
+            box-shadow: 0 0 10px rgba(100,181,246,0.5);
+        }
+        body.theme-ocean .classic-btn {
+            border: 2px solid #42A5F5;
+            color: #FFF;
+        }
+        body.theme-ocean .btn-purple-classic { background: linear-gradient(145deg, #81D4FA 0%, #4FC3F7 100%); } /* Light Blue */
+        body.theme-ocean .btn-blue-classic { background: linear-gradient(145deg, #2196F3 0%, #1976D2 100%); } /* Regular Blue */
+        body.theme-ocean .btn-green-classic { background: linear-gradient(145deg, #4CAF50 0%, #388E3C 100%); } /* Green */
+        body.theme-ocean .btn-red-classic { background: linear-gradient(145deg, #FF5252 0%, #D32F2F 100%); } /* Red */
+        body.theme-ocean .btn-gray-classic { background: linear-gradient(145deg, #9E9E9E 0%, #757575 100%); }
+        body.theme-ocean .btn-brown-classic { background: linear-gradient(145deg, #A1887F 0%, #795548 100%); } /* Brown */
+        body.theme-ocean .btn-gold-classic { background: linear-gradient(145deg, #FFC107 0%, #FFA000 100%); } /* Amber */
+
+        body.theme-ocean input,
+        body.theme-ocean select {
+            background-color: #0E2947;
+            border: 2px solid #42A5F5;
+            color: #BBDEFB;
+        }
+        body.theme-ocean input::placeholder { color: #90CAF9; }
+        body.theme-ocean input:focus,
+        body.theme-ocean select:focus {
+            border-color: #64B5F6 !important;
+            box-shadow: 0 0 0 4px rgba(66,165,245,0.5) !important, inset 0 2px 4px rgba(0,0,0,0.5) !important;
+        }
+
+        body.theme-ocean .app-header,
+        body.theme-ocean .lobby-header {
+            background: linear-gradient(to right, #0A192F, #0E2947);
+            border-bottom: 3px solid #64B5F6;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+        }
+        body.theme-ocean #header-user-coins-container {
+            background-color: rgba(66,165,245,0.3); /* Blue tint */
+            box-shadow: 0 2px 5px rgba(66,165,245,0.3);
+            color: #BBDEFB;
+        }
+        body.theme-ocean .lobby-header .search-container {
+            background-color: #0E2947;
+            border: 2px solid #42A5F5;
+        }
+        body.theme-ocean .lobby-header .search-container svg { color: #64B5F6; }
+
+        body.theme-ocean .app-footer,
+        body.theme-ocean .lobby-footer {
+            background: linear-gradient(to left, #0A192F, #0E2947);
+            border-top: 3px solid #64B5F6;
+            box-shadow: 0 -5px 15px rgba(0,0,0,0.5);
+        }
+        body.theme-ocean .lobby-footer .icon-btn { color: #BBDEFB; }
+        body.theme-ocean .lobby-footer .games-running-text { color: #BBDEFB; }
+
+        body.theme-ocean .main-content-area {
+            background: linear-gradient(180deg, #1A2E4F 0%, #0E2947 100%);
+        }
+
+        body.theme-ocean .lobby-item {
+            background: linear-gradient(145deg, #1A2E4F 0%, #0E2947 100%);
+            border: 2px solid #42A5F5;
+            box-shadow: 0 5px 10px rgba(0,0,0,0.3), inset 0 0 8px rgba(100,181,246,0.3);
+        }
+        body.theme-ocean .lobby-item h3 { color: #64B5F6; }
+        body.theme-ocean .lobby-item p { color: #BBDEFB; }
+
+        body.theme-ocean .lobby-detail-screen-full {
+            background: linear-gradient(180deg, #1A2E4F 0%, #0E2947 100%);
+        }
+        body.theme-ocean .lobby-detail-content {
+            background: linear-gradient(145deg, #0E2947 0%, #0A192F 100%);
+            border: 3px solid #42A5F5;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.7);
+        }
+
+        body.theme-ocean .lobby-sidebar {
+            background-color: rgba(66,165,245,0.2);
+            border: 1px solid #64B5F6;
+        }
+        body.theme-ocean .player-list-item {
+            background-color: rgba(187,222,251,0.1);
+            border: 1px solid rgba(187,222,251,0.2);
+        }
+        body.theme-ocean .player-list-item.is-host { border-color: #64B5F6; }
+        body.theme-ocean .player-list-item .player-name { color: #BBDEFB; }
+        body.theme-ocean .player-list-item .host-label { color: #64B5F6; }
+        body.theme-ocean .kick-player-btn { border: 1px solid #D32F2F; color: #D32F2F; }
+        body.theme-ocean .kick-player-btn:hover { background: #D32F2F; color: white; }
+
+        body.theme-ocean .lobby-chat-container {
+            background-color: rgba(66,165,245,0.4);
+            border: 2px solid #42A5F5;
+        }
+        body.theme-ocean .chat-message { background-color: #1A2E4F; }
+        body.theme-ocean .chat-message.current-user { background-color: #0E2947; }
+        body.theme-ocean .chat-message .sender-name { color: #BBDEFB; }
+        body.theme-ocean .chat-message .message-text-deleted { color: #90CAF9; }
+        body.theme-ocean .delete-message-btn { color: #90CAF9; }
+        body.theme-ocean .delete-message-btn:hover { color: #D32F2F; }
+
+        body.theme-ocean .start-game-btn { background: linear-gradient(145deg, #4CAF50 0%, #388E3C 100%); border: 2px solid #42A5F5; }
+
+        body.theme-ocean .lobby-sidebar::-webkit-scrollbar-track,
+        body.theme-ocean #player-list-container::-webkit-scrollbar-track,
+        body.theme-ocean .lobby-chat-messages::-webkit-scrollbar-track,
+        body.theme-ocean .custom-scrollbar::-webkit-scrollbar-track { background: #0E2947; }
+        body.theme-ocean .lobby-sidebar::-webkit-scrollbar-thumb,
+        body.theme-ocean #player-list-container::-webkit-scrollbar-thumb,
+        body.theme-ocean .lobby-chat-messages::-webkit-scrollbar-thumb,
+        body.theme-ocean .custom-scrollbar::-webkit-scrollbar-thumb { background: #42A5F5; }
+        body.theme-ocean .lobby-sidebar::-webkit-scrollbar-thumb:hover,
+        body.theme-ocean #player-list-container::-webkit-scrollbar-thumb:hover,
+        body.theme-ocean .lobby-chat-messages::-webkit-scrollbar-thumb:hover,
+        body.theme-ocean .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #64B5F6; }
+
+        body.theme-ocean .lobby-type-btn { border: 2px solid #42A5F5; background-color: transparent; color: #42A5F5; }
+        body.theme-ocean .lobby-type-btn.active { background-color: #42A5F5; color: #0A192F; box-shadow: 0 0 10px rgba(100,181,246,0.5); }
+        body.theme-ocean .lobby-lock-icon { color: #64B5F6; }
+
+        body.theme-ocean .game-player-pod {
+            background-color: rgba(187,222,251,0.1);
+            border: 1px solid rgba(187,222,251,0.2);
+        }
+        body.theme-ocean .game-player-pod.is-ai { background-color: rgba(255, 82, 82, 0.1); border-color: #FF5252; }
+        body.theme-ocean .game-player-pod.is-human { background-color: rgba(33, 150, 243, 0.1); border-color: #2196F3; }
+        body.theme-ocean .game-player-pod.current-active-player { border-color: #64B5F6; box-shadow: 0 0 15px rgba(100,181,246,0.7); }
+        body.theme-ocean .game-player-pod .player-name { color: #BBDEFB; }
+        body.theme-ocean .game-player-pod .player-role { color: #64B5F6; }
+        body.theme-ocean .game-player-pod .player-status { color: #90CAF9; }
+
+        body.theme-ocean .voting-btn { border: 3px solid #64B5F6; }
+        body.theme-ocean .voting-btn.ai-vote { background: linear-gradient(145deg, #FF5252 0%, #D32F2F 100%); color: white; }
+        body.theme-ocean .voting-btn.human-vote { background: linear-gradient(145deg, #2196F3 0%, #1976D2 100%); color: white; }
+
+        body.theme-ocean .coin-icon { fill: #FFC107; }
+
+
+        /* === NEW THEME: RETRO === */
+        body.theme-retro {
+            background: linear-gradient(to bottom right, #3C3C3C, #1E1E1E); /* Dark grays */
+            color: #FEE715; /* Bright Yellow */
+            font-family: 'Press Start 2P', cursive; /* Pixelated font for headings */
+        }
+        /* Google Fonts for Retro */
+        body.theme-retro .fonts-retro {
+            font-family: 'Press Start 2P', cursive;
+        }
+        body.theme-retro h1,
+        body.theme-retro h2 {
+            font-family: 'Press Start 2P', cursive;
+            color: #FF69B4; /* Hot Pink */
+            text-shadow: 2px 2px #000;
+        }
+        body.theme-retro .spinner { border-top-color: #00FFFF; }
+        body.theme-retro .classic-card {
+            background: linear-gradient(145deg, #5C007C 0%, #8A00C2 100%); /* Deep Purple */
+            border: 4px solid #FEE715; /* Bright Yellow */
+            box-shadow: 0 0 15px #FF69B4, inset 0 0 10px #FEE715;
+            border-radius: 5px; /* Sharper corners */
+        }
+        body.theme-retro .classic-card::before,
+        body.theme-retro .classic-card::after {
+            border-color: #FF69B4;
+            box-shadow: 0 0 8px #FF69B4;
+            border-radius: 0;
+        }
+        body.theme-retro .classic-btn {
+            border: 2px solid #FEE715;
+            color: #000; /* Black text on buttons */
+            border-radius: 5px;
+            font-weight: 700;
+            text-shadow: none;
+        }
+        body.theme-retro .classic-btn:hover {
+            box-shadow: 0 0 20px #FF69B4, inset 0 0 10px #FEE715;
+        }
+        body.theme-retro .btn-purple-classic { background: linear-gradient(145deg, #8A00C2 0%, #5C007C 100%); }
+        body.theme-retro .btn-blue-classic { background: linear-gradient(145deg, #00FFFF 0%, #00BFFF 100%); } /* Cyan Blue */
+        body.theme-retro .btn-green-classic { background: linear-gradient(145deg, #39FF14 0%, #00FF00 100%); } /* Neon Green */
+        body.theme-retro .btn-red-classic { background: linear-gradient(145deg, #FF00FF 0%, #FF0077 100%); } /* Magenta Pink */
+        body.theme-retro .btn-gray-classic { background: linear-gradient(145deg, #A9A9A9 0%, #808080 100%); }
+        body.theme-retro .btn-brown-classic { background: linear-gradient(145deg, #D2B48C 0%, #A0522D 100%); } /* Tan/Sienna */
+        body.theme-retro .btn-gold-classic { background: linear-gradient(145deg, #FF69B4 0%, #FF00FF 100%); } /* Pink/Magenta */
+
+        body.theme-retro input,
+        body.theme-retro select {
+            background-color: #101010;
+            border: 2px solid #FEE715;
+            color: #00FFFF; /* Cyan for input text */
+            border-radius: 5px;
+            font-family: 'Press Start 2P', cursive;
+        }
+        body.theme-retro input::placeholder { color: #808080; }
+        body.theme-retro input:focus,
+        body.theme-retro select:focus {
+            border-color: #FF69B4 !important;
+            box-shadow: 0 0 0 4px rgba(255,105,180,0.5) !important, inset 0 0 5px #FEE715 !important;
+        }
+
+        body.theme-retro .app-header,
+        body.theme-retro .lobby-header {
+            background: linear-gradient(to right, #001000, #002000);
+            border-bottom: 3px solid #39FF14; /* Neon Green */
+            box-shadow: 0 5px 10px rgba(0,255,0,0.5);
+        }
+        body.theme-retro #header-user-coins-container {
+            background-color: rgba(0,255,255,0.1);
+            box-shadow: 0 2px 5px rgba(0,255,255,0.3);
+            color: #FEE715; /* Bright Yellow */
+        }
+        body.theme-retro .lobby-header .search-container {
+            background-color: #0A0A0A;
+            border: 2px solid #FEE715;
+            border-radius: 5px;
+        }
+        body.theme-retro .lobby-header .search-container svg { color: #FF69B4; }
+
+        body.theme-retro .app-footer,
+        body.theme-retro .lobby-footer {
+            background: linear-gradient(to left, #001000, #002000);
+            border-top: 3px solid #39FF14;
+            box-shadow: 0 -5px 10px rgba(0,255,0,0.5);
+        }
+        body.theme-retro .lobby-footer .icon-btn { color: #FEE715; }
+        body.theme-retro .lobby-footer .games-running-text { color: #FF69B4; }
+
+        body.theme-retro .main-content-area {
+            background: linear-gradient(180deg, #1A1A1A 0%, #0A0A0A 100%);
+        }
+
+        body.theme-retro .lobby-item {
+            background: linear-gradient(145deg, #2A2A2A 0%, #1A1A1A 100%);
+            border: 2px solid #FEE715;
+            box-shadow: 0 5px 10px rgba(255,105,180,0.3), inset 0 0 8px rgba(0,255,255,0.3);
+            border-radius: 5px;
+        }
+        body.theme-retro .lobby-item h3 { color: #FF69B4; font-family: 'Press Start 2P', cursive; }
+        body.theme-retro .lobby-item p { color: #FEE715; }
+
+        body.theme-retro .lobby-detail-screen-full {
+            background: linear-gradient(180deg, #1A1A1A 0%, #0A0A0A 100%);
+        }
+        body.theme-retro .lobby-detail-content {
+            background: linear-gradient(145deg, #0A0A0A 0%, #000000 100%);
+            border: 3px solid #FEE715;
+            box-shadow: 0 8px 16px rgba(255,105,180,0.7);
+            border-radius: 5px;
+        }
+
+        body.theme-retro .lobby-sidebar {
+            background-color: rgba(0,255,255,0.2);
+            border: 1px solid #FF69B4;
+            border-radius: 5px;
+        }
+        body.theme-retro .player-list-item {
+            background-color: rgba(255,105,180,0.1);
+            border: 1px solid rgba(255,105,180,0.2);
+            border-radius: 5px;
+        }
+        body.theme-retro .player-list-item.is-host { border-color: #FEE715; }
+        body.theme-retro .player-list-item .player-name { color: #00FFFF; font-family: 'Press Start 2P', cursive; }
+        body.theme-retro .player-list-item .host-label { color: #FF69B4; }
+        body.theme-retro .kick-player-btn { border: 1px solid #FF00FF; color: #FF00FF; }
+        body.theme-retro .kick-player-btn:hover { background: #FF00FF; color: black; }
+
+        body.theme-retro .lobby-chat-container {
+            background-color: rgba(0,0,0,0.7);
+            border: 2px solid #FEE715;
+            border-radius: 5px;
+        }
+        body.theme-retro .chat-message { background-color: #2A2A2A; border-radius: 5px;}
+        body.theme-retro .chat-message.current-user { background-color: #008080; }
+        body.theme-retro .chat-message .sender-name { color: #00FFFF; }
+        body.theme-retro .chat-message .message-text-deleted { color: #808080; }
+        body.theme-retro .delete-message-btn { color: #808080; }
+        body.theme-retro .delete-message-btn:hover { color: #FF00FF; }
+
+        body.theme-retro .start-game-btn { background: linear-gradient(145deg, #39FF14 0%, #00FF00 100%); border: 2px solid #FEE715; }
+
+        body.theme-retro .lobby-sidebar::-webkit-scrollbar-track,
+        body.theme-retro #player-list-container::-webkit-scrollbar-track,
+        body.theme-retro .lobby-chat-messages::-webkit-scrollbar-track,
+        body.theme-retro .custom-scrollbar::-webkit-scrollbar-track { background: #1A1A1A; }
+        body.theme-retro .lobby-sidebar::-webkit-scrollbar-thumb,
+        body.theme-retro #player-list-container::-webkit-scrollbar-thumb,
+        body.theme-retro .lobby-chat-messages::-webkit-scrollbar-thumb,
+        body.theme-retro .custom-scrollbar::-webkit-scrollbar-thumb { background: #FEE715; }
+        body.theme-retro .lobby-sidebar::-webkit-scrollbar-thumb:hover,
+        body.theme-retro #player-list-container::-webkit-scrollbar-thumb:hover,
+        body.theme-retro .lobby-chat-messages::-webkit-scrollbar-thumb:hover,
+        body.theme-retro .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #FF69B4; }
+
+        body.theme-retro .lobby-type-btn { border: 2px solid #FEE715; background-color: transparent; color: #FEE715; border-radius: 5px; }
+        body.theme-retro .lobby-type-btn.active { background-color: #FEE715; color: #101010; box-shadow: 0 0 10px rgba(255,105,180,0.5); }
+        body.theme-retro .lobby-lock-icon { color: #FF69B4; }
+
+        body.theme-retro .game-player-pod {
+            background-color: rgba(255,105,180,0.1);
+            border: 1px solid rgba(255,105,180,0.3);
+            border-radius: 5px;
+        }
+        body.theme-retro .game-player-pod.is-ai { background-color: rgba(255, 0, 255, 0.1); border-color: #FF00FF; }
+        body.theme-retro .game-player-pod.is-human { background-color: rgba(0, 255, 255, 0.1); border-color: #00FFFF; }
+        body.theme-retro .game-player-pod.current-active-player { border-color: #FF69B4; box-shadow: 0 0 15px rgba(255,105,180,0.7); }
+        body.theme-retro .game-player-pod .player-name { color: #FEE715; font-family: 'Press Start 2P', cursive; }
+        body.theme-retro .game-player-pod .player-role { color: #FF69B4; }
+        body.theme-retro .game-retro .player-status { color: #808080; }
+
+        body.theme-retro .voting-btn { border: 3px solid #FF69B4; border-radius: 5px; }
+        body.theme-retro .voting-btn.ai-vote { background: linear-gradient(145deg, #FF00FF 0%, #FF0077 100%); color: black; }
+        body.theme-retro .voting-btn.human-vote { background: linear-gradient(145deg, #00FFFF 0%, #00BFFF 100%); color: black; }
+
+        body.theme-retro .coin-icon { fill: #FEE715; }
+
+
+        /* === NEW THEME: MINIMAL === */
+        body.theme-minimal {
+            background-color: #F8F8F8; /* Light gray */
+            color: #333; /* Dark text */
+            font-family: 'Inter', sans-serif; /* Modern, clean font */
+        }
+        /* Google Fonts for Minimal */
+        body.theme-minimal .fonts-minimal {
+            font-family: 'Inter', sans-serif;
+        }
+        body.theme-minimal h1,
+        body.theme-minimal h2 {
+            font-family: 'Inter', sans-serif;
+            color: #007BFF; /* Blue */
+            text-shadow: none;
+        }
+        body.theme-minimal .spinner { border-top-color: #007BFF; }
+        body.theme-minimal .classic-card {
+            background-color: #FFF;
+            border: 1px solid #E0E0E0;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            border-radius: 8px;
+            backdrop-filter: none;
+            -webkit-backdrop-filter: none;
+        }
+        body.theme-minimal .classic-card::before,
+        body.theme-minimal .classic-card::after { display: none; } /* No ornaments */
+        body.theme-minimal .classic-btn {
+            border: 1px solid #007BFF;
+            color: #FFF;
+            border-radius: 8px;
+            font-weight: normal;
+            text-shadow: none;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        body.theme-minimal .classic-btn:hover {
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            transform: translateY(-2px) scale(1.01);
+        }
+        body.theme-minimal .btn-purple-classic { background: #6F42C1; } /* Darker Purple */
+        body.theme-minimal .btn-blue-classic { background: #007BFF; } /* Standard Blue */
+        body.theme-minimal .btn-green-classic { background: #28A745; } /* Standard Green */
+        body.theme-minimal .btn-red-classic { background: #DC3545; } /* Standard Red */
+        body.theme-minimal .btn-gray-classic { background: #6C757D; } /* Standard Gray */
+        body.theme-minimal .btn-brown-classic { background: #A0522D; } /* Sienna */
+        body.theme-minimal .btn-gold-classic { background: #FFC107; border: none; padding: 0.4rem; border-radius: 6px; }
+        body.theme-minimal .btn-gold-classic:hover { box-shadow: 0 3px 6px rgba(0,0,0,0.2); transform: translateY(-1px) scale(1.02); }
+
+
+        body.theme-minimal input,
+        body.theme-minimal select {
+            background-color: #F0F0F0;
+            border: 1px solid #CCC;
+            color: #333;
+            border-radius: 6px;
+            box-shadow: inset 0 1px 2px rgba(0,0,0,0.1);
+        }
+        body.theme-minimal input::placeholder { color: #999; }
+        body.theme-minimal input:focus,
+        body.theme-minimal select:focus {
+            border-color: #007BFF !important;
+            box-shadow: 0 0 0 3px rgba(0,123,255,0.25) !important, inset 0 1px 2px rgba(0,0,0,0.1) !important;
+        }
+
+        body.theme-minimal .app-header,
+        body.theme-minimal .lobby-header {
+            background-color: #FFF;
+            border-bottom: 1px solid #E0E0E0;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        body.theme-minimal #header-user-coins-container {
+            background-color: rgba(0,123,255,0.1);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            color: #007BFF;
+        }
+        body.theme-minimal .lobby-header .search-container {
+            background-color: #F0F0F0;
+            border: 1px solid #CCC;
+            border-radius: 8px;
+            padding: 0.4rem 0.8rem;
+        }
+        body.theme-minimal .lobby-header .search-container input { padding: 0.1rem 0.3rem; }
+        body.theme-minimal .lobby-header .search-container svg { color: #007BFF; }
+
+        body.theme-minimal .app-footer,
+        body.theme-minimal .lobby-footer {
+            background-color: #FFF;
+            border-top: 1px solid #E0E0E0;
+            box-shadow: 0 -2px 5px rgba(0,0,0,0.1);
+        }
+        body.theme-minimal .lobby-footer .icon-btn { color: #007BFF; font-size: 0.75rem;}
+        body.theme-minimal .lobby-footer .icon-btn svg { width: 28px; height: 28px; }
+        body.theme-minimal .lobby-footer .games-running-text { color: #6C757D; font-size: 1rem; }
+
+        body.theme-minimal .main-content-area {
+            background-color: #F8F8F8;
+        }
+
+        body.theme-minimal .lobby-item {
+            background-color: #FFF;
+            border: 1px solid #E0E0E0;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            border-radius: 8px;
+            padding: 1rem 1.25rem;
+        }
+        body.theme-minimal .lobby-item:hover {
+            transform: translateY(-3px) scale(1.01);
+            box-shadow: 0 5px 10px rgba(0,0,0,0.15);
+        }
+        body.theme-minimal .lobby-item h3 { color: #007BFF; font-family: 'Inter', sans-serif; font-size: 1.5rem;}
+        body.theme-minimal .lobby-item p { color: #6C757D; font-size: 0.9rem;}
+
+        body.theme-minimal .lobby-detail-screen-full { background-color: #F8F8F8; }
+        body.theme-minimal .lobby-detail-content {
+            background-color: #FFF;
+            border: 1px solid #E0E0E0;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            border-radius: 8px;
+        }
+        body.theme-minimal .lobby-sidebar {
+            background-color: #F8F8F8;
+            border: 1px solid #E0E0E0;
+            border-radius: 8px;
+            padding: 0.75rem;
+        }
+        body.theme-minimal .player-list-item {
+            background-color: #E9ECEF;
+            border: 1px solid #E0E0E0;
+            border-radius: 6px;
+            padding: 0.5rem 0.75rem;
+            margin-bottom: 0.4rem;
+        }
+        body.theme-minimal .player-list-item.is-host { border-color: #007BFF; }
+        body.theme-minimal .player-list-item .player-name { color: #333; }
+        body.theme-minimal .player-list-item .host-label { color: #007BFF; font-size: 0.7rem;}
+        body.theme-minimal .kick-player-btn { border: 1px solid #DC3545; color: #DC3545; padding: 0.15rem 0.4rem; font-size: 0.7rem;}
+        body.theme-minimal .kick-player-btn:hover { background: #DC3545; color: white; }
+
+        body.theme-minimal .lobby-chat-container {
+            background-color: #F0F0F0;
+            border: 1px solid #E0E0E0;
+            border-radius: 8px;
+            padding: 0.5rem;
+        }
+        body.theme-minimal .chat-message {
+            background-color: #E9ECEF;
+            padding: 0.4rem 0.6rem;
+            border-radius: 8px;
+        }
+        body.theme-minimal .chat-message.current-user { background-color: #D6E8FA; }
+        body.theme-minimal .chat-message .sender-name { color: #007BFF; font-size: 0.8em; margin-bottom: 0.1rem;}
+        body.theme-minimal .chat-message .message-text-deleted { color: #AAA; }
+        body.theme-minimal .delete-message-btn { color: #AAA; padding: 0.2rem;}
+        body.theme-minimal .delete-message-btn:hover { color: #DC3545; }
+
+        body.theme-minimal .lobby-chat-input-form input { padding: 0.5rem; }
+        body.theme-minimal .lobby-chat-input-form button { padding: 0.5rem 1rem; font-size: 0.9rem; }
+
+        body.theme-minimal .start-game-btn { background: #28A745; border: 1px solid #28A745; }
+
+        body.theme-minimal .lobby-sidebar::-webkit-scrollbar-track,
+        body.theme-minimal #player-list-container::-webkit-scrollbar-track,
+        body.theme-minimal .lobby-chat-messages::-webkit-scrollbar-track,
+        body.theme-minimal .custom-scrollbar::-webkit-scrollbar-track { background: #E9ECEF; }
+        body.theme-minimal .lobby-sidebar::-webkit-scrollbar-thumb,
+        body.theme-minimal #player-list-container::-webkit-scrollbar-thumb,
+        body.theme-minimal .lobby-chat-messages::-webkit-scrollbar-thumb,
+        body.theme-minimal .custom-scrollbar::-webkit-scrollbar-thumb { background: #007BFF; }
+        body.theme-minimal .lobby-sidebar::-webkit-scrollbar-thumb:hover,
+        body.theme-minimal #player-list-container::-webkit-scrollbar-thumb:hover,
+        body.theme-minimal .lobby-chat-messages::-webkit-scrollbar-thumb:hover,
+        body.theme-minimal .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #0056b3; }
+
+        body.theme-minimal .lobby-type-btn { border: 1px solid #007BFF; background-color: transparent; color: #007BFF; border-radius: 6px; padding: 0.4rem 1.2rem; }
+        body.theme-minimal .lobby-type-btn.active { background-color: #007BFF; color: white; box-shadow: 0 0 8px rgba(0,123,255,0.3); }
+        body.theme-minimal .lobby-lock-icon { color: #007BFF; }
+
+        body.theme-minimal .game-player-pod {
+            background-color: #F0F8FF;
+            border: 1px solid #D6E8FA;
+            border-radius: 8px;
+        }
+        body.theme-minimal .game-player-pod.is-ai { background-color: #FCEAEA; border-color: #FACDCD; }
+        body.theme-minimal .game-player-pod.is-human { background-color: #E0EEFF; border-color: #C0DAF7; }
+        body.theme-minimal .game-player-pod.current-active-player { border-color: #007BFF; box-shadow: 0 0 10px rgba(0,123,255,0.5); }
+        body.theme-minimal .game-player-pod .player-name { color: #333; font-size: 1rem;}
+        body.theme-minimal .game-player-pod .player-role { color: #007BFF; font-size: 0.85rem;}
+        body.theme-minimal .game-minimal .player-status { color: #6C757D; font-size: 0.75rem;}
+
+        body.theme-minimal .voting-btn { border: 1px solid #007BFF; border-radius: 8px; padding: 0.8rem 1.5rem; font-size: 1.2rem;}
+        body.theme-minimal .voting-btn.ai-vote { background: #DC3545; color: white; }
+        body.theme-minimal .voting-btn.human-vote { background: #007BFF; color: white; }
+
+        body.theme-minimal .coin-icon { fill: #007BFF; }
+
+        /* Styles for active theme button */
+        .theme-button.active-theme-btn {
+            background-color: #DAA520; /* Default gold for classic */
+            color: #1A1A1A; /* Dark text for classic */
+            box-shadow: 0 0 10px rgba(255,215,0,0.5);
+            border-color: #FFD700;
+        }
+        body.theme-cyberpunk .theme-button.active-theme-btn {
+            background-color: #FF00FF; /* Magenta for cyberpunk */
+            color: #1A001A;
+            box-shadow: 0 0 10px rgba(0,255,255,0.5);
+            border-color: #00FFFF;
+        }
+        body.theme-forest .theme-button.active-theme-btn {
+            background-color: #2E8B57; /* Sea Green for forest */
+            color: #D4EDDA;
+            box-shadow: 0 0 10px rgba(146,180,161,0.5);
+            border-color: #92B4A1;
+        }
+        body.theme-ocean .theme-button.active-theme-btn {
+            background-color: #2196F3; /* Blue for ocean */
+            color: #0A192F;
+            box-shadow: 0 0 10px rgba(100,181,246,0.5);
+            border-color: #42A5F5;
+        }
+        body.theme-retro .theme-button.active-theme-btn {
+            background-color: #FEE715; /* Yellow for retro */
+            color: #101010;
+            box-shadow: 0 0 10px rgba(255,105,180,0.5);
+            border-color: #FF69B4;
+        }
+        body.theme-minimal .theme-button.active-theme-btn {
+            background-color: #007BFF; /* Blue for minimal */
+            color: white;
+            box-shadow: 0 0 8px rgba(0,123,255,0.3);
+            border-color: #007BFF;
         }
 
         /* NEW: Animation for refresh button icon */
@@ -69,10 +1125,7 @@
 
         /* Classic Card/Modal Styling - More detailed */
         .classic-card {
-            background: linear-gradient(145deg, #4B0000 0%, #660000 60%, #800000 100%); /* Deeper ruby red velvet effect */
-            border: 4px solid #DAA520; /* Goldenrod border */
             border-radius: 20px; /* Slightly larger radius */
-            box-shadow: 0 15px 30px rgba(0,0,0,0.6), inset 0 0 15px rgba(255,255,255,0.1); /* Deeper outer shadow, subtle inner light */
             backdrop-filter: blur(10px); /* Stronger blur for more prominent glass effect */
             -webkit-backdrop-filter: blur(10px); /* For Safari */
             position: relative; /* For pseudo-elements */
@@ -87,10 +1140,9 @@
             left: -10px;
             width: 30px;
             height: 30px;
-            border-top: 5px solid #FFD700;
-            border-left: 5px solid #FFD700;
+            border-top: 5px solid;
+            border-left: 5px solid;
             border-radius: 5px 0 0 0;
-            box-shadow: 0 0 10px rgba(255,215,0,0.5);
         }
         .classic-card::after { /* Bottom right ornamental corner */
             content: '';
@@ -99,21 +1151,18 @@
             right: -10px;
             width: 30px;
             height: 30px;
-            border-bottom: 5px solid #FFD700;
-            border-right: 5px solid #FFD700;
+            border-bottom: 5px solid;
+            border-right: 5px solid;
             border-radius: 0 0 5px 0;
-            box-shadow: 0 0 10px rgba(255,215,0,0.5);
         }
 
 
         /* Button Base Styles - More polished Classic Look */
         .classic-btn {
-            border: 2px solid #DAA520; /* Golden border for all buttons */
             border-radius: 15px; /* Slightly rounded corners */
             font-weight: 700; /* Bold text */
             text-shadow: 1px 1px 2px rgba(0,0,0,0.6); /* Text shadow for elegance */
             transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1); /* Smoother transition */
-            box-shadow: 0 8px 16px rgba(0,0,0,0.4), inset 0 0 8px rgba(255,255,255,0.1); /* Deeper outer shadow, subtle inner light */
             color: #FFFFFF; /* White text on buttons */
             padding: 0.875rem 1.5rem; /* Equivalent to py-3.5 px-6 */
             font-size: 1.125rem; /* Equivalent to text-lg */
@@ -136,68 +1185,20 @@
         }
         .classic-btn:hover {
             transform: translateY(-5px) scale(1.03); /* More pronounced lift and scale */
-            box-shadow: 0 12px 24px rgba(0,0,0,0.6), inset 0 0 10px rgba(255,255,255,0.2); /* Stronger shadow on hover */
         }
         .classic-btn:disabled {
             opacity: 0.6;
             cursor: not-allowed;
             transform: none;
-            box-shadow: 0 8px 16px rgba(0,0,0,0.4), inset 0 0 8px rgba(255,255,255,0.1);
         }
-
-        /* Specific Button Colors - Classic Pallette */
-        .btn-purple-classic {
-            background: linear-gradient(145deg, #8A2BE2 0%, #6A0DAD 100%); /* Amethyst */
-        }
-        .btn-blue-classic {
-            background: linear-gradient(145deg, #4682B4 0%, #2A52BE 100%); /* Steel Blue / Royal Blue */
-        }
-        .btn-green-classic {
-            background: linear-gradient(145deg, #228B22 0%, #006400 100%); /* Forest Green */
-        }
-        .btn-red-classic {
-            background: linear-gradient(145deg, #CD5C5C 0%, #B22222 100%); /* Indian Red / Firebrick */
-        }
-        .btn-gray-classic {
-            background: linear-gradient(145deg, #A9A9A9 0%, #808080 100%); /* Dark Gray */
-        }
-        .btn-brown-classic { /* New for Profile/Shop */
-            background: linear-gradient(145deg, #8B4513 0%, #69320E 100%); /* Saddle Brown / Dark Sienna */
-        }
-        .btn-gold-classic { /* For footer icons */
-            background: linear-gradient(145deg, #FFD700 0%, #DAA520 100%); /* Gold */
-            border: none; /* No border for these small buttons */
-            padding: 0.5rem;
-            border-radius: 10px;
-        }
-        .btn-gold-classic:hover {
-            transform: translateY(-2px) scale(1.05);
-            box-shadow: 0 6px 12px rgba(0,0,0,0.5), inset 0 0 5px rgba(255,255,255,0.3);
-        }
-
 
         /* Input Field Styles - More refined Classic Look */
         input, select { /* Added select for lobby names dropdown */
-            background-color: #202020; /* Even darker input background */
-            border: 2px solid #5A5A5A; /* Dark gray border */
-            color: #E0E0E0; /* Light text color */
             padding: 0.875rem; /* Equivalent to p-3.5 */
             border-radius: 0.75rem; /* Equivalent to rounded-xl */
-            box-shadow: inset 0 2px 4px rgba(0,0,0,0.5); /* Inner shadow for depth */
         }
-        input::placeholder {
-            color: #A0A0A0; /* Lighter placeholder text */
-        }
-        input:focus, select:focus {
-            border-color: #DAA520 !important; /* Gold border on focus */
-            box-shadow: 0 0 0 4px rgba(218, 165, 32, 0.5) !important, inset 0 2px 4px rgba(0,0,0,0.5) !important; /* Gold focus ring with inner shadow */
-        }
-
         /* Header specific styles - Richer Gold/Brown */
         .app-header {
-            background: linear-gradient(to right, #4A2B00 0%, #7A4C00 50%, #4A2B00 100%); /* Richer gold/brown gradient */
-            border-bottom: 3px solid #FFD700; /* Thicker gold border */
-            box-shadow: 0 8px 20px rgba(0,0,0,0.7); /* Deeper shadow */
             height: 70px; /* Fixed height for header */
             position: fixed; /* Explicitly fixed */
             top: 0; left: 0; right: 0;
@@ -211,23 +1212,17 @@
         /* NEW: Coin display container in header (positioned on the left for RTL) */
         #header-user-coins-container {
             /* flex-grow added directly in HTML to push it rightwards */
-            background-color: rgba(0,0,0,0.3);
             border-radius: 10px;
             padding: 0.5rem 1rem;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
             transition: all 0.3s ease;
             margin-left: 1rem; /* Space between coins and menu button */
         }
         #header-user-coins-container:hover {
             transform: translateY(-2px);
-            box-shadow: 0 6px 12px rgba(0,0,0,0.5);
         }
 
         /* Lobby Screen Specific Header */
         .lobby-header {
-            background: linear-gradient(to right, #4A2B00 0%, #7A4C00 50%, #4A2B00 100%);
-            border-bottom: 3px solid #FFD700;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.7);
             height: 70px;
             position: fixed;
             top: 0; left: 0; right: 0;
@@ -243,9 +1238,7 @@
             max-width: 600px; /* Limit max width on larger screens */
             margin: 0 auto; /* Center the search container */
             align-items: center;
-            background-color: #303030; /* Darker background for search bar */
             border-radius: 15px; /* Rounded corners for search bar */
-            border: 2px solid #5A5A5A;
             padding: 0.5rem 1rem; /* Adjust padding */
         }
         .lobby-header .search-container input {
@@ -257,10 +1250,8 @@
             text-align: right; /* Align text to right for RTL */
         }
         .lobby-header .search-container input::placeholder {
-            color: #A0A0A0;
         }
         .lobby-header .search-container svg {
-            color: #DAA520; /* Gold color for icons */
             min-width: 24px; /* Ensure icons don't shrink */
             min-height: 24px;
         }
@@ -279,9 +1270,6 @@
 
 
         .app-footer {
-            background: linear-gradient(to left, #4A2B00 0%, #7A4C00 50%, #4A2B00 100%); /* Richer gold/brown gradient */
-            border-top: 3px solid #FFD700; /* Thicker gold border */
-            box-shadow: 0 -8px 20px rgba(0,0,0,0.7); /* Deeper shadow */
             height: 90px; /* Fixed height for footer */
             position: fixed; /* Explicitly fixed */
             bottom: 0; left: 0; right: 0;
@@ -294,9 +1282,6 @@
         }
         /* Lobby Screen Specific Footer */
         .lobby-footer {
-            background: linear-gradient(to left, #4A2B00 0%, #7A4C00 50%, #4A2B00 100%);
-            border-top: 3px solid #FFD700;
-            box-shadow: 0 -8px 20px rgba(0,0,0,0.7);
             height: 90px;
             position: fixed;
             bottom: 0; left: 0; right: 0;
@@ -310,7 +1295,6 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            color: #FFD700; /* Gold color for icons */
             font-size: 0.8rem;
             text-align: center;
             cursor: pointer;
@@ -331,7 +1315,6 @@
             transition: transform 0.8s ease-in-out;
         }
         .lobby-footer .games-running-text {
-            color: #E0E0E0;
             font-size: 1.1rem;
             font-weight: bold;
             display: flex;
@@ -351,11 +1334,10 @@
             flex-direction: column;
             justify-content: flex-start; /* Align content to start for scrollable lists */
             align-items: center; /* Center content horizontally */
-            background: linear-gradient(180deg, #2C2C2C 0%, #1A1A1A 100%); /* Subtle dark grey gradient for main area */
             position: relative; /* For any absolute positioned elements inside */
         }
         
-        /* Profile Modal specific styles */
+        /* Profile Modal specific styles (now main-menu-modal) */
         .profile-modal-overlay {
             background-color: rgba(0,0,0,0.7); /* Darker overlay */
             transition: opacity 0.3s ease-in-out;
@@ -393,10 +1375,7 @@
 
         /* Enhanced Lobby Item Styling */
         .lobby-item {
-            background: linear-gradient(145deg, #2A2A2A 0%, #1A1A1A 100%); /* Deep gradient background */
-            border: 2px solid #DAA520; /* Gold border */
             border-radius: 15px; /* Rounded corners */
-            box-shadow: 0 8px 16px rgba(0,0,0,0.5), inset 0 0 10px rgba(255,215,0,0.1); /* Deep outer shadow, subtle inner glow */
             transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1); /* Smooth transitions for hover effects */
             position: relative; /* For overflow hidden and pseudo-elements */
             overflow: hidden; /* Ensures internal elements stay within rounded corners */
@@ -426,18 +1405,14 @@
 
         .lobby-item:hover {
             transform: translateY(-8px) scale(1.02); /* More pronounced lift and slight scale */
-            box-shadow: 0 15px 25px rgba(0,0,0,0.6), inset 0 0 12px rgba(255,215,0,0.2); /* Stronger shadow, more glow */
         }
 
         .lobby-item h3 {
-            color: #FFD700; /* Gold for lobby names */
             font-size: 1.75rem; /* Larger font for name */
-            font-family: 'Playfair Display', serif;
             text-shadow: 1px 1px 3px rgba(0,0,0,0.7);
         }
 
         .lobby-item p {
-            color: #C0C0C0; /* Silver for details */
             font-size: 1rem;
             margin-top: 0.25rem;
         }
@@ -458,30 +1433,6 @@
             font-size: 1rem; /* Consistent font size */
         }
 
-        /* Responsive adjustments for lobby-item buttons on larger screens */
-        @media (min-width: 640px) { /* sm breakpoint */
-            .lobby-item {
-                flex-direction: row; /* Align items in a row */
-                text-align: right; /* Text aligned right in RTL */
-            }
-            .lobby-item .lobby-actions {
-                flex-direction: row; /* Buttons side-by-side */
-                width: auto; /* Buttons take their natural width */
-                margin-top: 0; /* No top margin when side-by-side */
-                gap: 0.5rem; /* Small gap between buttons */
-            }
-            /* Add margin-left to close button for spacing from join button */
-            .lobby-item .close-lobby-btn {
-                margin-right: 0.5rem; /* Space from join button in RTL */
-            }
-            .lobby-item .join-lobby-btn,
-            .lobby-item .close-lobby-btn {
-                width: auto; /* Allow buttons to size naturally */
-                font-size: 0.9rem; /* Slightly smaller for compactness */
-                padding: 0.6rem 1.2rem; /* Adjusted padding */
-            }
-        }
-
         /* === Lobby Detail Screen Styles (Major Redesign for Game) === */
         .lobby-detail-screen-full {
             padding-top: 0; /* No padding, the content will manage it */
@@ -490,12 +1441,9 @@
             flex-direction: column;
             width: 100%;
             height: 100%;
-            background: linear-gradient(180deg, #2C2C2C 0%, #1A1A1A 100%);
         }
 
         .lobby-detail-content {
-            background: linear-gradient(145deg, #1A1A1A 0%, #0D0D0D 100%);
-            border: 3px solid #DAA520;
             border-radius: 20px;
             box-shadow: 0 10px 20px rgba(0,0,0,0.7);
             padding: 1.5rem;
@@ -515,10 +1463,8 @@
             flex-direction: column;
             flex-shrink: 0;
             width: 300px;
-            background-color: rgba(0,0,0,0.3);
             border-radius: 15px;
             padding: 1rem;
-            border: 1px solid #444;
             overflow-y: auto;
         }
 
@@ -542,32 +1488,23 @@
             overflow-y: auto; /* Scroll if many players */
         }
         .player-list-item {
-            background-color: rgba(255, 255, 255, 0.05);
             border-radius: 8px;
             padding: 0.75rem;
             margin-bottom: 0.5rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border: 1px solid transparent;
             transition: all 0.2s ease-in-out;
-        }
-        .player-list-item.is-host {
-            border-color: #FFD700;
         }
         .player-list-item .player-name {
             font-weight: bold;
-            color: #E0E0E0;
         }
         .player-list-item .host-label {
-            color: #FFD700;
             font-size: 0.8rem;
             margin-right: 0.5rem;
         }
         .kick-player-btn {
             background: none;
-            border: 1px solid #B22222;
-            color: #B22222;
             border-radius: 5px;
             padding: 0.2rem 0.5rem;
             font-size: 0.8rem;
@@ -575,13 +1512,10 @@
             transition: all 0.2s ease;
         }
         .kick-player-btn:hover {
-            background: #B22222;
             color: white;
         }
 
         .lobby-chat-container {
-            background-color: rgba(0,0,0,0.4);
-            border: 2px solid #5A5A5A;
             border-radius: 10px;
             padding: 0.75rem;
             flex-grow: 1; /* Key change: makes chat take all vertical space */
@@ -597,7 +1531,6 @@
             flex-direction: column;
         }
         .chat-message {
-            background-color: #333;
             padding: 0.5rem 0.75rem;
             border-radius: 10px;
             margin-bottom: 0.5rem;
@@ -609,7 +1542,6 @@
             gap: 0.5rem; /* NEW: Space between message and button */
         }
         .chat-message.current-user {
-            background-color: #4682B4;
             align-self: flex-end;
             flex-direction: row-reverse; /* NEW: Puts delete button on the left for RTL */
         }
@@ -618,19 +1550,16 @@
         }
         .chat-message .sender-name {
             font-weight: bold;
-            color: #FFD700;
             display: block;
             font-size: 0.9em;
             margin-bottom: 0.2rem;
         }
         .chat-message .message-text-deleted { /* NEW STYLE */
             font-style: italic;
-            color: #999;
         }
         .delete-message-btn { /* NEW STYLE */
             background: none;
             border: none;
-            color: #aaa;
             cursor: pointer;
             padding: 0.25rem;
             opacity: 0.5;
@@ -639,10 +1568,6 @@
         }
         .chat-message:hover .delete-message-btn { /* NEW STYLE */
             opacity: 1;
-        }
-        .delete-message-btn:hover { /* NEW STYLE */
-            color: #ff6b6b;
-            transform: scale(1.1);
         }
 
         .lobby-chat-input-form {
@@ -662,8 +1587,6 @@
             gap: 1rem;
         }
         .start-game-btn {
-            background: linear-gradient(145deg, #228B22 0%, #006400 100%);
-            border: 2px solid #DAA520;
             font-size: 1.1rem;
             padding: 0.6rem 1.2rem;
         }
@@ -681,17 +1604,36 @@
         .lobby-sidebar::-webkit-scrollbar-track,
         #player-list-container::-webkit-scrollbar-track,
         .lobby-chat-messages::-webkit-scrollbar-track,
-        .custom-scrollbar::-webkit-scrollbar-track { background: #202020; border-radius: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-track { border-radius: 4px; }
         .lobby-sidebar::-webkit-scrollbar-thumb,
         #player-list-container::-webkit-scrollbar-thumb,
         .lobby-chat-messages::-webkit-scrollbar-thumb,
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: #DAA520; border-radius: 4px; }
-        .lobby-sidebar::-webkit-scrollbar-thumb:hover,
-        #player-list-container::-webkit-scrollbar-thumb:hover,
-        .lobby-chat-messages::-webkit-scrollbar-thumb:hover,
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #FFD700; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { border-radius: 4px; }
         
         /* ===== CORRECTED RESPONSIVE STYLES ===== */
+        @media (min-width: 640px) { /* sm breakpoint */
+            .lobby-item {
+                flex-direction: row; /* Align items in a row */
+                text-align: right; /* Text aligned right in RTL */
+            }
+            .lobby-item .lobby-actions {
+                flex-direction: row; /* Buttons side-by-side */
+                width: auto; /* Buttons take their natural width */
+                margin-top: 0; /* No top margin when side-by-side */
+                gap: 0.5rem; /* Small gap between buttons */
+            }
+            /* Add margin-left to close button for spacing from join button */
+            .lobby-item .close-lobby-btn {
+                margin-right: 0.5rem; /* Space from join button in RTL */
+            }
+            .lobby-item .join-lobby-btn,
+            .lobby-item .close-lobby-btn {
+                width: auto; /* Allow buttons to size naturally */
+                font-size: 0.9rem; /* Slightly smaller for compactness */
+                padding: 0.6rem 1.2rem; /* Adjusted padding */
+            }
+        }
+
         @media (max-width: 860px) {
             .lobby-detail-content {
                 flex-direction: column; /* Stack panels on smaller screens */
@@ -735,9 +1677,8 @@
         }
         
         /* Lobby Type Toggle Styles */
-        .lobby-type-btn { padding: 0.5rem 1.5rem; border: 2px solid #DAA520; border-radius: 10px; transition: all 0.2s ease-in-out; background-color: transparent; color: #DAA520; font-weight: bold; }
-        .lobby-type-btn.active { background-color: #DAA520; color: #1A1A1A; box-shadow: 0 0 10px rgba(255,215,0,0.5); }
-        .lobby-lock-icon { width: 1.2rem; height: 1.2rem; margin-left: 0.5rem; color: #FFD700; display: inline-block; vertical-align: middle; }
+        .lobby-type-btn { padding: 0.5rem 1.5rem; border: 2px solid; border-radius: 10px; transition: all 0.2s ease-in-out; background-color: transparent; font-weight: bold; }
+        .lobby-lock-icon { width: 1.2rem; height: 1.2rem; margin-left: 0.5rem; display: inline-block; vertical-align: middle; }
 
         /* NEW: Countdown Animation */
         @keyframes countdown-pulse {
@@ -754,41 +1695,25 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            background-color: rgba(255,255,255,0.05);
-            border: 1px solid rgba(255,255,255,0.1);
             border-radius: 10px;
             padding: 0.75rem 1rem;
             min-width: 120px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
             transition: all 0.3s ease-in-out;
             position: relative;
         }
-        .game-player-pod.is-ai {
-            background-color: rgba(255, 99, 71, 0.1); /* Tomato red tint */
-            border-color: #FF6347; /* Tomato */
-        }
-        .game-player-pod.is-human {
-            background-color: rgba(100, 149, 237, 0.1); /* Cornflower Blue tint */
-            border-color: #6495ED; /* Cornflower Blue */
-        }
         .game-player-pod.current-active-player {
             transform: scale(1.05);
-            border-color: #FFD700; /* Gold */
-            box-shadow: 0 0 15px rgba(255,215,0,0.7);
         }
         .game-player-pod .player-name {
             font-weight: bold;
-            color: #E0E0E0;
             font-size: 1.1rem;
             margin-bottom: 0.2rem;
         }
         .game-player-pod .player-role {
             font-size: 0.9rem;
-            color: #DAA520; /* Gold */
         }
         .game-player-pod .player-status {
             font-size: 0.8rem;
-            color: #C0C0C0;
             margin-top: 0.2rem;
         }
 
@@ -800,15 +1725,6 @@
             font-weight: bold;
             transition: all 0.3s ease;
             cursor: pointer;
-            border: 3px solid #FFD700;
-        }
-        .voting-btn.ai-vote {
-            background: linear-gradient(145deg, #E24B4B 0%, #B22222 100%);
-            color: white;
-        }
-        .voting-btn.human-vote {
-            background: linear-gradient(145deg, #4BBEE2 0%, #2A52BE 100%);
-            color: white;
         }
         .voting-btn:hover:not(:disabled) {
             transform: translateY(-5px) scale(1.05);
@@ -826,7 +1742,6 @@
             display: inline-block;
             vertical-align: middle;
             margin-right: 0.25rem; /* Equivalent to mr-1 */
-            fill: #FFD700; /* Gold color for coins */
         }
     </style>
 </head>
@@ -998,26 +1913,51 @@
             </footer>
         </div>
 
-        <!-- 5. Profile Modal (Hidden by default) -->
-        <div id="profile-modal" class="hidden fixed inset-0 flex justify-center items-center z-50 profile-modal-overlay">
+        <!-- 5. Main Menu Modal (Replaces Profile Modal) -->
+        <div id="main-menu-modal" class="hidden fixed inset-0 flex justify-center items-center z-50 profile-modal-overlay">
             <div class="classic-card profile-modal-content p-6 sm:p-8 w-11/12 max-w-md text-center relative">
-                <h2 class="text-2xl sm:text-3xl font-bold mb-6">پروفایل کاربری</h2>
-                <button id="close-profile-modal-btn" class="absolute top-4 left-4 text-white hover:text-gray-300 transition-colors duration-200">
+                <button id="close-main-menu-modal-btn" class="absolute top-4 left-4 text-white hover:text-gray-300 transition-colors duration-200">
                     <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-x">
                         <path d="M18 6 6 18"/><path d="m6 6 12 12"/>
                     </svg>
                 </button>
-                <div class="text-lg space-y-4 mb-8 text-white">
+
+                <!-- Main Menu Navigation -->
+                <div id="main-menu-nav" class="space-y-4">
+                    <h2 class="text-2xl sm:text-3xl font-bold mb-6 text-yellow-300">منوی اصلی</h2>
+                    <button id="show-profile-btn" class="w-full classic-btn btn-blue-classic text-lg sm:text-xl">
+                        پروفایل کاربری
+                    </button>
+                    <button id="show-themes-btn" class="w-full classic-btn btn-green-classic text-lg sm:text-xl">
+                        انتخاب تم
+                    </button>
+                    <button id="main-menu-logout-btn" class="w-full classic-btn btn-red-classic text-lg sm:text-xl">
+                        خروج از حساب
+                    </button>
+                </div>
+
+                <!-- Profile View (initially hidden, shown when "Profile" is clicked) -->
+                <div id="profile-view" class="hidden text-lg space-y-4 mb-8 text-white text-right">
+                    <h2 class="text-2xl sm:text-3xl font-bold mb-6 text-yellow-300">پروفایل کاربری</h2>
                     <p><strong>نام نمایشی:</strong> <span id="profile-display-name">---</span></p>
                     <p><strong>ایمیل:</strong> <span id="profile-email">---</span></p>
                     <p><strong>شناسه کاربر (UID):</strong> <span id="profile-uid" class="break-all text-sm text-gray-400">---</span></p>
                     <p><strong>سکه‌ها:</strong> <span id="profile-coins" class="font-bold text-yellow-300">---</span></p>
-                    <!-- Add more profile stats here later (e.g., wins, losses) -->
+                    <button id="back-to-main-menu-from-profile" class="w-full classic-btn btn-gray-classic text-lg sm:text-xl">
+                        بازگشت
+                    </button>
                 </div>
-                <button id="profile-logout-btn"
-                        class="w-full classic-btn btn-red-classic text-lg sm:text-xl">
-                    خروج از حساب
-                </button>
+
+                <!-- Themes View (initially hidden, shown when "Themes" is clicked) -->
+                <div id="themes-view" class="hidden text-lg space-y-4 mb-8 text-white">
+                    <h2 class="text-2xl sm:text-3xl font-bold mb-6 text-yellow-300">انتخاب تم</h2>
+                    <div id="theme-buttons-container" class="grid grid-cols-2 gap-4">
+                        <!-- Theme buttons will be dynamically generated by JS -->
+                    </div>
+                    <button id="back-to-main-menu-from-themes" class="w-full classic-btn btn-gray-classic text-lg sm:text-xl">
+                        بازگشت
+                    </button>
+                </div>
             </div>
         </div>
 
@@ -1351,14 +2291,27 @@
         const myLobbiesBtn = document.getElementById('my-lobbies-btn'); // Footer icon
         const activeGamesCount = document.getElementById('active-games-count');
 
-        // Profile Modal Elements
-        const profileModal = document.getElementById('profile-modal');
-        const closeProfileModalBtn = document.getElementById('close-profile-modal-btn');
+        // Main Menu Modal Elements (Replaced Profile Modal)
+        const mainMenuModal = document.getElementById('main-menu-modal');
+        const closeMainMenuModalBtn = document.getElementById('close-main-menu-modal-btn');
+        const mainMenuNav = document.getElementById('main-menu-nav');
+        const showProfileBtn = document.getElementById('show-profile-btn');
+        const showThemesBtn = document.getElementById('show-themes-btn');
+        const mainMenuLogoutBtn = document.getElementById('main-menu-logout-btn'); // Logout button now in main menu modal
+
+        // Profile View (inside Main Menu Modal)
+        const profileView = document.getElementById('profile-view');
         const profileDisplayName = document.getElementById('profile-display-name');
         const profileEmail = document.getElementById('profile-email');
         const profileUid = document.getElementById('profile-uid');
-        const profileCoins = document.getElementById('profile-coins'); // NEW
-        const profileLogoutBtn = document.getElementById('profile-logout-btn');
+        const profileCoins = document.getElementById('profile-coins');
+        const backToMainMenuFromProfile = document.getElementById('back-to-main-menu-from-profile');
+
+        // Themes View (inside Main Menu Modal)
+        const themesView = document.getElementById('themes-view');
+        const themeButtonsContainer = document.getElementById('theme-buttons-container');
+        const backToMainMenuFromThemes = document.getElementById('back-to-main-menu-from-themes');
+
 
         // Create Lobby Modal Elements
         const createLobbyModal = document.getElementById('create-lobby-modal');
@@ -1432,8 +2385,8 @@
         const votingInstructions = document.getElementById('voting-instructions');
         const votingOptions = document.getElementById('voting-options');
         const gameResultDisplay = document.getElementById('game-result-display');
-        const winnerText = document.getElementById('winner-text'); 
-        const reasonText = document.getElementById('reason-text');
+        const winnerText = document.getElementById('winnerText'); 
+        const reasonText = document.getElementById('reasonText');
         const returnToLobbiesBtn = document.getElementById('return-to-lobbies-btn');
 
 
@@ -1483,6 +2436,7 @@
         let lobbyToJoin = null; // To store data of private lobby user wants to join
         let isRefreshing = false; // NEW: State for refresh button
         let gameEntryCost = 100; // NEW: Default game entry cost, will be fetched from Firebase
+        let currentTheme = 'classic'; // NEW: To store the currently active theme
 
         // Promise resolver for custom confirmation modal
         let resolveCustomConfirm;
@@ -1533,6 +2487,132 @@
             gameVotingOverlay.style.display = 'none';
         }
 
+        // NEW: Theme Configurations
+        const themeConfigs = {
+            'classic': {
+                displayName: 'کلاسیک',
+                bodyClass: 'theme-classic',
+                buttonClass: 'btn-brown-classic'
+            },
+            'cyberpunk': {
+                displayName: 'سایبرپانک',
+                bodyClass: 'theme-cyberpunk',
+                buttonClass: 'btn-purple-classic'
+            },
+            'forest': {
+                displayName: 'جنگلی',
+                bodyClass: 'theme-forest',
+                buttonClass: 'btn-green-classic'
+            },
+            'ocean': {
+                displayName: 'اقیانوس',
+                bodyClass: 'theme-ocean',
+                buttonClass: 'btn-blue-classic'
+            },
+            'retro': {
+                displayName: 'رترو',
+                bodyClass: 'theme-retro',
+                buttonClass: 'btn-red-classic'
+            },
+            'minimal': {
+                displayName: 'مینیمال',
+                bodyClass: 'theme-minimal',
+                buttonClass: 'btn-gray-classic'
+            }
+        };
+
+        /**
+         * Applies the specified theme to the body and saves it to user profile.
+         * @param {string} themeName - The key of the theme to apply (e.g., 'classic', 'cyberpunk').
+         */
+        async function applyTheme(themeName) {
+            let config = themeConfigs[themeName];
+            if (!config) {
+                console.warn(`Theme "${themeName}" not found. Falling back to 'classic'.`);
+                themeName = 'classic';
+                config = themeConfigs['classic'];
+            }
+
+            // Remove all existing theme classes from the body
+            Object.values(themeConfigs).forEach(conf => {
+                document.body.classList.remove(conf.bodyClass);
+            });
+
+            // Add the new theme class to the body
+            document.body.classList.add(config.bodyClass);
+            currentTheme = themeName; // Update global state
+
+            // Update active button visual in modal if it's open
+            updateThemeButtonsActiveState();
+
+            // Save selected theme to user's profile in Firebase
+            if (auth.currentUser && currentUserData && currentUserData.theme !== themeName) {
+                try {
+                    const userProfileRef = doc(db, `artifacts/${appId}/users/${auth.currentUser.uid}/profile/data`);
+                    await updateDoc(userProfileRef, { theme: themeName });
+                    console.log(`Theme "${themeName}" saved to user profile.`);
+                } catch (error) {
+                    console.error("Error saving theme to user profile:", error);
+                    // This error shouldn't prevent theme application, just means it might not persist.
+                }
+            } else if (auth.currentUser && !currentUserData) {
+                console.warn("User data not fully loaded, cannot save theme yet.");
+            }
+        }
+
+        /**
+         * Populates the theme selection buttons and sets the active state.
+         */
+        function populateThemeButtons() {
+            themeButtonsContainer.innerHTML = ''; // Clear existing buttons
+
+            for (const themeKey in themeConfigs) {
+                const theme = themeConfigs[themeKey];
+                const button = document.createElement('button');
+                button.className = `classic-btn ${theme.buttonClass} text-base sm:text-lg theme-button`;
+                button.dataset.theme = themeKey;
+                button.textContent = theme.displayName;
+                button.addEventListener('click', () => applyTheme(themeKey));
+                themeButtonsContainer.appendChild(button);
+            }
+            updateThemeButtonsActiveState();
+        }
+
+        /**
+         * Updates the 'active-theme-btn' class on theme buttons based on currentTheme.
+         */
+        function updateThemeButtonsActiveState() {
+            document.querySelectorAll('.theme-button').forEach(btn => {
+                if (btn.dataset.theme === currentTheme) {
+                    btn.classList.add('active-theme-btn');
+                } else {
+                    btn.classList.remove('active-theme-btn');
+                }
+            });
+        }
+
+
+        // Function to open the main menu modal and show default view (Main Nav)
+        function openMainMenuModal() {
+            mainMenuModal.classList.remove('hidden');
+            void mainMenuModal.offsetWidth;
+            mainMenuModal.classList.add('profile-modal-enter-active');
+            
+            // Show main nav and hide other views
+            mainMenuNav.classList.remove('hidden');
+            profileView.classList.add('hidden');
+            themesView.classList.add('hidden');
+        }
+
+        // Function to close the main menu modal
+        function closeMainMenuModal() {
+            mainMenuModal.classList.remove('profile-modal-enter-active');
+            mainMenuModal.classList.add('profile-modal-leave-active');
+            setTimeout(() => {
+                mainMenuModal.classList.add('hidden');
+                mainMenuModal.classList.remove('profile-modal-leave-active');
+            }, 300);
+        }
 
         // Function to show custom message box (re-used for auth and create lobby modals)
         function showCustomMessage(element, message, type = 'info') {
@@ -1746,27 +2826,245 @@
 
             }, 600); // Matches CSS transition duration
         }
+        
+        function openKickPlayerConfirmModal(playerName, playerUid) {
+            kickPlayerConfirmName.textContent = playerName;
+            kickPlayerConfirmModal.classList.remove('hidden');
+            void kickPlayerConfirmModal.offsetWidth;
+            kickPlayerConfirmModal.classList.add('profile-modal-enter-active');
+            kickedPlayerToProcess = { uid: playerUid, displayName: playerName };
+        }
 
-        // Functions to open/close modals
-        function openProfileModal() {
-            profileModal.classList.remove('hidden');
-            void profileModal.offsetWidth;
-            profileModal.classList.add('profile-modal-enter-active');
-            if (currentUserData) {
-                profileDisplayName.textContent = currentUserData.displayName || 'ناشناس';
-                profileEmail.textContent = currentUserData.email || 'ناشناس';
-                profileUid.textContent = currentUserData.uid || 'ناشناس';
-                profileCoins.textContent = currentUserData.coins !== undefined ? currentUserData.coins.toLocaleString('fa-IR') : '---'; // NEW
+        function closeKickPlayerConfirmModal() {
+            kickPlayerConfirmModal.classList.remove('profile-modal-enter-active');
+            kickPlayerConfirmModal.classList.add('profile-modal-leave-active');
+            setTimeout(() => {
+                kickPlayerConfirmModal.classList.add('hidden');
+                kickPlayerConfirmModal.classList.remove('profile-modal-leave-active');
+                kickedPlayerToProcess = null;
+            }, 300);
+        }
+
+        function showKickedMessageModal(lobbyName) {
+            kickedLobbyName.textContent = lobbyName;
+            kickedMessageModal.classList.remove('hidden');
+            void kickedMessageModal.offsetWidth;
+            kickedMessageModal.classList.add('profile-modal-enter-active');
+        }
+
+        function closeKickedMessageModal() {
+            kickedMessageModal.classList.remove('profile-modal-enter-active');
+            kickedMessageModal.classList.add('profile-modal-leave-active');
+            setTimeout(() => {
+                kickedMessageModal.classList.add('hidden');
+                kickedMessageModal.classList.remove('profile-modal-leave-active');
+                setActiveScreen(lobbyScreen);
+                unsubscribeLobbies = setupLobbyListener('');
+            }, 300);
+        }
+
+        function openKickedPlayersListModal() {
+            kickedPlayersListModal.classList.remove('hidden');
+            void kickedPlayersListModal.offsetWidth;
+            kickedPlayersListModal.classList.add('profile-modal-enter-active');
+            if (currentLobbyId) {
+                unsubscribeKickedPlayers = setupKickedPlayersListListener(currentLobbyId);
+            } else {
+                kickedPlayersListContent.innerHTML = '<p class="text-gray-400 text-center">خطا: لابی فعال یافت نشد.</p>';
             }
         }
 
-        function closeProfileModal() {
-            profileModal.classList.remove('profile-modal-enter-active');
-            profileModal.classList.add('profile-modal-leave-active');
+        function closeKickedPlayersListModal() {
+            kickedPlayersListModal.classList.remove('profile-modal-enter-active');
+            kickedPlayersListModal.classList.add('profile-modal-leave-active');
             setTimeout(() => {
-                profileModal.classList.add('hidden');
-                profileModal.classList.remove('profile-modal-leave-active');
+                kickedPlayersListModal.classList.add('hidden');
+                kickedPlayersListModal.classList.remove('profile-modal-leave-active');
+                if (unsubscribeKickedPlayers) {
+                    unsubscribeKickedPlayers();
+                    unsubscribeKickedPlayers = null;
+                }
             }, 300);
+        }
+
+        // NEW: Function to update coins display in header
+        function updateUserCoinsDisplay() {
+            if (currentUserData && currentUserData.coins !== undefined) {
+                headerUserCoins.textContent = currentUserData.coins.toLocaleString('fa-IR'); // Display only number now
+            } else {
+                headerUserCoins.textContent = `---`;
+            }
+        }
+        
+        // =========================================================================
+        // === START OF CORRECTED AUTH & REAL-TIME SETTINGS LOGIC =================
+        // =========================================================================
+
+        /**
+         * NEW: Sets up a real-time listener for game settings (like entry cost).
+         * This ensures any changes in Firestore are immediately reflected in the app.
+         */
+        function setupGameSettingsListener() {
+            if (unsubscribeGameSettings) unsubscribeGameSettings(); // Clean up previous listener if any
+
+            const configRef = doc(db, `artifacts/${appId}/config/game_settings`);
+            unsubscribeGameSettings = onSnapshot(configRef, (docSnap) => {
+                if (docSnap.exists()) {
+                    const newCost = docSnap.data().gameEntryCost;
+                    if (typeof newCost === 'number') {
+                        gameEntryCost = newCost;
+                        friendlyGameCostSpan.textContent = gameEntryCost.toLocaleString('fa-IR');
+                        console.log(`هزینه ورودی بازی به صورت لحظه‌ای به ${gameEntryCost} تغییر کرد.`);
+                    }
+                } else {
+                    console.warn("سند تنظیمات بازی یافت نشد. از مقدار پیش‌فرض استفاده می‌شود.");
+                    // Fallback to default if somehow the document is deleted after app start
+                    gameEntryCost = 100;
+                    friendlyGameCostSpan.textContent = gameEntryCost.toLocaleString('fa-IR');
+                }
+            }, (error) => {
+                console.error("خطا در گوش دادن به تنظیمات بازی:", error);
+            });
+        }
+        
+        onAuthStateChanged(auth, async (user) => {
+            console.log("onAuthStateChanged triggered. User:", user ? user.uid : "logged out");
+
+            // Part 1: Manage User Data and Listeners
+            if (user) {
+                // If a user is logged in, set up listeners.
+                if (unsubscribeUserProfile) unsubscribeUserProfile();
+                if (unsubscribeGameSettings) unsubscribeGameSettings();
+
+                // Setup listener for user profile
+                const userDocRef = doc(db, `artifacts/${appId}/users/${user.uid}/profile/data`);
+                unsubscribeUserProfile = onSnapshot(userDocRef, (docSnap) => {
+                    if (docSnap.exists()) {
+                        currentUserData = { uid: user.uid, email: user.email, ...docSnap.data() };
+                        headerDisplayName.textContent = currentUserData.displayName || 'کاربر ناشناس';
+                        headerUserId.textContent = `شناسه: ${currentUserData.uid.substring(0, 8)}...`;
+                        updateUserCoinsDisplay();
+                        
+                        // NEW: Apply user's saved theme
+                        const savedTheme = currentUserData.theme || 'classic'; // Default to 'classic'
+                        if (currentTheme !== savedTheme) { // Only apply if different to avoid unnecessary transitions
+                            applyTheme(savedTheme);
+                        }
+
+                        // Also update the approved lobby names list in the modal whenever profile data changes
+                        if (!createLobbyModal.classList.contains('hidden')) { // Only if modal is open
+                           renderApprovedLobbyNamesManagementList(); // Rerender management list
+                           // Re-evaluate approved names dropdown & proposal area visibility
+                           updateCreateLobbyModalUI(createLobbyModalTitle.textContent === 'مدیریت نام‌های لابی و ساخت لابی' ? 'myLobbies' : 'create'); // Use the new helper here
+                        }
+                    } else {
+                        console.warn("User profile document not found. Creating a default one.");
+                        // Create a default profile if it doesn't exist
+                        setDoc(userDocRef, {
+                            displayName: user.displayName || user.email.split('@')[0],
+                            email: user.email,
+                            coins: 500, // Starting coins
+                            approvedLobbyNames: [],
+                            banStatus: { isBanned: false },
+                            createdAt: serverTimestamp(),
+                            theme: 'classic' // NEW: Add default theme
+                        }, { merge: true }).then(() => {
+                            console.log("Default user profile created.");
+                            applyTheme('classic'); // Apply default theme
+                        }).catch(e => {
+                            console.error("Error creating default user profile:", e);
+                        });
+                        currentUserData = { uid: user.uid, email: user.email, displayName: 'کاربر جدید', coins: 0, approvedLobbyNames: [], theme: 'classic' };
+                        applyTheme('classic'); // Ensure default is applied immediately
+                    }
+                }, (error) => {
+                    console.error("خطا در گوش دادن به user profile:", error);
+                });
+
+                // NEW: Setup listener for game settings
+                setupGameSettingsListener();
+
+            } else {
+                // User is logged out. Clean up all data and listeners.
+                if (unsubscribeUserProfile) unsubscribeUserProfile();
+                if (unsubscribeGameSettings) unsubscribeGameSettings();
+                // ... (other listener cleanups) ...
+                if (unsubscribeLobbies) unsubscribeLobbies();
+                if (unsubscribeLobbyDetail) unsubscribeLobbyDetail();
+                if (unsubscribeKickedPlayers) unsubscribeKickedPlayers();
+                if (unsubscribeLobbyChat) unsubscribeLobbyChat();
+                if (unsubscribePendingLobbyNames) unsubscribePendingLobbyNames();
+                
+                unsubscribeUserProfile = unsubscribeGameSettings = unsubscribeLobbies = unsubscribeLobbyDetail = unsubscribeKickedPlayers = unsubscribeLobbyChat = unsubscribePendingLobbyNames = null;
+                clearGameIntervals();
+                
+                currentUserData = null;
+                currentLobbyId = null;
+                userHasActiveLobby = false;
+                
+                resetGameUI();
+                updateUserCoinsDisplay();
+                applyTheme('classic'); // Reset to classic theme on logout
+            }
+
+            // Part 2: Manage Screen Transitions (no change needed here)
+            if (!isInitialAuthCheckComplete) {
+                setActiveScreen(user ? mainScreen : authScreen);
+                isInitialAuthCheckComplete = true;
+            } else {
+                if (user && currentActiveScreen === authScreen) {
+                    setActiveScreen(mainScreen);
+                } else if (!user && currentActiveScreen !== authScreen) {
+                    setActiveScreen(authScreen);
+                }
+            }
+        });
+
+        async function initializeFirebaseAndAuth() {
+            console.log("Initializing Firebase...");
+
+            // Ensure game_settings config exists at startup. If not, create it.
+            // The real-time listener will then pick up the value.
+            try {
+                const configRef = doc(db, `artifacts/${appId}/config/game_settings`);
+                const configSnap = await getDoc(configRef);
+                if (!configSnap.exists()) {
+                    console.log("`game_settings` document not found. Creating with default values...");
+                    await setDoc(configRef, { gameEntryCost: 100 });
+                    console.log("Default `game_settings` config created successfully.");
+                }
+            } catch (error) {
+                console.error("CRITICAL: Error initializing game settings config:", error);
+                showMessageBox("خطا در بارگذاری تنظیمات بازی.", "error");
+            }
+            
+            // Handle initial authentication
+            if (initialAuthToken) {
+                try {
+                    await signInWithCustomToken(auth, initialAuthToken);
+                } catch (error) {
+                    console.error("Error signing in with initial custom token:", error);
+                }
+            }
+            console.log("Firebase initialization finished.");
+        }
+        // --- END OF CORRECTED AUTH & REAL-TIME SETTINGS LOGIC ---
+
+        // Maps Firebase auth error codes to user-friendly Persian messages.
+        function getFirebaseErrorMessage(errorCode) {
+            const messages = {
+                'auth/invalid-email': "فرمت ایمیل نامعتبر است.",
+                'auth/user-disabled': "حساب کاربری شما غیرفعال شده است.",
+                'auth/user-not-found': "کاربری با این ایمیل یافت نشد.",
+                'auth/wrong-password': "ایمیل یا رمز عبور اشتباه است.",
+                'auth/invalid-credential': "ایمیل یا رمز عبور اشتباه است.",
+                'auth/email-already-in-use': "این ایمیل قبلاً ثبت نام شده است.",
+                'auth/weak-password': "رمز عبور باید حداقل ۶ کاراکتر باشد.",
+                'auth/operation-not-allowed': "این نوع ورود فعال نیست.",
+                'auth/network-request-failed': "مشکل در اتصال به اینترنت.",
+                'auth/too-many-requests': "تعداد تلاش‌های ناموفق بیش از حد مجاز.",
+            };
+            return messages[errorCode] || "خطایی ناشناخته رخ داده است.";
         }
 
         /**
@@ -2077,235 +3375,6 @@
             }, 300);
         }
         
-        function openKickPlayerConfirmModal(playerName, playerUid) {
-            kickPlayerConfirmName.textContent = playerName;
-            kickPlayerConfirmModal.classList.remove('hidden');
-            void kickPlayerConfirmModal.offsetWidth;
-            kickPlayerConfirmModal.classList.add('profile-modal-enter-active');
-            kickedPlayerToProcess = { uid: playerUid, displayName: playerName };
-        }
-
-        function closeKickPlayerConfirmModal() {
-            kickPlayerConfirmModal.classList.remove('profile-modal-enter-active');
-            kickPlayerConfirmModal.classList.add('profile-modal-leave-active');
-            setTimeout(() => {
-                kickPlayerConfirmModal.classList.add('hidden');
-                kickPlayerConfirmModal.classList.remove('profile-modal-leave-active');
-                kickedPlayerToProcess = null;
-            }, 300);
-        }
-
-        function showKickedMessageModal(lobbyName) {
-            kickedLobbyName.textContent = lobbyName;
-            kickedMessageModal.classList.remove('hidden');
-            void kickedMessageModal.offsetWidth;
-            kickedMessageModal.classList.add('profile-modal-enter-active');
-        }
-
-        function closeKickedMessageModal() {
-            kickedMessageModal.classList.remove('profile-modal-enter-active');
-            kickedMessageModal.classList.add('profile-modal-leave-active');
-            setTimeout(() => {
-                kickedMessageModal.classList.add('hidden');
-                kickedMessageModal.classList.remove('profile-modal-leave-active');
-                setActiveScreen(lobbyScreen);
-                unsubscribeLobbies = setupLobbyListener('');
-            }, 300);
-        }
-
-        function openKickedPlayersListModal() {
-            kickedPlayersListModal.classList.remove('hidden');
-            void kickedPlayersListModal.offsetWidth;
-            kickedPlayersListModal.classList.add('profile-modal-enter-active');
-            if (currentLobbyId) {
-                unsubscribeKickedPlayers = setupKickedPlayersListListener(currentLobbyId);
-            } else {
-                kickedPlayersListContent.innerHTML = '<p class="text-gray-400 text-center">خطا: لابی فعال یافت نشد.</p>';
-            }
-        }
-
-        function closeKickedPlayersListModal() {
-            kickedPlayersListModal.classList.remove('profile-modal-enter-active');
-            kickedPlayersListModal.classList.add('profile-modal-leave-active');
-            setTimeout(() => {
-                kickedPlayersListModal.classList.add('hidden');
-                kickedPlayersListModal.classList.remove('profile-modal-leave-active');
-                if (unsubscribeKickedPlayers) {
-                    unsubscribeKickedPlayers();
-                    unsubscribeKickedPlayers = null;
-                }
-            }, 300);
-        }
-
-        // NEW: Function to update coins display in header
-        function updateUserCoinsDisplay() {
-            if (currentUserData && currentUserData.coins !== undefined) {
-                headerUserCoins.textContent = currentUserData.coins.toLocaleString('fa-IR'); // Display only number now
-            } else {
-                headerUserCoins.textContent = `---`;
-            }
-        }
-        
-        // =========================================================================
-        // === START OF CORRECTED AUTH & REAL-TIME SETTINGS LOGIC =================
-        // =========================================================================
-
-        /**
-         * NEW: Sets up a real-time listener for game settings (like entry cost).
-         * This ensures any changes in Firestore are immediately reflected in the app.
-         */
-        function setupGameSettingsListener() {
-            if (unsubscribeGameSettings) unsubscribeGameSettings(); // Clean up previous listener if any
-
-            const configRef = doc(db, `artifacts/${appId}/config/game_settings`);
-            unsubscribeGameSettings = onSnapshot(configRef, (docSnap) => {
-                if (docSnap.exists()) {
-                    const newCost = docSnap.data().gameEntryCost;
-                    if (typeof newCost === 'number') {
-                        gameEntryCost = newCost;
-                        friendlyGameCostSpan.textContent = gameEntryCost.toLocaleString('fa-IR');
-                        console.log(`هزینه ورودی بازی به صورت لحظه‌ای به ${gameEntryCost} تغییر کرد.`);
-                    }
-                } else {
-                    console.warn("سند تنظیمات بازی یافت نشد. از مقدار پیش‌فرض استفاده می‌شود.");
-                    // Fallback to default if somehow the document is deleted after app start
-                    gameEntryCost = 100;
-                    friendlyGameCostSpan.textContent = gameEntryCost.toLocaleString('fa-IR');
-                }
-            }, (error) => {
-                console.error("خطا در گوش دادن به تنظیمات بازی:", error);
-            });
-        }
-        
-        onAuthStateChanged(auth, async (user) => {
-            console.log("onAuthStateChanged triggered. User:", user ? user.uid : "logged out");
-
-            // Part 1: Manage User Data and Listeners
-            if (user) {
-                // If a user is logged in, set up listeners.
-                if (unsubscribeUserProfile) unsubscribeUserProfile();
-                if (unsubscribeGameSettings) unsubscribeGameSettings();
-
-                // Setup listener for user profile
-                const userDocRef = doc(db, `artifacts/${appId}/users/${user.uid}/profile/data`);
-                unsubscribeUserProfile = onSnapshot(userDocRef, (docSnap) => {
-                    if (docSnap.exists()) {
-                        currentUserData = { uid: user.uid, email: user.email, ...docSnap.data() };
-                        headerDisplayName.textContent = currentUserData.displayName || 'کاربر ناشناس';
-                        headerUserId.textContent = `شناسه: ${currentUserData.uid.substring(0, 8)}...`;
-                        updateUserCoinsDisplay();
-                        // Also update the approved lobby names list in the modal whenever profile data changes
-                        if (!createLobbyModal.classList.contains('hidden')) { // Only if modal is open
-                           renderApprovedLobbyNamesManagementList(); // Rerender management list
-                           // Re-evaluate approved names dropdown & proposal area visibility
-                           updateCreateLobbyModalUI(createLobbyModalTitle.textContent === 'مدیریت نام‌های لابی و ساخت لابی' ? 'myLobbies' : 'create'); // Use the new helper here
-                        }
-                    } else {
-                        console.warn("User profile document not found. Creating a default one.");
-                        // Create a default profile if it doesn't exist
-                        setDoc(userDocRef, {
-                            displayName: user.displayName || user.email.split('@')[0],
-                            email: user.email,
-                            coins: 500, // Starting coins
-                            approvedLobbyNames: [],
-                            banStatus: { isBanned: false },
-                            createdAt: serverTimestamp()
-                        }, { merge: true }).then(() => {
-                            console.log("Default user profile created.");
-                        }).catch(e => {
-                            console.error("Error creating default user profile:", e);
-                        });
-                        currentUserData = { uid: user.uid, email: user.email, displayName: 'کاربر جدید', coins: 0, approvedLobbyNames: [] };
-                    }
-                }, (error) => {
-                    console.error("خطا در گوش دادن به user profile:", error);
-                });
-
-                // NEW: Setup listener for game settings
-                setupGameSettingsListener();
-
-            } else {
-                // User is logged out. Clean up all data and listeners.
-                if (unsubscribeUserProfile) unsubscribeUserProfile();
-                if (unsubscribeGameSettings) unsubscribeGameSettings();
-                // ... (other listener cleanups) ...
-                if (unsubscribeLobbies) unsubscribeLobbies();
-                if (unsubscribeLobbyDetail) unsubscribeLobbyDetail();
-                if (unsubscribeKickedPlayers) unsubscribeKickedPlayers();
-                if (unsubscribeLobbyChat) unsubscribeLobbyChat();
-                if (unsubscribePendingLobbyNames) unsubscribePendingLobbyNames();
-                
-                unsubscribeUserProfile = unsubscribeGameSettings = unsubscribeLobbies = unsubscribeLobbyDetail = unsubscribeKickedPlayers = unsubscribeLobbyChat = unsubscribePendingLobbyNames = null;
-                clearGameIntervals();
-                
-                currentUserData = null;
-                currentLobbyId = null;
-                userHasActiveLobby = false;
-                
-                resetGameUI();
-                updateUserCoinsDisplay();
-            }
-
-            // Part 2: Manage Screen Transitions (no change needed here)
-            if (!isInitialAuthCheckComplete) {
-                setActiveScreen(user ? mainScreen : authScreen);
-                isInitialAuthCheckComplete = true;
-            } else {
-                if (user && currentActiveScreen === authScreen) {
-                    setActiveScreen(mainScreen);
-                } else if (!user && currentActiveScreen !== authScreen) {
-                    setActiveScreen(authScreen);
-                }
-            }
-        });
-
-        async function initializeFirebaseAndAuth() {
-            console.log("Initializing Firebase...");
-
-            // Ensure game_settings config exists at startup. If not, create it.
-            // The real-time listener will then pick up the value.
-            try {
-                const configRef = doc(db, `artifacts/${appId}/config/game_settings`);
-                const configSnap = await getDoc(configRef);
-                if (!configSnap.exists()) {
-                    console.log("`game_settings` document not found. Creating with default values...");
-                    await setDoc(configRef, { gameEntryCost: 100 });
-                    console.log("Default `game_settings` config created successfully.");
-                }
-            } catch (error) {
-                console.error("CRITICAL: Error initializing game settings config:", error);
-                showMessageBox("خطا در بارگذاری تنظیمات بازی.", "error");
-            }
-            
-            // Handle initial authentication
-            if (initialAuthToken) {
-                try {
-                    await signInWithCustomToken(auth, initialAuthToken);
-                } catch (error) {
-                    console.error("Error signing in with initial custom token:", error);
-                }
-            }
-            console.log("Firebase initialization finished.");
-        }
-        // --- END OF CORRECTED AUTH & REAL-TIME SETTINGS LOGIC ---
-
-        // Maps Firebase auth error codes to user-friendly Persian messages.
-        function getFirebaseErrorMessage(errorCode) {
-            const messages = {
-                'auth/invalid-email': "فرمت ایمیل نامعتبر است.",
-                'auth/user-disabled': "حساب کاربری شما غیرفعال شده است.",
-                'auth/user-not-found': "کاربری با این ایمیل یافت نشد.",
-                'auth/wrong-password': "ایمیل یا رمز عبور اشتباه است.",
-                'auth/invalid-credential': "ایمیل یا رمز عبور اشتباه است.",
-                'auth/email-already-in-use': "این ایمیل قبلاً ثبت نام شده است.",
-                'auth/weak-password': "رمز عبور باید حداقل ۶ کاراکتر باشد.",
-                'auth/operation-not-allowed': "این نوع ورود فعال نیست.",
-                'auth/network-request-failed': "مشکل در اتصال به اینترنت.",
-                'auth/too-many-requests': "تعداد تلاش‌های ناموفق بیش از حد مجاز.",
-            };
-            return messages[errorCode] || "خطایی ناشناخته رخ داده است.";
-        }
-
         // --- Firebase Lobby Functions ---
         async function createLobby(lobbyName, userId, displayName, lobbyType, password, gameDurationMinutes) {
             try {
@@ -3284,7 +4353,8 @@
                         coins: 500, // Starting coins
                         approvedLobbyNames: [],
                         banStatus: { isBanned: false },
-                        createdAt: serverTimestamp()
+                        createdAt: serverTimestamp(),
+                        theme: 'classic' // Set default theme on registration
                     });
                     console.log("User profile document created immediately after registration.");
                 }
@@ -3296,17 +4366,54 @@
             }
         });
 
-        menuBtn.addEventListener('click', openProfileModal);
-        profileSummary.addEventListener('click', openProfileModal);
-        closeProfileModalBtn.addEventListener('click', closeProfileModal);
-        profileModal.addEventListener('click', (e) => e.target === profileModal && closeProfileModal());
-        
-        profileLogoutBtn.addEventListener('click', async () => {
-            try { 
-                await signOut(auth); 
-                closeProfileModal(); 
-            } catch (error) { 
-                showMessageBox(getFirebaseErrorMessage(error.code), 'error'); 
+        // Change from openProfileModal to openMainMenuModal
+        menuBtn.addEventListener('click', openMainMenuModal);
+        profileSummary.addEventListener('click', openMainMenuModal); // Still opens main menu
+
+        // New Event Listeners for Main Menu Modal navigation
+        closeMainMenuModalBtn.addEventListener('click', closeMainMenuModal);
+        mainMenuModal.addEventListener('click', (e) => e.target === mainMenuModal && closeMainMenuModal());
+
+        showProfileBtn.addEventListener('click', () => {
+            mainMenuNav.classList.add('hidden');
+            profileView.classList.remove('hidden');
+            themesView.classList.add('hidden'); // Ensure themes view is hidden
+            if (currentUserData) { // Populate profile data when opening profile view
+                profileDisplayName.textContent = currentUserData.displayName || 'ناشناس';
+                profileEmail.textContent = currentUserData.email || 'ناشناس';
+                profileUid.textContent = currentUserData.uid || 'ناشناس';
+                profileCoins.textContent = currentUserData.coins !== undefined ? currentUserData.coins.toLocaleString('fa-IR') : '---';
+            }
+        });
+
+        showThemesBtn.addEventListener('click', () => {
+            mainMenuNav.classList.add('hidden');
+            profileView.classList.add('hidden'); // Ensure profile view is hidden
+            themesView.classList.remove('hidden');
+            populateThemeButtons(); // Populate theme buttons when showing themes view
+        });
+
+        backToMainMenuFromProfile.addEventListener('click', () => {
+            profileView.classList.add('hidden');
+            mainMenuNav.classList.remove('hidden');
+        });
+
+        backToMainMenuFromThemes.addEventListener('click', () => {
+            themesView.classList.add('hidden');
+            mainMenuNav.classList.remove('hidden');
+        });
+
+        // Logout button is now within the main menu modal
+        mainMenuLogoutBtn.addEventListener('click', async () => {
+            const confirmed = await showCustomConfirm("آیا مطمئن هستید که می‌خواهید از حساب کاربری خود خارج شوید؟");
+            if (confirmed) {
+                try { 
+                    await signOut(auth); 
+                    closeMainMenuModal(); 
+                    // Theme will automatically reset to classic via onAuthStateChanged
+                } catch (error) { 
+                    showMessageBox(getFirebaseErrorMessage(error.code), 'error'); 
+                }
             }
         });
 
@@ -3353,7 +4460,7 @@
             );
             const pendingSnapshot = await getDocs(qPending);
             if (pendingSnapshot.size >= MAX_PENDING_PROPOSALS) { // Use constant for limit
-                showCreateLobbyMessageBox(`شما به حداکثر تعداد (${MAX_PENDING_PROPOSALS}) درخواست لابی در انتظار تایید رسیده‌اید.`, "error");
+                                showCreateLobbyMessageBox(`شما به حداکثر تعداد (${MAX_PENDING_PROPOSALS}) درخواست لابی در انتظار تایید رسیده‌اید.`, "error");
                 return;
             }
 
@@ -3683,3 +4790,4 @@
     </script>
 </body>
 </html>
+                
