@@ -1463,6 +1463,7 @@
         let unsubscribeLobbyChat = null; // NEW: Listener for lobby chat messages
         let unsubscribeUserProfile = null; // NEW: Listener for real-time user profile updates
         let unsubscribePendingLobbyNames = null; // NEW: Listener for pending lobby names
+        let unsubscribeGameSettings = null; // NEW: Listener for real-time game settings
         let isInitialAuthCheckComplete = false; // Flag to ensure initial loading screen transition happens only once
         let userHasActiveLobby = false; // Track if the current user has an active lobby (created or joined)
         let currentLobbyId = null; // Stores the ID of the lobby the current user is in
@@ -2054,52 +2055,77 @@
             }
         }
         
-        // --- START OF CORRECTED AUTH LOGIC ---
-        // Firebase Authentication State Listener (REVISED AND SIMPLIFIED)
+        // =========================================================================
+        // === START OF CORRECTED AUTH & REAL-TIME SETTINGS LOGIC =================
+        // =========================================================================
+
+        /**
+         * NEW: Sets up a real-time listener for game settings (like entry cost).
+         * This ensures any changes in Firestore are immediately reflected in the app.
+         */
+        function setupGameSettingsListener() {
+            if (unsubscribeGameSettings) unsubscribeGameSettings(); // Clean up previous listener if any
+
+            const configRef = doc(db, `artifacts/${appId}/config/game_settings`);
+            unsubscribeGameSettings = onSnapshot(configRef, (docSnap) => {
+                if (docSnap.exists()) {
+                    const newCost = docSnap.data().gameEntryCost;
+                    if (typeof newCost === 'number') {
+                        gameEntryCost = newCost;
+                        friendlyGameCostSpan.textContent = gameEntryCost.toLocaleString('fa-IR');
+                        console.log(`هزینه ورودی بازی به صورت لحظه‌ای به ${gameEntryCost} تغییر کرد.`);
+                    }
+                } else {
+                    console.warn("سند تنظیمات بازی یافت نشد. از مقدار پیش‌فرض استفاده می‌شود.");
+                    // Fallback to default if somehow the document is deleted after app start
+                    gameEntryCost = 100;
+                    friendlyGameCostSpan.textContent = gameEntryCost.toLocaleString('fa-IR');
+                }
+            }, (error) => {
+                console.error("خطا در گوش دادن به تنظیمات بازی:", error);
+            });
+        }
+        
         onAuthStateChanged(auth, async (user) => {
             console.log("onAuthStateChanged triggered. User:", user ? user.uid : "logged out");
 
             // Part 1: Manage User Data and Listeners
             if (user) {
-                // If a user is logged in, set up a real-time listener for their profile data.
-                const userDocRef = doc(db, `artifacts/${appId}/users/${user.uid}/profile/data`);
-                if (unsubscribeUserProfile) unsubscribeUserProfile(); // Clean up old listener
+                // If a user is logged in, set up listeners.
+                if (unsubscribeUserProfile) unsubscribeUserProfile();
+                if (unsubscribeGameSettings) unsubscribeGameSettings();
 
+                // Setup listener for user profile
+                const userDocRef = doc(db, `artifacts/${appId}/users/${user.uid}/profile/data`);
                 unsubscribeUserProfile = onSnapshot(userDocRef, (docSnap) => {
                     if (docSnap.exists()) {
-                        const latestUserData = docSnap.data();
-                        currentUserData = {
-                            uid: user.uid,
-                            email: user.email,
-                            displayName: latestUserData.displayName || 'کاربر ناشناس',
-                            coins: latestUserData.coins,
-                            approvedLobbyNames: latestUserData.approvedLobbyNames,
-                            banStatus: latestUserData.banStatus || { isBanned: false }
-                        };
-                        headerDisplayName.textContent = currentUserData.displayName;
+                        currentUserData = { uid: user.uid, email: user.email, ...docSnap.data() };
+                        headerDisplayName.textContent = currentUserData.displayName || 'کاربر ناشناس';
                         headerUserId.textContent = `شناسه: ${currentUserData.uid.substring(0, 8)}...`;
                         updateUserCoinsDisplay();
                     } else {
-                        console.warn("User profile document not found. Using fallback data.");
-                        currentUserData = { uid: user.uid, email: user.email, displayName: 'کاربر جدید', coins: 0, approvedLobbyNames: [], banStatus: { isBanned: false } };
-                        headerDisplayName.textContent = currentUserData.displayName;
-                        headerUserId.textContent = `شناسه: ${currentUserData.uid.substring(0, 8)}...`;
-                        updateUserCoinsDisplay();
+                        console.warn("User profile document not found.");
+                        currentUserData = { uid: user.uid, email: user.email, displayName: 'کاربر جدید', coins: 0, approvedLobbyNames: [] };
                     }
                 }, (error) => {
                     console.error("Error listening to user profile:", error);
-                    showMessageBox("خطا در بارگذاری پروفایل.", "error");
                 });
+
+                // NEW: Setup listener for game settings
+                setupGameSettingsListener();
+
             } else {
                 // User is logged out. Clean up all data and listeners.
                 if (unsubscribeUserProfile) unsubscribeUserProfile();
+                if (unsubscribeGameSettings) unsubscribeGameSettings();
+                // ... (other listener cleanups) ...
                 if (unsubscribeLobbies) unsubscribeLobbies();
                 if (unsubscribeLobbyDetail) unsubscribeLobbyDetail();
                 if (unsubscribeKickedPlayers) unsubscribeKickedPlayers();
                 if (unsubscribeLobbyChat) unsubscribeLobbyChat();
                 if (unsubscribePendingLobbyNames) unsubscribePendingLobbyNames();
                 
-                unsubscribeUserProfile = unsubscribeLobbies = unsubscribeLobbyDetail = unsubscribeKickedPlayers = unsubscribeLobbyChat = unsubscribePendingLobbyNames = null;
+                unsubscribeUserProfile = unsubscribeGameSettings = unsubscribeLobbies = unsubscribeLobbyDetail = unsubscribeKickedPlayers = unsubscribeLobbyChat = unsubscribePendingLobbyNames = null;
                 clearGameIntervals();
                 
                 currentUserData = null;
@@ -2110,68 +2136,48 @@
                 updateUserCoinsDisplay();
             }
 
-            // Part 2: Manage Screen Transitions
+            // Part 2: Manage Screen Transitions (no change needed here)
             if (!isInitialAuthCheckComplete) {
-                // This runs only ONCE on page load to transition from the loading screen.
                 setActiveScreen(user ? mainScreen : authScreen);
                 isInitialAuthCheckComplete = true;
             } else {
-                // For all subsequent auth changes (login, register, logout).
                 if (user && currentActiveScreen === authScreen) {
-                    // If user logs in or registers, and we are on the auth screen, move to main screen.
                     setActiveScreen(mainScreen);
                 } else if (!user && currentActiveScreen !== authScreen) {
-                    // If user logs out, and we are NOT on the auth screen, move to auth screen.
                     setActiveScreen(authScreen);
                 }
             }
         });
 
-        // =========================================================================
-        // === SOLUTION: Robust function to initialize Firebase and settings ===
-        // =========================================================================
         async function initializeFirebaseAndAuth() {
             console.log("Initializing Firebase...");
 
-            // SOLUTION 2: Ensure game_settings config exists at startup.
-            // This is placed in its own try/catch to be robust.
+            // Ensure game_settings config exists at startup. If not, create it.
+            // The real-time listener will then pick up the value.
             try {
                 const configRef = doc(db, `artifacts/${appId}/config/game_settings`);
                 const configSnap = await getDoc(configRef);
                 if (!configSnap.exists()) {
                     console.log("`game_settings` document not found. Creating with default values...");
-                    await setDoc(configRef, { gameEntryCost: 100 }); // Default cost
-                    gameEntryCost = 100;
+                    await setDoc(configRef, { gameEntryCost: 100 });
                     console.log("Default `game_settings` config created successfully.");
-                } else {
-                    gameEntryCost = configSnap.data().gameEntryCost || 100;
-                    console.log(`Game entry cost loaded: ${gameEntryCost}`);
                 }
-                friendlyGameCostSpan.textContent = gameEntryCost.toLocaleString('fa-IR');
             } catch (error) {
                 console.error("CRITICAL: Error initializing game settings config:", error);
-                gameEntryCost = 100; // Fallback on error
-                friendlyGameCostSpan.textContent = gameEntryCost.toLocaleString('fa-IR');
-                showMessageBox("خطا در بارگذاری تنظیمات بازی. از مقادیر پیش‌فرض استفاده می‌شود.", "error");
+                showMessageBox("خطا در بارگذاری تنظیمات بازی.", "error");
             }
             
-            // onAuthStateChanged is already set up globally. We just need to trigger
-            // sign-in if a token is available. Firebase will handle cached sessions automatically.
+            // Handle initial authentication
             if (initialAuthToken) {
-                console.log("Initial auth token found. Attempting sign-in...");
                 try {
                     await signInWithCustomToken(auth, initialAuthToken);
-                    console.log("Sign in with custom token successful.");
                 } catch (error) {
                     console.error("Error signing in with initial custom token:", error);
-                    // onAuthStateChanged will handle the 'null' user state and show the auth screen.
                 }
-            } else {
-                console.log("No initial auth token. Waiting for Firebase to resolve session.");
             }
             console.log("Firebase initialization finished.");
         }
-        // --- END OF CORRECTED AUTH LOGIC ---
+        // --- END OF CORRECTED AUTH & REAL-TIME SETTINGS LOGIC ---
 
         // Maps Firebase auth error codes to user-friendly Persian messages.
         function getFirebaseErrorMessage(errorCode) {
@@ -3296,11 +3302,17 @@
                 const newLobbyId = await createLobby(lobbyName, auth.currentUser.uid, currentUserData.displayName, lobbyType, password, gameDuration);
                 showCreateLobbyMessageBox("لابی شما با موفقیت ساخته شد!", "success");
                 
+                // ===================================================================
+                // === تغییر کلیدی: طبق درخواست شما، این بخش کامنت شد تا نام لابی ===
+                // === بعد از استفاده از لیست نام‌های تایید شده حذف نشود.          ===
+                // ===================================================================
+                /*
                 // Remove the used lobby name from the user's approved list
                 const userDocRef = doc(db, `artifacts/${appId}/users/${auth.currentUser.uid}/profile/data`);
                 await updateDoc(userDocRef, {
                     approvedLobbyNames: arrayRemove(lobbyName)
                 });
+                */
 
                 setTimeout(() => {
                     closeCreateLobbyModal();
