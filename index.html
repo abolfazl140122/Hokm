@@ -1795,13 +1795,14 @@
 
         <!-- All Modals and other screens remain the same... -->
         <!-- 1. Loading Screen -->
-        <div id="loading-screen" class="absolute inset-0 flex flex-col justify-center items-center bg-gray-900 z-50 page-transition-active page-transition-visible" tabindex="-1">
+        <!-- Starts visible, then hidden by JS after initial load -->
+        <div id="loading-screen" class="absolute inset-0 flex flex-col justify-center items-center bg-gray-900 z-50 page-transition-active page-transition-visible">
             <div class="spinner mb-4"></div>
             <p class="text-xl md:text-2xl font-semibold loading-text">در حال بارگذاری...</p>
         </div>
 
         <!-- 2. Authentication Screen (Login/Register) -->
-        <div id="auth-screen" class="hidden absolute inset-0 flex justify-center items-center bg-gray-900 bg-opacity-90 z-40 page-transition-active page-transition-hidden" tabindex="-1">
+        <div id="auth-screen" class="hidden absolute inset-0 flex justify-center items-center bg-gray-900 bg-opacity-90 z-40 page-transition-active page-transition-hidden">
             <div class="classic-card p-6 sm:p-8 w-11/12 max-w-md text-center">
                 <h2 class="text-2xl sm:text-3xl font-bold mb-6">ورود / ثبت نام</h2>
                 <form id="auth-form" class="space-y-5">
@@ -1842,7 +1843,7 @@
         </div>
 
         <!-- 3. Main Screen -->
-        <div id="main-screen" class="hidden absolute inset-0 flex flex-col z-30 page-transition-active page-transition-hidden" tabindex="-1">
+        <div id="main-screen" class="hidden absolute inset-0 flex flex-col z-30 page-transition-active page-transition-hidden">
             <!-- Header for Main Screen - Fixed at top -->
             <header class="app-header">
                 <!-- User Info and ID - Aligned Right (for RTL) -->
@@ -1898,7 +1899,7 @@
         </div>
 
         <!-- 4. Lobby Screen (صفحه جدید برای لابی‌ها) -->
-        <div id="lobby-screen" class="hidden absolute inset-0 flex flex-col z-30 page-transition-active page-transition-hidden" tabindex="-1">
+        <div id="lobby-screen" class="hidden absolute inset-0 flex flex-col z-30 page-transition-active page-transition-hidden">
             <!-- Header for Lobby Screen -->
             <header class="lobby-header">
                 <div class="search-container">
@@ -2107,7 +2108,7 @@
         </div>
 
         <!-- 8. Lobby Detail Screen (REDESIGNED for Text-Based Game) -->
-        <div id="lobby-detail-screen" class="hidden absolute inset-0 z-30 page-transition-active page-transition-hidden lobby-detail-screen-full" tabindex="-1">
+        <div id="lobby-detail-screen" class="hidden absolute inset-0 z-30 page-transition-active page-transition-hidden lobby-detail-screen-full">
             <div class="lobby-detail-content">
                 
                 <!-- Sidebar: Lobby Info & Players -->
@@ -2168,8 +2169,8 @@
                             <!-- Voting buttons will be injected here -->
                         </div>
                         <div id="game-result-display" class="hidden text-center mt-10">
-                            <h2 class="text-5xl font-extrabold mb-4" id="winner-text"></h2>
-                            <p class="text-2xl" id="reason-text"></p>
+                            <h2 class="text-5xl font-extrabold mb-4" id="winnerText"></h2>
+                            <p class="text-2xl" id="reasonText"></p>
                             <button id="return-to-lobbies-btn" class="classic-btn btn-blue-classic mt-8 py-3 px-6">بازگشت به لابی‌ها</button>
                         </div>
                     </div>
@@ -2271,8 +2272,7 @@
         // REVISED: Imported writeBatch for atomic updates
         import { getFirestore, doc, setDoc, getDoc, collection, addDoc, serverTimestamp, query, where, onSnapshot, updateDoc, arrayUnion, arrayRemove, deleteDoc, getDocs, orderBy, deleteField, increment, writeBatch } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js"; 
 
-        // Firebase Configuration (from user's input)
-        // **IMPORTANT**: You should replace these with your actual Firebase project configuration.
+        // Initialize Firebase
         const firebaseConfig = {
             apiKey: "AIzaSyBpVHnjF5gdTm3vJiHEoAZCowsRkTapj_4", // Replace with your Firebase project API Key
             authDomain: "hokm-d6911.firebaseapp.com",
@@ -2282,8 +2282,6 @@
             appId: "1:128133280011:web:c9fe28f5201eef7a3a320e",
             measurementId: "G-LN0S9W86MK"
         };
-
-        // Initialize Firebase
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
@@ -2761,7 +2759,7 @@
                         type: "OBJECT", 
                         properties: { 
                             "is_literary": { "type": "BOOLEAN" }, 
-                            ""reason": { "type": "STRING" } 
+                            "reason": { "type": "STRING" } // Corrected syntax error here
                         }, 
                         "propertyOrdering": ["is_literary", "reason"] 
                     } 
@@ -2972,7 +2970,7 @@
             if (user) {
                 // If a user is logged in, set up listeners.
                 if (unsubscribeUserProfile) unsubscribeUserProfile();
-                if (unsubscribeGameSettings) unsubscribeGameSettings();
+                // setupGameSettingsListener is now called once in performAsyncAppSetup(), no need to call it here.
 
                 // Setup listener for user profile
                 const userDocRef = doc(db, `artifacts/${appId}/users/${user.uid}/profile/data`);
@@ -3019,13 +3017,10 @@
                     console.error("خطا در گوش دادن به user profile:", error);
                 });
 
-                // NEW: Setup listener for game settings
-                setupGameSettingsListener();
-
             } else {
                 // User is logged out. Clean up all data and listeners.
                 if (unsubscribeUserProfile) unsubscribeUserProfile();
-                if (unsubscribeGameSettings) unsubscribeGameSettings();
+                // unsubscribeGameSettings is intentionally not cleared here, as it's a global setting.
                 // ... (other listener cleanups) ...
                 if (unsubscribeLobbies) unsubscribeLobbies();
                 if (unsubscribeLobbyDetail) unsubscribeLobbyDetail();
@@ -3033,7 +3028,7 @@
                 if (unsubscribeLobbyChat) unsubscribeLobbyChat();
                 if (unsubscribePendingLobbyNames) unsubscribePendingLobbyNames();
                 
-                unsubscribeUserProfile = unsubscribeGameSettings = unsubscribeLobbies = unsubscribeLobbyDetail = unsubscribeKickedPlayers = unsubscribeLobbyChat = unsubscribePendingLobbyNames = null;
+                unsubscribeUserProfile = unsubscribeLobbies = unsubscribeLobbyDetail = unsubscribeKickedPlayers = unsubscribeLobbyChat = unsubscribePendingLobbyNames = null;
                 clearGameIntervals();
                 
                 currentUserData = null;
@@ -3058,8 +3053,8 @@
             }
         });
 
-        async function initializeFirebaseAndAuth() {
-            console.log("Initializing Firebase...");
+        async function performAsyncAppSetup() {
+            console.log("Performing asynchronous app setup...");
 
             // Ensure game_settings config exists at startup. If not, create it.
             // The real-time listener will then pick up the value.
@@ -3073,9 +3068,13 @@
                 }
             } catch (error) {
                 console.error("CRITICAL: Error initializing game settings config:", error);
+                // We might want a more prominent error display here if this is fatal.
                 showMessageBox("خطا در بارگذاری تنظیمات بازی.", "error");
             }
             
+            // NEW: Setup listener for game settings
+            setupGameSettingsListener();
+
             // Handle initial authentication
             if (initialAuthToken) {
                 try {
@@ -3086,6 +3085,9 @@
             }
             console.log("Firebase initialization finished.");
         }
+        // Call the async setup function
+        performAsyncAppSetup();
+
         // --- END OF CORRECTED AUTH & REAL-TIME SETTINGS LOGIC ---
 
         // Maps Firebase auth error codes to user-friendly Persian messages.
@@ -3502,16 +3504,25 @@
             lobbiesList.innerHTML = '<p>در حال بارگذاری لابی‌ها...</p>';
             userHasActiveLobby = false; // Reset this flag when entering lobby list view
 
-            const allLobbiesQuery = query(collection(db, `global_lobbies`));
+            const allLobbiesQuery = query(
+                collection(db, `global_lobbies`),
+                where("status", "in", ["waiting", "playing"]) // Check all active lobbies
+            );
             getDocs(allLobbiesQuery).then(allLobbiesSnapshot => {
                 if (auth.currentUser) {
+                    let foundActiveLobby = false;
                     allLobbiesSnapshot.forEach(doc => {
                         const lobbyData = doc.data();
                         if (lobbyData.players && lobbyData.players[auth.currentUser.uid]) {
+                            foundActiveLobby = true;
                             userHasActiveLobby = true;
                             currentLobbyId = doc.id; 
                         }
                     });
+                    if (!foundActiveLobby) { // If user was in a lobby but it's now gone/ended
+                        userHasActiveLobby = false;
+                        currentLobbyId = null;
+                    }
                 }
                 console.log(`User has active lobby: ${userHasActiveLobby} (ID: ${currentLobbyId})`);
             }).catch(error => {
@@ -4247,31 +4258,45 @@
         async function castVote(lobbyId, voterUid, votedForUid) {
             const lobbyRef = doc(db, 'global_lobbies', lobbyId);
             try {
-                await updateDoc(lobbyRef, {
-                    [`gameState.votes.${voterUid}`]: votedForUid
-                });
-                showMessageBox(`رای شما ثبت شد.`, "success");
+                // Use a transaction to ensure atomic update and read-check
+                await db.runTransaction(async (transaction) => {
+                    const lobbyDoc = await transaction.get(lobbyRef);
+                    if (!lobbyDoc.exists()) {
+                        throw new Error("لابی یافت نشد یا بسته شده است.");
+                    }
+                    const lobbyData = lobbyDoc.data();
+                    const gameState = lobbyData.gameState;
 
-                const lobbySnap = await getDoc(lobbyRef);
-                if (lobbySnap.exists() && lobbySnap.data().gameState.status === 'voting') {
-                                        const updatedGameState = lobbySnap.data().gameState;
-                    const updatedLobbyData = lobbySnap.data();
-                    const livingHumanPlayers = updatedGameState.players.filter(uid => 
-                        updatedGameState.roles[uid] === 'Human' && updatedLobbyData.players && updatedLobbyData.players[uid]
+                    if (gameState.status !== 'voting') {
+                        throw new Error("رای‌گیری فعال نیست.");
+                    }
+                    if (gameState.votes && gameState.votes[voterUid]) {
+                        throw new Error("شما قبلاً رای داده‌اید.");
+                    }
+
+                    // Update the vote
+                    const newVotes = { ...gameState.votes, [voterUid]: votedForUid };
+                    transaction.update(lobbyRef, { 'gameState.votes': newVotes });
+
+                    // Check if all living human players have voted (logic only for host to resolve)
+                    // This check is duplicated client-side for UX, but primary resolution is server-side via host.
+                    const livingHumanPlayers = gameState.players.filter(uid => 
+                        gameState.roles[uid] === 'Human' && lobbyData.players && lobbyData.players[uid]
                     );
                     const totalVotesExpected = livingHumanPlayers.length; 
-                    const actualVotesCount = Object.keys(updatedGameState.votes || {}).length;
+                    const actualVotesCount = Object.keys(newVotes).length;
 
                     if (actualVotesCount >= totalVotesExpected) {
-                        if (auth.currentUser && updatedLobbyData.hostId === auth.currentUser.uid) {
-                            await resolveVotes(lobbyId, updatedGameState, updatedLobbyData);
+                        if (auth.currentUser && lobbyData.hostId === auth.currentUser.uid) {
+                            // If current user is host and all votes are in, resolve the game
+                            await resolveVotes(lobbyId, { ...gameState, votes: newVotes }, lobbyData);
                         }
                     }
-                }
-
+                });
+                showMessageBox(`رای شما ثبت شد.`, "success");
             } catch (error) {
                 console.error("Error casting vote:", error);
-                showMessageBox("خطا در ثبت رای.", "error");
+                showMessageBox(`خطا در ثبت رای: ${error.message}`, "error");
             }
         }
 
@@ -4281,52 +4306,55 @@
             const playerUidsInGame = gameState.players || [];
             const roles = gameState.roles || {};
             const currentLobbyPlayers = lobbyData.players || {};
+
+            // Filter players who were in the game AND are still in the lobby
             const livingPlayersInGameAndLobby = playerUidsInGame.filter(uid => currentLobbyPlayers[uid]);
             const livingHumanPlayers = livingPlayersInGameAndLobby.filter(uid => roles[uid] === 'Human');
             const livingAIPlayers = livingPlayersInGameAndLobby.filter(uid => roles[uid] === 'AI');
 
-            if (livingPlayersInGameAndLobby.length === 1 && roles[livingPlayersInGameAndLobby[0]] === 'AI') {
-                 await updateDoc(lobbyRef, {
-                    'gameState.status': 'ended', 'gameState.winner': 'AI',
-                    'gameState.winReason': `تمام انسان‌ها از بازی خارج شدند. هوش مصنوعی برنده است.`
-                }); return;
-            }
+            let winner = null;
+            let winReason = '';
 
-            if (livingPlayersInGameAndLobby.length === 1 && roles[livingPlayersInGameAndLobby[0]] === 'Human') {
-                 await updateDoc(lobbyRef, {
-                    'gameState.status': 'ended', 'gameState.winner': 'Human',
-                    'gameState.winReason': `هوش مصنوعی از بازی خارج شد. انسان برنده است.`
-                }); return;
-            }
-
-            if (livingAIPlayers.length === 1 && livingHumanPlayers.length === 1 && livingPlayersInGameAndLobby.length === 2) {
-                await updateDoc(lobbyRef, {
-                    'gameState.status': 'ended', 'gameState.winner': 'AI',
-                    'gameState.winReason': `فقط هوش مصنوعی و یک انسان باقی ماندند. هوش مصنوعی برنده است.`
-                }); return;
+            // Edge cases for sudden player leaves during voting
+            if (livingHumanPlayers.length === 0 && livingAIPlayers.length > 0) {
+                winner = 'AI';
+                winReason = `تمام انسان‌ها از بازی خارج شدند. هوش مصنوعی برنده است.`;
+            } else if (livingAIPlayers.length === 0 && livingHumanPlayers.length > 0) {
+                winner = 'Human';
+                winReason = `هوش مصنوعی از بازی خارج شد. انسان‌ها برنده هستند.`;
+            } else if (livingHumanPlayers.length === 0 && livingAIPlayers.length === 0) {
+                winner = 'None'; // Or draw, depending on game rules
+                winReason = `تمام بازیکنان از بازی خارج شدند.`;
+            } else if (livingPlayersInGameAndLobby.length === 2 && livingAIPlayers.length === 1 && livingHumanPlayers.length === 1) {
+                // Special case: 1 AI vs 1 Human remains after initial vote phase, AI wins (if this is Hokm-like)
+                winner = 'AI';
+                winReason = `فقط هوش مصنوعی و یک انسان باقی ماندند. هوش مصنوعی برنده است.`;
+            } else {
+                // Normal voting resolution
+                if (livingAIPlayers.length > 0) {
+                    const aiPlayerUid = livingAIPlayers[0]; // Assuming only one AI
+                    const votesForAI = Object.values(votes).filter(votedUid => votedUid === aiPlayerUid).length;
+                    
+                    // Simple majority of living human players
+                    if (votesForAI > livingHumanPlayers.length / 2) {
+                        winner = 'AI';
+                        winReason = `بیشتر بازیکنان به هوش مصنوعی رای دادند.`;
+                    } else {
+                        winner = 'Human';
+                        winReason = `بازیکنان هوش مصنوعی را تشخیص ندادند. انسان‌ها برنده شدند.`;
+                    }
+                } else {
+                    // No AI left, humans win by default
+                    winner = 'Human';
+                    winReason = `هوش مصنوعی از بازی خارج شد. انسان‌ها برنده شدند.`;
+                }
             }
             
-            if (livingAIPlayers.length > 0) {
-                const aiPlayerUid = livingAIPlayers[0];
-                const votesForAI = Object.values(votes).filter(votedUid => votedUid === aiPlayerUid).length;
-                
-                if (votesForAI > livingHumanPlayers.length / 2) {
-                     await updateDoc(lobbyRef, {
-                        'gameState.status': 'ended', 'gameState.winner': 'AI',
-                        'gameState.winReason': `بیشتر بازیکنان به هوش مصنوعی رای دادند.`
-                    });
-                } else {
-                     await updateDoc(lobbyRef, {
-                        'gameState.status': 'ended', 'gameState.winner': 'Human',
-                        'gameState.winReason': `بازیکنان هوش مصنوعی را تشخیص ندادند. انسان‌ها برنده شدند.`
-                    });
-                }
-            } else {
-                await updateDoc(lobbyRef, {
-                    'gameState.status': 'ended', 'gameState.winner': 'Human',
-                    'gameState.winReason': `هوش مصنوعی از بازی خارج شد. انسان‌ها برنده شدند.`
-                });
-            }
+            await updateDoc(lobbyRef, {
+                'gameState.status': 'ended',
+                'gameState.winner': winner,
+                'gameState.winReason': winReason
+            });
         }
 
 
@@ -4338,7 +4366,8 @@
             loginToggleBtn.classList.add('hidden');
             registerToggleBtn.classList.remove('hidden');
             authForm.reset();
-            if(currentActiveScreen === authScreen) {
+            // Ensure focus is on email input if auth screen is the active screen
+            if (currentActiveScreen === authScreen) {
                  emailInput.focus();
             }
         }
@@ -4498,7 +4527,7 @@
             );
             const pendingSnapshot = await getDocs(qPending);
             if (pendingSnapshot.size >= MAX_PENDING_PROPOSALS) { // Use constant for limit
-                                showCreateLobbyMessageBox(`شما به حداکثر تعداد (${MAX_PENDING_PROPOSALS}) درخواست لابی در انتظار تایید رسیده‌اید.`, "error");
+                showCreateLobbyMessageBox(`شما به حداکثر تعداد (${MAX_PENDING_PROPOSALS}) درخواست لابی در انتظار تایید رسیده‌اید.`, "error");
                 return;
             }
 
@@ -4780,39 +4809,46 @@
                 if (!lobbySnap.exists()) { throw new Error("Lobby not found"); }
                 
                 const lobbyData = lobbySnap.data();
-                const gameState = lobbyData.gameState;
-                
-                // If a player leaves, they are removed from the active game.
-                await updateDoc(lobbyRef, {
-                    [`players.${myUid}`]: deleteField(), // Remove from main lobby player list
-                    // The player remains in gameState.players and gameState.roles to preserve game history,
-                    // but they are now considered "inactive".
-                });
-                
-                // Now, re-fetch the lobby to check win/loss conditions
-                const updatedLobbySnap = await getDoc(lobbyRef);
-                if (updatedLobbySnap.exists()) {
-                    const updatedLobbyData = updatedLobbySnap.data();
-                    const updatedGameState = updatedLobbyData.gameState;
-                    
-                    // Host should check for game end conditions
-                    if (updatedLobbyData.hostId === myUid || auth.currentUser.uid === updatedLobbyData.hostId) { 
-                        await resolveVotes(lobbyId, updatedGameState, updatedLobbyData);
+                // Check if current user is the host. If so, they must close the lobby, not just leave the game.
+                if (lobbyData.hostId === myUid) {
+                    const hostConfirmedClose = await showCustomConfirm("شما سازنده لابی هستید. خروج شما باعث بسته شدن لابی برای همه می‌شود. آیا مطمئن هستید؟", "بستن لابی");
+                    if (hostConfirmedClose) {
+                        await deleteDoc(lobbyRef); // Host closes the lobby
+                    } else {
+                        // If host cancels closing, they remain in the game.
+                        return;
                     }
+                } else {
+                    // Non-host player: simply remove from player list
+                    // Use a transaction to ensure no race conditions if multiple players leave simultaneously
+                    await db.runTransaction(async (transaction) => {
+                        const currentLobbyDoc = await transaction.get(lobbyRef);
+                        if (!currentLobbyDoc.exists()) {
+                            throw new Error("Lobby not found or already closed.");
+                        }
+                        const currentLobbyData = currentLobbyDoc.data();
+                        const currentPlayers = { ...currentLobbyData.players };
+                        delete currentPlayers[myUid];
+
+                        transaction.update(lobbyRef, { players: currentPlayers });
+
+                        // Host (if still in game) will resolve game state based on remaining players
+                        // The onSnapshot listener will update UI for everyone
+                    });
                 }
                 
                 showMessageBox("شما از بازی خارج شدید.", "info");
             } catch (error) {
                 console.error("Error leaving game:", error);
-                showMessageBox("خطا در خروج از بازی.", "error");
+                showMessageBox("خطا در خروج از بازی: " + error.message, "error");
             } finally {
                 // Regardless of outcome, transition user away from the game.
-                currentLobbyId = null;
-                userHasActiveLobby = false;
-                setActiveScreen(lobbyScreen);
-                unsubscribeLobbies = setupLobbyListener('');
+                // This will be handled by the onSnapshot listener for lobbyDetailScreen
+                // if the lobby is deleted or player removed.
+                // If the transaction fails, the user remains in the lobby's state.
             }
         });
+
 
         returnToLobbiesBtn.addEventListener('click', () => {
             currentLobbyId = null;
@@ -4821,10 +4857,6 @@
             unsubscribeLobbies = setupLobbyListener('');
         });
 
-
-        // Initialize the app when the window loads
-        window.onload = initializeFirebaseAndAuth;
-        console.log("Script execution finished.");
     </script>
 </body>
 </html>
