@@ -6,48 +6,78 @@
     <title>بازی متنی هوش مصنوعی و انسان</title>
     <!-- Tailwind CSS CDN for styling -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Google Fonts for Classic Look -->
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Merriweather:wght@400;700&display=swap" rel="stylesheet">
+    <!-- Google Fonts for Futuristic Look -->
+    <!-- Orbitron for bold, techy headings -->
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&display=swap" rel="stylesheet">
+    <!-- Rajdhani for sleek body text -->
+    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;600&display=swap" rel="stylesheet">
     <style>
-        /* General Classic Theme Background and Fonts */
-        html, body, #app { /* Ensure these take full viewport height */
+        /* NEW: Futuristic / Cyberpunk Theme */
+
+        /* General Body and App Container */
+        html, body, #app {
             height: 100%;
             margin: 0;
             padding: 0;
-            overflow: hidden; /* Prevent body scrollbars, including horizontal */
+            overflow: hidden;
         }
         body {
-            font-family: 'Merriweather', serif; /* Default body font for readability */
-            /* Deep, rich, slightly textured background for classic feel */
-            background: radial-gradient(ellipse at bottom, #100C08 0%, #000000 100%); /* Darker, more intense background */
-            color: #E0E0E0; /* Softer white text for elegance */
+            font-family: 'Rajdhani', sans-serif; /* Sleek body font */
+            background: linear-gradient(135deg, #0A0A10 0%, #1A0D1A 50%, #0A0A10 100%); /* Deep, dark, subtle gradient */
+            color: #E0E0E0; /* Light gray text for contrast */
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
+            /* Add subtle grain/noise for texture */
+            background-image: url("data:image/svg+xml,%3Csvg width='6' height='6' viewBox='0 0 6 6' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%239C92AC' fill-opacity='0.05' fill-rule='evenodd'%3E%3Cpath d='M0 0h3v3H0V0zm3 3h3v3H3V3z'/%3E%3C/g%3E%3C/svg%3E");
         }
 
-        h1, h2 {
-            font-family: 'Playfair Display', serif; /* Elegant headings */
-            color: #FFD700; /* Gold color for titles */
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.5); /* Subtle text shadow for depth */
+        h1, h2, h3 {
+            font-family: 'Orbitron', sans-serif; /* Bold, techy headings */
+            color: #00FFFF; /* Cyan/Aqua for titles, for a digital feel */
+            text-shadow: 0 0 8px rgba(0,255,255,0.7); /* Glowing effect */
+            letter-spacing: 1px;
         }
 
-        /* Custom spinner for loading screen - Gold themed */
+        /* Custom spinner - Pulsating Hexagon */
         .spinner {
-            border: 4px solid rgba(255, 255, 255, 0.3);
-            border-top: 4px solid #DAA520; /* Gold spinner */
-            border-radius: 50%;
-            width: 50px; /* Slightly larger spinner */
-            height: 50px;
-            animation: spin 1s linear infinite;
+            width: 60px; /* Larger spinner */
+            height: 60px;
+            border-radius: 50%; /* Still circular, but we'll use pseudo-elements for hex look */
+            position: relative;
+            animation: spin-pulse 2s cubic-bezier(0.65, 0.05, 0.36, 1) infinite;
+            background: transparent;
         }
-        @keyframes spin {
+        .spinner::before, .spinner::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: 4px solid transparent;
+            border-top-color: #00FFFF; /* Cyan top */
+            border-right-color: #A020F0; /* Purple right */
+            border-bottom-color: #00FFFF; /* Cyan bottom */
+            border-left-color: #A020F0; /* Purple left */
+            border-radius: 50%;
+            animation: spinner-border-rotate 1.5s linear infinite;
+        }
+        .spinner::after {
+            animation-delay: -0.75s; /* Opposite direction/phase */
+            transform: rotateY(180deg);
+        }
+        @keyframes spinner-border-rotate {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
+        @keyframes spin-pulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.1); opacity: 0.8; }
+        }
 
-        /* NEW: Animation for refresh button icon */
+        /* Refresh button icon animation */
         @keyframes spin-refresh {
             from { transform: rotate(0deg); }
             to { transform: rotate(360deg); }
@@ -58,455 +88,521 @@
 
         /* Page transition animation */
         .page-transition-active {
-            transition: opacity 0.6s ease-in-out; /* Slightly slower transition */
+            transition: opacity 0.6s ease-in-out, transform 0.6s ease-in-out; /* Add transform for slide effect */
         }
         .page-transition-hidden {
             opacity: 0;
+            transform: translateY(20px); /* Slide down slightly on hide */
         }
         .page-transition-visible {
             opacity: 1;
+            transform: translateY(0);
         }
 
-        /* Classic Card/Modal Styling - More detailed */
-        .classic-card {
-            background: linear-gradient(145deg, #4B0000 0%, #660000 60%, #800000 100%); /* Deeper ruby red velvet effect */
-            border: 4px solid #DAA520; /* Goldenrod border */
-            border-radius: 20px; /* Slightly larger radius */
-            box-shadow: 0 15px 30px rgba(0,0,0,0.6), inset 0 0 15px rgba(255,255,255,0.1); /* Deeper outer shadow, subtle inner light */
-            backdrop-filter: blur(10px); /* Stronger blur for more prominent glass effect */
-            -webkit-backdrop-filter: blur(10px); /* For Safari */
-            position: relative; /* For pseudo-elements */
-            max-height: 90vh; /* Ensure card doesn't overflow viewport */
-            overflow-y: hidden; /* Removed vertical scrollbars */
-            overflow-x: hidden; /* Ensure horizontal scrollbar is hidden for cards */
+        /* Futuristic Card/Modal Styling - Glassmorphism & Glowing Edges */
+        .futuristic-card {
+            background: rgba(15, 15, 25, 0.8); /* Darker, semi-transparent base */
+            border: 1px solid rgba(0,255,255,0.3); /* Subtle outer border */
+            border-radius: 15px; /* Softer rounded corners */
+            box-shadow: 0 0 20px rgba(0,255,255,0.3), inset 0 0 10px rgba(0,255,255,0.1); /* Cyan glow */
+            backdrop-filter: blur(12px) brightness(1.1); /* Stronger blur, slightly brighter behind */
+            -webkit-backdrop-filter: blur(12px) brightness(1.1);
+            position: relative;
+            max-height: 95vh; /* Slightly more room */
+            overflow-y: hidden;
+            overflow-x: hidden;
+            padding: 2.5rem; /* More generous padding */
+            animation: card-appear 0.8s ease-out forwards;
         }
-        .classic-card::before { /* Top left ornamental corner */
+        /* Card entry animation */
+        @keyframes card-appear {
+            from { opacity: 0; transform: scale(0.9) translateY(20px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        /* Add glowing border effect with pseudo-element */
+        .futuristic-card::before {
             content: '';
             position: absolute;
-            top: -10px;
-            left: -10px;
-            width: 30px;
-            height: 30px;
-            border-top: 5px solid #FFD700;
-            border-left: 5px solid #FFD700;
-            border-radius: 5px 0 0 0;
-            box-shadow: 0 0 10px rgba(255,215,0,0.5);
+            inset: -2px; /* Expand slightly beyond the card */
+            border-radius: 15px;
+            padding: 2px;
+            background: linear-gradient(45deg, #00FFFF, #A020F0, #00FFFF); /* Cyan-Purple gradient glow */
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            pointer-events: none; /* Ensure it doesn't block clicks */
+            animation: border-glow 4s linear infinite alternate;
         }
-        .classic-card::after { /* Bottom right ornamental corner */
-            content: '';
-            position: absolute;
-            bottom: -10px;
-            right: -10px;
-            width: 30px;
-            height: 30px;
-            border-bottom: 5px solid #FFD700;
-            border-right: 5px solid #FFD700;
-            border-radius: 0 0 5px 0;
-            box-shadow: 0 0 10px rgba(255,215,0,0.5);
+        @keyframes border-glow {
+            0% { filter: hue-rotate(0deg); opacity: 0.7; }
+            50% { opacity: 1; }
+            100% { filter: hue-rotate(360deg); opacity: 0.7; }
         }
 
 
-        /* Button Base Styles - More polished Classic Look */
-        .classic-btn {
-            border: 2px solid #DAA520; /* Golden border for all buttons */
-            border-radius: 15px; /* Slightly rounded corners */
-            font-weight: 700; /* Bold text */
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.6); /* Text shadow for elegance */
-            transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1); /* Smoother transition */
-            box-shadow: 0 8px 16px rgba(0,0,0,0.4), inset 0 0 8px rgba(255,255,255,0.1); /* Deeper outer shadow, subtle inner light */
-            color: #FFFFFF; /* White text on buttons */
-            padding: 0.875rem 1.5rem; /* Equivalent to py-3.5 px-6 */
-            font-size: 1.125rem; /* Equivalent to text-lg */
-            position: relative; /* For pseudo-elements */
-            overflow: hidden; /* To contain the hover overlay */
+        /* Button Base Styles - Modern, Glowing */
+        .futuristic-btn {
+            border: none; /* No direct border */
+            border-radius: 10px; /* Less rounded than classic */
+            font-weight: 600; /* Rajdhani semibold */
+            text-shadow: 0 0 5px rgba(0,255,255,0.5); /* Subtle cyan text glow */
+            transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94); /* Smoother cubic bezier */
+            box-shadow: 0 4px 15px rgba(0,0,0,0.4), 0 0 10px rgba(0,255,255,0.4); /* Deeper shadow, cyan glow */
+            color: #FFFFFF;
+            padding: 0.875rem 1.75rem; /* Slightly more horizontal padding */
+            font-size: 1.125rem;
+            position: relative;
+            overflow: hidden;
+            background: linear-gradient(135deg, #0A0A15 0%, #1A0D1A 100%); /* Dark gradient base */
+            /* Add subtle noise for texture */
+            background-image: url("data:image/svg+xml,%3Csvg width='6' height='6' viewBox='0 0 6 6' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%239C92AC' fill-opacity='0.08' fill-rule='evenodd'%3E%3Cpath d='M0 0h3v3H0V0zm3 3h3v3H3V3z'/%3E%3C/g%3E%3C/svg%3E");
+            z-index: 1; /* For pseudo-elements to be below glow */
         }
-        .classic-btn::before { /* Subtle light effect on hover */
+        /* Inner glowing border on button */
+        .futuristic-btn::before {
             content: '';
             position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: rgba(255,255,255,0.1);
-            transform: skewX(-30deg);
-            transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+            inset: 0;
+            border-radius: 10px;
+            padding: 2px; /* Controls border thickness */
+            background: linear-gradient(45deg, #00FFFF, #A020F0); /* Cyan-Purple gradient */
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            z-index: -1; /* Place behind button content */
+            transition: opacity 0.3s ease, transform 0.3s ease;
+            opacity: 0.7;
         }
-        .classic-btn:hover::before {
-            left: 100%;
+        /* Hover effect on buttons */
+        .futuristic-btn:hover {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.6), 0 0 20px rgba(0,255,255,0.7); /* Stronger glow on hover */
+            color: #00FFFF; /* Text color change on hover */
         }
-        .classic-btn:hover {
-            transform: translateY(-5px) scale(1.03); /* More pronounced lift and scale */
-            box-shadow: 0 12px 24px rgba(0,0,0,0.6), inset 0 0 10px rgba(255,255,255,0.2); /* Stronger shadow on hover */
+        .futuristic-btn:hover::before {
+            opacity: 1;
+            transform: scale(1.05); /* Make inner border slightly larger */
         }
-        .classic-btn:disabled {
-            opacity: 0.6;
+        .futuristic-btn:disabled {
+            opacity: 0.4;
             cursor: not-allowed;
             transform: none;
-            box-shadow: 0 8px 16px rgba(0,0,0,0.4), inset 0 0 8px rgba(255,255,255,0.1);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.4), 0 0 10px rgba(0,255,255,0.2);
+            color: #CCC;
+            text-shadow: none;
+        }
+        .futuristic-btn:disabled::before {
+             opacity: 0.3;
+             transform: scale(1);
+             background: linear-gradient(45deg, #555, #777); /* Grayed out gradient */
         }
 
-        /* Specific Button Colors - Classic Pallette */
-        .btn-purple-classic {
-            background: linear-gradient(145deg, #8A2BE2 0%, #6A0DAD 100%); /* Amethyst */
+        /* Specific Button Colors - Futuristic Palette */
+        .btn-blue-futuristic {
+            background: linear-gradient(135deg, #1A1A2A 0%, #2A2A5A 100%);
         }
-        .btn-blue-classic {
-            background: linear-gradient(145deg, #4682B4 0%, #2A52BE 100%); /* Steel Blue / Royal Blue */
+        .btn-green-futuristic {
+            background: linear-gradient(135deg, #152A15 0%, #2A5A2A 100%);
         }
-        .btn-green-classic {
-            background: linear-gradient(145deg, #228B22 0%, #006400 100%); /* Forest Green */
+        .btn-red-futuristic {
+            background: linear-gradient(135deg, #2A1515 0%, #5A2A2A 100%);
         }
-        .btn-red-classic {
-            background: linear-gradient(145deg, #CD5C5C 0%, #B22222 100%); /* Indian Red / Firebrick */
+        .btn-gray-futuristic {
+            background: linear-gradient(135deg, #2A2A2A 0%, #4A4A4A 100%);
         }
-        .btn-gray-classic {
-            background: linear-gradient(145deg, #A9A9A9 0%, #808080 100%); /* Dark Gray */
+        .btn-purple-futuristic {
+            background: linear-gradient(135deg, #2A152A 0%, #5A2A5A 100%);
         }
-        .btn-brown-classic { /* New for Profile/Shop */
-            background: linear-gradient(145deg, #8B4513 0%, #69320E 100%); /* Saddle Brown / Dark Sienna */
+        .btn-brown-futuristic { /* Repurpose brown to a darker sci-fi tone */
+            background: linear-gradient(135deg, #302010 0%, #503020 100%);
         }
-        .btn-gold-classic { /* For footer icons */
-            background: linear-gradient(145deg, #FFD700 0%, #DAA520 100%); /* Gold */
-            border: none; /* No border for these small buttons */
-            padding: 0.5rem;
-            border-radius: 10px;
+        .btn-aqua-futuristic { /* For footer icons/small actions */
+            background: linear-gradient(135deg, #00CACA 0%, #00FFFF 100%);
+            border-radius: 8px; /* Slightly less rounded */
+            padding: 0.6rem 1rem;
+            box-shadow: 0 0 15px rgba(0,255,255,0.6);
+            color: #0A0A10; /* Dark text on bright button */
+            text-shadow: none;
         }
-        .btn-gold-classic:hover {
+        .btn-aqua-futuristic:hover {
             transform: translateY(-2px) scale(1.05);
-            box-shadow: 0 6px 12px rgba(0,0,0,0.5), inset 0 0 5px rgba(255,255,255,0.3);
+            box-shadow: 0 0 25px rgba(0,255,255,0.8);
+            color: #0A0A10;
         }
 
 
-        /* Input Field Styles - More refined Classic Look */
-        input, select { /* Added select for lobby names dropdown */
-            background-color: #202020; /* Even darker input background */
-            border: 2px solid #5A5A5A; /* Dark gray border */
-            color: #E0E0E0; /* Light text color */
-            padding: 0.875rem; /* Equivalent to p-3.5 */
-            border-radius: 0.75rem; /* Equivalent to rounded-xl */
-            box-shadow: inset 0 2px 4px rgba(0,0,0,0.5); /* Inner shadow for depth */
+        /* Input Field Styles - Sleek and Digital */
+        input, select {
+            background-color: #0F0F1A; /* Very dark blue */
+            border: 1px solid #00FFFF; /* Cyan border */
+            color: #E0E0E0;
+            padding: 0.75rem 1rem; /* Adjust padding */
+            border-radius: 8px; /* Slightly less rounded */
+            box-shadow: inset 0 2px 5px rgba(0,255,255,0.2); /* Inner glow */
+            outline: none; /* Remove default outline */
+            transition: all 0.3s ease;
         }
         input::placeholder {
-            color: #A0A0A0; /* Lighter placeholder text */
+            color: #707080; /* Muted placeholder */
         }
         input:focus, select:focus {
-            border-color: #DAA520 !important; /* Gold border on focus */
-            box-shadow: 0 0 0 4px rgba(218, 165, 32, 0.5) !important, inset 0 2px 4px rgba(0,0,0,0.5) !important; /* Gold focus ring with inner shadow */
+            border-color: #A020F0 !important; /* Purple on focus */
+            box-shadow: 0 0 0 3px rgba(160,32,240,0.5) !important, inset 0 2px 5px rgba(0,255,255,0.2) !important; /* Purple focus ring with inner glow */
+        }
+        /* Specific input styles for search bar in lobby header */
+        .lobby-header .search-container input {
+            padding: 0.5rem 1rem; /* Slightly less padding */
+            border-radius: 8px; /* Consistent with other inputs */
         }
 
-        /* Header specific styles - Richer Gold/Brown */
+        /* Header specific styles - Digital Display */
         .app-header {
-            background: linear-gradient(to right, #4A2B00 0%, #7A4C00 50%, #4A2B00 100%); /* Richer gold/brown gradient */
-            border-bottom: 3px solid #FFD700; /* Thicker gold border */
-            box-shadow: 0 8px 20px rgba(0,0,0,0.7); /* Deeper shadow */
-            height: 70px; /* Fixed height for header */
-            position: fixed; /* Explicitly fixed */
-            top: 0; left: 0; right: 0;
+            background: rgba(10, 10, 20, 0.9); /* Darker, semi-transparent */
+            border-bottom: 2px solid #00FFFF; /* Cyan bottom line */
+            box-shadow: 0 5px 15px rgba(0,255,255,0.2), inset 0 -2px 5px rgba(0,255,255,0.1); /* Subtle top glow */
+            height: 80px; /* Slightly taller */
+            position: fixed; top: 0; left: 0; right: 0;
             z-index: 40;
-            padding: 0.75rem 1rem; /* Adjust padding */
+            padding: 0.75rem 1.5rem; /* More padding */
             display: flex;
-            justify-content: space-between; /* Spreads items */
+            justify-content: space-between;
             align-items: center;
+            backdrop-filter: blur(8px); /* Glassmorphism */
+            -webkit-backdrop-filter: blur(8px);
         }
-
-        /* NEW: Coin display container in header (positioned on the left for RTL) */
+        /* Coin display container in header */
         #header-user-coins-container {
-            /* flex-grow added directly in HTML to push it rightwards */
-            background-color: rgba(0,0,0,0.3);
-            border-radius: 10px;
-            padding: 0.5rem 1rem;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+            background-color: rgba(0,0,0,0.4);
+            border: 1px solid #A020F0; /* Purple border */
+            border-radius: 12px;
+            padding: 0.4rem 0.8rem; /* Smaller padding */
+            box-shadow: 0 2px 10px rgba(160,32,240,0.3); /* Purple glow */
             transition: all 0.3s ease;
-            margin-left: 1rem; /* Space between coins and menu button */
+            margin-left: 1rem;
         }
         #header-user-coins-container:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 12px rgba(0,0,0,0.5);
+            transform: translateY(-2px) scale(1.03);
+            box-shadow: 0 4px 15px rgba(160,32,240,0.6);
+        }
+        #header-user-coins {
+            color: #A020F0; /* Purple coin text */
+            font-size: 1.6rem; /* Slightly larger */
+            font-weight: 700;
+        }
+        .coin-icon {
+            fill: #00FFFF; /* Cyan color for coins */
         }
 
         /* Lobby Screen Specific Header */
         .lobby-header {
-            background: linear-gradient(to right, #4A2B00 0%, #7A4C00 50%, #4A2B00 100%);
-            border-bottom: 3px solid #FFD700;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.7);
-            height: 70px;
-            position: fixed;
-            top: 0; left: 0; right: 0;
+            background: rgba(10, 10, 20, 0.9);
+            border-bottom: 2px solid #00FFFF;
+            box-shadow: 0 5px 15px rgba(0,255,255,0.2), inset 0 -2px 5px rgba(0,255,255,0.1);
+            height: 80px;
+            position: fixed; top: 0; left: 0; right: 0;
             z-index: 40;
-            padding: 0.75rem 1rem;
+            padding: 0.75rem 1.5rem;
             display: flex;
-            align-items: center; /* Align items vertically */
-            justify-content: center; /* Center horizontally by default */
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
         }
         .lobby-header .search-container {
             display: flex;
-            flex-grow: 1; /* Allow search container to take available space */
-            max-width: 600px; /* Limit max width on larger screens */
-            margin: 0 auto; /* Center the search container */
+            flex-grow: 1;
+            max-width: 700px; /* Wider search bar */
+            margin: 0 auto;
             align-items: center;
-            background-color: #303030; /* Darker background for search bar */
-            border-radius: 15px; /* Rounded corners for search bar */
-            border: 2px solid #5A5A5A;
-            padding: 0.5rem 1rem; /* Adjust padding */
+            background-color: #0A0A10; /* Very dark background */
+            border-radius: 10px;
+            border: 1px solid #A020F0; /* Purple border */
+            padding: 0.5rem 1rem;
+            box-shadow: inset 0 0 8px rgba(160,32,240,0.3); /* Inner purple glow */
         }
         .lobby-header .search-container input {
-            flex-grow: 1;
-            background-color: transparent; /* Transparent background */
-            border: none; /* No border for input inside search bar */
+            background-color: transparent;
+            border: none;
             padding: 0.25rem 0.5rem;
-            outline: none; /* No outline on focus */
-            text-align: right; /* Align text to right for RTL */
-        }
-        .lobby-header .search-container input::placeholder {
-            color: #A0A0A0;
+            outline: none;
+            text-align: right;
         }
         .lobby-header .search-container svg {
-            color: #DAA520; /* Gold color for icons */
-            min-width: 24px; /* Ensure icons don't shrink */
-            min-height: 24px;
+            color: #00FFFF; /* Cyan color for icons */
+            min-width: 28px; /* Larger icons */
+            min-height: 28px;
+            transition: color 0.2s ease;
         }
         .lobby-header .search-container button {
             background: none;
             border: none;
             cursor: pointer;
             padding: 0 0.5rem;
+            transition: transform 0.2s ease;
         }
-        .lobby-header .back-btn-wrapper {
-            margin-left: 10px; /* Space between back button and search bar (for RTL) */
-        }
-        .lobby-header .search-icon-wrapper {
-            margin-right: 10px; /* Space between search icon and search input (RTL) */
+        .lobby-header .search-container button:hover svg {
+            color: #A020F0; /* Purple on hover */
+            transform: scale(1.1);
         }
 
 
         .app-footer {
-            background: linear-gradient(to left, #4A2B00 0%, #7A4C00 50%, #4A2B00 100%); /* Richer gold/brown gradient */
-            border-top: 3px solid #FFD700; /* Thicker gold border */
-            box-shadow: 0 -8px 20px rgba(0,0,0,0.7); /* Deeper shadow */
-            height: 90px; /* Fixed height for footer */
-            position: fixed; /* Explicitly fixed */
-            bottom: 0; left: 0; right: 0;
+            background: rgba(10, 10, 20, 0.9);
+            border-top: 2px solid #00FFFF;
+            box-shadow: 0 -5px 15px rgba(0,255,255,0.2), inset 0 2px 5px rgba(0,255,255,0.1);
+            height: 100px; /* Taller footer */
+            position: fixed; bottom: 0; left: 0; right: 0;
             z-index: 40;
-            padding: 1rem; /* Adjust padding */
+            padding: 1rem 1.5rem;
             display: flex;
             justify-content: space-around;
             align-items: center;
-            gap: 1rem; /* Added gap here for spacing buttons */
+            gap: 1.5rem; /* Increased gap */
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
         }
         /* Lobby Screen Specific Footer */
         .lobby-footer {
-            background: linear-gradient(to left, #4A2B00 0%, #7A4C00 50%, #4A2B00 100%);
-            border-top: 3px solid #FFD700;
-            box-shadow: 0 -8px 20px rgba(0,0,0,0.7);
-            height: 90px;
-            position: fixed;
-            bottom: 0; left: 0; right: 0;
+            background: rgba(10, 10, 20, 0.9);
+            border-top: 2px solid #00FFFF;
+            box-shadow: 0 -5px 15px rgba(0,255,255,0.2), inset 0 2px 5px rgba(0,255,255,0.1);
+            height: 100px;
+            position: fixed; bottom: 0; left: 0; right: 0;
             z-index: 40;
-            padding: 1rem;
+            padding: 1rem 1.5rem;
             display: flex;
             justify-content: space-around;
             align-items: center;
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
         }
         .lobby-footer .icon-btn {
             display: flex;
             flex-direction: column;
             align-items: center;
-            color: #FFD700; /* Gold color for icons */
-            font-size: 0.8rem;
+            color: #00FFFF; /* Cyan for icons */
+            font-size: 0.9rem; /* Slightly larger font */
             text-align: center;
             cursor: pointer;
-            transition: transform 0.2s ease-in-out;
+            transition: transform 0.2s ease-in-out, color 0.2s ease, text-shadow 0.2s ease;
+            text-shadow: 0 0 5px rgba(0,255,255,0.4);
         }
         .lobby-footer .icon-btn:hover {
             transform: translateY(-5px);
+            color: #A020F0; /* Purple on hover */
+            text-shadow: 0 0 10px rgba(160,32,240,0.8);
         }
         .lobby-footer .icon-btn:disabled {
             opacity: 0.5;
             cursor: not-allowed;
             transform: none;
+            text-shadow: none;
+            color: #888;
         }
         .lobby-footer .icon-btn svg {
-            width: 30px;
-            height: 30px;
+            width: 35px; /* Larger icons */
+            height: 35px;
             margin-bottom: 5px;
             transition: transform 0.8s ease-in-out;
         }
         .lobby-footer .games-running-text {
             color: #E0E0E0;
-            font-size: 1.1rem;
-            font-weight: bold;
+            font-size: 1.2rem; /* Larger and bolder */
+            font-weight: 600;
             display: flex;
             align-items: center;
-            gap: 5px;
+            gap: 8px; /* More space */
+            padding: 0.5rem 1rem;
+            background: rgba(0,0,0,0.3);
+            border-radius: 10px;
+            border: 1px solid rgba(0,255,255,0.2);
+            box-shadow: inset 0 0 5px rgba(0,255,255,0.1);
         }
+        .lobby-footer .games-running-text #active-games-count {
+            color: #A020F0; /* Purple count */
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 700;
+            text-shadow: 0 0 5px rgba(160,32,240,0.7);
+        }
+
 
         /* Main content area padding to avoid overlap with fixed header/footer */
         .main-content-area {
-            padding-top: 70px; /* Header height */
-            padding-bottom: 90px; /* Footer height */
-            flex-grow: 1; /* Allow content to fill available space */
-            overflow-y: auto; /* Re-enabled for scrollable lists */
-            overflow-x: hidden; /* Ensure horizontal scrollbar is hidden for main content */
-            width: 100%; /* Ensure it takes full width */
+            padding-top: 80px; /* Header height */
+            padding-bottom: 100px; /* Footer height */
+            flex-grow: 1;
+            overflow-y: auto;
+            overflow-x: hidden;
+            width: 100%;
             display: flex;
             flex-direction: column;
-            justify-content: flex-start; /* Align content to start for scrollable lists */
-            align-items: center; /* Center content horizontally */
-            background: linear-gradient(180deg, #2C2C2C 0%, #1A1A1A 100%); /* Subtle dark grey gradient for main area */
-            position: relative; /* For any absolute positioned elements inside */
+            justify-content: flex-start;
+            align-items: center;
+            background: rgba(0,0,0,0.3); /* Slightly transparent for background to show */
+            position: relative;
+            padding-left: 1rem; /* Adjust for RTL padding */
+            padding-right: 1rem; /* Adjust for RTL padding */
         }
         
         /* Profile Modal specific styles */
         .profile-modal-overlay {
-            background-color: rgba(0,0,0,0.7); /* Darker overlay */
-            transition: opacity 0.3s ease-in-out;
+            background-color: rgba(0,0,0,0.85); /* Darker, more immersive overlay */
+            transition: opacity 0.4s ease-in-out;
         }
         .profile-modal-content {
-            transform: translateY(-20px); /* Initial slightly elevated */
-            transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+            transform: translateY(-30px); /* More pronounced initial elevation */
+            transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
         }
         .profile-modal-enter-active .profile-modal-content {
             transform: translateY(0);
         }
         .profile-modal-leave-active .profile-modal-content {
-            transform: translateY(-20px);
+            transform: translateY(-30px);
             opacity: 0;
         }
 
         /* Create Lobby Modal Specific Styles */
         #create-lobby-modal {
-            background-color: rgba(0,0,0,0.7);
-            transition: opacity 0.3s ease-in-out;
+            background-color: rgba(0,0,0,0.85);
+            transition: opacity 0.4s ease-in-out;
         }
 
         /* Confirmation Modal Styles */
         #confirmation-modal {
-            background-color: rgba(0,0,0,0.7);
-            transition: opacity 0.3s ease-in-out;
+            background-color: rgba(0,0,0,0.85);
+            transition: opacity 0.4s ease-in-out;
         }
 
         /* Animation for lobby items when closing */
         .lobby-item.fade-out {
             opacity: 0;
-            transform: translateY(20px);
-            transition: opacity 0.5s ease-out, transform 0.5s ease-out;
+            transform: translateY(30px) scale(0.95);
+            transition: opacity 0.6s ease-out, transform 0.6s ease-out;
         }
 
-        /* Enhanced Lobby Item Styling */
+        /* Enhanced Lobby Item Styling - Grid-like, glowing */
         .lobby-item {
-            background: linear-gradient(145deg, #2A2A2A 0%, #1A1A1A 100%); /* Deep gradient background */
-            border: 2px solid #DAA520; /* Gold border */
-            border-radius: 15px; /* Rounded corners */
-            box-shadow: 0 8px 16px rgba(0,0,0,0.5), inset 0 0 10px rgba(255,215,0,0.1); /* Deep outer shadow, subtle inner glow */
-            transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1); /* Smooth transitions for hover effects */
-            position: relative; /* For overflow hidden and pseudo-elements */
-            overflow: hidden; /* Ensures internal elements stay within rounded corners */
-            padding: 1.25rem 1.5rem; /* More generous padding */
+            background: linear-gradient(145deg, #0F0F1A 0%, #1A0D1A 100%); /* Dark gradient base */
+            border: 1px solid rgba(0,255,255,0.3); /* Subtle outer border */
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.5), 0 0 12px rgba(0,255,255,0.3); /* Glow */
+            transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            position: relative;
+            overflow: hidden;
+            padding: 1.5rem 1.8rem; /* More generous padding */
             display: flex;
-            flex-direction: column; /* Default to column for small screens */
+            flex-direction: column;
             justify-content: space-between;
             align-items: center;
             text-align: center;
         }
-
-        .lobby-item::before { /* Subtle light overlay on hover */
+        /* Inner glowing border on lobby item */
+        .lobby-item::before {
             content: '';
             position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: rgba(255,255,255,0.05);
-            transform: skewX(-30deg);
-            transition: all 0.3s ease-in-out;
-        }
-
-        .lobby-item:hover::before {
-            left: 100%;
+            inset: 0;
+            border-radius: 12px;
+            padding: 2px;
+            background: linear-gradient(45deg, #00FFFF, #A020F0);
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            z-index: -1;
+            opacity: 0.5;
+            transition: opacity 0.3s ease, transform 0.3s ease;
         }
 
         .lobby-item:hover {
-            transform: translateY(-8px) scale(1.02); /* More pronounced lift and slight scale */
-            box-shadow: 0 15px 25px rgba(0,0,0,0.6), inset 0 0 12px rgba(255,215,0,0.2); /* Stronger shadow, more glow */
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.7), 0 0 20px rgba(0,255,255,0.7); /* Stronger glow on hover */
+        }
+        .lobby-item:hover::before {
+            opacity: 0.8;
+            transform: scale(1.02);
         }
 
         .lobby-item h3 {
-            color: #FFD700; /* Gold for lobby names */
-            font-size: 1.75rem; /* Larger font for name */
-            font-family: 'Playfair Display', serif;
-            text-shadow: 1px 1px 3px rgba(0,0,0,0.7);
+            color: #00FFFF; /* Cyan for lobby names */
+            font-size: 1.8rem; /* Larger font */
+            font-family: 'Orbitron', sans-serif;
+            text-shadow: 0 0 5px rgba(0,255,255,0.7);
+            margin-bottom: 0.5rem; /* Space below title */
         }
 
         .lobby-item p {
-            color: #C0C0C0; /* Silver for details */
-            font-size: 1rem;
-            margin-top: 0.25rem;
+            color: #B0B0C0; /* Muted light gray */
+            font-size: 1.05rem;
+            margin-top: 0.15rem;
         }
         
-        .lobby-item .lobby-actions { /* Container for buttons in lobby item */
-            margin-top: 1rem; /* Space between text and buttons */
+        .lobby-item .lobby-actions {
+            margin-top: 1.25rem;
             display: flex;
-            flex-direction: column; /* Stack buttons on mobile */
-            width: 100%; /* Take full width on mobile */
-            gap: 0.75rem; /* Space between stacked buttons */
+            flex-direction: column;
+            width: 100%;
+            gap: 0.8rem;
         }
 
-        /* Ensure buttons within lobby-item are full width on mobile */
+        /* Lobby buttons, use futuristic-btn base */
         .lobby-item .join-lobby-btn,
-        .lobby-item .close-lobby-btn {
-            width: 100%; /* Take full width on small screens */
-            padding: 0.75rem 1rem; /* Consistent padding */
-            font-size: 1rem; /* Consistent font size */
+        .lobby-item .close-lobby-btn,
+        .lobby-item .view-my-lobby-btn { /* Added this for consistency */
+            width: 100%;
+            padding: 0.8rem 1.2rem;
+            font-size: 1rem;
         }
 
         /* Responsive adjustments for lobby-item buttons on larger screens */
         @media (min-width: 640px) { /* sm breakpoint */
             .lobby-item {
-                flex-direction: row; /* Align items in a row */
-                text-align: right; /* Text aligned right in RTL */
+                flex-direction: row;
+                text-align: right;
             }
             .lobby-item .lobby-actions {
-                flex-direction: row; /* Buttons side-by-side */
-                width: auto; /* Buttons take their natural width */
-                margin-top: 0; /* No top margin when side-by-side */
-                gap: 0.5rem; /* Small gap between buttons */
+                flex-direction: row;
+                width: auto;
+                margin-top: 0;
+                gap: 0.75rem; /* Small gap between buttons */
             }
-            /* Add margin-left to close button for spacing from join button */
             .lobby-item .close-lobby-btn {
-                margin-right: 0.5rem; /* Space from join button in RTL */
+                margin-right: 0.75rem;
             }
             .lobby-item .join-lobby-btn,
-            .lobby-item .close-lobby-btn {
-                width: auto; /* Allow buttons to size naturally */
-                font-size: 0.9rem; /* Slightly smaller for compactness */
-                padding: 0.6rem 1.2rem; /* Adjusted padding */
+            .lobby-item .close-lobby-btn,
+            .lobby-item .view-my-lobby-btn {
+                width: auto;
+                font-size: 0.95rem;
+                padding: 0.7rem 1.4rem;
             }
         }
 
-        /* === Lobby Detail Screen Styles (Major Redesign for Game) === */
+        /* === Lobby Detail Screen Styles (Futuristic HUD) === */
         .lobby-detail-screen-full {
-            padding-top: 0; /* No padding, the content will manage it */
+            padding-top: 0;
             padding-bottom: 0;
             display: flex;
             flex-direction: column;
             width: 100%;
             height: 100%;
-            background: linear-gradient(180deg, #2C2C2C 0%, #1A1A1A 100%);
+            background: linear-gradient(160deg, #05050A 0%, #0A0A10 100%); /* Even darker, subtle gradient */
         }
 
         .lobby-detail-content {
-            background: linear-gradient(145deg, #1A1A1A 0%, #0D0D0D 100%);
-            border: 3px solid #DAA520;
+            background: rgba(10, 10, 20, 0.7); /* Semi-transparent dark blue */
+            border: 2px solid #A020F0; /* Purple border */
             border-radius: 20px;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.7);
-            padding: 1.5rem;
-            width: 95%;
-            max-width: 1200px;
-            height: calc(100% - 100px); /* Fill available space minus header/margins */
+            box-shadow: 0 12px 25px rgba(0,0,0,0.7), 0 0 25px rgba(160,32,240,0.5); /* Deep shadow, purple glow */
+            padding: 2rem;
+            width: 98%; /* Slightly wider */
+            max-width: 1400px; /* Max width for larger screens */
+            height: calc(100% - 120px); /* Fill available space minus header/margins */
             display: flex;
-            flex-direction: row; /* Side-by-side layout on desktop */
-            gap: 1.5rem;
-            margin: 50px auto; /* Centered with margin top/bottom */
-            overflow: hidden; /* Prevent content from spilling */
+            flex-direction: row;
+            gap: 2rem; /* More space between panels */
+            margin: 60px auto; /* Centered with margin top/bottom */
+            overflow: hidden;
+            backdrop-filter: blur(15px); /* Stronger glass effect */
+            -webkit-backdrop-filter: blur(15px);
         }
 
         /* Sidebar for player info */
@@ -514,320 +610,537 @@
             display: flex;
             flex-direction: column;
             flex-shrink: 0;
-            width: 300px;
-            background-color: rgba(0,0,0,0.3);
+            width: 320px; /* Slightly wider sidebar */
+            background-color: rgba(0,0,0,0.4);
             border-radius: 15px;
-            padding: 1rem;
-            border: 1px solid #444;
+            padding: 1.5rem;
+            border: 1px solid rgba(0,255,255,0.3); /* Cyan border */
+            box-shadow: inset 0 0 10px rgba(0,255,255,0.1);
             overflow-y: auto;
         }
 
-        /* Main panel for chat and actions (Crucial for overlays) */
+        /* Main panel for chat and actions */
         .lobby-main-panel {
-            position: relative; /* Crucial for absolute positioned overlays */
+            position: relative;
             display: flex;
             flex-direction: column;
             flex-grow: 1;
             min-width: 0;
-            overflow: hidden; /* To contain overlays without affecting scrollbars for chat */
+            overflow: hidden;
         }
         /* Ensure overlay z-index is higher than chat but lower than other modals */
         #game-countdown-overlay, #game-voting-overlay {
-            z-index: 40; /* Higher than chat (which is inside lobby-main-panel) but lower than global modals (z-50) */
+            z-index: 40;
         }
         
         #player-list-container {
-            margin-top: 1rem;
-            flex-grow: 1; /* Allow list to take space */
-            overflow-y: auto; /* Scroll if many players */
+            margin-top: 1.5rem;
+            flex-grow: 1;
+            overflow-y: auto;
+            min-height: 0; /* Important for flex-grow to work in scrollable container */
         }
         .player-list-item {
-            background-color: rgba(255, 255, 255, 0.05);
-            border-radius: 8px;
-            padding: 0.75rem;
-            margin-bottom: 0.5rem;
+            background-color: rgba(0,255,255,0.08); /* Cyan tint */
+            border-radius: 10px;
+            padding: 0.8rem 1rem;
+            margin-bottom: 0.6rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
             border: 1px solid transparent;
             transition: all 0.2s ease-in-out;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
         }
         .player-list-item.is-host {
-            border-color: #FFD700;
+            border-color: #A020F0; /* Purple host indicator */
+            box-shadow: 0 0 10px rgba(160,32,240,0.5);
         }
         .player-list-item .player-name {
-            font-weight: bold;
+            font-weight: 600; /* Semibold */
             color: #E0E0E0;
+            letter-spacing: 0.5px;
         }
         .player-list-item .host-label {
-            color: #FFD700;
-            font-size: 0.8rem;
-            margin-right: 0.5rem;
+            color: #00FFFF; /* Cyan label */
+            font-size: 0.9rem;
+            margin-right: 0.6rem;
+            font-family: 'Rajdhani', sans-serif;
+            text-transform: uppercase;
         }
         .kick-player-btn {
-            background: none;
-            border: 1px solid #B22222;
-            color: #B22222;
-            border-radius: 5px;
-            padding: 0.2rem 0.5rem;
-            font-size: 0.8rem;
+            background: linear-gradient(135deg, #3A0A0A 0%, #5A2A2A 100%);
+            border: 1px solid #FF0000; /* Red border */
+            color: #FF0000;
+            border-radius: 8px;
+            padding: 0.3rem 0.7rem;
+            font-size: 0.9rem;
             cursor: pointer;
             transition: all 0.2s ease;
+            text-shadow: 0 0 5px rgba(255,0,0,0.5);
         }
         .kick-player-btn:hover {
-            background: #B22222;
+            background: #FF0000;
             color: white;
+            box-shadow: 0 0 10px rgba(255,0,0,0.7);
+            text-shadow: none;
         }
 
         .lobby-chat-container {
-            background-color: rgba(0,0,0,0.4);
-            border: 2px solid #5A5A5A;
-            border-radius: 10px;
-            padding: 0.75rem;
-            flex-grow: 1; /* Key change: makes chat take all vertical space */
+            background-color: rgba(10,10,20,0.6); /* Darker, more opaque */
+            border: 2px solid rgba(160,32,240,0.4); /* Purple border */
+            border-radius: 12px;
+            padding: 1rem;
+            flex-grow: 1;
             display: flex;
             flex-direction: column;
-            overflow: hidden; /* CRITICAL: This contains the scrolling child */
+            overflow: hidden;
+            box-shadow: inset 0 0 15px rgba(160,32,240,0.2); /* Inner purple glow */
         }
         .lobby-chat-messages {
-            flex-grow: 1; /* CRITICAL: This element grows to fill the parent */
-            overflow-y: auto; /* CRITICAL: This element gets the scrollbar */
-            padding-right: 0.5rem;
+            flex-grow: 1;
+            overflow-y: auto;
+            padding-right: 0.75rem; /* For scrollbar */
             display: flex;
             flex-direction: column;
+            gap: 0.6rem; /* Space between messages */
         }
         .chat-message {
-            background-color: #333;
-            padding: 0.5rem 0.75rem;
-            border-radius: 10px;
-            margin-bottom: 0.5rem;
-            max-width: 80%;
+            background-color: #2A2A3A; /* Dark blue-gray */
+            padding: 0.6rem 1rem;
+            border-radius: 12px;
+            max-width: 85%; /* Wider bubbles */
             word-wrap: break-word;
             align-self: flex-start;
-            display: flex; /* NEW: Flex layout for message content and delete button */
-            align-items: center; /* NEW: Vertically align content and button */
-            gap: 0.5rem; /* NEW: Space between message and button */
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            border: 1px solid rgba(0,255,255,0.1); /* Subtle border */
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+            transition: all 0.2s ease;
         }
         .chat-message.current-user {
-            background-color: #4682B4;
+            background-color: #1A3A4A; /* Darker blue for user */
             align-self: flex-end;
-            flex-direction: row-reverse; /* NEW: Puts delete button on the left for RTL */
-        }
-        .chat-message-content {
-             flex-grow: 1; /* NEW: Allows text content to take up available space */
+            flex-direction: row-reverse;
+            border-color: rgba(160,32,240,0.1); /* Subtle purple border */
         }
         .chat-message .sender-name {
-            font-weight: bold;
-            color: #FFD700;
+            font-weight: 700; /* Bold */
+            color: #00FFFF; /* Cyan name */
             display: block;
-            font-size: 0.9em;
-            margin-bottom: 0.2rem;
+            font-size: 0.95em;
+            margin-bottom: 0.1rem;
         }
-        .chat-message .message-text-deleted { /* NEW STYLE */
+        .chat-message .message-text {
+            color: #E0E0E0;
+            font-size: 1rem;
+        }
+        .chat-message .message-text-deleted {
             font-style: italic;
-            color: #999;
+            color: #707080; /* Darker gray for deleted */
+            font-size: 0.9rem;
         }
-        .delete-message-btn { /* NEW STYLE */
+        .delete-message-btn {
             background: none;
             border: none;
-            color: #aaa;
+            color: #F00000; /* Red icon */
             cursor: pointer;
             padding: 0.25rem;
-            opacity: 0.5;
+            opacity: 0.3; /* Less visible when not hovered */
             transition: all 0.2s ease;
-            flex-shrink: 0; /* Prevent button from shrinking */
+            flex-shrink: 0;
         }
-        .chat-message:hover .delete-message-btn { /* NEW STYLE */
-            opacity: 1;
+        .chat-message:hover .delete-message-btn {
+            opacity: 0.8; /* More visible on hover */
+            text-shadow: 0 0 8px rgba(255,0,0,0.7);
         }
-        .delete-message-btn:hover { /* NEW STYLE */
-            color: #ff6b6b;
-            transform: scale(1.1);
+        .delete-message-btn:hover {
+            color: #FF6347; /* Lighter red on active hover */
+            transform: scale(1.2);
         }
 
         .lobby-chat-input-form {
-            margin-top: 0.75rem;
+            margin-top: 1rem;
             display: flex;
-            gap: 0.5rem;
-            flex-shrink: 0; /* CRITICAL: Prevents the input form from shrinking */
+            gap: 0.6rem;
+            flex-shrink: 0;
+        }
+        .lobby-chat-input-form input {
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
         }
 
         .lobby-actions-footer {
-            flex-shrink: 0; /* Prevent shrinking */
-            margin-top: 1rem;
+            flex-shrink: 0;
+            margin-top: 1.5rem;
             display: flex;
             flex-wrap: wrap;
             justify-content: space-between;
             align-items: center;
-            gap: 1rem;
+            gap: 1.25rem; /* Larger gap */
         }
         .start-game-btn {
-            background: linear-gradient(145deg, #228B22 0%, #006400 100%);
-            border: 2px solid #DAA520;
-            font-size: 1.1rem;
-            padding: 0.6rem 1.2rem;
+            background: linear-gradient(135deg, #103A10 0%, #206A20 100%); /* Darker green */
+            border: 2px solid #00FF00; /* Bright green border */
+            font-size: 1.2rem;
+            padding: 0.7rem 1.4rem;
+            box-shadow: 0 0 15px rgba(0,255,0,0.5);
+            text-shadow: 0 0 8px rgba(0,255,0,0.7);
+        }
+        .start-game-btn:disabled {
+            box-shadow: none;
+            text-shadow: none;
         }
         #host-actions-container {
              display: flex;
              flex-wrap: wrap;
-             gap: 1rem;
+             gap: 1.25rem;
         }
 
-        /* Custom Scrollbars */
-        .lobby-sidebar::-webkit-scrollbar,
-        #player-list-container::-webkit-scrollbar,
-        .lobby-chat-messages::-webkit-scrollbar,
-        .custom-scrollbar::-webkit-scrollbar { width: 8px; }
-        .lobby-sidebar::-webkit-scrollbar-track,
-        #player-list-container::-webkit-scrollbar-track,
-        .lobby-chat-messages::-webkit-scrollbar-track,
-        .custom-scrollbar::-webkit-scrollbar-track { background: #202020; border-radius: 4px; }
-        .lobby-sidebar::-webkit-scrollbar-thumb,
-        #player-list-container::-webkit-scrollbar-thumb,
-        .lobby-chat-messages::-webkit-scrollbar-thumb,
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: #DAA520; border-radius: 4px; }
-        .lobby-sidebar::-webkit-scrollbar-thumb:hover,
-        #player-list-container::-webkit-scrollbar-thumb:hover,
-        .lobby-chat-messages::-webkit-scrollbar-thumb:hover,
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #FFD700; }
+        /* Custom Scrollbars - Glowing */
+        ::-webkit-scrollbar { width: 10px; } /* Thicker scrollbar */
+        ::-webkit-scrollbar-track { background: #0A0A15; border-radius: 5px; } /* Dark track */
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(180deg, #00FFFF, #A020F0); /* Cyan-Purple gradient thumb */
+            border-radius: 5px;
+            border: 1px solid #00FFFF; /* Subtle border */
+        }
+        ::-webkit-scrollbar-thumb:hover { background: linear-gradient(180deg, #A020F0, #00FFFF); } /* Invert colors on hover */
         
         /* ===== CORRECTED RESPONSIVE STYLES ===== */
         @media (max-width: 860px) {
             .lobby-detail-content {
-                flex-direction: column; /* Stack panels on smaller screens */
-                height: calc(100% - 80px); /* Adjust height */
-                margin: 40px auto;
-                padding: 1rem;
-                overflow: hidden; /* ** THE MAIN FIX **: Prevent the whole card from scrolling */
+                flex-direction: column;
+                height: calc(100% - 100px); /* Adjust height */
+                margin: 50px auto;
+                padding: 1.5rem;
+                overflow: hidden;
             }
             .lobby-sidebar {
-                width: 100%; /* Sidebar takes full width */
-                flex-shrink: 0; /* ** FIX **: Prevent sidebar from shrinking when keyboard opens */
-                max-height: 250px; /* Limit sidebar height */
+                width: 100%;
+                flex-shrink: 0;
+                max-height: 280px; /* Increased sidebar height on mobile */
             }
             .lobby-main-panel {
-                flex-grow: 1; /* ** FIX **: Allow panel to fill remaining vertical space */
-                min-height: 0; /* ** FIX **: Flexbox fix to allow shrinking properly */
+                flex-grow: 1;
+                min-height: 0;
+            }
+            .lobby-actions-footer {
+                justify-content: center; /* Center buttons on small screens */
+            }
+            .lobby-item .join-lobby-btn,
+            .lobby-item .close-lobby-btn,
+            .lobby-item .view-my-lobby-btn {
+                padding: 0.75rem 1rem;
+                font-size: 1rem;
             }
         }
         /* General Responsive */
         @media (max-width: 640px) {
             .max-w-md { max-width: 95%; }
             .p-6, .p-8 { padding: 1.5rem; }
+            .futuristic-card { padding: 2rem; }
+            h1 { font-size: 2.5rem; }
+            h2 { font-size: 1.8rem; }
             .text-3xl { font-size: 2rem; }
-            .classic-btn { padding: 0.75rem 1.25rem; font-size: 1rem; }
-            .app-header, .lobby-header, .app-footer, .lobby-footer { padding: 0.5rem; }
-            .app-header, .lobby-header { height: 60px; }
-            .app-footer, .lobby-footer { height: 80px; }
-            .main-content-area { padding-top: 60px; padding-bottom: 80px; }
-            .lobby-detail-content { margin: 20px auto; height: calc(100% - 40px); }
-
-            /* New Coin Display responsive */
+            .futuristic-btn { padding: 0.75rem 1.25rem; font-size: 1rem; }
+            .app-header, .lobby-header { height: 70px; padding: 0.5rem 1rem;}
+            .app-footer, .lobby-footer { height: 90px; padding: 0.8rem 1rem; gap: 0.8rem;}
+            .main-content-area { padding-top: 70px; padding-bottom: 90px; }
+            .lobby-detail-content { margin: 20px auto; height: calc(100% - 40px); padding: 1rem;}
+            .lobby-sidebar { padding: 1rem; max-height: 200px; }
+            .lobby-footer .icon-btn svg { width: 30px; height: 30px; }
+            .lobby-footer .icon-btn { font-size: 0.8rem; }
+            .lobby-footer .games-running-text { font-size: 1rem; padding: 0.4rem 0.8rem; }
+            .lobby-footer .games-running-text #active-games-count { font-size: 1.3rem; }
+            
             #header-user-coins-container {
-                font-size: 1.2rem;
-                padding: 0.4rem 0.8rem; /* Adjusted for smaller screens */
+                font-size: 1.1rem;
+                padding: 0.3rem 0.6rem;
             }
             #header-user-coins-container .coin-icon {
-                width: 1.2rem; /* Smaller icon */
-                height: 1.2rem;
-                margin-left: 0.2rem; /* Adjusted margin */
+                width: 1.1rem;
+                height: 1.1rem;
+                margin-left: 0.1rem;
             }
+            .profile-modal-content { padding: 1.5rem; }
+            .profile-summary svg { width: 20px; height: 20px; }
+            #profile-summary { padding: 0.5rem; }
+            #header-display-name { font-size: 0.9rem; }
+            #header-user-id { font-size: 0.7rem; }
         }
         
-        /* Lobby Type Toggle Styles */
-        .lobby-type-btn { padding: 0.5rem 1.5rem; border: 2px solid #DAA520; border-radius: 10px; transition: all 0.2s ease-in-out; background-color: transparent; color: #DAA520; font-weight: bold; }
-        .lobby-type-btn.active { background-color: #DAA520; color: #1A1A1A; box-shadow: 0 0 10px rgba(255,215,0,0.5); }
-        .lobby-lock-icon { width: 1.2rem; height: 1.2rem; margin-left: 0.5rem; color: #FFD700; display: inline-block; vertical-align: middle; }
+        /* Lobby Type Toggle Styles - Futuristic Buttons */
+        .lobby-type-btn { 
+            padding: 0.6rem 1.8rem; /* More generous padding */
+            border: none; /* No direct border */
+            border-radius: 10px;
+            transition: all 0.2s ease-in-out; 
+            background: rgba(0,0,0,0.3); /* Transparent base for non-active */
+            color: #00FFFF; 
+            font-weight: 600; 
+            box-shadow: inset 0 0 5px rgba(0,255,255,0.2);
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+        }
+        .lobby-type-btn::before { /* Inner border glow */
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 10px;
+            padding: 2px;
+            background: linear-gradient(45deg, #00FFFF, #A020F0);
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            z-index: -1;
+            opacity: 0.5;
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+
+        .lobby-type-btn.active { 
+            background: linear-gradient(135deg, #00CACA 0%, #00FFFF 100%); /* Bright cyan gradient for active */
+            color: #0A0A10; /* Dark text on bright button */
+            box-shadow: 0 0 15px rgba(0,255,255,0.6);
+            text-shadow: none;
+        }
+        .lobby-type-btn.active::before {
+             opacity: 0; /* Hide inner glow when active/filled */
+        }
+        .lobby-type-btn:hover:not(.active) {
+            transform: translateY(-2px);
+            box-shadow: 0 0 10px rgba(0,255,255,0.5), inset 0 0 8px rgba(0,255,255,0.4);
+            color: #00FFFF;
+        }
+        .lobby-type-btn:hover:not(.active)::before {
+            opacity: 0.8;
+            transform: scale(1.02);
+        }
+
+        .lobby-lock-icon { 
+            width: 1.3rem; 
+            height: 1.3rem; 
+            margin-left: 0.6rem; 
+            color: #A020F0; /* Purple for lock */
+            display: inline-block; 
+            vertical-align: middle; 
+            text-shadow: 0 0 5px rgba(160,32,240,0.5);
+        }
 
         /* NEW: Countdown Animation */
         @keyframes countdown-pulse {
-            0% { transform: scale(0.5); opacity: 0; }
-            50% { transform: scale(1.1); opacity: 1; }
-            100% { transform: scale(1); opacity: 0; }
+            0% { transform: scale(0.6) translateY(10px); opacity: 0; filter: blur(5px); }
+            50% { transform: scale(1.1) translateY(0px); opacity: 1; filter: blur(0px); }
+            100% { transform: scale(1) translateY(0px); opacity: 0; filter: blur(5px); }
         }
         .countdown-effect {
             animation: countdown-pulse 1s ease-out forwards;
+            font-family: 'Orbitron', sans-serif; /* Digital font for countdown */
+            text-shadow: 0 0 20px rgba(0,255,255,0.8), 0 0 40px rgba(160,32,240,0.6);
+            color: #00FFFF;
         }
 
-        /* NEW: Game Player Status Pods */
+        /* NEW: Game Player Status Pods - Modular HUD elements */
         .game-player-pod {
             display: flex;
             flex-direction: column;
             align-items: center;
-            background-color: rgba(255,255,255,0.05);
-            border: 1px solid rgba(255,255,255,0.1);
+            background-color: rgba(0,0,0,0.4);
+            border: 1px solid rgba(0,255,255,0.2); /* Cyan border */
             border-radius: 10px;
             padding: 0.75rem 1rem;
-            min-width: 120px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+            min-width: 130px; /* Slightly wider */
+            box-shadow: 0 4px 10px rgba(0,0,0,0.4), inset 0 0 8px rgba(0,255,255,0.1); /* Subtle glow */
             transition: all 0.3s ease-in-out;
             position: relative;
+            overflow: hidden;
+            font-family: 'Rajdhani', sans-serif;
+            text-align: center;
         }
         .game-player-pod.is-ai {
-            background-color: rgba(255, 99, 71, 0.1); /* Tomato red tint */
+            background-color: rgba(255, 99, 71, 0.15); /* Tomato red tint */
             border-color: #FF6347; /* Tomato */
+            box-shadow: 0 4px 10px rgba(0,0,0,0.4), inset 0 0 8px rgba(255,99,71,0.2);
         }
         .game-player-pod.is-human {
-            background-color: rgba(100, 149, 237, 0.1); /* Cornflower Blue tint */
+            background-color: rgba(100, 149, 237, 0.15); /* Cornflower Blue tint */
             border-color: #6495ED; /* Cornflower Blue */
+            box-shadow: 0 4px 10px rgba(0,0,0,0.4), inset 0 0 8px rgba(100,149,237,0.2);
         }
         .game-player-pod.current-active-player {
-            transform: scale(1.05);
-            border-color: #FFD700; /* Gold */
-            box-shadow: 0 0 15px rgba(255,215,0,0.7);
+            transform: scale(1.08); /* More pronounced lift */
+            border-color: #A020F0; /* Purple active border */
+            box-shadow: 0 0 20px rgba(160,32,240,0.8), inset 0 0 15px rgba(160,32,240,0.5); /* Stronger purple glow */
         }
         .game-player-pod .player-name {
-            font-weight: bold;
+            font-weight: 600;
             color: #E0E0E0;
-            font-size: 1.1rem;
-            margin-bottom: 0.2rem;
+            font-size: 1.15rem; /* Slightly larger */
+            margin-bottom: 0.1rem;
         }
         .game-player-pod .player-role {
             font-size: 0.9rem;
-            color: #DAA520; /* Gold */
+            color: #00FFFF; /* Cyan for role */
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
         .game-player-pod .player-status {
             font-size: 0.8rem;
-            color: #C0C0C0;
+            color: #B0B0C0;
             margin-top: 0.2rem;
+            opacity: 0.8;
         }
+        .game-info-panel {
+            background: rgba(0,0,0,0.6);
+            border: 1px solid #A020F0;
+            border-radius: 12px;
+            padding: 0.8rem 1.2rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5), inset 0 0 10px rgba(160,32,240,0.3);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-family: 'Orbitron', sans-serif;
+            letter-spacing: 1px;
+        }
+        #game-timer-display {
+            font-size: 2.8rem;
+            color: #00FF00; /* Green timer */
+            text-shadow: 0 0 15px rgba(0,255,0,0.7);
+        }
+        #game-role-display {
+            color: #E0E0E0;
+            font-size: 1.2rem;
+            text-shadow: 0 0 5px rgba(0,255,255,0.4);
+        }
+        #my-role {
+            color: #00FFFF;
+            font-weight: 700;
+        }
+        #game-scores-display {
+            color: #E0E0E0;
+            font-size: 1.2rem;
+            text-shadow: 0 0 5px rgba(0,255,255,0.4);
+        }
+        #ai-score, #human-score {
+            font-weight: 700;
+        }
+        #ai-score { color: #FF6347; } /* Tomato for AI */
+        #human-score { color: #6495ED; } /* Cornflower Blue for Human */
+
 
         /* Voting Buttons */
         .voting-btn {
-            padding: 1rem 2rem;
-            font-size: 1.5rem;
+            padding: 1.2rem 2.5rem; /* Larger buttons */
+            font-size: 1.8rem; /* Larger font */
             border-radius: 15px;
-            font-weight: bold;
+            font-weight: 700;
             transition: all 0.3s ease;
             cursor: pointer;
-            border: 3px solid #FFD700;
+            border: none;
+            text-shadow: 0 0 10px rgba(255,255,255,0.7);
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
         }
+        .voting-btn::before { /* Inner glow border */
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 15px;
+            padding: 3px;
+            background: linear-gradient(45deg, #00FFFF, #A020F0);
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            z-index: -1;
+            opacity: 0.7;
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+
         .voting-btn.ai-vote {
-            background: linear-gradient(145deg, #E24B4B 0%, #B22222 100%);
+            background: linear-gradient(145deg, #5A0A0A 0%, #8A2020 100%); /* Darker red */
             color: white;
+            box-shadow: 0 0 20px rgba(255,0,0,0.6);
         }
         .voting-btn.human-vote {
-            background: linear-gradient(145deg, #4BBEE2 0%, #2A52BE 100%);
+            background: linear-gradient(145deg, #0A0A5A 0%, #20208A 100%); /* Darker blue */
             color: white;
+            box-shadow: 0 0 20px rgba(0,0,255,0.6);
         }
         .voting-btn:hover:not(:disabled) {
-            transform: translateY(-5px) scale(1.05);
-            box-shadow: 0 10px 20px rgba(0,0,0,0.6);
+            transform: translateY(-8px) scale(1.08); /* More dramatic lift */
+            box-shadow: 0 15px 30px rgba(0,0,0,0.8), 0 0 30px currentColor; /* Deeper shadow, color matching glow */
+        }
+        .voting-btn:hover:not(:disabled)::before {
+            opacity: 1;
+            transform: scale(1.05);
         }
         .voting-btn:disabled {
-            opacity: 0.5;
+            opacity: 0.4;
             cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+            text-shadow: none;
+        }
+        .voting-btn:disabled::before {
+             opacity: 0.2;
+             background: linear-gradient(45deg, #555, #777);
+        }
+
+        /* Game Result Display */
+        #game-result-display {
+            font-family: 'Orbitron', sans-serif;
+            letter-spacing: 1.5px;
+        }
+        #winner-text {
+            text-shadow: 0 0 25px currentColor;
+        }
+        #winner-text.text-green-500 { color: #00FF00; }
+        #winner-text.text-red-500 { color: #FF0000; }
+        #reason-text {
+            color: #B0B0C0;
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 1.5rem;
+        }
+        #return-to-lobbies-btn {
+            font-size: 1.2rem;
+            padding: 0.8rem 1.8rem;
         }
 
         /* Coin Icon for Buttons */
         .coin-icon {
-            width: 1.25rem; /* Equivalent to w-5 */
-            height: 1.25rem; /* Equivalent to h-5 */
+            width: 1.4rem; /* Slightly larger */
+            height: 1.4rem;
             display: inline-block;
             vertical-align: middle;
-            margin-right: 0.25rem; /* Equivalent to mr-1 */
-            fill: #FFD700; /* Gold color for coins */
+            margin-right: 0.3rem; /* Adjusted margin */
+            fill: currentColor; /* Inherit color from parent for easier styling */
+            filter: drop-shadow(0 0 5px currentColor); /* Glow effect for icon */
         }
+        /* Specific override for header coins */
+        #header-user-coins-container .coin-icon {
+            fill: #00FFFF; /* Force cyan for header coin */
+        }
+
+        /* General icons (back button, search, profile, menu, etc.) */
+        .lucide {
+            color: #00FFFF; /* Cyan for all lucide icons */
+            transition: color 0.2s ease, transform 0.2s ease;
+        }
+        .lucide:hover {
+            color: #A020F0; /* Purple on hover */
+            transform: scale(1.1);
+        }
+        /* Override for header profile icon for consistent look with profile summary */
+        #profile-summary svg {
+            color: #E0E0E0; /* White/gray for user icon */
+            filter: drop-shadow(0 0 3px rgba(255,255,255,0.3));
+        }
+        #profile-summary:hover svg {
+            color: #A020F0; /* Purple on hover for user icon */
+        }
+
     </style>
 </head>
 <body>
@@ -844,37 +1157,37 @@
 
         <!-- 2. Authentication Screen (Login/Register) -->
         <div id="auth-screen" class="hidden absolute inset-0 flex justify-center items-center bg-gray-900 bg-opacity-90 z-40 page-transition-active page-transition-hidden" tabindex="-1">
-            <div class="classic-card p-6 sm:p-8 w-11/12 max-w-md text-center">
+            <div class="futuristic-card p-6 sm:p-8 w-11/12 max-w-md text-center">
                 <h2 class="text-2xl sm:text-3xl font-bold mb-6">ورود / ثبت نام</h2>
                 <form id="auth-form" class="space-y-5">
                     <div>
                         <input type="email" id="email" placeholder="ایمیل شما"
-                               class="w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
+                               class="w-full"
                                required>
                     </div>
                     <div id="display-name-field" class="hidden">
                          <input type="text" id="display-name" placeholder="نام نمایشی (در بازی)"
-                               class="w-full focus:outline-none focus:ring-2 focus:ring-green-500">
+                               class="w-full">
                     </div>
                     <div>
                         <input type="password" id="password" placeholder="رمز عبور (حداقل ۶ کاراکتر)"
-                               class="w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
+                               class="w-full"
                                required>
                     </div>
                     <!-- Toggle buttons for Auth mode -->
                     <div class="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4 sm:space-x-reverse mt-6">
                         <button type="button" id="login-toggle-btn"
-                                class="w-full sm:w-1/2 classic-btn btn-blue-classic text-xl sm:text-2xl">
+                                class="w-full sm:w-1/2 futuristic-btn btn-blue-futuristic text-xl sm:text-2xl">
                             ورود
                         </button>
                         <button type="button" id="register-toggle-btn"
-                                class="w-full sm:w-1/2 classic-btn btn-green-classic text-xl sm:text-2xl">
+                                class="w-full sm:w-1/2 futuristic-btn btn-green-futuristic text-xl sm:text-2xl">
                             ثبت نام
                         </button>
                     </div>
                     <!-- Main submit button, text changes based on authMode -->
                     <button type="submit" id="submit-auth-btn"
-                            class="w-full mt-4 classic-btn btn-purple-classic text-xl sm:text-2xl">
+                            class="w-full mt-4 futuristic-btn btn-purple-futuristic text-xl sm:text-2xl">
                         ادامه
                     </button>
                 </form>
@@ -927,13 +1240,13 @@
             <!-- Footer Navigation - Fixed at bottom -->
             <footer class="app-footer flex justify-center items-center gap-4">
                 <button id="friendly-game-btn"
-                        class="classic-btn btn-purple-classic text-base sm:text-lg flex-grow flex items-center justify-center whitespace-nowrap">
+                        class="futuristic-btn btn-purple-futuristic text-base sm:text-lg flex-grow flex items-center justify-center whitespace-nowrap">
                         <svg class="coin-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm0 18a8 8 0 1 1 8-8 8 8 0 0 1-8 8zm-2-10h4a1 1 0 0 0 0-2h-4a1 1 0 0 0 0 2zm0 4h4a1 1 0 0 0 0-2h-4a1 1 0 0 0 0 2z"/></svg>
                     <span>بازی دوستانه (<span id="friendly-game-cost">100</span>)</span>
                 </button>
                 <!-- Placeholder for other main buttons like 'Rated Game' -->
                 <button id="rated-game-btn"
-                        class="classic-btn btn-brown-classic text-base sm:text-lg flex-grow flex items-center justify-center whitespace-nowrap">
+                        class="futuristic-btn btn-brown-futuristic text-base sm:text-lg flex-grow flex items-center justify-center whitespace-nowrap">
                     بازی امتیازی
                 </button>
             </footer>
@@ -1000,7 +1313,7 @@
 
         <!-- 5. Profile Modal (Hidden by default) -->
         <div id="profile-modal" class="hidden fixed inset-0 flex justify-center items-center z-50 profile-modal-overlay">
-            <div class="classic-card profile-modal-content p-6 sm:p-8 w-11/12 max-w-md text-center relative">
+            <div class="futuristic-card profile-modal-content p-6 sm:p-8 w-11/12 max-w-md text-center relative">
                 <h2 class="text-2xl sm:text-3xl font-bold mb-6">پروفایل کاربری</h2>
                 <button id="close-profile-modal-btn" class="absolute top-4 left-4 text-white hover:text-gray-300 transition-colors duration-200">
                     <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-x">
@@ -1015,7 +1328,7 @@
                     <!-- Add more profile stats here later (e.g., wins, losses) -->
                 </div>
                 <button id="profile-logout-btn"
-                        class="w-full classic-btn btn-red-classic text-lg sm:text-xl">
+                        class="w-full futuristic-btn btn-red-futuristic text-lg sm:text-xl">
                     خروج از حساب
                 </button>
             </div>
@@ -1023,7 +1336,7 @@
 
         <!-- 6. Create Lobby Input Modal (NEW) -->
         <div id="create-lobby-modal" class="hidden fixed inset-0 flex justify-center items-center z-50 profile-modal-overlay">
-            <div class="classic-card profile-modal-content p-6 sm:p-8 w-11/12 max-w-md text-center relative overflow-y-auto custom-scrollbar">
+            <div class="futuristic-card profile-modal-content p-6 sm:p-8 w-11/12 max-w-md text-center relative overflow-y-auto custom-scrollbar">
                 <h2 id="create-lobby-modal-title" class="text-2xl sm:text-3xl font-bold mb-6">ساخت لابی جدید</h2>
                 <button id="close-create-lobby-modal-btn" class="absolute top-4 left-4 text-white hover:text-gray-300 transition-colors duration-200">
                     <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-x">
@@ -1035,7 +1348,7 @@
                     <!-- NEW: Lobby Name Selection/Proposal Area -->
                     <div id="lobby-name-selection-area" class="hidden">
                         <label for="approved-lobby-names-select" class="block text-right text-sm text-gray-300 mb-1">نام لابی تأیید شده خود را انتخاب کنید:</label>
-                        <select id="approved-lobby-names-select" class="w-full focus:outline-none focus:ring-2 focus:ring-green-500">
+                        <select id="approved-lobby-names-select" class="w-full">
                             <!-- Options will be dynamically loaded here -->
                             <option value="">نام لابی را انتخاب کنید</option>
                         </select>
@@ -1043,10 +1356,10 @@
 
                     <div id="lobby-name-proposal-area" class="hidden">
                         <label for="proposed-lobby-name-input" class="block text-right text-sm text-gray-300 mb-1">نام لابی جدید را برای تأیید ارسال کنید (می‌توانید از کد رنگی [#RRGGBB] در ابتدای نام استفاده کنید):</label>
-                        <input type="text" id="proposed-lobby-name-input" placeholder="مثال: [#FFD700]لابی طلایی من"
-                               class="w-full focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <input type="text" id="proposed-lobby-name-input" placeholder="مثال: [#00FFFF]لابی دیجیتالی من"
+                               class="w-full">
                         <button type="button" id="submit-lobby-name-for-approval-btn"
-                                class="w-full mt-4 classic-btn btn-blue-classic text-lg sm:text-xl">
+                                class="w-full mt-4 futuristic-btn btn-blue-futuristic text-lg sm:text-xl">
                             ارسال برای تأیید
                         </button>
                         <p class="text-gray-400 text-sm mt-2" id="lobby-proposal-message">بعد از ارسال، ادمین نام لابی شما را بررسی و تأیید می‌کند. سپس می‌توانید از آن نام استفاده کنید.</p>
@@ -1070,7 +1383,7 @@
                         </div>
                     </div>
 
-                    <div class="w-full h-px bg-yellow-600 my-4"></div> <!-- Divider -->
+                    <div class="w-full h-px bg-purple-600 my-4 shadow-md shadow-purple-900"></div> <!-- Divider -->
 
                     <!-- NEW: Lobby Type Toggle (Public/Private) -->
                     <div class="flex justify-center space-x-2 space-x-reverse my-4" id="lobby-type-toggle">
@@ -1087,7 +1400,7 @@
                     <!-- NEW: Password field for private lobbies (initially hidden) -->
                     <div id="new-lobby-password-field" class="hidden relative">
                         <input type="password" id="new-lobby-password-input" placeholder="رمز عبور لابی (حداقل ۴ کاراکتر)"
-                               class="w-full focus:outline-none focus:ring-2 focus:ring-green-500 pr-10">
+                               class="w-full pr-10">
                         <button type="button" id="toggle-password-visibility" class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white">
                             <svg id="eye-icon-open" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-eye"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
                             <svg id="eye-icon-closed" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-eye-off" style="display: none;"><path d="M9.88 9.88a3 3 0 1 0 4.24 4.24"/><path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"/><path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 4 0 0 0 5.39-1.61"/><line x1="2" x2="22" y1="2" y2="22"/></svg>
@@ -1098,12 +1411,12 @@
                     <div>
                         <label for="game-duration-input" class="block text-right text-sm text-gray-300 mb-1">مدت زمان بازی (دقیقه):</label>
                         <input type="number" id="game-duration-input" value="5" min="1" max="60"
-                               class="w-full focus:outline-none focus:ring-2 focus:ring-green-500 text-center"
+                               class="w-full text-center"
                                required>
                     </div>
 
                     <button type="submit" id="submit-create-lobby-btn"
-                            class="w-full mt-4 classic-btn btn-green-classic text-xl sm:text-2xl">
+                            class="w-full mt-4 futuristic-btn btn-green-futuristic text-xl sm:text-2xl">
                         ساخت لابی
                     </button>
                 </form>
@@ -1113,12 +1426,12 @@
 
         <!-- 7. Custom Confirmation Modal -->
         <div id="custom-confirm-modal" class="hidden fixed inset-0 flex justify-center items-center z-50 profile-modal-overlay">
-            <div class="classic-card profile-modal-content p-6 sm:p-8 w-11/12 max-w-md text-center relative">
-                <h2 id="confirm-title" class="text-2xl sm:text-3xl font-bold mb-6 text-yellow-300">تایید عملیات</h2>
+            <div class="futuristic-card profile-modal-content p-6 sm:p-8 w-11/12 max-w-md text-center relative">
+                <h2 id="confirm-title" class="text-2xl sm:text-3xl font-bold mb-6">تایید عملیات</h2>
                 <p id="confirm-message" class="text-lg mb-8 text-white">آیا از انجام این عمل مطمئن هستید؟</p>
                 <div class="flex justify-around space-x-4 space-x-reverse">
-                    <button id="confirm-yes-btn" class="w-1/2 classic-btn btn-red-classic">بله</button>
-                    <button id="confirm-no-btn" class="w-1/2 classic-btn btn-gray-classic">خیر</button>
+                    <button id="confirm-yes-btn" class="w-1/2 futuristic-btn btn-red-futuristic">بله</button>
+                    <button id="confirm-no-btn" class="w-1/2 futuristic-btn btn-gray-futuristic">خیر</button>
                 </div>
             </div>
         </div>
@@ -1133,7 +1446,7 @@
                     <p id="detail-host-name" class="text-md text-gray-300 mt-2">سازنده: ---</p>
                     <p id="detail-player-count" class="text-sm font-semibold text-white mb-4">بازیکنان: 0/4</p>
                     
-                    <div class="w-full h-px bg-yellow-600 mb-4"></div>
+                    <div class="w-full h-px bg-purple-600 mb-4 shadow-md shadow-purple-900"></div>
 
                     <!-- Player List / Status Display (moved here for game view) -->
                     <div id="game-player-status" class="flex flex-wrap justify-center gap-2 p-2 bg-gray-800 rounded-lg mb-4 shadow-inner">
@@ -1157,7 +1470,7 @@
                                 <span id="ai-score">AI: 0</span> | <span id="human-score">Human: 0</span>
                             </div>
                         </div>
-                        <button id="leave-game-from-lobby-btn" class="classic-btn btn-red-classic text-sm py-2 px-4 hidden">ترک بازی</button>
+                        <button id="leave-game-from-lobby-btn" class="futuristic-btn btn-red-futuristic text-sm py-2 px-4 hidden">ترک بازی</button>
                     </div>
 
                     <!-- Countdown Overlay (now relative to lobby-main-panel) -->
@@ -1173,7 +1486,7 @@
                         </div>
                         <form id="lobby-chat-form" class="lobby-chat-input-form flex-shrink-0">
                             <input type="text" id="lobby-chat-input" placeholder="پیام خود را بنویسید..." autocomplete="off">
-                            <button type="submit" id="lobby-chat-send-btn" class="classic-btn btn-blue-classic text-sm py-2 px-4">ارسال</button>
+                            <button type="submit" id="lobby-chat-send-btn" class="futuristic-btn btn-blue-futuristic text-sm py-2 px-4">ارسال</button>
                         </form>
                     </div>
 
@@ -1187,25 +1500,25 @@
                         <div id="game-result-display" class="hidden text-center mt-10">
                             <h2 class="text-5xl font-extrabold text-green-500 mb-4" id="winner-text"></h2>
                             <p class="text-2xl text-white" id="reason-text"></p>
-                            <button id="return-to-lobbies-btn" class="classic-btn btn-blue-classic mt-8 py-3 px-6">بازگشت به لابی‌ها</button>
+                            <button id="return-to-lobbies-btn" class="futuristic-btn btn-blue-futuristic mt-8 py-3 px-6">بازگشت به لابی‌ها</button>
                         </div>
                     </div>
 
                     <!-- Action Buttons Footer -->
                     <div class="lobby-actions-footer">
                         <div id="host-actions-container" style="display: none;">
-                            <button id="start-game-btn" class="classic-btn start-game-btn" disabled>
+                            <button id="start-game-btn" class="futuristic-btn start-game-btn" disabled>
                                 شروع بازی
                             </button>
-                             <button id="toggle-chat-lock-btn" class="classic-btn btn-gray-classic text-sm py-2 px-4">
+                             <button id="toggle-chat-lock-btn" class="futuristic-btn btn-gray-futuristic text-sm py-2 px-4">
                                 قفل کردن چت
                             </button>
-                            <button id="view-kicked-players-btn" class="classic-btn btn-brown-classic text-sm py-2 px-4">
+                            <button id="view-kicked-players-btn" class="futuristic-btn btn-brown-futuristic text-sm py-2 px-4">
                                 لیست اخراجی‌ها
                             </button>
                         </div>
                         <!-- Leave Lobby Button (now only for host to close lobby outside of game) -->
-                        <button id="leave-lobby-btn" class="classic-btn btn-red-classic text-sm py-2 px-4 hidden">
+                        <button id="leave-lobby-btn" class="futuristic-btn btn-red-futuristic text-sm py-2 px-4 hidden">
                             بستن لابی
                         </button>
                     </div>
@@ -1217,8 +1530,8 @@
         <!-- ... All other modals (kick, kicked message, etc.) remain the same ... -->
         <!-- 10. Kick Player Confirmation Modal -->
         <div id="kick-player-confirm-modal" class="hidden fixed inset-0 flex justify-center items-center z-50 profile-modal-overlay">
-            <div class="classic-card profile-modal-content p-6 sm:p-8 w-11/12 max-w-md text-center relative">
-                <h2 class="text-2xl sm:text-3xl font-bold mb-6 text-yellow-300">اخراج بازیکن</h2>
+            <div class="futuristic-card profile-modal-content p-6 sm:p-8 w-11/12 max-w-md text-center relative">
+                <h2 class="text-2xl sm:text-3xl font-bold mb-6">اخراج بازیکن</h2>
                 <button id="close-kick-player-confirm-modal-btn" class="absolute top-4 left-4 text-white hover:text-gray-300 transition-colors duration-200">
                     <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-x">
                         <path d="M18 6 6 18"/><path d="m6 6 12 12"/>
@@ -1226,25 +1539,25 @@
                 </button>
                 <p class="text-lg mb-8 text-white">آیا مطمئن هستید که می‌خواهید <span id="kick-player-confirm-name" class="font-bold"></span> را از لابی اخراج کنید؟</p>
                 <div class="flex justify-around space-x-4 space-x-reverse">
-                    <button id="kick-player-confirm-btn" class="w-1/2 classic-btn btn-red-classic">اخراج کردن</button>
-                    <button id="cancel-kick-player-btn" class="w-1/2 classic-btn btn-gray-classic">انصراف</button>
+                    <button id="kick-player-confirm-btn" class="w-1/2 futuristic-btn btn-red-futuristic">اخراج کردن</button>
+                    <button id="cancel-kick-player-btn" class="w-1/2 futuristic-btn btn-gray-futuristic">انصراف</button>
                 </div>
             </div>
         </div>
 
         <!-- 11. Kicked Message Modal -->
         <div id="kicked-message-modal" class="hidden fixed inset-0 flex justify-center items-center z-50 profile-modal-overlay">
-            <div class="classic-card profile-modal-content p-6 sm:p-8 w-11/12 max-w-md text-center relative">
+            <div class="futuristic-card profile-modal-content p-6 sm:p-8 w-11/12 max-w-md text-center relative">
                 <h2 class="text-2xl sm:text-3xl font-bold mb-6 text-red-400">شما اخراج شدید!</h2>
                 <p id="kicked-message-text" class="text-lg mb-8 text-white">شما از لابی <span class="font-bold" id="kicked-lobby-name"></span> اخراج شده‌اید و نمی‌توانید به آن بازگردید.</p>
-                <button id="kicked-message-ok-btn" class="w-full classic-btn btn-blue-classic">متوجه شدم</button>
+                <button id="kicked-message-ok-btn" class="w-full futuristic-btn btn-blue-futuristic">متوجه شدم</button>
             </div>
         </div>
 
         <!-- 12. Kicked Players List Modal -->
         <div id="kicked-players-list-modal" class="hidden fixed inset-0 flex justify-center items-center z-50 profile-modal-overlay">
-            <div class="classic-card profile-modal-content p-6 sm:p-8 w-11/12 max-w-md text-center relative">
-                <h2 class="text-2xl sm:text-3xl font-bold mb-6 text-yellow-300">لیست بازیکنان اخراج شده</h2>
+            <div class="futuristic-card profile-modal-content p-6 sm:p-8 w-11/12 max-w-md text-center relative">
+                <h2 class="text-2xl sm:text-3xl font-bold mb-6">لیست بازیکنان اخراج شده</h2>
                 <button id="close-kicked-players-list-modal-btn" class="absolute top-4 left-4 text-white hover:text-gray-300 transition-colors duration-200">
                     <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-x">
                         <path d="M18 6 6 18"/><path d="m6 6 12 12"/>
@@ -1254,24 +1567,24 @@
                     <!-- Kicked players will be dynamically loaded here -->
                     <p class="text-gray-400 text-center">هیچ بازیکنی اخراج نشده است.</p>
                 </div>
-                <button id="kicked-list-ok-btn" class="w-full classic-btn btn-gray-classic">بستن</button>
+                <button id="kicked-list-ok-btn" class="w-full futuristic-btn btn-gray-futuristic">بستن</button>
             </div>
         </div>
         
         <!-- 13. Enter Password Modal (for private lobbies) -->
         <div id="enter-password-modal" class="hidden fixed inset-0 flex justify-center items-center z-50 profile-modal-overlay">
-            <div class="classic-card profile-modal-content p-6 sm:p-8 w-11/12 max-w-md text-center relative">
+            <div class="futuristic-card profile-modal-content p-6 sm:p-8 w-11/12 max-w-md text-center relative">
                 <h2 class="text-2xl sm:text-3xl font-bold mb-4">ورود به لابی خصوصی</h2>
                 <p class="text-lg mb-6 text-white">لابی <span id="password-prompt-lobby-name" class="font-bold text-yellow-300"></span> نیاز به رمز عبور دارد.</p>
                 <form id="enter-password-form" class="space-y-5">
                     <div>
                         <input type="password" id="join-lobby-password-input" placeholder="رمز عبور را وارد کنید"
-                               class="w-full focus:outline-none focus:ring-2 focus:ring-blue-500 text-center"
+                               class="w-full text-center"
                                required>
                     </div>
                     <div class="flex justify-around space-x-4 space-x-reverse">
-                        <button type="submit" id="submit-join-password-btn" class="w-1/2 classic-btn btn-green-classic">ورود</button>
-                        <button type="button" id="cancel-join-password-btn" class="w-1/2 classic-btn btn-gray-classic">انصراف</button>
+                        <button type="submit" id="submit-join-password-btn" class="w-1/2 futuristic-btn btn-green-futuristic">ورود</button>
+                        <button type="button" id="cancel-join-password-btn" class="w-1/2 futuristic-btn btn-gray-futuristic">انصراف</button>
                     </div>
                 </form>
                 <div id="password-prompt-message-box" class="mt-5 p-3.5 rounded-xl text-base text-center hidden" role="alert"></div>
@@ -1846,7 +2159,7 @@
                     nameDiv.className = 'flex items-center justify-between bg-gray-700 p-2 rounded-lg mb-1';
                     nameDiv.innerHTML = `
                         <span>${formatLobbyNameWithColor(name)}</span>
-                        <button type="button" class="classic-btn btn-red-classic text-sm py-1 px-3 delete-approved-lobby-name-btn" data-name="${name}">
+                        <button type="button" class="futuristic-btn btn-red-futuristic text-sm py-1 px-3 delete-approved-lobby-name-btn" data-name="${name}">
                             حذف
                         </button>
                     `;
@@ -1982,7 +2295,7 @@
                         lobbyProposalMessage.classList.add('text-gray-400');
                         submitLobbyNameForApprovalBtn.disabled = false;
                         proposedLobbyNameInput.disabled = false;
-                        proposedLobbyNameInput.placeholder = "مثال: [#FFD700]لابی طلایی من";
+                        proposedLobbyNameInput.placeholder = "مثال: [#00FFFF]لابی دیجیتالی من";
                     }
                 }
             }, (error) => {
@@ -2460,17 +2773,17 @@
         
                         let joinButtonHtml = '';
                         if (isCurrentUserKicked) {
-                             joinButtonHtml = `<button class="join-lobby-btn classic-btn btn-red-classic opacity-50 cursor-not-allowed" disabled>اخراج شده‌اید</button>`;
+                             joinButtonHtml = `<button class="join-lobby-btn futuristic-btn btn-red-futuristic opacity-50 cursor-not-allowed" disabled>اخراج شده‌اید</button>`;
                         } else if (isCurrentUserHostOfThisLobby) {
-                            joinButtonHtml = `<button data-lobby-id="${lobby.id}" class="view-my-lobby-btn classic-btn btn-blue-classic">ورود به لابی من</button>`;
+                            joinButtonHtml = `<button data-lobby-id="${lobby.id}" class="view-my-lobby-btn futuristic-btn btn-blue-futuristic">ورود به لابی من</button>`;
                         } else if (canJoinThisLobby) {
-                            joinButtonHtml = `<button data-lobby-id="${lobby.id}" data-lobby-type="${lobby.type || 'public'}" data-lobby-name="${lobby.name}" class="join-lobby-btn classic-btn btn-blue-classic">ورود به لابی</button>`;
+                            joinButtonHtml = `<button data-lobby-id="${lobby.id}" data-lobby-type="${lobby.type || 'public'}" data-lobby-name="${lobby.name}" class="join-lobby-btn futuristic-btn btn-blue-futuristic">ورود به لابی</button>`;
                         } else {
-                            joinButtonHtml = `<button class="join-lobby-btn classic-btn btn-blue-classic opacity-50 cursor-not-allowed" disabled>ورود به لابی</button>`;
+                            joinButtonHtml = `<button class="join-lobby-btn futuristic-btn btn-blue-futuristic opacity-50 cursor-not-allowed" disabled>ورود به لابی</button>`;
                         }
                         
                         const closeButtonHtml = isCurrentUserHostOfThisLobby 
-                            ? `<button data-lobby-id="${lobby.id}" class="close-lobby-btn classic-btn btn-red-classic">بستن لابی</button>` : '';
+                            ? `<button data-lobby-id="${lobby.id}" class="close-lobby-btn futuristic-btn btn-red-futuristic">بستن لابی</button>` : '';
         
                         const lobbyItem = document.createElement('div');
                         lobbyItem.className = 'lobby-item mb-3 w-full';
@@ -2775,7 +3088,7 @@
                         validKickedPlayers.forEach(player => {
                             const playerDiv = document.createElement('div');
                             playerDiv.className = 'flex items-center justify-between bg-gray-700 p-3 rounded-lg mb-2';
-                            playerDiv.innerHTML = `<span>${player.displayName}</span><button data-player-uid="${player.uid}" class="unkick-player-btn classic-btn btn-green-classic text-sm py-1 px-3">بازگرداندن</button>`;
+                            playerDiv.innerHTML = `<span>${player.displayName}</span><button data-player-uid="${player.uid}" class="unkick-player-btn futuristic-btn btn-green-futuristic text-sm py-1 px-3">بازگرداندن</button>`;
                             kickedPlayersListContent.appendChild(playerDiv);
                         });
                         kickedPlayersListContent.querySelectorAll('.unkick-player-btn').forEach(button => {
