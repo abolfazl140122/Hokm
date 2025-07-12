@@ -1039,7 +1039,6 @@
                             <!-- Options will be dynamically loaded here -->
                             <option value="">نام لابی را انتخاب کنید</option>
                         </select>
-                        <p class="text-gray-400 text-sm mt-2">اگر نام لابی تأیید شده ندارید، می‌توانید در ادامه درخواست تأیید دهید.</p>
                     </div>
 
                     <div id="lobby-name-proposal-area" class="hidden">
@@ -1059,6 +1058,15 @@
                         <div id="pending-lobby-names-list" class="space-y-2 text-right text-gray-400 max-h-32 overflow-y-auto custom-scrollbar">
                             <!-- Pending names will be injected here -->
                             <p class="text-sm text-center">هیچ نام لابی در انتظار تایید ندارید.</p>
+                        </div>
+                    </div>
+
+                    <!-- NEW: Approved Lobby Names Management Area -->
+                    <div id="approved-lobby-names-management-area" class="hidden mt-4">
+                        <h3 class="text-xl font-bold text-gray-300 mb-2">نام‌های لابی تأیید شده شما:</h3>
+                        <div id="approved-lobby-names-management-list" class="space-y-2 text-right text-gray-400 max-h-32 overflow-y-auto custom-scrollbar">
+                            <!-- Approved names with delete buttons will be injected here -->
+                            <p class="text-sm text-center">هیچ نام لابی تأیید شده‌ای ندارید.</p>
                         </div>
                     </div>
 
@@ -1379,6 +1387,10 @@
         const pendingLobbyNamesArea = document.getElementById('pending-lobby-names-area');
         const pendingLobbyNamesList = document.getElementById('pending-lobby-names-list');
 
+        // NEW: Approved Lobby Names Management Area (for deletion)
+        const approvedLobbyNamesManagementArea = document.getElementById('approved-lobby-names-management-area');
+        const approvedLobbyNamesManagementList = document.getElementById('approved-lobby-names-management-list');
+
 
         // Custom Confirmation Modal Elements
         const customConfirmModal = document.getElementById('custom-confirm-modal');
@@ -1478,6 +1490,9 @@
         // Global timer variables for game
         let gameCountdownInterval = null;
         let gameTimerInterval = null;
+        
+        // NEW: Max pending proposals limit
+        const MAX_PENDING_PROPOSALS = 5;
 
         // Function to clear all game-related intervals
         function clearGameIntervals() {
@@ -1813,6 +1828,66 @@
             }
         }
 
+        // NEW: Function to render the list of approved lobby names for management (deletion)
+        function renderApprovedLobbyNamesManagementList() {
+            if (!currentUserData || !currentUserData.approvedLobbyNames) {
+                approvedLobbyNamesManagementList.innerHTML = '<p class="text-sm text-center">هیچ نام لابی تأیید شده‌ای ندارید.</p>';
+                approvedLobbyNamesManagementArea.classList.add('hidden');
+                return;
+            }
+
+            const approvedNames = currentUserData.approvedLobbyNames;
+            approvedLobbyNamesManagementList.innerHTML = ''; // Clear existing list
+
+            if (approvedNames.length === 0) {
+                approvedLobbyNamesManagementList.innerHTML = '<p class="text-sm text-center">هیچ نام لابی تأیید شده‌ای ندارید.</p>';
+                approvedLobbyNamesManagementArea.classList.add('hidden');
+            } else {
+                approvedLobbyNamesManagementArea.classList.remove('hidden');
+                approvedNames.forEach(name => {
+                    const nameDiv = document.createElement('div');
+                    nameDiv.className = 'flex items-center justify-between bg-gray-700 p-2 rounded-lg mb-1';
+                    nameDiv.innerHTML = `
+                        <span>${formatLobbyNameWithColor(name)}</span>
+                        <button type="button" class="classic-btn btn-red-classic text-sm py-1 px-3 delete-approved-lobby-name-btn" data-name="${name}">
+                            حذف
+                        </button>
+                    `;
+                    approvedLobbyNamesManagementList.appendChild(nameDiv);
+                });
+
+                approvedLobbyNamesManagementList.querySelectorAll('.delete-approved-lobby-name-btn').forEach(button => {
+                    button.addEventListener('click', async (e) => {
+                        const nameToDelete = e.target.dataset.name;
+                        const confirmed = await showCustomConfirm(`آیا مطمئن هستید که می‌خواهید نام لابی "${nameToDelete}" را حذف کنید؟`, "حذف نام لابی");
+                        if (confirmed) {
+                            await deleteApprovedLobbyName(nameToDelete);
+                        }
+                    });
+                });
+            }
+        }
+
+        // NEW: Function to delete an approved lobby name from user's profile
+        async function deleteApprovedLobbyName(nameToDelete) {
+            if (!auth.currentUser || !currentUserData) {
+                showCreateLobbyMessageBox("خطا: اطلاعات کاربری در دسترس نیست.", "error");
+                return;
+            }
+
+            const userProfileRef = doc(db, `artifacts/${appId}/users/${auth.currentUser.uid}/profile/data`);
+            try {
+                await updateDoc(userProfileRef, {
+                    approvedLobbyNames: arrayRemove(nameToDelete)
+                });
+                showCreateLobbyMessageBox(`نام لابی "${nameToDelete}" با موفقیت حذف شد.`, "success");
+                // The onSnapshot for user profile will re-trigger and update UI.
+            } catch (error) {
+                console.error("Error deleting approved lobby name:", error);
+                showCreateLobbyMessageBox(`خطا در حذف نام لابی: ${error.message}`, "error");
+            }
+        }
+
 
         // NEW: Function to update the approved lobby names dropdown and visibility of related areas
         async function updateApprovedLobbyNamesDropdownOnModalOpen(mode) {
@@ -1846,74 +1921,76 @@
                     approvedLobbyNamesSelect.appendChild(option);
                 });
                 lobbyNameSelectionArea.classList.remove('hidden');
-                submitCreateLobbyBtn.classList.remove('hidden'); // Enable 'Create Lobby' button
-                lobbyNameProposalArea.classList.add('hidden'); // Hide proposal area
-                submitLobbyNameForApprovalBtn.classList.add('hidden'); // Hide proposal button
-                pendingLobbyNamesArea.classList.add('hidden'); // Hide pending area if approved names exist
-                approvedLobbyNamesSelect.focus();
+                // The 'Create Lobby' button is enabled/disabled by the select's onchange listener below
             } else {
-                // No approved names. Show proposal area and potentially pending requests.
                 lobbyNameSelectionArea.classList.add('hidden');
-                submitCreateLobbyBtn.classList.add('hidden'); // Disable 'Create Lobby' button
-                
-                if (mode === 'create') {
-                    lobbyNameProposalArea.classList.remove('hidden');
-                    submitLobbyNameForApprovalBtn.classList.remove('hidden'); 
-                } else { 
-                    lobbyNameProposalArea.classList.add('hidden');
-                    submitLobbyNameForApprovalBtn.classList.add('hidden');
-                    showCreateLobbyMessageBox("شما هیچ نام لابی تأیید شده‌ای ندارید. لطفاً از بخش 'ایجاد لابی' یک نام جدید برای تأیید ارسال کنید.", "info");
+                submitCreateLobbyBtn.disabled = true; // No approved names, so can't create lobby from dropdown
+            }
+            
+            // Ensure submitCreateLobbyBtn is disabled initially until a name is selected
+            submitCreateLobbyBtn.disabled = true; 
+
+
+            // Always show proposal area and its button by default for 'create' mode
+            if (mode === 'create') {
+                lobbyNameProposalArea.classList.remove('hidden');
+                submitLobbyNameForApprovalBtn.classList.remove('hidden'); 
+            } else { // For 'myLobbies' view, hide proposal as user is just managing existing
+                lobbyNameProposalArea.classList.add('hidden');
+                submitLobbyNameForApprovalBtn.classList.add('hidden');
+            }
+
+            // Set up listener for PENDING requests for the current user
+            const proposedLobbyNamesRef = collection(db, `artifacts/${appId}/proposedLobbyNames`);
+            const qPending = query(
+                proposedLobbyNamesRef,
+                where("userId", "==", auth.currentUser.uid),
+                where("status", "==", "pending")
+            );
+
+            unsubscribePendingLobbyNames = onSnapshot(qPending, (snapshot) => {
+                pendingLobbyNamesList.innerHTML = ''; // Clear existing list
+                const pendingCount = snapshot.size;
+                if (pendingCount === 0) {
+                    pendingLobbyNamesList.innerHTML = '<p class="text-sm text-center">هیچ نام لابی در انتظار تایید ندارید.</p>';
+                    pendingLobbyNamesArea.classList.add('hidden');
+                } else {
+                    pendingLobbyNamesArea.classList.remove('hidden');
+                    snapshot.forEach(doc => {
+                        const proposal = doc.data();
+                        const proposalDiv = document.createElement('div');
+                        proposalDiv.className = 'flex items-center justify-between bg-gray-700 p-2 rounded-lg mb-1';
+                        proposalDiv.innerHTML = `<span>${formatLobbyNameWithColor(proposal.name)}</span><span class="text-yellow-400 text-sm">در حال تایید...</span>`;
+                        pendingLobbyNamesList.appendChild(proposalDiv);
+                    });
                 }
-                
-                // Set up listener for PENDING requests for the current user
-                const proposedLobbyNamesRef = collection(db, `artifacts/${appId}/proposedLobbyNames`);
-                const qPending = query(
-                    proposedLobbyNamesRef,
-                    where("userId", "==", auth.currentUser.uid),
-                    where("status", "==", "pending")
-                );
 
-                unsubscribePendingLobbyNames = onSnapshot(qPending, (snapshot) => {
-                    pendingLobbyNamesList.innerHTML = ''; // Clear existing list
-                    const pendingCount = snapshot.size;
-                    if (pendingCount === 0) {
-                        pendingLobbyNamesList.innerHTML = '<p class="text-sm text-center">هیچ نام لابی در انتظار تایید ندارید.</p>';
-                        pendingLobbyNamesArea.classList.add('hidden');
-                    } else {
-                        pendingLobbyNamesArea.classList.remove('hidden');
-                        snapshot.forEach(doc => {
-                            const proposal = doc.data();
-                            const proposalDiv = document.createElement('div');
-                            proposalDiv.className = 'flex items-center justify-between bg-gray-700 p-2 rounded-lg mb-1';
-                            proposalDiv.innerHTML = `<span>${formatLobbyNameWithColor(proposal.name)}</span><span class="text-yellow-400 text-sm">در حال تایید...</span>`;
-                            pendingLobbyNamesList.appendChild(proposalDiv);
-                        });
-                    }
-
-                    if (pendingCount >= 5) { // Assuming 5 is the max limit for pending requests
-                        lobbyProposalMessage.textContent = `شما ${pendingCount} درخواست نام لابی در انتظار تایید دارید. تا زمانی که درخواست‌های شما بررسی نشوند، نمی‌توانید درخواست جدیدی ارسال کنید.`;
-                        lobbyProposalMessage.classList.remove('text-gray-400');
-                        lobbyProposalMessage.classList.add('text-red-400');
-                        submitLobbyNameForApprovalBtn.disabled = true;
-                        proposedLobbyNameInput.disabled = true;
-                        proposedLobbyNameInput.placeholder = "تعداد درخواست‌های شما به حداکثر رسیده است.";
-                    } else {
-                        lobbyProposalMessage.textContent = "بعد از ارسال، ادمین نام لابی شما را بررسی و تأیید می‌کند. سپس می‌توانید از آن نام استفاده کنید.";
-                        lobbyProposalMessage.classList.remove('text-red-400');
-                        lobbyProposalMessage.classList.add('text-gray-400');
-                        submitLobbyNameForApprovalBtn.disabled = false;
-                        proposedLobbyNameInput.disabled = false;
-                        proposedLobbyNameInput.placeholder = "مثال: [#FFD700]لابی طلایی من";
-                    }
-                }, (error) => {
-                    console.error("Error listening to pending lobby names:", error);
-                    pendingLobbyNamesList.innerHTML = `<p class="text-red-400 text-center">خطا در بارگذاری درخواست‌های شما.</p>`;
-                });
-
-                proposedLobbyNameInput.value = ''; // Clear proposed input field
-                if (mode === 'create') { 
-                    proposedLobbyNameInput.focus();
+                // Control proposal input based on pending limit
+                if (pendingCount >= MAX_PENDING_PROPOSALS) {
+                    lobbyProposalMessage.textContent = `شما ${pendingCount} درخواست نام لابی در انتظار تایید دارید. تا زمانی که درخواست‌های شما بررسی نشوند، نمی‌توانید درخواست جدیدی ارسال کنید.`;
+                    lobbyProposalMessage.classList.remove('text-gray-400');
+                    lobbyProposalMessage.classList.add('text-red-400');
+                    submitLobbyNameForApprovalBtn.disabled = true;
+                    proposedLobbyNameInput.disabled = true;
+                    proposedLobbyNameInput.placeholder = "تعداد درخواست‌های شما به حداکثر رسیده است.";
+                } else {
+                    lobbyProposalMessage.textContent = "بعد از ارسال، ادمین نام لابی شما را بررسی و تأیید می‌کند. سپس می‌توانید از آن نام استفاده کنید.";
+                    lobbyProposalMessage.classList.remove('text-red-400');
+                    lobbyProposalMessage.classList.add('text-gray-400');
+                    submitLobbyNameForApprovalBtn.disabled = false;
+                    proposedLobbyNameInput.disabled = false;
+                    proposedLobbyNameInput.placeholder = "مثال: [#FFD700]لابی طلایی من";
                 }
+            }, (error) => {
+                console.error("Error listening to pending lobby names:", error);
+                pendingLobbyNamesList.innerHTML = `<p class="text-red-400 text-center">خطا در بارگذاری درخواست‌های شما.</p>`;
+            });
+
+            proposedLobbyNameInput.value = ''; // Clear proposed input field
+            if (mode === 'create' && approvedNames.length === 0) { // Focus only if no approved names to select from
+                proposedLobbyNameInput.focus();
+            } else if (mode === 'create' && approvedNames.length > 0) {
+                 approvedLobbyNamesSelect.focus();
             }
         }
 
@@ -1959,9 +2036,25 @@
             newLobbyPasswordField.classList.add('hidden');
             gameDurationInput.value = 5;
 
-            createLobbyModalTitle.textContent = (mode === 'myLobbies' ? 'لابی‌های من' : 'ساخت لابی جدید');
+            createLobbyModalTitle.textContent = (mode === 'myLobbies' ? 'مدیریت نام‌های لابی' : 'ساخت لابی جدید'); // Changed title for 'myLobbies' mode
+            submitCreateLobbyBtn.textContent = 'ساخت لابی'; // Reset button text
 
+            // Render both approved name selection/proposal and approved name management lists
             await updateApprovedLobbyNamesDropdownOnModalOpen(mode); 
+            renderApprovedLobbyNamesManagementList();
+
+            // Special handling for 'myLobbies' mode: hide lobby creation related forms, only show management
+            if (mode === 'myLobbies') {
+                lobbyNameSelectionArea.classList.add('hidden');
+                lobbyNameProposalArea.classList.add('hidden');
+                pendingLobbyNamesArea.classList.add('hidden');
+                submitCreateLobbyBtn.classList.add('hidden');
+                
+                // Show a message if no approved lobbies to manage
+                if (!currentUserData.approvedLobbyNames || currentUserData.approvedLobbyNames.length === 0) {
+                     showCreateLobbyMessageBox("شما هیچ نام لابی تایید شده‌ای برای مدیریت ندارید.", "info");
+                }
+            }
         }
 
         function closeCreateLobbyModal() {
@@ -1979,6 +2072,14 @@
                 lobbyProposalMessage.classList.remove('text-red-400'); 
                 lobbyProposalMessage.classList.add('text-gray-400');
                 
+                // Ensure all related areas are hidden when closing
+                lobbyNameSelectionArea.classList.add('hidden');
+                lobbyNameProposalArea.classList.add('hidden');
+                pendingLobbyNamesArea.classList.add('hidden');
+                approvedLobbyNamesManagementArea.classList.add('hidden');
+                submitCreateLobbyBtn.classList.add('hidden');
+
+
                 if (unsubscribePendingLobbyNames) {
                     unsubscribePendingLobbyNames();
                     unsubscribePendingLobbyNames = null;
@@ -2103,8 +2204,27 @@
                         headerDisplayName.textContent = currentUserData.displayName || 'کاربر ناشناس';
                         headerUserId.textContent = `شناسه: ${currentUserData.uid.substring(0, 8)}...`;
                         updateUserCoinsDisplay();
+                        // Also update the approved lobby names list in the modal whenever profile data changes
+                        if (!createLobbyModal.classList.contains('hidden')) { // Only if modal is open
+                           renderApprovedLobbyNamesManagementList(); // Rerender management list
+                           // Re-evaluate approved names dropdown & proposal area visibility
+                           updateApprovedLobbyNamesDropdownOnModalOpen(createLobbyModalTitle.textContent === 'مدیریت نام‌های لابی' ? 'myLobbies' : 'create');
+                        }
                     } else {
-                        console.warn("User profile document not found.");
+                        console.warn("User profile document not found. Creating a default one.");
+                        // Create a default profile if it doesn't exist
+                        setDoc(userDocRef, {
+                            displayName: user.displayName || user.email.split('@')[0],
+                            email: user.email,
+                            coins: 500, // Starting coins
+                            approvedLobbyNames: [],
+                            banStatus: { isBanned: false },
+                            createdAt: serverTimestamp()
+                        }, { merge: true }).then(() => {
+                            console.log("Default user profile created.");
+                        }).catch(e => {
+                            console.error("Error creating default user profile:", e);
+                        });
                         currentUserData = { uid: user.uid, email: user.email, displayName: 'کاربر جدید', coins: 0, approvedLobbyNames: [] };
                     }
                 }, (error) => {
@@ -3242,8 +3362,8 @@
                 where("status", "==", "pending")
             );
             const pendingSnapshot = await getDocs(qPending);
-            if (pendingSnapshot.size >= 5) {
-                showCreateLobbyMessageBox("شما بیشتر از 5 درخواست لابی در انتظار تایید دارید.", "error");
+            if (pendingSnapshot.size >= MAX_PENDING_PROPOSALS) { // Use constant for limit
+                showCreateLobbyMessageBox(`شما به حداکثر تعداد (${MAX_PENDING_PROPOSALS}) درخواست لابی در انتظار تایید رسیده‌اید.`, "error");
                 return;
             }
 
@@ -3273,19 +3393,21 @@
             }
         });
         
+        // Listen for changes in the approved lobby names dropdown to enable/disable the "Create Lobby" button
+        approvedLobbyNamesSelect.addEventListener('change', () => {
+            submitCreateLobbyBtn.disabled = !approvedLobbyNamesSelect.value;
+        });
+
         createLobbyForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             let lobbyName;
             
-            if (!lobbyNameSelectionArea.classList.contains('hidden')) {
+            // Check if lobby name selection area is visible and a name is selected
+            if (!lobbyNameSelectionArea.classList.contains('hidden') && approvedLobbyNamesSelect.value) {
                 lobbyName = approvedLobbyNamesSelect.value;
-                if (!lobbyName) { 
-                    showCreateLobbyMessageBox("لطفاً یک نام لابی تأیید شده را از لیست انتخاب کنید.", "error"); 
-                    return; 
-                }
             } else {
-                showCreateLobbyMessageBox("امکان ساخت لابی وجود ندارد. لطفاً یک نام تأیید شده انتخاب کنید یا آن را برای تأیید ارسال کنید.", "error");
-                return;
+                showCreateLobbyMessageBox("لطفاً یک نام لابی تأیید شده را از لیست انتخاب کنید.", "error"); 
+                return; 
             }
 
             const lobbyType = document.querySelector('input[name="lobby-type"]:checked').value;
