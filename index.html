@@ -6,40 +6,40 @@
     <title>بازی متنی هوش مصنوعی و انسان</title>
     <!-- Tailwind CSS CDN for styling -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Google Fonts for Classic Look -->
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Merriweather:wght@400;700&display=swap" rel="stylesheet">
+    <!-- Google Fonts for Modern Look (Inter for body, Orbitron for headings) -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Orbitron:wght@600;700&display=swap" rel="stylesheet">
     <style>
-        /* General Classic Theme Background and Fonts */
-        html, body, #app { /* Ensure these take full viewport height */
+        /* Modern Digital Theme Background and Fonts */
+        html, body, #app {
             height: 100%;
             margin: 0;
             padding: 0;
-            overflow: hidden; /* Prevent body scrollbars, including horizontal */
+            overflow: hidden;
         }
         body {
-            font-family: 'Merriweather', serif; /* Default body font for readability */
-            /* Deep, rich, slightly textured background for classic feel */
-            background: radial-gradient(ellipse at bottom, #100C08 0%, #000000 100%); /* Darker, more intense background */
-            color: #E0E0E0; /* Softer white text for elegance */
+            font-family: 'Inter', sans-serif; /* Modern sans-serif for readability */
+            /* Dark, futuristic background with subtle gradient */
+            background: radial-gradient(ellipse at bottom, #0A0A1A 0%, #000000 100%);
+            color: #E0E0F5; /* Soft white text with a blueish tint */
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
         }
 
-        h1, h2 {
-            font-family: 'Playfair Display', serif; /* Elegant headings */
-            color: #FFD700; /* Gold color for titles */
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.5); /* Subtle text shadow for depth */
+        h1, h2, h3 {
+            font-family: 'Orbitron', sans-serif; /* Bold, futuristic headings */
+            color: #00E0FF; /* Electric Cyan for titles */
+            text-shadow: 0 0 8px rgba(0,224,255,0.6), 0 0 15px rgba(0,224,255,0.4); /* Neon glow effect */
         }
 
-        /* Custom spinner for loading screen - Gold themed */
+        /* Custom spinner for loading screen - Electric Cyan themed */
         .spinner {
-            border: 4px solid rgba(255, 255, 255, 0.3);
-            border-top: 4px solid #DAA520; /* Gold spinner */
+            border: 4px solid rgba(0, 224, 255, 0.2);
+            border-top: 4px solid #00E0FF; /* Electric Cyan spinner */
             border-radius: 50%;
-            width: 50px; /* Slightly larger spinner */
-            height: 50px;
+            width: 60px;
+            height: 60px;
             animation: spin 1s linear infinite;
         }
         @keyframes spin {
@@ -47,7 +47,7 @@
             100% { transform: rotate(360deg); }
         }
 
-        /* NEW: Animation for refresh button icon */
+        /* Animation for refresh button icon - Modern Spin */
         @keyframes spin-refresh {
             from { transform: rotate(0deg); }
             to { transform: rotate(360deg); }
@@ -56,9 +56,9 @@
             animation: spin-refresh 0.8s ease-in-out;
         }
 
-        /* Page transition animation */
+        /* Page transition animation - Smoother */
         .page-transition-active {
-            transition: opacity 0.6s ease-in-out; /* Slightly slower transition */
+            transition: opacity 0.5s ease-in-out;
         }
         .page-transition-hidden {
             opacity: 0;
@@ -67,320 +67,288 @@
             opacity: 1;
         }
 
-        /* Classic Card/Modal Styling - More detailed */
+        /* Modern Card/Modal Styling - Glassmorphism inspired */
         .classic-card {
-            background: linear-gradient(145deg, #4B0000 0%, #660000 60%, #800000 100%); /* Deeper ruby red velvet effect */
-            border: 4px solid #DAA520; /* Goldenrod border */
-            border-radius: 20px; /* Slightly larger radius */
-            box-shadow: 0 15px 30px rgba(0,0,0,0.6), inset 0 0 15px rgba(255,255,255,0.1); /* Deeper outer shadow, subtle inner light */
-            backdrop-filter: blur(10px); /* Stronger blur for more prominent glass effect */
-            -webkit-backdrop-filter: blur(10px); /* For Safari */
-            position: relative; /* For pseudo-elements */
-            max-height: 90vh; /* Ensure card doesn't overflow viewport */
-            overflow-y: hidden; /* Removed vertical scrollbars */
-            overflow-x: hidden; /* Ensure horizontal scrollbar is hidden for cards */
-        }
-        .classic-card::before { /* Top left ornamental corner */
-            content: '';
-            position: absolute;
-            top: -10px;
-            left: -10px;
-            width: 30px;
-            height: 30px;
-            border-top: 5px solid #FFD700;
-            border-left: 5px solid #FFD700;
-            border-radius: 5px 0 0 0;
-            box-shadow: 0 0 10px rgba(255,215,0,0.5);
-        }
-        .classic-card::after { /* Bottom right ornamental corner */
-            content: '';
-            position: absolute;
-            bottom: -10px;
-            right: -10px;
-            width: 30px;
-            height: 30px;
-            border-bottom: 5px solid #FFD700;
-            border-right: 5px solid #FFD700;
-            border-radius: 0 0 5px 0;
-            box-shadow: 0 0 10px rgba(255,215,0,0.5);
+            background: rgba(25, 25, 40, 0.9); /* Dark blue-purple with transparency */
+            border: 1px solid rgba(70, 130, 180, 0.5); /* Steel blue, subtle border */
+            border-radius: 12px; /* Slightly rounded corners */
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8), inset 0 0 10px rgba(70, 130, 180, 0.1); /* Deeper, softer outer shadow, subtle inner light */
+            backdrop-filter: blur(8px) saturate(1.8); /* Stronger blur and saturation for prominent glass effect */
+            -webkit-backdrop-filter: blur(8px) saturate(1.8); /* For Safari */
+            position: relative;
+            max-height: 90vh;
+            overflow-y: hidden;
+            overflow-x: hidden;
+            padding: 2.5rem; /* More generous padding by default */
         }
 
 
-        /* Button Base Styles - More polished Classic Look */
+        /* Button Base Styles - Sleek, futuristic, with neon accents */
         .classic-btn {
-            border: 2px solid #DAA520; /* Golden border for all buttons */
-            border-radius: 15px; /* Slightly rounded corners */
-            font-weight: 700; /* Bold text */
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.6); /* Text shadow for elegance */
-            transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1); /* Smoother transition */
-            box-shadow: 0 8px 16px rgba(0,0,0,0.4), inset 0 0 8px rgba(255,255,255,0.1); /* Deeper outer shadow, subtle inner light */
-            color: #FFFFFF; /* White text on buttons */
-            padding: 0.875rem 1.5rem; /* Equivalent to py-3.5 px-6 */
-            font-size: 1.125rem; /* Equivalent to text-lg */
-            position: relative; /* For pseudo-elements */
-            overflow: hidden; /* To contain the hover overlay */
+            border: 1px solid #00E0FF; /* Electric Cyan border */
+            border-radius: 8px; /* Slightly rounded corners */
+            font-weight: 600; /* Semi-bold text */
+            text-shadow: none; /* No text shadow, rely on glow */
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); /* Faster, crisp transition */
+            box-shadow: 0 4px 15px rgba(0,0,0,0.4); /* Softer outer shadow */
+            color: #E0E0F5; /* Light text */
+            padding: 0.875rem 1.5rem; /* Consistent padding */
+            font-size: 1.125rem; /* Consistent font size */
+            position: relative;
+            overflow: hidden;
+            text-transform: uppercase; /* Modern touch */
+            letter-spacing: 0.05em; /* Spaced out letters */
         }
-        .classic-btn::before { /* Subtle light effect on hover */
+        .classic-btn::before { /* Subtle electric pulse on hover */
             content: '';
             position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: rgba(255,255,255,0.1);
-            transform: skewX(-30deg);
-            transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(0,224,255,0.4);
+            border-radius: 50%;
+            opacity: 0;
+            transform: translate(-50%, -50%);
+            transition: width 0.4s ease-out, height 0.4s ease-out, opacity 0.4s ease-out;
+            z-index: 0;
         }
         .classic-btn:hover::before {
-            left: 100%;
+            width: 200%;
+            height: 200%;
+            opacity: 1;
         }
         .classic-btn:hover {
-            transform: translateY(-5px) scale(1.03); /* More pronounced lift and scale */
-            box-shadow: 0 12px 24px rgba(0,0,0,0.6), inset 0 0 10px rgba(255,255,255,0.2); /* Stronger shadow on hover */
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.6), 0 0 15px rgba(0,224,255,0.7); /* Stronger shadow, neon glow */
+            border-color: #00FFFF; /* Brighter cyan on hover */
+            color: #FFFFFF;
         }
         .classic-btn:disabled {
-            opacity: 0.6;
+            opacity: 0.5;
             cursor: not-allowed;
             transform: none;
-            box-shadow: 0 8px 16px rgba(0,0,0,0.4), inset 0 0 8px rgba(255,255,255,0.1);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+            border-color: #4a4a6e;
+            color: #B0B0C0;
         }
 
-        /* Specific Button Colors - Classic Pallette */
+        /* Specific Button Colors - Modern Digital Palette */
         .btn-purple-classic {
-            background: linear-gradient(145deg, #8A2BE2 0%, #6A0DAD 100%); /* Amethyst */
+            background: linear-gradient(145deg, #7b68ee 0%, #483d8b 100%); /* MediumSlateBlue to DarkSlateBlue */
         }
         .btn-blue-classic {
-            background: linear-gradient(145deg, #4682B4 0%, #2A52BE 100%); /* Steel Blue / Royal Blue */
+            background: linear-gradient(145deg, #4682B4 0%, #2A52BE 100%); /* Steel Blue / Royal Blue (kept similar for now, can be more electric) */
         }
         .btn-green-classic {
-            background: linear-gradient(145deg, #228B22 0%, #006400 100%); /* Forest Green */
+            background: linear-gradient(145deg, #32cd32 0%, #228b22 100%); /* LimeGreen to ForestGreen */
         }
         .btn-red-classic {
-            background: linear-gradient(145deg, #CD5C5C 0%, #B22222 100%); /* Indian Red / Firebrick */
+            background: linear-gradient(145deg, #ff6347 0%, #dc143c 100%); /* Tomato to Crimson */
         }
         .btn-gray-classic {
-            background: linear-gradient(145deg, #A9A9A9 0%, #808080 100%); /* Dark Gray */
+            background: linear-gradient(145deg, #5a5a6a 0%, #3a3a4a 100%); /* Desaturated gray-blue */
         }
-        .btn-brown-classic { /* New for Profile/Shop */
-            background: linear-gradient(145deg, #8B4513 0%, #69320E 100%); /* Saddle Brown / Dark Sienna */
+        .btn-brown-classic { /* Mapped to a more techy dark orange/brown */
+            background: linear-gradient(145deg, #ffa500 0%, #cd853f 100%); /* Orange to Peru */
         }
-        .btn-gold-classic { /* For footer icons */
-            background: linear-gradient(145deg, #FFD700 0%, #DAA520 100%); /* Gold */
-            border: none; /* No border for these small buttons */
-            padding: 0.5rem;
+        .btn-gold-classic { /* For footer icons - mapped to electric cyan */
+            background: linear-gradient(145deg, #00E0FF 0%, #00BFFF 100%); /* Electric Cyan to Deep Sky Blue */
+            border: none;
+            padding: 0.6rem; /* Slightly larger for touch */
             border-radius: 10px;
         }
         .btn-gold-classic:hover {
             transform: translateY(-2px) scale(1.05);
-            box-shadow: 0 6px 12px rgba(0,0,0,0.5), inset 0 0 5px rgba(255,255,255,0.3);
+            box-shadow: 0 0 15px rgba(0,224,255,0.7), 0 6px 12px rgba(0,0,0,0.5);
         }
 
 
-        /* Input Field Styles - More refined Classic Look */
-        input, select { /* Added select for lobby names dropdown */
-            background-color: #202020; /* Even darker input background */
-            border: 2px solid #5A5A5A; /* Dark gray border */
-            color: #E0E0E0; /* Light text color */
-            padding: 0.875rem; /* Equivalent to p-3.5 */
-            border-radius: 0.75rem; /* Equivalent to rounded-xl */
+        /* Input Field Styles - Dark and clean */
+        input, select {
+            background-color: #1a1a2e; /* Darker blue-purple */
+            border: 1px solid #4a4a6e; /* Subtle purple-blue border */
+            color: #E0E0F5; /* Light text color */
+            padding: 0.875rem;
+            border-radius: 8px; /* Slightly rounded */
             box-shadow: inset 0 2px 4px rgba(0,0,0,0.5); /* Inner shadow for depth */
+            transition: all 0.2s ease-in-out;
         }
         input::placeholder {
-            color: #A0A0A0; /* Lighter placeholder text */
+            color: #9a9ab0; /* Lighter, subtle placeholder */
         }
         input:focus, select:focus {
-            border-color: #DAA520 !important; /* Gold border on focus */
-            box-shadow: 0 0 0 4px rgba(218, 165, 32, 0.5) !important, inset 0 2px 4px rgba(0,0,0,0.5) !important; /* Gold focus ring with inner shadow */
+            border-color: #00E0FF !important; /* Electric Cyan border on focus */
+            box-shadow: 0 0 0 3px rgba(0,224,255,0.5) !important, inset 0 2px 4px rgba(0,0,0,0.5) !important; /* Neon focus ring */
+            outline: none; /* Remove default outline */
         }
 
-        /* Header specific styles - Richer Gold/Brown */
-        .app-header {
-            background: linear-gradient(to right, #4A2B00 0%, #7A4C00 50%, #4A2B00 100%); /* Richer gold/brown gradient */
-            border-bottom: 3px solid #FFD700; /* Thicker gold border */
-            box-shadow: 0 8px 20px rgba(0,0,0,0.7); /* Deeper shadow */
-            height: 70px; /* Fixed height for header */
-            position: fixed; /* Explicitly fixed */
-            top: 0; left: 0; right: 0;
-            z-index: 40;
-            padding: 0.75rem 1rem; /* Adjust padding */
-            display: flex;
-            justify-content: space-between; /* Spreads items */
-            align-items: center;
-        }
-
-        /* NEW: Coin display container in header (positioned on the left for RTL) */
-        #header-user-coins-container {
-            /* flex-grow added directly in HTML to push it rightwards */
-            background-color: rgba(0,0,0,0.3);
-            border-radius: 10px;
-            padding: 0.5rem 1rem;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
-            transition: all 0.3s ease;
-            margin-left: 1rem; /* Space between coins and menu button */
-        }
-        #header-user-coins-container:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 12px rgba(0,0,0,0.5);
-        }
-
-        /* Lobby Screen Specific Header */
-        .lobby-header {
-            background: linear-gradient(to right, #4A2B00 0%, #7A4C00 50%, #4A2B00 100%);
-            border-bottom: 3px solid #FFD700;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.7);
+        /* Header specific styles - Sleek, dark gradient */
+        .app-header, .lobby-header {
+            background: linear-gradient(to right, #1a1a2e 0%, #2c2c4a 50%, #1a1a2e 100%);
+            border-bottom: 1px solid #00E0FF; /* Thin electric cyan line */
+            box-shadow: 0 4px 15px rgba(0,0,0,0.6); /* Softer, wider shadow */
             height: 70px;
             position: fixed;
             top: 0; left: 0; right: 0;
             z-index: 40;
             padding: 0.75rem 1rem;
             display: flex;
-            align-items: center; /* Align items vertically */
-            justify-content: center; /* Center horizontally by default */
-        }
-        .lobby-header .search-container {
-            display: flex;
-            flex-grow: 1; /* Allow search container to take available space */
-            max-width: 600px; /* Limit max width on larger screens */
-            margin: 0 auto; /* Center the search container */
+            justify-content: space-between;
             align-items: center;
-            background-color: #303030; /* Darker background for search bar */
-            border-radius: 15px; /* Rounded corners for search bar */
-            border: 2px solid #5A5A5A;
-            padding: 0.5rem 1rem; /* Adjust padding */
+            color: #E0E0F5;
+        }
+        .app-header svg, .lobby-header svg {
+            color: #00E0FF; /* Electric cyan icons */
+        }
+
+        /* Coin display container in header */
+        #header-user-coins-container {
+            background-color: rgba(0,0,0,0.4); /* More transparent */
+            border-radius: 8px;
+            padding: 0.4rem 0.8rem; /* Adjusted for sleekness */
+            box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+            transition: all 0.2s ease;
+            margin-left: 1rem;
+            font-weight: 700; /* Bolder for emphasis */
+        }
+        #header-user-coins-container:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.6);
+            border: 1px solid #00E0FF; /* Add border on hover */
+        }
+
+        /* Lobby Screen Specific Header - Search container */
+        .lobby-header .search-container {
+            background-color: #1a1a2e; /* Matches input background */
+            border-radius: 10px;
+            border: 1px solid #4a4a6e;
+            padding: 0.4rem 0.8rem;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.5);
         }
         .lobby-header .search-container input {
-            flex-grow: 1;
-            background-color: transparent; /* Transparent background */
-            border: none; /* No border for input inside search bar */
-            padding: 0.25rem 0.5rem;
-            outline: none; /* No outline on focus */
-            text-align: right; /* Align text to right for RTL */
+            background-color: transparent;
+            border: none;
+            padding: 0.2rem 0.4rem;
+            outline: none;
+            color: #E0E0F5;
+            text-align: right;
         }
         .lobby-header .search-container input::placeholder {
-            color: #A0A0A0;
+            color: #9a9ab0;
         }
         .lobby-header .search-container svg {
-            color: #DAA520; /* Gold color for icons */
-            min-width: 24px; /* Ensure icons don't shrink */
-            min-height: 24px;
+            color: #00E0FF;
+            min-width: 20px;
+            min-height: 20px;
         }
         .lobby-header .search-container button {
             background: none;
             border: none;
             cursor: pointer;
-            padding: 0 0.5rem;
+            padding: 0 0.4rem;
+            transition: color 0.2s ease;
         }
-        .lobby-header .back-btn-wrapper {
-            margin-left: 10px; /* Space between back button and search bar (for RTL) */
-        }
-        .lobby-header .search-icon-wrapper {
-            margin-right: 10px; /* Space between search icon and search input (RTL) */
+        .lobby-header .search-container button:hover svg {
+            color: #00FFFF;
         }
 
 
-        .app-footer {
-            background: linear-gradient(to left, #4A2B00 0%, #7A4C00 50%, #4A2B00 100%); /* Richer gold/brown gradient */
-            border-top: 3px solid #FFD700; /* Thicker gold border */
-            box-shadow: 0 -8px 20px rgba(0,0,0,0.7); /* Deeper shadow */
-            height: 90px; /* Fixed height for footer */
-            position: fixed; /* Explicitly fixed */
-            bottom: 0; left: 0; right: 0;
-            z-index: 40;
-            padding: 1rem; /* Adjust padding */
-            display: flex;
-            justify-content: space-around;
-            align-items: center;
-            gap: 1rem; /* Added gap here for spacing buttons */
-        }
-        /* Lobby Screen Specific Footer */
-        .lobby-footer {
-            background: linear-gradient(to left, #4A2B00 0%, #7A4C00 50%, #4A2B00 100%);
-            border-top: 3px solid #FFD700;
-            box-shadow: 0 -8px 20px rgba(0,0,0,0.7);
-            height: 90px;
+        .app-footer, .lobby-footer {
+            background: linear-gradient(to left, #1a1a2e 0%, #2c2c4a 50%, #1a1a2e 100%);
+            border-top: 1px solid #00E0FF;
+            box-shadow: 0 -4px 15px rgba(0,0,0,0.6);
+            height: 80px; /* Slightly shorter */
             position: fixed;
             bottom: 0; left: 0; right: 0;
             z-index: 40;
-            padding: 1rem;
+            padding: 0.75rem 1rem;
             display: flex;
             justify-content: space-around;
             align-items: center;
+            gap: 1rem;
         }
         .lobby-footer .icon-btn {
             display: flex;
             flex-direction: column;
             align-items: center;
-            color: #FFD700; /* Gold color for icons */
+            color: #00E0FF; /* Electric Cyan for icons */
             font-size: 0.8rem;
+            font-weight: 600;
             text-align: center;
             cursor: pointer;
-            transition: transform 0.2s ease-in-out;
+            transition: transform 0.2s ease-in-out, color 0.2s ease-in-out;
         }
         .lobby-footer .icon-btn:hover {
-            transform: translateY(-5px);
+            transform: translateY(-3px);
+            color: #00FFFF;
         }
         .lobby-footer .icon-btn:disabled {
-            opacity: 0.5;
+            opacity: 0.4;
             cursor: not-allowed;
             transform: none;
         }
         .lobby-footer .icon-btn svg {
-            width: 30px;
-            height: 30px;
-            margin-bottom: 5px;
+            width: 28px;
+            height: 28px;
+            margin-bottom: 4px;
             transition: transform 0.8s ease-in-out;
         }
         .lobby-footer .games-running-text {
-            color: #E0E0E0;
-            font-size: 1.1rem;
-            font-weight: bold;
+            color: #E0E0F5;
+            font-size: 1rem;
+            font-weight: 600;
             display: flex;
             align-items: center;
             gap: 5px;
+            background-color: rgba(0,0,0,0.4);
+            padding: 0.4rem 0.8rem;
+            border-radius: 8px;
+            border: 1px solid #4a4a6e;
         }
 
-        /* Main content area padding to avoid overlap with fixed header/footer */
+        /* Main content area padding */
         .main-content-area {
-            padding-top: 70px; /* Header height */
-            padding-bottom: 90px; /* Footer height */
-            flex-grow: 1; /* Allow content to fill available space */
-            overflow-y: auto; /* Re-enabled for scrollable lists */
-            overflow-x: hidden; /* Ensure horizontal scrollbar is hidden for main content */
-            width: 100%; /* Ensure it takes full width */
+            padding-top: 70px;
+            padding-bottom: 80px;
+            flex-grow: 1;
+            overflow-y: auto;
+            overflow-x: hidden;
+            width: 100%;
             display: flex;
             flex-direction: column;
-            justify-content: flex-start; /* Align content to start for scrollable lists */
-            align-items: center; /* Center content horizontally */
-            background: linear-gradient(180deg, #2C2C2C 0%, #1A1A1A 100%); /* Subtle dark grey gradient for main area */
-            position: relative; /* For any absolute positioned elements inside */
+            justify-content: flex-start;
+            align-items: center;
+            background: linear-gradient(180deg, #1a1a2e 0%, #0d0d1a 100%); /* Darker blue-purple gradient */
+            position: relative;
         }
         
-        /* Profile Modal specific styles */
+        /* Profile Modal specific styles - Inherits classic-card */
         .profile-modal-overlay {
-            background-color: rgba(0,0,0,0.7); /* Darker overlay */
+            background-color: rgba(0,0,0,0.8);
             transition: opacity 0.3s ease-in-out;
         }
         .profile-modal-content {
-            transform: translateY(-20px); /* Initial slightly elevated */
+            transform: translateY(-10px); /* Initial slight lift */
             transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
         }
         .profile-modal-enter-active .profile-modal-content {
             transform: translateY(0);
         }
         .profile-modal-leave-active .profile-modal-content {
-            transform: translateY(-20px);
+            transform: translateY(-10px);
             opacity: 0;
         }
 
-        /* Create Lobby Modal Specific Styles */
+        /* Create Lobby Modal Specific Styles - Inherits classic-card */
         #create-lobby-modal {
-            background-color: rgba(0,0,0,0.7);
+            background-color: rgba(0,0,0,0.8);
             transition: opacity 0.3s ease-in-out;
         }
 
-        /* Confirmation Modal Styles */
+        /* Confirmation Modal Styles - Inherits classic-card */
         #confirmation-modal {
-            background-color: rgba(0,0,0,0.7);
+            background-color: rgba(0,0,0,0.8);
             transition: opacity 0.3s ease-in-out;
         }
 
@@ -391,122 +359,123 @@
             transition: opacity 0.5s ease-out, transform 0.5s ease-out;
         }
 
-        /* Enhanced Lobby Item Styling */
+        /* Enhanced Lobby Item Styling - Sleek, distinct, with hover effects */
         .lobby-item {
-            background: linear-gradient(145deg, #2A2A2A 0%, #1A1A1A 100%); /* Deep gradient background */
-            border: 2px solid #DAA520; /* Gold border */
-            border-radius: 15px; /* Rounded corners */
-            box-shadow: 0 8px 16px rgba(0,0,0,0.5), inset 0 0 10px rgba(255,215,0,0.1); /* Deep outer shadow, subtle inner glow */
-            transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1); /* Smooth transitions for hover effects */
-            position: relative; /* For overflow hidden and pseudo-elements */
-            overflow: hidden; /* Ensures internal elements stay within rounded corners */
-            padding: 1.25rem 1.5rem; /* More generous padding */
+            background: rgba(25, 25, 40, 0.7); /* Matching classic-card but slightly more transparent */
+            border: 1px solid #4a4a6e; /* Subtle blue-purple border */
+            border-radius: 10px; /* Modern rounded corners */
+            box-shadow: 0 6px 15px rgba(0,0,0,0.5), inset 0 0 5px rgba(70, 130, 180, 0.1); /* Softer shadows */
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); /* Faster, crisp transitions */
+            position: relative;
+            overflow: hidden;
+            padding: 1rem 1.25rem; /* Adjusted padding */
             display: flex;
-            flex-direction: column; /* Default to column for small screens */
+            flex-direction: column;
             justify-content: space-between;
             align-items: center;
             text-align: center;
         }
 
-        .lobby-item::before { /* Subtle light overlay on hover */
+        .lobby-item::before { /* Subtle internal glow effect on hover */
             content: '';
             position: absolute;
             top: 0;
-            left: -100%;
+            left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(255,255,255,0.05);
-            transform: skewX(-30deg);
-            transition: all 0.3s ease-in-out;
+            background: linear-gradient(135deg, rgba(0,224,255,0.05) 0%, rgba(123,104,238,0.05) 100%);
+            opacity: 0;
+            transition: opacity 0.3s ease-in-out;
+            z-index: 0;
         }
 
         .lobby-item:hover::before {
-            left: 100%;
+            opacity: 1;
         }
 
         .lobby-item:hover {
-            transform: translateY(-8px) scale(1.02); /* More pronounced lift and slight scale */
-            box-shadow: 0 15px 25px rgba(0,0,0,0.6), inset 0 0 12px rgba(255,215,0,0.2); /* Stronger shadow, more glow */
+            transform: translateY(-5px); /* More subtle lift */
+            box-shadow: 0 10px 20px rgba(0,0,0,0.7), 0 0 15px rgba(0,224,255,0.4); /* Stronger shadow, electric glow */
+            border-color: #00E0FF; /* Electric Cyan border on hover */
         }
 
         .lobby-item h3 {
-            color: #FFD700; /* Gold for lobby names */
-            font-size: 1.75rem; /* Larger font for name */
-            font-family: 'Playfair Display', serif;
-            text-shadow: 1px 1px 3px rgba(0,0,0,0.7);
+            color: #00E0FF; /* Electric Cyan for lobby names */
+            font-size: 1.5rem; /* Adjusted font size for sleekness */
+            font-family: 'Orbitron', sans-serif;
+            text-shadow: 0 0 5px rgba(0,224,255,0.7);
         }
 
         .lobby-item p {
-            color: #C0C0C0; /* Silver for details */
-            font-size: 1rem;
-            margin-top: 0.25rem;
+            color: #B0B0C0; /* Lighter gray for details */
+            font-size: 0.9rem;
+            margin-top: 0.2rem;
         }
         
-        .lobby-item .lobby-actions { /* Container for buttons in lobby item */
-            margin-top: 1rem; /* Space between text and buttons */
+        .lobby-item .lobby-actions {
+            margin-top: 0.8rem;
             display: flex;
-            flex-direction: column; /* Stack buttons on mobile */
-            width: 100%; /* Take full width on mobile */
-            gap: 0.75rem; /* Space between stacked buttons */
+            flex-direction: column;
+            width: 100%;
+            gap: 0.6rem;
         }
 
-        /* Ensure buttons within lobby-item are full width on mobile */
         .lobby-item .join-lobby-btn,
         .lobby-item .close-lobby-btn {
-            width: 100%; /* Take full width on small screens */
-            padding: 0.75rem 1rem; /* Consistent padding */
-            font-size: 1rem; /* Consistent font size */
+            width: 100%;
+            padding: 0.6rem 1rem;
+            font-size: 0.9rem;
         }
 
         /* Responsive adjustments for lobby-item buttons on larger screens */
-        @media (min-width: 640px) { /* sm breakpoint */
+        @media (min-width: 640px) {
             .lobby-item {
-                flex-direction: row; /* Align items in a row */
-                text-align: right; /* Text aligned right in RTL */
+                flex-direction: row;
+                text-align: right;
             }
             .lobby-item .lobby-actions {
-                flex-direction: row; /* Buttons side-by-side */
-                width: auto; /* Buttons take their natural width */
-                margin-top: 0; /* No top margin when side-by-side */
-                gap: 0.5rem; /* Small gap between buttons */
+                flex-direction: row;
+                width: auto;
+                margin-top: 0;
+                gap: 0.4rem;
             }
-            /* Add margin-left to close button for spacing from join button */
             .lobby-item .close-lobby-btn {
-                margin-right: 0.5rem; /* Space from join button in RTL */
+                margin-right: 0.4rem;
             }
             .lobby-item .join-lobby-btn,
             .lobby-item .close-lobby-btn {
-                width: auto; /* Allow buttons to size naturally */
-                font-size: 0.9rem; /* Slightly smaller for compactness */
-                padding: 0.6rem 1.2rem; /* Adjusted padding */
+                width: auto;
+                font-size: 0.85rem;
+                padding: 0.5rem 1rem;
             }
         }
 
-        /* === Lobby Detail Screen Styles (Major Redesign for Game) === */
+        /* === Lobby Detail Screen Styles (Modern & Functional) === */
         .lobby-detail-screen-full {
-            padding-top: 0; /* No padding, the content will manage it */
+            padding-top: 0;
             padding-bottom: 0;
             display: flex;
             flex-direction: column;
             width: 100%;
             height: 100%;
-            background: linear-gradient(180deg, #2C2C2C 0%, #1A1A1A 100%);
+            background: linear-gradient(180deg, #1a1a2e 0%, #0d0d1a 100%);
         }
 
         .lobby-detail-content {
-            background: linear-gradient(145deg, #1A1A1A 0%, #0D0D0D 100%);
-            border: 3px solid #DAA520;
-            border-radius: 20px;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.7);
+            background: rgba(25, 25, 40, 0.9);
+            border: 1px solid rgba(70, 130, 180, 0.5);
+            border-radius: 15px; /* Slightly larger radius for main container */
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8), inset 0 0 10px rgba(70, 130, 180, 0.1);
+            backdrop-filter: blur(8px) saturate(1.8);
             padding: 1.5rem;
             width: 95%;
             max-width: 1200px;
-            height: calc(100% - 100px); /* Fill available space minus header/margins */
+            height: calc(100% - 100px);
             display: flex;
-            flex-direction: row; /* Side-by-side layout on desktop */
+            flex-direction: row;
             gap: 1.5rem;
-            margin: 50px auto; /* Centered with margin top/bottom */
-            overflow: hidden; /* Prevent content from spilling */
+            margin: 50px auto;
+            overflow: hidden;
         }
 
         /* Sidebar for player info */
@@ -514,32 +483,33 @@
             display: flex;
             flex-direction: column;
             flex-shrink: 0;
-            width: 300px;
+            width: 280px; /* Slightly narrower sidebar */
             background-color: rgba(0,0,0,0.3);
-            border-radius: 15px;
+            border-radius: 12px;
             padding: 1rem;
-            border: 1px solid #444;
+            border: 1px solid #3a3a4a; /* Darker border */
             overflow-y: auto;
+            box-shadow: inset 0 0 8px rgba(0,0,0,0.3);
         }
 
-        /* Main panel for chat and actions (Crucial for overlays) */
+        /* Main panel for chat and actions */
         .lobby-main-panel {
-            position: relative; /* Crucial for absolute positioned overlays */
+            position: relative;
             display: flex;
             flex-direction: column;
             flex-grow: 1;
             min-width: 0;
-            overflow: hidden; /* To contain overlays without affecting scrollbars for chat */
+            overflow: hidden;
         }
-        /* Ensure overlay z-index is higher than chat but lower than other modals */
+        
         #game-countdown-overlay, #game-voting-overlay {
-            z-index: 40; /* Higher than chat (which is inside lobby-main-panel) but lower than global modals (z-50) */
+            z-index: 40;
         }
         
         #player-list-container {
             margin-top: 1rem;
-            flex-grow: 1; /* Allow list to take space */
-            overflow-y: auto; /* Scroll if many players */
+            flex-grow: 1;
+            overflow-y: auto;
         }
         .player-list-item {
             background-color: rgba(255, 255, 255, 0.05);
@@ -551,97 +521,105 @@
             align-items: center;
             border: 1px solid transparent;
             transition: all 0.2s ease-in-out;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
         }
         .player-list-item.is-host {
-            border-color: #FFD700;
+            border-color: #00E0FF; /* Electric Cyan border for host */
+            box-shadow: 0 0 10px rgba(0,224,255,0.4);
         }
         .player-list-item .player-name {
-            font-weight: bold;
-            color: #E0E0E0;
+            font-weight: 600;
+            color: #E0E0F5;
         }
         .player-list-item .host-label {
-            color: #FFD700;
-            font-size: 0.8rem;
-            margin-right: 0.5rem;
+            color: #00E0FF; /* Electric Cyan for host label */
+            font-size: 0.75rem;
+            margin-right: 0.4rem;
+            font-weight: 700;
         }
         .kick-player-btn {
             background: none;
-            border: 1px solid #B22222;
-            color: #B22222;
+            border: 1px solid #ff6347; /* Tomato */
+            color: #ff6347;
             border-radius: 5px;
             padding: 0.2rem 0.5rem;
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             cursor: pointer;
             transition: all 0.2s ease;
+            text-transform: uppercase;
         }
         .kick-player-btn:hover {
-            background: #B22222;
+            background: #ff6347;
             color: white;
+            box-shadow: 0 0 8px rgba(255,99,71,0.5);
         }
 
         .lobby-chat-container {
             background-color: rgba(0,0,0,0.4);
-            border: 2px solid #5A5A5A;
+            border: 1px solid #4a4a6e;
             border-radius: 10px;
             padding: 0.75rem;
-            flex-grow: 1; /* Key change: makes chat take all vertical space */
+            flex-grow: 1;
             display: flex;
             flex-direction: column;
-            overflow: hidden; /* CRITICAL: This contains the scrolling child */
+            overflow: hidden;
+            box-shadow: inset 0 0 8px rgba(0,0,0,0.3);
         }
         .lobby-chat-messages {
-            flex-grow: 1; /* CRITICAL: This element grows to fill the parent */
-            overflow-y: auto; /* CRITICAL: This element gets the scrollbar */
+            flex-grow: 1;
+            overflow-y: auto;
             padding-right: 0.5rem;
             display: flex;
             flex-direction: column;
+            scroll-behavior: smooth;
         }
         .chat-message {
-            background-color: #333;
+            background-color: #2c2c4a; /* Darker blue-purple */
             padding: 0.5rem 0.75rem;
             border-radius: 10px;
             margin-bottom: 0.5rem;
-            max-width: 80%;
+            max-width: 85%; /* Slightly wider */
             word-wrap: break-word;
             align-self: flex-start;
-            display: flex; /* NEW: Flex layout for message content and delete button */
-            align-items: center; /* NEW: Vertically align content and button */
-            gap: 0.5rem; /* NEW: Space between message and button */
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #E0E0F5;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+            border: 1px solid rgba(74,74,110,0.3);
         }
         .chat-message.current-user {
-            background-color: #4682B4;
+            background-color: #4a4a6e; /* Slightly lighter blue-purple for current user */
             align-self: flex-end;
-            flex-direction: row-reverse; /* NEW: Puts delete button on the left for RTL */
-        }
-        .chat-message-content {
-             flex-grow: 1; /* NEW: Allows text content to take up available space */
+            flex-direction: row-reverse;
+            border-color: rgba(74,74,110,0.5);
         }
         .chat-message .sender-name {
-            font-weight: bold;
-            color: #FFD700;
+            font-weight: 700;
+            color: #00E0FF; /* Electric Cyan for sender names */
             display: block;
-            font-size: 0.9em;
+            font-size: 0.8em;
             margin-bottom: 0.2rem;
         }
-        .chat-message .message-text-deleted { /* NEW STYLE */
+        .chat-message .message-text-deleted {
             font-style: italic;
-            color: #999;
+            color: #7a7a90; /* Desaturated gray */
         }
-        .delete-message-btn { /* NEW STYLE */
+        .delete-message-btn {
             background: none;
             border: none;
-            color: #aaa;
+            color: #9a9ab0;
             cursor: pointer;
             padding: 0.25rem;
-            opacity: 0.5;
+            opacity: 0.7;
             transition: all 0.2s ease;
-            flex-shrink: 0; /* Prevent button from shrinking */
+            flex-shrink: 0;
         }
-        .chat-message:hover .delete-message-btn { /* NEW STYLE */
+        .chat-message:hover .delete-message-btn {
             opacity: 1;
         }
-        .delete-message-btn:hover { /* NEW STYLE */
-            color: #ff6b6b;
+        .delete-message-btn:hover {
+            color: #ff6347; /* Tomato red on hover */
             transform: scale(1.1);
         }
 
@@ -649,11 +627,23 @@
             margin-top: 0.75rem;
             display: flex;
             gap: 0.5rem;
-            flex-shrink: 0; /* CRITICAL: Prevents the input form from shrinking */
+            flex-shrink: 0;
+        }
+        .lobby-chat-input-form input {
+            flex-grow: 1;
+            background-color: #0d0d1a; /* Even darker input for chat */
+            border: 1px solid #2c2c4a;
+            padding: 0.75rem;
+            border-radius: 8px;
+        }
+        .lobby-chat-input-form button {
+            padding: 0.6rem 1rem;
+            font-size: 0.9rem;
         }
 
+
         .lobby-actions-footer {
-            flex-shrink: 0; /* Prevent shrinking */
+            flex-shrink: 0;
             margin-top: 1rem;
             display: flex;
             flex-wrap: wrap;
@@ -662,10 +652,11 @@
             gap: 1rem;
         }
         .start-game-btn {
-            background: linear-gradient(145deg, #228B22 0%, #006400 100%);
-            border: 2px solid #DAA520;
+            background: linear-gradient(145deg, #32cd32 0%, #228b22 100%); /* LimeGreen */
+            border: 1px solid #00E0FF;
             font-size: 1.1rem;
             padding: 0.6rem 1.2rem;
+            box-shadow: 0 0 10px rgba(50,205,50,0.5); /* Green glow */
         }
         #host-actions-container {
              display: flex;
@@ -673,7 +664,7 @@
              gap: 1rem;
         }
 
-        /* Custom Scrollbars */
+        /* Custom Scrollbars - Modern & Sleek */
         .lobby-sidebar::-webkit-scrollbar,
         #player-list-container::-webkit-scrollbar,
         .lobby-chat-messages::-webkit-scrollbar,
@@ -681,152 +672,194 @@
         .lobby-sidebar::-webkit-scrollbar-track,
         #player-list-container::-webkit-scrollbar-track,
         .lobby-chat-messages::-webkit-scrollbar-track,
-        .custom-scrollbar::-webkit-scrollbar-track { background: #202020; border-radius: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #1a1a2e; border-radius: 4px; }
         .lobby-sidebar::-webkit-scrollbar-thumb,
         #player-list-container::-webkit-scrollbar-thumb,
         .lobby-chat-messages::-webkit-scrollbar-thumb,
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: #DAA520; border-radius: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #00E0FF; border-radius: 4px; }
         .lobby-sidebar::-webkit-scrollbar-thumb:hover,
         #player-list-container::-webkit-scrollbar-thumb:hover,
         .lobby-chat-messages::-webkit-scrollbar-thumb:hover,
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #FFD700; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #00FFFF; }
         
         /* ===== CORRECTED RESPONSIVE STYLES ===== */
         @media (max-width: 860px) {
             .lobby-detail-content {
-                flex-direction: column; /* Stack panels on smaller screens */
-                height: calc(100% - 80px); /* Adjust height */
+                flex-direction: column;
+                height: calc(100% - 80px);
                 margin: 40px auto;
                 padding: 1rem;
-                overflow: hidden; /* ** THE MAIN FIX **: Prevent the whole card from scrolling */
+                overflow: hidden;
             }
             .lobby-sidebar {
-                width: 100%; /* Sidebar takes full width */
-                flex-shrink: 0; /* ** FIX **: Prevent sidebar from shrinking when keyboard opens */
-                max-height: 250px; /* Limit sidebar height */
+                width: 100%;
+                flex-shrink: 0;
+                max-height: 200px; /* Slightly shorter sidebar on mobile */
             }
             .lobby-main-panel {
-                flex-grow: 1; /* ** FIX **: Allow panel to fill remaining vertical space */
-                min-height: 0; /* ** FIX **: Flexbox fix to allow shrinking properly */
+                flex-grow: 1;
+                min-height: 0;
+            }
+            .lobby-actions-footer {
+                justify-content: center; /* Center buttons on smaller screens */
             }
         }
         /* General Responsive */
         @media (max-width: 640px) {
             .max-w-md { max-width: 95%; }
-            .p-6, .p-8 { padding: 1.5rem; }
-            .text-3xl { font-size: 2rem; }
-            .classic-btn { padding: 0.75rem 1.25rem; font-size: 1rem; }
-            .app-header, .lobby-header, .app-footer, .lobby-footer { padding: 0.5rem; }
+            .p-6, .p-8 { padding: 1.25rem; }
+            .text-3xl { font-size: 1.75rem; }
+            .classic-btn { padding: 0.7rem 1rem; font-size: 0.9rem; }
+            .app-header, .lobby-header, .app-footer, .lobby-footer { padding: 0.4rem; }
             .app-header, .lobby-header { height: 60px; }
-            .app-footer, .lobby-footer { height: 80px; }
-            .main-content-area { padding-top: 60px; padding-bottom: 80px; }
-            .lobby-detail-content { margin: 20px auto; height: calc(100% - 40px); }
+            .app-footer, .lobby-footer { height: 75px; }
+            .main-content-area { padding-top: 60px; padding-bottom: 75px; }
+            .lobby-detail-content { margin: 15px auto; height: calc(100% - 30px); }
 
-            /* New Coin Display responsive */
+            /* Coin Display responsive */
             #header-user-coins-container {
-                font-size: 1.2rem;
-                padding: 0.4rem 0.8rem; /* Adjusted for smaller screens */
+                font-size: 1.1rem;
+                padding: 0.3rem 0.6rem;
             }
             #header-user-coins-container .coin-icon {
-                width: 1.2rem; /* Smaller icon */
-                height: 1.2rem;
-                margin-left: 0.2rem; /* Adjusted margin */
+                width: 1rem;
+                height: 1rem;
+                margin-left: 0.15rem;
+            }
+            .lobby-footer .games-running-text {
+                font-size: 0.9rem;
+                padding: 0.3rem 0.6rem;
             }
         }
         
-        /* Lobby Type Toggle Styles */
-        .lobby-type-btn { padding: 0.5rem 1.5rem; border: 2px solid #DAA520; border-radius: 10px; transition: all 0.2s ease-in-out; background-color: transparent; color: #DAA520; font-weight: bold; }
-        .lobby-type-btn.active { background-color: #DAA520; color: #1A1A1A; box-shadow: 0 0 10px rgba(255,215,0,0.5); }
-        .lobby-lock-icon { width: 1.2rem; height: 1.2rem; margin-left: 0.5rem; color: #FFD700; display: inline-block; vertical-align: middle; }
+        /* Lobby Type Toggle Styles - Modern buttons */
+        .lobby-type-btn {
+            padding: 0.5rem 1.2rem;
+            border: 1px solid #00E0FF; /* Electric Cyan */
+            border-radius: 8px;
+            transition: all 0.2s ease-in-out;
+            background-color: transparent;
+            color: #00E0FF;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        .lobby-type-btn.active {
+            background-color: #00E0FF;
+            color: #0d0d1a; /* Dark background color */
+            box-shadow: 0 0 10px rgba(0,224,255,0.7);
+        }
+        .lobby-lock-icon {
+            width: 1rem; /* Slightly smaller */
+            height: 1rem;
+            margin-left: 0.4rem;
+            color: #00E0FF; /* Electric Cyan */
+            display: inline-block;
+            vertical-align: middle;
+        }
 
-        /* NEW: Countdown Animation */
+        /* NEW: Countdown Animation - Electric Pulse */
         @keyframes countdown-pulse {
-            0% { transform: scale(0.5); opacity: 0; }
-            50% { transform: scale(1.1); opacity: 1; }
-            100% { transform: scale(1); opacity: 0; }
+            0% { transform: scale(0.5); opacity: 0; text-shadow: none; }
+            50% { transform: scale(1.1); opacity: 1; text-shadow: 0 0 20px rgba(0,224,255,0.8); }
+            100% { transform: scale(1); opacity: 0; text-shadow: none; }
         }
         .countdown-effect {
             animation: countdown-pulse 1s ease-out forwards;
+            color: #00E0FF; /* Electric Cyan */
         }
 
-        /* NEW: Game Player Status Pods */
+        /* NEW: Game Player Status Pods - Futuristic and clear */
         .game-player-pod {
             display: flex;
             flex-direction: column;
             align-items: center;
-            background-color: rgba(255,255,255,0.05);
-            border: 1px solid rgba(255,255,255,0.1);
+            background-color: rgba(25, 25, 40, 0.7); /* Dark blue-purple with transparency */
+            border: 1px solid #4a4a6e; /* Subtle border */
             border-radius: 10px;
-            padding: 0.75rem 1rem;
-            min-width: 120px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
-            transition: all 0.3s ease-in-out;
+            padding: 0.6rem 0.8rem;
+            min-width: 100px; /* Smaller pods */
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+            transition: all 0.2s ease-in-out;
             position: relative;
+            text-align: center;
+            font-size: 0.9rem;
         }
         .game-player-pod.is-ai {
             background-color: rgba(255, 99, 71, 0.1); /* Tomato red tint */
             border-color: #FF6347; /* Tomato */
+            box-shadow: 0 0 8px rgba(255,99,71,0.5);
         }
         .game-player-pod.is-human {
             background-color: rgba(100, 149, 237, 0.1); /* Cornflower Blue tint */
             border-color: #6495ED; /* Cornflower Blue */
+            box-shadow: 0 0 8px rgba(100,149,237,0.5);
         }
         .game-player-pod.current-active-player {
             transform: scale(1.05);
-            border-color: #FFD700; /* Gold */
-            box-shadow: 0 0 15px rgba(255,215,0,0.7);
+            border-color: #00E0FF; /* Electric Cyan */
+            box-shadow: 0 0 15px rgba(0,224,255,0.7); /* Strong neon glow */
         }
         .game-player-pod .player-name {
-            font-weight: bold;
-            color: #E0E0E0;
-            font-size: 1.1rem;
-            margin-bottom: 0.2rem;
+            font-weight: 700;
+            color: #E0E0F5;
+            font-size: 1rem;
+            margin-bottom: 0.1rem;
+            text-shadow: 0 0 3px rgba(0,0,0,0.5);
         }
         .game-player-pod .player-role {
-            font-size: 0.9rem;
-            color: #DAA520; /* Gold */
+            font-size: 0.8rem;
+            color: #00E0FF; /* Electric Cyan */
+            font-weight: 600;
+            text-transform: uppercase;
         }
         .game-player-pod .player-status {
-            font-size: 0.8rem;
-            color: #C0C0C0;
-            margin-top: 0.2rem;
+            font-size: 0.7rem;
+            color: #9a9ab0;
+            margin-top: 0.1rem;
         }
 
-        /* Voting Buttons */
+        /* Voting Buttons - Bold and distinct */
         .voting-btn {
-            padding: 1rem 2rem;
-            font-size: 1.5rem;
-            border-radius: 15px;
-            font-weight: bold;
-            transition: all 0.3s ease;
+            padding: 0.8rem 1.8rem; /* Adjusted padding */
+            font-size: 1.3rem; /* Slightly smaller */
+            border-radius: 10px; /* Modern corners */
+            font-weight: 700;
+            transition: all 0.2s ease;
             cursor: pointer;
-            border: 3px solid #FFD700;
+            border: 1px solid #00E0FF; /* Electric Cyan border */
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #E0E0F5;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.4);
         }
         .voting-btn.ai-vote {
-            background: linear-gradient(145deg, #E24B4B 0%, #B22222 100%);
-            color: white;
+            background: linear-gradient(145deg, #ff6347 0%, #dc143c 100%); /* Tomato to Crimson */
         }
         .voting-btn.human-vote {
-            background: linear-gradient(145deg, #4BBEE2 0%, #2A52BE 100%);
-            color: white;
+            background: linear-gradient(145deg, #4682B4 0%, #2A52BE 100%); /* Steel Blue / Royal Blue */
         }
         .voting-btn:hover:not(:disabled) {
-            transform: translateY(-5px) scale(1.05);
-            box-shadow: 0 10px 20px rgba(0,0,0,0.6);
+            transform: translateY(-3px) scale(1.03); /* More subtle hover */
+            box-shadow: 0 8px 20px rgba(0,0,0,0.6), 0 0 15px rgba(0,224,255,0.7); /* Neon glow */
+            border-color: #00FFFF;
         }
         .voting-btn:disabled {
             opacity: 0.5;
             cursor: not-allowed;
+            transform: none;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+            border-color: #4a4a6e;
+            color: #B0B0C0;
         }
 
         /* Coin Icon for Buttons */
         .coin-icon {
-            width: 1.25rem; /* Equivalent to w-5 */
-            height: 1.25rem; /* Equivalent to h-5 */
+            width: 1.25rem;
+            height: 1.25rem;
             display: inline-block;
             vertical-align: middle;
-            margin-right: 0.25rem; /* Equivalent to mr-1 */
-            fill: #FFD700; /* Gold color for coins */
+            margin-right: 0.25rem;
+            fill: #00E0FF; /* Electric Cyan for coins */
         }
     </style>
 </head>
@@ -2395,7 +2428,10 @@
             lobbiesList.innerHTML = '<p class="text-gray-400">در حال بارگذاری لابی‌ها...</p>';
             userHasActiveLobby = false; // Reset this flag when entering lobby list view
 
-            const allLobbiesQuery = query(collection(db, `global_lobbies`));
+            const allLobbiesQuery = query(
+                collection(db, `global_lobbies`),
+                where("status", "in", ["waiting", "playing"]) // Check all relevant lobby statuses
+            );
             getDocs(allLobbiesQuery).then(allLobbiesSnapshot => {
                 if (auth.currentUser) {
                     allLobbiesSnapshot.forEach(doc => {
