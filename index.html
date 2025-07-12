@@ -7,7 +7,7 @@
     <!-- Tailwind CSS CDN for styling -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Google Fonts for Classic Look & New Themes -->
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Merriweather:wght@400;700&family=Share+Tech+Mono&family=Orbitron:wght@400..900&family=Inter:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Merriweather:wght@400;700&family=Share+Tech+Mono&family=Orbitron:wght@400..900&family=Press+Start+2P&family=Inter:wght@400;700&display=swap" rel="stylesheet">
     <style>
         /* General Classic Theme Background and Fonts */
         html, body, #app { /* Ensure these take full viewport height */
@@ -108,24 +108,11 @@
             border-bottom: 3px solid #FFD700;
             box-shadow: 0 8px 20px rgba(0,0,0,0.7);
         }
-        /* Specific header elements for Classic theme */
-        body.theme-classic .app-header #profile-summary #header-display-name,
-        body.theme-classic .app-header #profile-summary #header-user-id,
-        body.theme-classic .app-header #profile-summary svg,
-        body.theme-classic .app-header #menu-btn svg {
-            color: #E0E0E0; /* Softer white for text and icons */
-            stroke: #E0E0E0; /* For SVG stroke */
-        }
         body.theme-classic #header-user-coins-container {
             background-color: rgba(0,0,0,0.3);
             box-shadow: 0 4px 8px rgba(0,0,0,0.3);
             color: #FFD700; /* Coin text color */
         }
-        body.theme-classic .coin-icon {
-            fill: #FFD700; /* Gold fill for coin icon */
-        }
-
-
         body.theme-classic .lobby-header .search-container {
             background-color: #303030;
             border: 2px solid #5A5A5A;
@@ -289,23 +276,11 @@
             border-bottom: 3px solid #00FFFF;
             box-shadow: 0 5px 15px rgba(0,255,255,0.5);
         }
-        /* Specific header elements for Cyberpunk theme */
-        body.theme-cyberpunk .app-header #profile-summary #header-display-name,
-        body.theme-cyberpunk .app-header #profile-summary #header-user-id,
-        body.theme-cyberpunk .app-header #profile-summary svg,
-        body.theme-cyberpunk .app-header #menu-btn svg {
-            color: #00FFFF; /* Cyan for text and icons */
-            stroke: #00FFFF; /* For SVG stroke */
-        }
         body.theme-cyberpunk #header-user-coins-container {
             background-color: rgba(0,255,255,0.1);
             box-shadow: 0 2px 5px rgba(0,255,255,0.3);
             color: #FF00FF; /* Coin text color */
         }
-        body.theme-cyberpunk .coin-icon {
-            fill: #00FFFF; /* Cyan fill for coin icon */
-        }
-
         body.theme-cyberpunk .lobby-header .search-container {
             background-color: #10101A;
             border: 2px solid #00FFFF;
@@ -458,23 +433,11 @@
             border-bottom: 3px solid #92B4A1;
             box-shadow: 0 5px 15px rgba(0,0,0,0.5);
         }
-        /* Specific header elements for Forest theme */
-        body.theme-forest .app-header #profile-summary #header-display-name,
-        body.theme-forest .app-header #profile-summary #header-user-id,
-        body.theme-forest .app-header #profile-summary svg,
-        body.theme-forest .app-header #menu-btn svg {
-            color: #D4EDDA; /* Light green-white for text and icons */
-            stroke: #D4EDDA; /* For SVG stroke */
-        }
         body.theme-forest #header-user-coins-container {
             background-color: rgba(46,139,87,0.3); /* Sea Green tint */
             box-shadow: 0 2px 5px rgba(46,139,87,0.3);
             color: #92B4A1;
         }
-        body.theme-forest .coin-icon {
-            fill: #D4EDDA;
-        }
-
         body.theme-forest .lobby-header .search-container {
             background-color: #2F4F4F;
             border: 2px solid #79A3B1;
@@ -626,23 +589,11 @@
             border-bottom: 3px solid #64B5F6;
             box-shadow: 0 5px 15px rgba(0,0,0,0.5);
         }
-        /* Specific header elements for Ocean theme */
-        body.theme-ocean .app-header #profile-summary #header-display-name,
-        body.theme-ocean .app-header #profile-summary #header-user-id,
-        body.theme-ocean .app-header #profile-summary svg,
-        body.theme-ocean .app-header #menu-btn svg {
-            color: #BBDEFB; /* Light sky blue for text and icons */
-            stroke: #BBDEFB; /* For SVG stroke */
-        }
         body.theme-ocean #header-user-coins-container {
             background-color: rgba(66,165,245,0.3); /* Blue tint */
             box-shadow: 0 2px 5px rgba(66,165,245,0.3);
             color: #BBDEFB;
         }
-        body.theme-ocean .coin-icon {
-            fill: #FFC107;
-        }
-
         body.theme-ocean .lobby-header .search-container {
             background-color: #0E2947;
             border: 2px solid #42A5F5;
@@ -741,7 +692,182 @@
         body.theme-ocean .coin-icon { fill: #FFC107; }
 
 
-        /* REMOVED: RETRO THEME CSS BLOCK */
+        /* === NEW THEME: RETRO === */
+        body.theme-retro {
+            background: linear-gradient(to bottom right, #3C3C3C, #1E1E1E); /* Dark grays */
+            color: #FEE715; /* Bright Yellow */
+            font-family: 'Press Start 2P', cursive; /* Pixelated font for headings */
+        }
+        /* Google Fonts for Retro */
+        body.theme-retro .fonts-retro {
+            font-family: 'Press Start 2P', cursive;
+        }
+        body.theme-retro h1,
+        body.theme-retro h2 {
+            font-family: 'Press Start 2P', cursive;
+            color: #FF69B4; /* Hot Pink */
+            text-shadow: 2px 2px #000;
+        }
+        body.theme-retro .spinner { border-top-color: #00FFFF; }
+        body.theme-retro .classic-card {
+            background: linear-gradient(145deg, #5C007C 0%, #8A00C2 100%); /* Deep Purple */
+            border: 4px solid #FEE715; /* Bright Yellow */
+            box-shadow: 0 0 15px #FF69B4, inset 0 0 10px #FEE715;
+            border-radius: 5px; /* Sharper corners */
+        }
+        body.theme-retro .classic-card::before,
+        body.theme-retro .classic-card::after {
+            border-color: #FF69B4;
+            box-shadow: 0 0 8px #FF69B4;
+            border-radius: 0;
+        }
+        body.theme-retro .classic-btn {
+            border: 2px solid #FEE715;
+            color: #000; /* Black text on buttons */
+            border-radius: 5px;
+            font-weight: 700;
+            text-shadow: none;
+        }
+        body.theme-retro .classic-btn:hover {
+            box-shadow: 0 0 20px #FF69B4, inset 0 0 10px #FEE715;
+        }
+        body.theme-retro .btn-purple-classic { background: linear-gradient(145deg, #8A00C2 0%, #5C007C 100%); }
+        body.theme-retro .btn-blue-classic { background: linear-gradient(145deg, #00FFFF 0%, #00BFFF 100%); } /* Cyan Blue */
+        body.theme-retro .btn-green-classic { background: linear-gradient(145deg, #39FF14 0%, #00FF00 100%); } /* Neon Green */
+        body.theme-retro .btn-red-classic { background: linear-gradient(145deg, #FF00FF 0%, #FF0077 100%); } /* Magenta Pink */
+        body.theme-retro .btn-gray-classic { background: linear-gradient(145deg, #A9A9A9 0%, #808080 100%); }
+        body.theme-retro .btn-brown-classic { background: linear-gradient(145deg, #D2B48C 0%, #A0522D 100%); } /* Tan/Sienna */
+        body.theme-retro .btn-gold-classic { background: linear-gradient(145deg, #FF69B4 0%, #FF00FF 100%); } /* Pink/Magenta */
+
+        body.theme-retro input,
+        body.theme-retro select {
+            background-color: #101010;
+            border: 2px solid #FEE715;
+            color: #00FFFF; /* Cyan for input text */
+            border-radius: 5px;
+            font-family: 'Press Start 2P', cursive;
+        }
+        body.theme-retro input::placeholder { color: #808080; }
+        body.theme-retro input:focus,
+        body.theme-retro select:focus {
+            border-color: #FF69B4 !important;
+            box-shadow: 0 0 0 4px rgba(255,105,180,0.5) !important, inset 0 0 5px #FEE715 !important;
+        }
+
+        body.theme-retro .app-header,
+        body.theme-retro .lobby-header {
+            background: linear-gradient(to right, #001000, #002000);
+            border-bottom: 3px solid #39FF14; /* Neon Green */
+            box-shadow: 0 5px 10px rgba(0,255,0,0.5);
+        }
+        body.theme-retro #header-user-coins-container {
+            background-color: rgba(0,255,255,0.1);
+            box-shadow: 0 2px 5px rgba(0,255,255,0.3);
+            color: #FEE715; /* Bright Yellow */
+        }
+        body.theme-retro .lobby-header .search-container {
+            background-color: #0A0A0A;
+            border: 2px solid #FEE715;
+            border-radius: 5px;
+        }
+        body.theme-retro .lobby-header .search-container svg { color: #FF69B4; }
+
+        body.theme-retro .app-footer,
+        body.theme-retro .lobby-footer {
+            background: linear-gradient(to left, #001000, #002000);
+            border-top: 3px solid #39FF14;
+            box-shadow: 0 -5px 10px rgba(0,255,0,0.5);
+        }
+        body.theme-retro .lobby-footer .icon-btn { color: #FEE715; }
+        body.theme-retro .lobby-footer .games-running-text { color: #FF69B4; }
+
+        body.theme-retro .main-content-area {
+            background: linear-gradient(180deg, #1A1A1A 0%, #0A0A0A 100%);
+        }
+
+        body.theme-retro .lobby-item {
+            background: linear-gradient(145deg, #2A2A2A 0%, #1A1A1A 100%);
+            border: 2px solid #FEE715;
+            box-shadow: 0 5px 10px rgba(255,105,180,0.3), inset 0 0 8px rgba(0,255,255,0.3);
+            border-radius: 5px;
+        }
+        body.theme-retro .lobby-item h3 { color: #FF69B4; font-family: 'Press Start 2P', cursive; }
+        body.theme-retro .lobby-item p { color: #FEE715; }
+
+        body.theme-retro .lobby-detail-screen-full {
+            background: linear-gradient(180deg, #1A1A1A 0%, #0A0A0A 100%);
+        }
+        body.theme-retro .lobby-detail-content {
+            background: linear-gradient(145deg, #0A0A0A 0%, #000000 100%);
+            border: 3px solid #FEE715;
+            box-shadow: 0 8px 16px rgba(255,105,180,0.7);
+            border-radius: 5px;
+        }
+
+        body.theme-retro .lobby-sidebar {
+            background-color: rgba(0,255,255,0.2);
+            border: 1px solid #FF69B4;
+            border-radius: 5px;
+        }
+        body.theme-retro .player-list-item {
+            background-color: rgba(255,105,180,0.1);
+            border: 1px solid rgba(255,105,180,0.2);
+            border-radius: 5px;
+        }
+        body.theme-retro .player-list-item.is-host { border-color: #FEE715; }
+        body.theme-retro .player-list-item .player-name { color: #00FFFF; font-family: 'Press Start 2P', cursive; }
+        body.theme-retro .player-list-item .host-label { color: #FF69B4; }
+        body.theme-retro .kick-player-btn { border: 1px solid #FF00FF; color: #FF00FF; }
+        body.theme-retro .kick-player-btn:hover { background: #FF00FF; color: black; }
+
+        body.theme-retro .lobby-chat-container {
+            background-color: rgba(0,0,0,0.7);
+            border: 2px solid #FEE715;
+            border-radius: 5px;
+        }
+        body.theme-retro .chat-message { background-color: #2A2A2A; border-radius: 5px;}
+        body.theme-retro .chat-message.current-user { background-color: #008080; }
+        body.theme-retro .chat-message .sender-name { color: #00FFFF; }
+        body.theme-retro .chat-message .message-text-deleted { color: #808080; }
+        body.theme-retro .delete-message-btn { color: #808080; }
+        body.theme-retro .delete-message-btn:hover { color: #FF00FF; }
+
+        body.theme-retro .start-game-btn { background: linear-gradient(145deg, #39FF14 0%, #00FF00 100%); border: 2px solid #FEE715; }
+
+        body.theme-retro .lobby-sidebar::-webkit-scrollbar-track,
+        body.theme-retro #player-list-container::-webkit-scrollbar-track,
+        body.theme-retro .lobby-chat-messages::-webkit-scrollbar-track,
+        body.theme-retro .custom-scrollbar::-webkit-scrollbar-track { background: #1A1A1A; }
+        body.theme-retro .lobby-sidebar::-webkit-scrollbar-thumb,
+        body.theme-retro #player-list-container::-webkit-scrollbar-thumb,
+        body.theme-retro .lobby-chat-messages::-webkit-scrollbar-thumb,
+        body.theme-retro .custom-scrollbar::-webkit-scrollbar-thumb { background: #FEE715; }
+        body.theme-retro .lobby-sidebar::-webkit-scrollbar-thumb:hover,
+        body.theme-retro #player-list-container::-webkit-scrollbar-thumb:hover,
+        body.theme-retro .lobby-chat-messages::-webkit-scrollbar-thumb:hover,
+        body.theme-retro .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #FF69B4; }
+
+        body.theme-retro .lobby-type-btn { border: 2px solid #FEE715; background-color: transparent; color: #FEE715; border-radius: 5px; }
+        body.theme-retro .lobby-type-btn.active { background-color: #FEE715; color: #101010; box-shadow: 0 0 10px rgba(255,105,180,0.5); }
+        body.theme-retro .lobby-lock-icon { color: #FF69B4; }
+
+        body.theme-retro .game-player-pod {
+            background-color: rgba(255,105,180,0.1);
+            border: 1px solid rgba(255,105,180,0.3);
+            border-radius: 5px;
+        }
+        body.theme-retro .game-player-pod.is-ai { background-color: rgba(255, 0, 255, 0.1); border-color: #FF00FF; }
+        body.theme-retro .game-player-pod.is-human { background-color: rgba(0, 255, 255, 0.1); border-color: #00FFFF; }
+        body.theme-retro .game-player-pod.current-active-player { border-color: #FF69B4; box-shadow: 0 0 15px rgba(255,105,180,0.7); }
+        body.theme-retro .game-player-pod .player-name { color: #FEE715; font-family: 'Press Start 2P', cursive; }
+        body.theme-retro .game-player-pod .player-role { color: #FF69B4; }
+        body.theme-retro .game-retro .player-status { color: #808080; }
+
+        body.theme-retro .voting-btn { border: 3px solid #FF69B4; border-radius: 5px; }
+        body.theme-retro .voting-btn.ai-vote { background: linear-gradient(145deg, #FF00FF 0%, #FF0077 100%); color: black; }
+        body.theme-retro .voting-btn.human-vote { background: linear-gradient(145deg, #00FFFF 0%, #00BFFF 100%); color: black; }
+
+        body.theme-retro .coin-icon { fill: #FEE715; }
 
 
         /* === NEW THEME: MINIMAL === */
@@ -808,38 +934,17 @@
             box-shadow: 0 0 0 3px rgba(0,123,255,0.25) !important, inset 0 1px 2px rgba(0,0,0,0.1) !important;
         }
 
-        /* Adjust header specific styles for minimal theme */
         body.theme-minimal .app-header,
         body.theme-minimal .lobby-header {
             background-color: #FFF;
             border-bottom: 1px solid #E0E0E0;
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
-        /* User info in header (text and icon) */
-        body.theme-minimal .app-header #profile-summary #header-display-name,
-        body.theme-minimal .app-header #profile-summary #header-user-id {
-            color: #333; /* Dark text for header info */
-        }
-        body.theme-minimal .app-header #profile-summary svg {
-            color: #333; /* Dark icons */
-            stroke: #333; /* For SVG stroke */
-        }
-        /* Coins container */
         body.theme-minimal #header-user-coins-container {
             background-color: rgba(0,123,255,0.1);
             box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-            color: #007BFF; /* Blue text */
+            color: #007BFF;
         }
-        body.theme-minimal #header-user-coins-container .coin-icon {
-            fill: #007BFF; /* Blue fill for coin icon */
-        }
-        /* Hamburger menu icon */
-        body.theme-minimal #menu-btn svg {
-            color: #333; /* Dark icon */
-            stroke: #333; /* For SVG stroke */
-        }
-
-
         body.theme-minimal .lobby-header .search-container {
             background-color: #F0F0F0;
             border: 1px solid #CCC;
@@ -952,7 +1057,7 @@
         body.theme-minimal .game-player-pod.current-active-player { border-color: #007BFF; box-shadow: 0 0 10px rgba(0,123,255,0.5); }
         body.theme-minimal .game-player-pod .player-name { color: #333; font-size: 1rem;}
         body.theme-minimal .game-player-pod .player-role { color: #007BFF; font-size: 0.85rem;}
-        body.theme-minimal .game-player-pod .player-status { color: #6C757D; font-size: 0.75rem;}
+        body.theme-minimal .game-minimal .player-status { color: #6C757D; font-size: 0.75rem;}
 
         body.theme-minimal .voting-btn { border: 1px solid #007BFF; border-radius: 8px; padding: 0.8rem 1.5rem; font-size: 1.2rem;}
         body.theme-minimal .voting-btn.ai-vote { background: #DC3545; color: white; }
@@ -985,7 +1090,12 @@
             box-shadow: 0 0 10px rgba(100,181,246,0.5);
             border-color: #42A5F5;
         }
-        /* REMOVED: RETRO THEME ACTIVE BUTTON STYLE */
+        body.theme-retro .theme-button.active-theme-btn {
+            background-color: #FEE715; /* Yellow for retro */
+            color: #101010;
+            box-shadow: 0 0 10px rgba(255,105,180,0.5);
+            border-color: #FF69B4;
+        }
         body.theme-minimal .theme-button.active-theme-btn {
             background-color: #007BFF; /* Blue for minimal */
             color: white;
@@ -1244,7 +1354,7 @@
             opacity: 0;
         }
 
-        /* Create Lobby Modal Styles */
+        /* Create Lobby Modal Specific Styles */
         #create-lobby-modal {
             background-color: rgba(0,0,0,0.7);
             transition: opacity 0.3s ease-in-out;
@@ -1843,7 +1953,6 @@
                     <h2 class="text-2xl sm:text-3xl font-bold mb-6 text-yellow-300">انتخاب تم</h2>
                     <div id="theme-buttons-container" class="grid grid-cols-2 gap-4">
                         <!-- Theme buttons will be dynamically generated by JS -->
-                        <p class="text-gray-400 text-center col-span-2">در حال بارگذاری تم‌ها...</p>
                     </div>
                     <button id="back-to-main-menu-from-themes" class="w-full classic-btn btn-gray-classic text-lg sm:text-xl">
                         بازگشت
@@ -2276,8 +2385,8 @@
         const votingInstructions = document.getElementById('voting-instructions');
         const votingOptions = document.getElementById('voting-options');
         const gameResultDisplay = document.getElementById('game-result-display');
-        const winnerText = document.getElementById('winner-text'); // Corrected ID reference
-        const reasonText = document.getElementById('reason-text'); // Corrected ID reference
+        const winnerText = document.getElementById('winnerText'); 
+        const reasonText = document.getElementById('reasonText');
         const returnToLobbiesBtn = document.getElementById('return-to-lobbies-btn');
 
 
@@ -2320,7 +2429,6 @@
         let unsubscribeUserProfile = null; // NEW: Listener for real-time user profile updates
         let unsubscribePendingLobbyNames = null; // NEW: Listener for pending lobby names
         let unsubscribeGameSettings = null; // NEW: Listener for real-time game settings
-        let unsubscribeThemeSettings = null; // NEW: Listener for real-time theme settings
         let isInitialAuthCheckComplete = false; // Flag to ensure initial loading screen transition happens only once
         let userHasActiveLobby = false; // Track if the current user has an active lobby (created or joined)
         let currentLobbyId = null; // Stores the ID of the lobby the current user is in
@@ -2329,7 +2437,6 @@
         let isRefreshing = false; // NEW: State for refresh button
         let gameEntryCost = 100; // NEW: Default game entry cost, will be fetched from Firebase
         let currentTheme = 'classic'; // NEW: To store the currently active theme
-        let themesData = {}; // NEW: To store theme data fetched from Firestore (including costs)
 
         // Promise resolver for custom confirmation modal
         let resolveCustomConfirm;
@@ -2380,8 +2487,8 @@
             gameVotingOverlay.style.display = 'none';
         }
 
-        // NEW: Original theme configurations (now purely for display and default button classes, costs will come from Firestore)
-        const themeDisplayConfigs = {
+        // NEW: Theme Configurations
+        const themeConfigs = {
             'classic': {
                 displayName: 'کلاسیک',
                 bodyClass: 'theme-classic',
@@ -2402,7 +2509,11 @@
                 bodyClass: 'theme-ocean',
                 buttonClass: 'btn-blue-classic'
             },
-            // RETRO THEME IS REMOVED
+            'retro': {
+                displayName: 'رترو',
+                bodyClass: 'theme-retro',
+                buttonClass: 'btn-red-classic'
+            },
             'minimal': {
                 displayName: 'مینیمال',
                 bodyClass: 'theme-minimal',
@@ -2412,35 +2523,18 @@
 
         /**
          * Applies the specified theme to the body and saves it to user profile.
-         * Before applying, it checks if the user owns the theme or if it's free.
          * @param {string} themeName - The key of the theme to apply (e.g., 'classic', 'cyberpunk').
          */
         async function applyTheme(themeName) {
-            if (!auth.currentUser || !currentUserData || !themesData[themeName]) {
-                console.warn(`Cannot apply theme ${themeName}: User not logged in, user data missing, or theme data not loaded.`);
-                showCustomMessage(messageBox, "خطا: امکان تغییر تم وجود ندارد. لطفا مجدد تلاش کنید.", "error");
-                return;
-            }
-
-            const isFreeTheme = themesData[themeName].cost === 0;
-            const ownsTheme = currentUserData.ownedThemes?.includes(themeName);
-
-            if (!isFreeTheme && !ownsTheme) {
-                console.warn(`User does not own theme "${themeName}" and it's not free.`);
-                // This scenario should ideally be prevented by button disabling, but as a safeguard.
-                showCustomMessage(messageBox, "شما این تم را خریداری نکرده‌اید.", "error");
-                return;
-            }
-
-            let config = themeDisplayConfigs[themeName]; // Use themeDisplayConfigs for CSS classes
+            let config = themeConfigs[themeName];
             if (!config) {
-                console.warn(`Theme display config "${themeName}" not found. Falling back to 'classic'.`);
+                console.warn(`Theme "${themeName}" not found. Falling back to 'classic'.`);
                 themeName = 'classic';
-                config = themeDisplayConfigs['classic'];
+                config = themeConfigs['classic'];
             }
 
             // Remove all existing theme classes from the body
-            Object.values(themeDisplayConfigs).forEach(conf => { // Use themeDisplayConfigs here
+            Object.values(themeConfigs).forEach(conf => {
                 document.body.classList.remove(conf.bodyClass);
             });
 
@@ -2452,153 +2546,36 @@
             updateThemeButtonsActiveState();
 
             // Save selected theme to user's profile in Firebase
-            if (currentUserData.theme !== themeName) {
+            if (auth.currentUser && currentUserData && currentUserData.theme !== themeName) {
                 try {
                     const userProfileRef = doc(db, `artifacts/${appId}/users/${auth.currentUser.uid}/profile/data`);
                     await updateDoc(userProfileRef, { theme: themeName });
                     console.log(`Theme "${themeName}" saved to user profile.`);
                 } catch (error) {
                     console.error("Error saving theme to user profile:", error);
+                    // This error shouldn't prevent theme application, just means it might not persist.
                 }
+            } else if (auth.currentUser && !currentUserData) {
+                console.warn("User data not fully loaded, cannot save theme yet.");
             }
-        }
-
-        /**
-         * Sets up a real-time listener for theme settings and costs.
-         */
-        function setupThemeSettingsListener() {
-            if (unsubscribeThemeSettings) unsubscribeThemeSettings(); // Clean up previous listener if any
-
-            const configRef = doc(db, `artifacts/${appId}/config/themes_settings`);
-            unsubscribeThemeSettings = onSnapshot(configRef, (docSnap) => {
-                if (docSnap.exists()) {
-                    themesData = docSnap.data();
-                    console.log("Theme settings loaded:", themesData);
-                    // If themes modal is open, re-populate to update costs/states
-                    if (!themesView.classList.contains('hidden')) {
-                        populateThemeButtons();
-                    }
-                    // Immediately apply user's saved theme in case it wasn't applied or data changed
-                    if (currentUserData && currentUserData.theme && currentTheme !== currentUserData.theme) {
-                        applyTheme(currentUserData.theme);
-                    } else if (!currentUserData && currentTheme !== 'classic') { // If user logs out, revert to classic
-                         applyTheme('classic');
-                    }
-                } else {
-                    console.warn("`themes_settings` document not found. Creating with default values.");
-                    const defaultThemes = {
-                        "classic": { "cost": 0, "displayName": "کلاسیک", "bodyClass": "theme-classic", "buttonClass": "btn-brown-classic" },
-                        "cyberpunk": { "cost": 500, "displayName": "سایبرپانک", "bodyClass": "theme-cyberpunk", "buttonClass": "btn-purple-classic" },
-                        "forest": { "cost": 500, "displayName": "جنگلی", "bodyClass": "theme-forest", "buttonClass": "btn-green-classic" },
-                        "ocean": { "cost": 500, "displayName": "اقیانوس", "bodyClass": "theme-ocean", "buttonClass": "btn-blue-classic" },
-                        "minimal": { "cost": 500, "displayName": "مینیمال", "bodyClass": "theme-minimal", "buttonClass": "btn-gray-classic" }
-                    };
-                    setDoc(configRef, defaultThemes)
-                        .then(() => console.log("Default `themes_settings` config created."))
-                        .catch(e => console.error("Error creating default theme settings:", e));
-                }
-            }, (error) => {
-                console.error("Error listening to theme settings:", error);
-            });
         }
 
         /**
          * Populates the theme selection buttons and sets the active state.
-         * Includes purchase logic based on fetched theme costs.
          */
         function populateThemeButtons() {
             themeButtonsContainer.innerHTML = ''; // Clear existing buttons
 
-            if (!currentUserData || Object.keys(themesData).length === 0) {
-                themeButtonsContainer.innerHTML = '<p class="text-gray-400">در حال بارگذاری تم‌ها...</p>';
-                return;
-            }
-
-            for (const themeKey in themesData) {
-                const themeData = themesData[themeKey]; // This now includes cost from Firestore
-                const displayConfig = themeDisplayConfigs[themeKey]; // This is for display-only properties
-                
-                if (!displayConfig) {
-                    console.warn(`Display config for theme "${themeKey}" not found. Skipping button creation.`);
-                    continue;
-                }
-
+            for (const themeKey in themeConfigs) {
+                const theme = themeConfigs[themeKey];
                 const button = document.createElement('button');
-                button.className = `classic-btn ${displayConfig.buttonClass} text-base sm:text-lg theme-button`;
+                button.className = `classic-btn ${theme.buttonClass} text-base sm:text-lg theme-button`;
                 button.dataset.theme = themeKey;
-                button.textContent = displayConfig.displayName; // Display name from original config
-
-                const isOwned = currentUserData.ownedThemes?.includes(themeKey);
-                const themeCost = themeData.cost || 0; // Get cost from themesData
-                const isFree = themeCost === 0;
-
-                if (isOwned) {
-                    button.textContent += ` (فعال)`;
-                    button.addEventListener('click', () => applyTheme(themeKey));
-                } else if (isFree) {
-                    button.textContent += ` (رایگان)`;
-                    button.addEventListener('click', () => handleThemePurchase(themeKey, themeCost)); // Treat free as purchase to add to owned
-                } else {
-                    button.textContent += ` (خرید: ${themeCost.toLocaleString('fa-IR')} سکه)`;
-                    button.disabled = currentUserData.coins < themeCost;
-                    if (button.disabled) {
-                        button.textContent += ` - سکه کافی نیست`;
-                        button.classList.add('opacity-50', 'cursor-not-allowed');
-                    }
-                    button.addEventListener('click', () => handleThemePurchase(themeKey, themeCost));
-                }
+                button.textContent = theme.displayName;
+                button.addEventListener('click', () => applyTheme(themeKey));
                 themeButtonsContainer.appendChild(button);
             }
             updateThemeButtonsActiveState();
-        }
-
-        /**
-         * Handles the logic for purchasing a theme.
-         * @param {string} themeKey - The key of the theme to purchase.
-         * @param {number} cost - The cost of the theme.
-         */
-        async function handleThemePurchase(themeKey, cost) {
-            if (!auth.currentUser || !currentUserData) {
-                showCustomMessage(messageBox, "خطا: ابتدا وارد حساب کاربری خود شوید.", "error");
-                return;
-            }
-
-            if (currentUserData.ownedThemes?.includes(themeKey)) {
-                // Already owned, just apply it
-                applyTheme(themeKey);
-                return;
-            }
-
-            if (currentUserData.coins < cost) {
-                showCustomMessage(messageBox, `سکه شما برای خرید این تم کافی نیست. (نیاز: ${cost} سکه، موجودی شما: ${currentUserData.coins || 0})`, "error");
-                return;
-            }
-
-            const confirmMessage = cost === 0 
-                ? `آیا مایلید تم "${themeDisplayConfigs[themeKey].displayName}" را فعال کنید؟`
-                : `آیا مطمئن هستید که می‌خواهید تم "${themeDisplayConfigs[themeKey].displayName}" را با هزینه ${cost.toLocaleString('fa-IR')} سکه خریداری کنید؟`;
-            
-            const confirmed = await showCustomConfirm(confirmMessage, "خرید تم");
-
-            if (confirmed) {
-                const userProfileRef = doc(db, `artifacts/${appId}/users/${auth.currentUser.uid}/profile/data`);
-                try {
-                    await updateDoc(userProfileRef, {
-                        coins: increment(-cost),
-                        ownedThemes: arrayUnion(themeKey)
-                    });
-                    showCustomMessage(messageBox, `تم "${themeDisplayConfigs[themeKey].displayName}" با موفقیت ${cost === 0 ? 'فعال' : 'خریداری'} شد!`, "success");
-                    // Update local currentUserData immediately for responsiveness
-                    currentUserData.coins -= cost;
-                    currentUserData.ownedThemes.push(themeKey);
-                    updateUserCoinsDisplay(); // Update header coins
-                    applyTheme(themeKey); // Apply the newly purchased/activated theme
-                    populateThemeButtons(); // Re-render buttons to show "owned" status
-                } catch (error) {
-                    console.error("Error purchasing theme:", error);
-                    showCustomMessage(messageBox, `خطا در ${cost === 0 ? 'فعال سازی' : 'خرید'} تم: ${error.message}`, "error");
-                }
-            }
         }
 
         /**
@@ -2958,7 +2935,6 @@
                 // If a user is logged in, set up listeners.
                 if (unsubscribeUserProfile) unsubscribeUserProfile();
                 if (unsubscribeGameSettings) unsubscribeGameSettings();
-                if (unsubscribeThemeSettings) unsubscribeThemeSettings(); // NEW: Cleanup theme listener
 
                 // Setup listener for user profile
                 const userDocRef = doc(db, `artifacts/${appId}/users/${user.uid}/profile/data`);
@@ -2991,15 +2967,14 @@
                             approvedLobbyNames: [],
                             banStatus: { isBanned: false },
                             createdAt: serverTimestamp(),
-                            theme: 'classic', // NEW: Add default theme
-                            ownedThemes: ['classic'] // NEW: User owns classic theme by default
+                            theme: 'classic' // NEW: Add default theme
                         }, { merge: true }).then(() => {
                             console.log("Default user profile created.");
                             applyTheme('classic'); // Apply default theme
                         }).catch(e => {
                             console.error("Error creating default user profile:", e);
                         });
-                        currentUserData = { uid: user.uid, email: user.email, displayName: 'کاربر جدید', coins: 0, approvedLobbyNames: [], theme: 'classic', ownedThemes: ['classic'] };
+                        currentUserData = { uid: user.uid, email: user.email, displayName: 'کاربر جدید', coins: 0, approvedLobbyNames: [], theme: 'classic' };
                         applyTheme('classic'); // Ensure default is applied immediately
                     }
                 }, (error) => {
@@ -3008,14 +2983,11 @@
 
                 // NEW: Setup listener for game settings
                 setupGameSettingsListener();
-                // NEW: Setup listener for theme settings
-                setupThemeSettingsListener();
 
             } else {
                 // User is logged out. Clean up all data and listeners.
                 if (unsubscribeUserProfile) unsubscribeUserProfile();
                 if (unsubscribeGameSettings) unsubscribeGameSettings();
-                if (unsubscribeThemeSettings) unsubscribeThemeSettings(); // NEW: Cleanup theme listener
                 // ... (other listener cleanups) ...
                 if (unsubscribeLobbies) unsubscribeLobbies();
                 if (unsubscribeLobbyDetail) unsubscribeLobbyDetail();
@@ -3023,7 +2995,7 @@
                 if (unsubscribeLobbyChat) unsubscribeLobbyChat();
                 if (unsubscribePendingLobbyNames) unsubscribePendingLobbyNames();
                 
-                unsubscribeUserProfile = unsubscribeGameSettings = unsubscribeThemeSettings = unsubscribeLobbies = unsubscribeLobbyDetail = unsubscribeKickedPlayers = unsubscribeLobbyChat = unsubscribePendingLobbyNames = null;
+                unsubscribeUserProfile = unsubscribeGameSettings = unsubscribeLobbies = unsubscribeLobbyDetail = unsubscribeKickedPlayers = unsubscribeLobbyChat = unsubscribePendingLobbyNames = null;
                 clearGameIntervals();
                 
                 currentUserData = null;
@@ -3064,26 +3036,6 @@
             } catch (error) {
                 console.error("CRITICAL: Error initializing game settings config:", error);
                 showMessageBox("خطا در بارگذاری تنظیمات بازی.", "error");
-            }
-            // NEW: Ensure themes_settings config exists at startup.
-            try {
-                const themeConfigRef = doc(db, `artifacts/${appId}/config/themes_settings`);
-                const themeConfigSnap = await getDoc(themeConfigRef);
-                if (!themeConfigSnap.exists()) {
-                    console.log("`themes_settings` document not found. Creating with default values...");
-                    const defaultThemes = {
-                        "classic": { "cost": 0, "displayName": "کلاسیک", "bodyClass": "theme-classic", "buttonClass": "btn-brown-classic" },
-                        "cyberpunk": { "cost": 500, "displayName": "سایبرپانک", "bodyClass": "theme-cyberpunk", "buttonClass": "btn-purple-classic" },
-                        "forest": { "cost": 500, "displayName": "جنگلی", "bodyClass": "theme-forest", "buttonClass": "btn-green-classic" },
-                        "ocean": { "cost": 500, "displayName": "اقیانوس", "bodyClass": "theme-ocean", "buttonClass": "btn-blue-classic" },
-                        "minimal": { "cost": 500, "displayName": "مینیمال", "bodyClass": "theme-minimal", "buttonClass": "btn-gray-classic" }
-                    };
-                    await setDoc(themeConfigRef, defaultThemes);
-                    console.log("Default `themes_settings` config created successfully.");
-                }
-            } catch (error) {
-                console.error("CRITICAL: Error initializing theme settings config:", error);
-                showMessageBox("خطا در بارگذاری تنظیمات تم.", "error");
             }
             
             // Handle initial authentication
@@ -3583,8 +3535,7 @@
                         } else if (canJoinThisLobby) {
                             joinButtonHtml = `<button data-lobby-id="${lobby.id}" data-lobby-type="${lobby.type || 'public'}" data-lobby-name="${lobby.name}" class="join-lobby-btn classic-btn btn-blue-classic">ورود به لابی</button>`;
                         } else {
-                            joinButtonHtml = `<button class="join-lobby-btn classic-btn
-                            btn-blue-classic opacity-50 cursor-not-allowed" disabled>ورود به لابی</button>`;
+                            joinButtonHtml = `<button class="join-lobby-btn classic-btn btn-blue-classic opacity-50 cursor-not-allowed" disabled>ورود به لابی</button>`;
                         }
                         
                         const closeButtonHtml = isCurrentUserHostOfThisLobby 
@@ -3834,23 +3785,21 @@
             const userId = auth.currentUser.uid;
             try {
                 const lobbySnap = await getDoc(lobbyRef);
-                if (!lobbySnap.exists()) { showMessageBox("لابی مورد نظر یافت نشد.", "error"); return; }
-                const lobbyData = lobbySnap.data();
-                if (lobbyData.hostId !== userId) { showMessageBox("شما اجازه بستن این لابی را ندارید.", "error"); return; }
-
-                const lobbyElement = document.querySelector(`[data-lobby-id="${lobbyId}"]`);
-                if (lobbyElement) {
-                    lobbyElement.classList.add('fade-out');
-                    await new Promise(resolve => setTimeout(resolve, 500));
+                if (!lobbySnap.exists()) {
+                    showMessageBox("لابی مورد نظر یافت نشد.", "error");
+                    currentLobbyId = null;
+                    userHasActiveLobby = false;
+                    setActiveScreen(lobbyScreen);
+                    unsubscribeLobbies = setupLobbyListener('');
+                    return;
                 }
-
-                await deleteDoc(lobbyRef);
-                showMessageBox(`لابی "${lobbyData.name}" با موفقیت بسته شد.`, "success");
-                userHasActiveLobby = false; // Host just closed their lobby
-                if (currentLobbyId === lobbyId) currentLobbyId = null;
-
-                clearGameIntervals();
-                resetGameUI();
+                const isHost = lobbySnap.data().hostId === userId;
+                if (isHost) {
+                    const confirmed = await showCustomConfirm("شما سازنده لابی هستید. خروج شما باعث بسته شدن لابی برای همه می‌شود. آیا مطمئن هستید؟", "بستن لابی");
+                    if (confirmed) {
+                        await deleteDoc(lobbyRef);
+                    }
+                }
             } catch (e) { console.error("Error leaving lobby:", e); showMessageBox("خطا در ترک لابی.", "error"); }
         }
 
@@ -4405,8 +4354,7 @@
                         approvedLobbyNames: [],
                         banStatus: { isBanned: false },
                         createdAt: serverTimestamp(),
-                        theme: 'classic', // Set default theme on registration
-                        ownedThemes: ['classic'] // User owns classic theme by default
+                        theme: 'classic' // Set default theme on registration
                     });
                     console.log("User profile document created immediately after registration.");
                 }
