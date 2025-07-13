@@ -2529,10 +2529,11 @@
         };
 
         
-        // --- START OF VOICE CHAT LOGIC ---
+        // --- START OF VOICE CHAT LOGIC (CORRECTED) ---
 
         async function joinVoiceChat() {
             if (!currentLobbyId || !auth.currentUser) return;
+            console.log("Attempting to join voice chat...");
 
             try {
                 // 1. Get user's microphone
@@ -2550,6 +2551,7 @@
 
                 // 3. Listen for signals (offers, answers, candidates)
                 listenForSignals();
+                console.log("Successfully joined voice chat, listening for signals.");
 
             } catch (error) {
                 console.error("Error joining voice chat:", error);
@@ -2560,6 +2562,7 @@
 
         function leaveVoiceChat() {
             if (!isVoiceChatActive) return;
+            console.log("Leaving voice chat...");
             isVoiceChatActive = false;
 
             // 1. Stop local media tracks
@@ -2597,6 +2600,7 @@
             // 5. Cleanup UI
             remoteAudioContainer.innerHTML = '';
             updateVoiceChatUI();
+            console.log("Voice chat left and cleaned up.");
         }
 
         function toggleMute() {
@@ -2606,38 +2610,39 @@
                 track.enabled = !isMuted;
             });
             updateVoiceChatUI();
+            console.log(`Mic is now ${isMuted ? 'muted' : 'unmuted'}.`);
         }
 
         function updateVoiceChatUI() {
             joinVoiceBtn.classList.toggle('hidden', isVoiceChatActive);
             leaveVoiceBtn.classList.toggle('hidden', !isVoiceChatActive);
             muteVoiceBtn.classList.toggle('hidden', !isVoiceChatActive);
-            voiceChatStatusIcon.classList.toggle('connected', isVoiceChatActive);
-            voiceChatStatusIcon.classList.toggle('muted', isMuted);
+            voiceChatStatusIcon.classList.remove('connected', 'muted');
+            if(isVoiceChatActive) voiceChatStatusIcon.classList.add('connected');
+            if(isMuted) voiceChatStatusIcon.classList.add('muted');
             muteVoiceBtn.textContent = isMuted ? 'باصدا' : 'بی‌صدا';
         }
         
-        // MODIFIED: This function now initiates calls
+        // MODIFIED: This function now initiates calls to new peers
         function managePeerConnections(lobbyData) {
-            if (!isVoiceChatActive) return;
+            if (!isVoiceChatActive || !auth.currentUser) return;
 
             const myUid = auth.currentUser.uid;
             const voiceMembers = lobbyData.voiceChatMembers || {};
             
             // Connect to new members
             for (const peerUid in voiceMembers) {
+                // If the peer is not me and I don't have a connection to them yet...
                 if (peerUid !== myUid && !peerConnections[peerUid]) {
-                    console.log(`New peer ${peerUid} detected. Initializing connection.`);
-                    peerConnections[peerUid] = createPeerConnection(peerUid);
-                    // NEW: Proactively start the call with the new peer
-                    initiateCall(peerUid);
+                    console.log(`[Manage] New peer ${peerUid} detected. Initializing connection.`);
+                    createPeerConnection(peerUid); // This now also initiates the call
                 }
             }
             
             // Disconnect from members who left
             for (const peerUid in peerConnections) {
                 if (!voiceMembers[peerUid]) {
-                    console.log(`Peer ${peerUid} left. Closing connection.`);
+                    console.log(`[Manage] Peer ${peerUid} left. Closing connection.`);
                     if (peerConnections[peerUid]) {
                         peerConnections[peerUid].close();
                     }
@@ -2648,48 +2653,62 @@
             }
         }
         
-        // MODIFIED: Explicitly play the audio stream to avoid browser autoplay restrictions
+        // MODIFIED: This now handles the full creation and call initiation
         function createPeerConnection(peerUid) {
+            console.log(`[CreatePC] Creating peer connection for ${peerUid}`);
             const pc = new RTCPeerConnection(rtcConfig);
+            peerConnections[peerUid] = pc; // Store the connection immediately
 
             // Add local stream tracks to send to the peer
             if (localStream) {
                 localStream.getTracks().forEach(track => {
                     pc.addTrack(track, localStream);
                 });
+                console.log(`[CreatePC] Added local audio track for peer ${peerUid}.`);
             }
 
             // Handle incoming remote tracks
             pc.ontrack = event => {
-                console.log(`Received remote track from ${peerUid}`);
+                console.log(`[OnTrack] Received remote track from ${peerUid}`);
                 let audio = document.getElementById(`audio-${peerUid}`);
                 if (!audio) {
                     audio = document.createElement('audio');
                     audio.id = `audio-${peerUid}`;
                     audio.autoplay = true;
-                    // For more robust playback, you can also append it to the body or a specific container
                     remoteAudioContainer.appendChild(audio);
                 }
                 audio.srcObject = event.streams[0];
-                // NEW: Explicitly try to play the audio to bypass some browser restrictions
-                audio.play().catch(e => console.error(`Audio play failed for peer ${peerUid}:`, e));
+                // NEW (CRUCIAL): Explicitly try to play the audio to bypass browser restrictions
+                audio.play().catch(e => console.error(`[OnTrack] Audio play failed for peer ${peerUid}:`, e));
             };
 
             // Handle ICE candidates
             pc.onicecandidate = event => {
                 if (event.candidate) {
+                    // console.log(`[OnIceCandidate] Sending ICE candidate to ${peerUid}`);
                     sendSignal(peerUid, { ice: event.candidate });
                 }
             };
             
+            // Handle connection state changes for debugging
             pc.onconnectionstatechange = () => {
-                console.log(`Connection state with ${peerUid}: ${pc.connectionState}`);
-                if (pc.connectionState === 'failed' || pc.connectionState === 'disconnected' || pc.connectionState === 'closed') {
-                    // Could implement restart logic here, for now just log
-                }
+                console.log(`[ConnectionState] State with ${peerUid} is now: ${pc.connectionState}`);
+                // Optional: implement reconnection logic here for 'failed' state
             };
 
-            return pc;
+            // NEW (CRUCIAL): Proactively start the call with the new peer
+            // The `onnegotiationneeded` event fires when tracks are added, triggering the offer.
+            pc.onnegotiationneeded = async () => {
+                 try {
+                    console.log(`[OnNegotiationNeeded] Fired for peer ${peerUid}. Creating offer...`);
+                    const offer = await pc.createOffer();
+                    await pc.setLocalDescription(offer);
+                    sendSignal(peerUid, { offer: pc.localDescription });
+                    console.log(`[OnNegotiationNeeded] Sent offer to ${peerUid}`);
+                } catch (err) {
+                    console.error(`[OnNegotiationNeeded] Error for peer ${peerUid}:`, err);
+                }
+            };
         }
 
         async function sendSignal(toUid, data) {
@@ -2697,7 +2716,7 @@
             const signalRef = doc(db, `global_lobbies/${currentLobbyId}/webrtc_signals/${toUid}`);
             const payload = { ...data, from: auth.currentUser.uid, timestamp: serverTimestamp() };
             
-            // Using setDoc with merge to avoid overwriting signals in race conditions
+            // Using setDoc with merge to add to an array of signals
             await setDoc(signalRef, { signals: arrayUnion(payload) }, { merge: true });
         }
 
@@ -2711,10 +2730,11 @@
                     const data = docSnap.data();
                     const signals = data.signals || [];
                     if (signals.length > 0) {
+                        console.log(`[Listener] Received ${signals.length} signal(s). Processing...`);
                         for (const signal of signals) {
                             await handleSignal(signal);
                         }
-                        // Clear processed signals
+                        // Clear processed signals atomically
                         await updateDoc(mySignalRef, { signals: [] });
                     }
                 }
@@ -2723,57 +2743,36 @@
         
         async function handleSignal(signal) {
             const fromUid = signal.from;
-            let pc = peerConnections[fromUid]; // Use 'let' instead of 'const' to allow reassignment
+            let pc = peerConnections[fromUid];
+            
             if (!pc) {
-                console.warn(`Received signal from unknown peer: ${fromUid}. Creating connection.`);
-                pc = createPeerConnection(fromUid); // Create and assign
-                peerConnections[fromUid] = pc; // Store it
+                console.warn(`[HandleSignal] Received signal from unknown peer: ${fromUid}. Creating connection now.`);
+                createPeerConnection(fromUid); // Create a new connection if one doesn't exist
+                pc = peerConnections[fromUid]; // Get the newly created connection
             }
 
             try {
-                if (signal.offer && pc.signalingState !== 'stable') {
-                    console.log('Signaling state is not stable, handling offer might cause issues. Rolling back...');
-                    // This is a common glitch, we create a new connection and try again.
-                    await pc.setLocalDescription({ type: 'rollback' });
-                }
-
                 if (signal.offer) {
-                    console.log(`Received offer from ${fromUid}`);
+                    console.log(`[HandleSignal] Received offer from ${fromUid}.`);
+                    // Robustness: Handle potential signaling state conflicts
+                    if (pc.signalingState !== 'stable') {
+                        console.warn(`[HandleSignal] Offer received from ${fromUid} while signaling state is ${pc.signalingState}. Attempting rollback.`);
+                        await pc.setLocalDescription({ type: 'rollback' });
+                    }
                     await pc.setRemoteDescription(new RTCSessionDescription(signal.offer));
                     const answer = await pc.createAnswer();
                     await pc.setLocalDescription(answer);
                     sendSignal(fromUid, { answer: pc.localDescription });
-                    console.log(`Sent answer to ${fromUid}`);
+                    console.log(`[HandleSignal] Sent answer to ${fromUid}.`);
                 } else if (signal.answer) {
-                    console.log(`Received answer from ${fromUid}`);
+                    console.log(`[HandleSignal] Received answer from ${fromUid}.`);
                     await pc.setRemoteDescription(new RTCSessionDescription(signal.answer));
                 } else if (signal.ice) {
-                    console.log(`Received ICE candidate from ${fromUid}`);
+                    // console.log(`[HandleSignal] Received ICE candidate from ${fromUid}.`);
                     await pc.addIceCandidate(new RTCIceCandidate(signal.ice));
                 }
             } catch (error) {
-                console.error(`Error handling signal from ${fromUid}:`, error);
-            }
-        }
-        
-        // When my client wants to initiate a call with a peer.
-        async function initiateCall(peerUid) {
-            const pc = peerConnections[peerUid];
-            if (!pc) return;
-            try {
-                // Set up onnegotiationneeded to create the offer
-                pc.onnegotiationneeded = async () => {
-                    try {
-                        const offer = await pc.createOffer();
-                        await pc.setLocalDescription(offer);
-                        sendSignal(peerUid, { offer: pc.localDescription });
-                        console.log(`Sent offer to ${peerUid}`);
-                    } catch (err) {
-                        console.error('onnegotiationneeded error:', err);
-                    }
-                };
-            } catch (error) {
-                console.error(`Error initiating call for ${peerUid}:`, error);
+                console.error(`[HandleSignal] Error handling signal from ${fromUid}:`, error, signal);
             }
         }
 
