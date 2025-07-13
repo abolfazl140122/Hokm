@@ -2214,9 +2214,14 @@
                             <button id="mute-voice-btn" class="classic-btn btn-gray-classic text-sm py-2 px-4 hidden">بی‌صدا</button>
                         </div>
                         
-                        <!-- Leave Lobby Button (now only for host to close lobby outside of game) -->
-                        <button id="leave-lobby-btn" class="classic-btn btn-red-classic text-sm py-2 px-4 hidden">
+                        <!-- Leave Lobby Button for Host -->
+                        <button id="host-close-lobby-btn" class="classic-btn btn-red-classic text-sm py-2 px-4 hidden">
                             بستن لابی
+                        </button>
+                        
+                        <!-- NEW: Leave Lobby Button for Players -->
+                        <button id="player-leave-lobby-btn" class="classic-btn btn-red-classic text-sm py-2 px-4 hidden">
+                            ترک لابی
                         </button>
                     </div>
                 </div>
@@ -2423,7 +2428,8 @@
         const startGameBtn = document.getElementById('start-game-btn');
         const toggleChatLockBtn = document.getElementById('toggle-chat-lock-btn');
         const viewKickedPlayersBtn = document.getElementById('view-kicked-players-btn');
-        const leaveLobbyBtn = document.getElementById('leave-lobby-btn');
+        const hostCloseLobbyBtn = document.getElementById('host-close-lobby-btn'); // MODIFIED: Renamed for clarity
+        const playerLeaveLobbyBtn = document.getElementById('player-leave-lobby-btn'); // NEW: Player's leave button
         const lobbyChatMessages = document.getElementById('lobby-chat-messages');
         const lobbyChatForm = document.getElementById('lobby-chat-form');
         const lobbyChatInput = document.getElementById('lobby-chat-input');
@@ -2610,7 +2616,8 @@
             voiceChatStatusIcon.classList.toggle('muted', isMuted);
             muteVoiceBtn.textContent = isMuted ? 'باصدا' : 'بی‌صدا';
         }
-
+        
+        // MODIFIED: This function now initiates calls
         function managePeerConnections(lobbyData) {
             if (!isVoiceChatActive) return;
 
@@ -2622,6 +2629,8 @@
                 if (peerUid !== myUid && !peerConnections[peerUid]) {
                     console.log(`New peer ${peerUid} detected. Initializing connection.`);
                     peerConnections[peerUid] = createPeerConnection(peerUid);
+                    // NEW: Proactively start the call with the new peer
+                    initiateCall(peerUid);
                 }
             }
             
@@ -2639,6 +2648,7 @@
             }
         }
         
+        // MODIFIED: Explicitly play the audio stream to avoid browser autoplay restrictions
         function createPeerConnection(peerUid) {
             const pc = new RTCPeerConnection(rtcConfig);
 
@@ -2657,9 +2667,12 @@
                     audio = document.createElement('audio');
                     audio.id = `audio-${peerUid}`;
                     audio.autoplay = true;
+                    // For more robust playback, you can also append it to the body or a specific container
                     remoteAudioContainer.appendChild(audio);
                 }
                 audio.srcObject = event.streams[0];
+                // NEW: Explicitly try to play the audio to bypass some browser restrictions
+                audio.play().catch(e => console.error(`Audio play failed for peer ${peerUid}:`, e));
             };
 
             // Handle ICE candidates
@@ -2710,16 +2723,20 @@
         
         async function handleSignal(signal) {
             const fromUid = signal.from;
-            const pc = peerConnections[fromUid];
+            let pc = peerConnections[fromUid]; // Use 'let' instead of 'const' to allow reassignment
             if (!pc) {
                 console.warn(`Received signal from unknown peer: ${fromUid}. Creating connection.`);
-                peerConnections[fromUid] = createPeerConnection(fromUid);
-                // Re-process the signal after a short delay to allow PC setup.
-                setTimeout(() => handleSignal(signal), 200);
-                return;
+                pc = createPeerConnection(fromUid); // Create and assign
+                peerConnections[fromUid] = pc; // Store it
             }
 
             try {
+                if (signal.offer && pc.signalingState !== 'stable') {
+                    console.log('Signaling state is not stable, handling offer might cause issues. Rolling back...');
+                    // This is a common glitch, we create a new connection and try again.
+                    await pc.setLocalDescription({ type: 'rollback' });
+                }
+
                 if (signal.offer) {
                     console.log(`Received offer from ${fromUid}`);
                     await pc.setRemoteDescription(new RTCSessionDescription(signal.offer));
@@ -2744,12 +2761,19 @@
             const pc = peerConnections[peerUid];
             if (!pc) return;
             try {
-                const offer = await pc.createOffer();
-                await pc.setLocalDescription(offer);
-                sendSignal(peerUid, { offer: pc.localDescription });
-                console.log(`Sent offer to ${peerUid}`);
+                // Set up onnegotiationneeded to create the offer
+                pc.onnegotiationneeded = async () => {
+                    try {
+                        const offer = await pc.createOffer();
+                        await pc.setLocalDescription(offer);
+                        sendSignal(peerUid, { offer: pc.localDescription });
+                        console.log(`Sent offer to ${peerUid}`);
+                    } catch (err) {
+                        console.error('onnegotiationneeded error:', err);
+                    }
+                };
             } catch (error) {
-                console.error(`Error creating offer for ${peerUid}:`, error);
+                console.error(`Error initiating call for ${peerUid}:`, error);
             }
         }
 
@@ -3875,38 +3899,39 @@
         async function joinLobby(lobbyId, userId, displayName) {
             const lobbyRef = doc(db, `global_lobbies`, lobbyId);
             try {
-                const lobbySnap = await getDoc(lobbyRef);
-                if (!lobbySnap.exists()) { throw new Error("لابی یافت نشد."); }
-                
-                const lobbyData = lobbySnap.data();
-                const playersMap = lobbyData.players || {};
-                const maxPlayers = lobbyData.gameSettings?.maxPlayers || 4;
-                const kickedPlayers = lobbyData.kickedPlayers || [];
+                await runTransaction(db, async (transaction) => {
+                    const lobbySnap = await transaction.get(lobbyRef);
+                    if (!lobbySnap.exists()) { throw new Error("لابی یافت نشد."); }
+                    
+                    const lobbyData = lobbySnap.data();
+                    const playersMap = lobbyData.players || {};
+                    const maxPlayers = lobbyData.gameSettings?.maxPlayers || 4;
+                    const kickedPlayers = lobbyData.kickedPlayers || [];
 
-                if (kickedPlayers.some(p => p.uid === userId)) {
-                    throw new Error("شما از این لابی اخراج شده‌اید.");
-                }
-                if (playersMap[userId]) {
-                    currentLobbyId = lobbyId;
-                    userHasActiveLobby = true;
-                    setActiveScreen(lobbyDetailScreen);
-                    unsubscribeLobbyDetail = setupLobbyDetailListener(lobbyId);
-                    return;
-                }
-                if (Object.keys(playersMap).length >= maxPlayers) { throw new Error("لابی پر است."); }
-                
-                await updateDoc(lobbyRef, {
-                    [`players.${userId}`]: displayName
+                    if (kickedPlayers.some(p => p.uid === userId)) {
+                        throw new Error("شما از این لابی اخراج شده‌اید.");
+                    }
+                    if (playersMap[userId]) {
+                        // User is already in, no need to update, just proceed to lobby
+                        return;
+                    }
+                    if (Object.keys(playersMap).length >= maxPlayers) { throw new Error("لابی پر است."); }
+                    
+                    transaction.update(lobbyRef, {
+                        [`players.${userId}`]: displayName
+                    });
                 });
-                
-                showMessageBox(`شما به لابی "${lobbyData.name}" وارد شدید.`, "success");
-                
+
+                // Transaction successful, now navigate
+                showMessageBox(`شما به لابی وارد شدید.`, "success");
                 currentLobbyId = lobbyId;
                 userHasActiveLobby = true;
                 setActiveScreen(lobbyDetailScreen);
                 unsubscribeLobbyDetail = setupLobbyDetailListener(lobbyId);
+
             } catch (e) {
                 console.error("خطا در ورود به لابی: ", e);
+                // Throw the error again so the calling function can catch it
                 throw e;
             }
         }
@@ -3918,7 +3943,7 @@
             if (unsubscribeLobbyChat) { unsubscribeLobbyChat(); unsubscribeLobbyChat = null; }
             if (unsubscribePendingLobbyNames) { unsubscribePendingLobbyNames(); unsubscribePendingLobbyNames = null; }
             clearGameIntervals();
-            leaveVoiceChat(); // NEW: Leave voice chat when starting to listen to a new lobby
+            leaveVoiceChat(); 
             resetGameUI();
 
             const lobbyRef = doc(db, `global_lobbies`, lobbyId);
@@ -3933,7 +3958,6 @@
                 }
                 
                 const lobbyData = docSnap.data();
-                const isCurrentUserHost = auth.currentUser && lobbyData.hostId === auth.currentUser.uid;
                 const myUid = auth.currentUser.uid;
 
                 if (!lobbyData.players || !lobbyData.players[myUid]) {
@@ -3949,27 +3973,25 @@
                     }
                     return;
                 }
+
+                const isCurrentUserHost = lobbyData.hostId === myUid;
                 
-                // NEW: Voice Chat Connection Management
+                // Voice Chat Connection Management
                 if (isVoiceChatActive) {
                     managePeerConnections(lobbyData);
                 }
 
+                // Show/Hide relevant buttons
+                hostActionsContainer.style.display = isCurrentUserHost ? 'flex' : 'none';
+                hostCloseLobbyBtn.classList.toggle('hidden', !isCurrentUserHost || lobbyData.status === 'playing');
+                playerLeaveLobbyBtn.classList.toggle('hidden', isCurrentUserHost || lobbyData.status === 'playing');
+
+
                 if (lobbyData.status === 'playing') {
                     setupGameUI(lobbyId, lobbyData);
-                    hostActionsContainer.style.display = 'none';
-                    leaveLobbyBtn.classList.add('hidden');
-                    return;
+                    return; // Stop further UI updates for waiting state
                 } else {
-                    resetGameUI();
-                    if (isCurrentUserHost) {
-                        hostActionsContainer.style.display = 'flex';
-                        leaveLobbyBtn.classList.remove('hidden');
-                        leaveLobbyBtn.textContent = 'بستن لابی';
-                    } else {
-                        hostActionsContainer.style.display = 'none';
-                        leaveLobbyBtn.classList.add('hidden');
-                    }
+                    resetGameUI(); // Ensure game UI is hidden if status changes back to waiting
                 }
 
                 const playersMap = lobbyData.players || {};
@@ -4045,29 +4067,48 @@
             return unsubscribe;
         }
 
-        async function leaveLobby() {
+        async function handleHostCloseLobby() {
             if (!currentLobbyId || !auth.currentUser) return;
             const lobbyRef = doc(db, `global_lobbies`, currentLobbyId);
             const userId = auth.currentUser.uid;
             try {
                 const lobbySnap = await getDoc(lobbyRef);
-                if (!lobbySnap.exists()) {
-                    showMessageBox("لابی مورد نظر یافت نشد.", "error");
-                    currentLobbyId = null;
-                    userHasActiveLobby = false;
-                    setActiveScreen(lobbyScreen);
-                    unsubscribeLobbies = setupLobbyListener('');
-                    return;
-                }
+                if (!lobbySnap.exists()) return;
+
                 const isHost = lobbySnap.data().hostId === userId;
                 if (isHost) {
                     const confirmed = await showCustomConfirm("شما سازنده لابی هستید. خروج شما باعث بسته شدن لابی برای همه می‌شود. آیا مطمئن هستید؟", "بستن لابی");
                     if (confirmed) {
                         await deleteDoc(lobbyRef);
+                        // The onSnapshot listener will handle the redirection.
                     }
                 }
-            } catch (e) { console.error("Error leaving lobby:", e); showMessageBox("خطا در ترک لابی.", "error"); }
+            } catch (e) { 
+                console.error("Error closing lobby as host:", e); 
+                showMessageBox("خطا در بستن لابی.", "error"); 
+            }
         }
+        
+        // NEW: Function for non-host player to leave the lobby
+        async function handlePlayerLeaveLobby() {
+            if (!currentLobbyId || !auth.currentUser) return;
+            
+            const confirmed = await showCustomConfirm("آیا مطمئن هستید که می‌خواهید لابی را ترک کنید؟");
+            if (!confirmed) return;
+
+            const lobbyRef = doc(db, 'global_lobbies', currentLobbyId);
+            try {
+                await updateDoc(lobbyRef, {
+                    [`players.${auth.currentUser.uid}`]: deleteField()
+                });
+                // The onSnapshot listener will see that the player is gone and will
+                // automatically navigate back to the lobby list.
+            } catch(error) {
+                console.error("Error leaving lobby as player:", error);
+                showMessageBox("خطا در ترک لابی.", "error");
+            }
+        }
+
 
         async function kickPlayer(lobbyId, playerToKickUid, playerToKickDisplayName) {
             const lobbyRef = doc(db, `global_lobbies`, lobbyId);
@@ -4294,13 +4335,14 @@
             leaveGameFromLobbyBtn.classList.remove('hidden');
             
             hostActionsContainer.style.display = 'none';
-            leaveLobbyBtn.classList.add('hidden');
+            hostCloseLobbyBtn.classList.add('hidden');
+            playerLeaveLobbyBtn.classList.add('hidden'); // Also hide player leave button during game
             
             playerListContainer.innerHTML = ''; 
 
             gamePlayerStatus.innerHTML = '';
             if (Array.isArray(gameState.players) && lobbyData.players) {
-                gameState.players.forEach(pUid => {
+                gameState.players.                forEach(pUid => {
                     const playerPod = document.createElement('div');
                     playerPod.className = `game-player-pod flex-grow`;
                     const isAI = gameState.roles[pUid] === 'AI';
@@ -4327,6 +4369,7 @@
             const lobbyRef = doc(db, 'global_lobbies', lobbyId);
 
             if (gameState.status === 'countdown') {
+                gameCountdownOverlay.style.display = 'flex'; // Use style to override class
                 gameCountdownOverlay.classList.remove('hidden');
                 gameVotingOverlay.classList.add('hidden');
                 gameResultDisplay.classList.add('hidden');
@@ -4403,6 +4446,7 @@
 
             } else if (gameState.status === 'voting') {
                 gameCountdownOverlay.classList.add('hidden');
+                gameVotingOverlay.style.display = 'flex'; // Use style to override class
                 gameVotingOverlay.classList.remove('hidden');
                 gameResultDisplay.classList.add('hidden');
                 gameTimerDisplay.classList.add('hidden');
@@ -4415,6 +4459,7 @@
                 
             } else if (gameState.status === 'ended') {
                 gameCountdownOverlay.classList.add('hidden');
+                gameVotingOverlay.style.display = 'flex'; // Use style to override class
                 gameVotingOverlay.classList.remove('hidden');
                 gameResultDisplay.classList.remove('hidden');
                 gameTimerDisplay.classList.add('hidden');
@@ -4428,7 +4473,7 @@
 
                 winnerText.textContent = gameState.winner === 'Human' ? 'تیم انسان‌ها برنده شد!' : 'هوش مصنوعی برنده شد!';
                 winnerText.classList.toggle('text-red-500', gameState.winner === 'AI');
-                                reasonText.textContent = gameState.winReason || 'بازی به پایان رسید.';
+                reasonText.textContent = gameState.winReason || 'بازی به پایان رسید.';
             }
 
             aiScore.textContent = `AI: ${gameState.aiScore || 0}`;
@@ -4447,7 +4492,6 @@
             }
             
             votingInstructions.textContent = `برای چه کسی رای می‌دهید؟`;
-
 
             const livingPlayers = gameState.players.filter(uid => lobbyData.players && lobbyData.players[uid]);
             const aiPlayers = livingPlayers.filter(uid => gameState.roles[uid] === 'AI');
@@ -4669,7 +4713,8 @@
             }
         });
 
-        friendlyGameBtn.addEventListener('click', () => {
+        // MODIFIED: Added microphone permission check
+        friendlyGameBtn.addEventListener('click', async () => {
             if (!auth.currentUser) {
                 showMessageBox("برای مشاهده لابی‌ها، ابتدا وارد شوید.", "error"); return;
             }
@@ -4679,8 +4724,21 @@
             if ((currentUserData.coins || 0) < gameEntryCost) {
                 showMessageBox(`سکه شما برای ورود به بازی دوستانه کافی نیست. (نیاز: ${gameEntryCost} سکه، موجودی شما: ${currentUserData.coins || 0})`, "error"); return;
             }
-            setActiveScreen(lobbyScreen);
-            unsubscribeLobbies = setupLobbyListener('');
+
+            // NEW: Microphone permission check
+            try {
+                // Request a temporary stream just to get permission.
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                // Stop the tracks immediately as we don't need them yet.
+                stream.getTracks().forEach(track => track.stop());
+                
+                // If permission is granted, proceed to the lobby screen
+                setActiveScreen(lobbyScreen);
+                unsubscribeLobbies = setupLobbyListener('');
+            } catch (err) {
+                console.error("Microphone permission denied:", err);
+                showMessageBox("برای استفاده از چت صوتی، باید به میکروفون دسترسی بدهید. لطفاً دسترسی را در تنظیمات مرورگر خود فعال کرده و دوباره تلاش کنید.", "error");
+            }
         });
         
         ratedGameBtn.addEventListener('click', () => showMessageBox("بازی امتیازی به زودی!", "info"));
@@ -4823,7 +4881,9 @@
             unsubscribeLobbies = setupLobbyListener(lobbySearchInput.value.trim().toLowerCase());
         });
 
-        leaveLobbyBtn.addEventListener('click', leaveLobby);
+        // MODIFIED: Pointing to the correct handler functions for host and player
+        hostCloseLobbyBtn.addEventListener('click', handleHostCloseLobby);
+        playerLeaveLobbyBtn.addEventListener('click', handlePlayerLeaveLobby);
 
         startGameBtn.addEventListener('click', async () => {
             if (currentLobbyId && auth.currentUser) {
