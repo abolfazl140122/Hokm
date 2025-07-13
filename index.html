@@ -29,7 +29,9 @@
         .chat-message,
         .game-player-pod,
         .voting-btn,
-        .lobby-type-btn {
+        .lobby-type-btn,
+        .voice-chat-btn, /* NEW */
+        .player-list-item.is-speaking { /* NEW */
             transition: background 0.8s ease-in-out, background-color 0.8s ease-in-out,
                         color 0.8s ease-in-out, border-color 0.8s ease-in-out,
                         box-shadow 0.8s ease-in-out, transform 0.3s ease; /* Keep transform faster */
@@ -183,7 +185,7 @@
         body.theme-classic .kicked-message-modal p,
         body.theme-classic .kicked-players-list-modal p,
         body.theme-classic .enter-password-modal p {
-            color: #E0E0E0;
+            color: #E0E0E0; /* Default text color */
         }
         body.theme-classic .lobby-proposal-message.text-red-400 {
             color: #FF6347; /* Ensure good visibility for error messages too */
@@ -210,6 +212,30 @@
         body.theme-classic .player-list-item .host-label { color: #FFD700; }
         body.theme-classic .kick-player-btn { border: 1px solid #B22222; color: #B22222; }
         body.theme-classic .kick-player-btn:hover { background: #B22222; color: white; }
+        
+        /* NEW: Voice Chat Styles for Classic */
+        body.theme-classic .player-list-item.is-speaking,
+        body.theme-classic .game-player-pod.is-speaking { 
+            border-color: #00FFFF; /* Bright Cyan for speaking border */
+            box-shadow: 0 0 15px rgba(0,255,255,0.7); /* Cyan glow */
+        }
+        body.theme-classic .voice-chat-btn {
+            background: linear-gradient(145deg, #8A2BE2 0%, #6A0DAD 100%); /* Purple for voice button */
+            border: 2px solid #DAA520; /* Gold border */
+            color: #FFFFFF;
+        }
+        body.theme-classic .voice-chat-btn svg {
+            color: #FFFFFF; /* White icon */
+        }
+        body.theme-classic .voice-chat-btn:hover {
+            box-shadow: 0 12px 24px rgba(0,0,0,0.6), inset 0 0 10px rgba(255,255,255,0.2);
+        }
+        body.theme-classic .voice-chat-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
 
         body.theme-classic .lobby-chat-container {
             background-color: rgba(0,0,0,0.4);
@@ -419,6 +445,22 @@
         body.theme-cyberpunk .kick-player-btn { border: 1px solid #FF0077; color: #FF0077; }
         body.theme-cyberpunk .kick-player-btn:hover { background: #FF0077; color: white; }
 
+        /* NEW: Voice Chat Styles for Cyberpunk */
+        body.theme-cyberpunk .player-list-item.is-speaking,
+        body.theme-cyberpunk .game-player-pod.is-speaking { 
+            border-color: #39FF14; /* Neon Green for speaking border */
+            box-shadow: 0 0 15px rgba(57,255,20,0.7); /* Neon green glow */
+        }
+        body.theme-cyberpunk .voice-chat-btn {
+            background: linear-gradient(145deg, #00BFFF 0%, #008080 100%); /* Deep Sky Blue to Teal */
+            border: 2px solid #00FFFF; /* Cyan border */
+            color: #FFF;
+        }
+        body.theme-cyberpunk .voice-chat-btn svg {
+            color: #FFF; /* White icon */
+        }
+
+
         body.theme-cyberpunk .lobby-chat-container {
             background-color: rgba(0,0,0,0.6);
             border: 2px solid #FF00FF;
@@ -613,6 +655,21 @@
         body.theme-forest .player-list-item .host-label { color: #92B4A1; }
         body.theme-forest .kick-player-btn { border: 1px solid #B22222; color: #B22222; }
         body.theme-forest .kick-player-btn:hover { background: #B22222; color: white; }
+
+        /* NEW: Voice Chat Styles for Forest */
+        body.theme-forest .player-list-item.is-speaking,
+        body.theme-forest .game-player-pod.is-speaking { 
+            border-color: #2E8B57; /* Sea Green for speaking border */
+            box-shadow: 0 0 15px rgba(46,139,87,0.7); /* Sea Green glow */
+        }
+        body.theme-forest .voice-chat-btn {
+            background: linear-gradient(145deg, #6A5ACD 0%, #483D8B 100%); /* Slate Blue */
+            border: 2px solid #79A3B1; /* Muted blue-green border */
+            color: #FFF;
+        }
+        body.theme-forest .voice-chat-btn svg {
+            color: #FFF; /* White icon */
+        }
 
         body.theme-forest .lobby-chat-container {
             background-color: rgba(46,139,87,0.4);
@@ -811,6 +868,21 @@
         body.theme-ocean .kick-player-btn { border: 1px solid #D32F2F; color: #D32F2F; }
         body.theme-ocean .kick-player-btn:hover { background: #D32F2F; color: white; }
 
+        /* NEW: Voice Chat Styles for Ocean */
+        body.theme-ocean .player-list-item.is-speaking,
+        body.theme-ocean .game-player-pod.is-speaking { 
+            border-color: #4CAF50; /* Green for speaking border */
+            box-shadow: 0 0 15px rgba(76,175,80,0.7); /* Green glow */
+        }
+        body.theme-ocean .voice-chat-btn {
+            background: linear-gradient(145deg, #81D4FA 0%, #4FC3F7 100%); /* Light Blue */
+            border: 2px solid #42A5F5; /* Blue border */
+            color: #FFF;
+        }
+        body.theme-ocean .voice-chat-btn svg {
+            color: #FFF; /* White icon */
+        }
+
         body.theme-ocean .lobby-chat-container {
             background-color: rgba(66,165,245,0.4);
             border: 2px solid #42A5F5;
@@ -906,7 +978,7 @@
         body.theme-minimal .btn-green-classic { background: #28A745; } /* Standard Green */
         body.theme-minimal .btn-red-classic { background: #DC3545; } /* Standard Red */
         body.theme-minimal .btn-gray-classic { background: #6C757D; } /* Standard Gray */
-        body.theme-minimal .btn-brown-classic { background: #A0522D; /* Sienna */ }
+        body.theme-minimal .btn-brown-classic { background: #A0522D; } /* Sienna */
         body.theme-minimal .btn-gold-classic { background: #FFC107; border: none; padding: 0.4rem; border-radius: 6px; }
         body.theme-minimal .btn-gold-classic:hover { box-shadow: 0 3px 6px rgba(0,0,0,0.2); transform: translateY(-1px) scale(1.02); }
 
@@ -1001,6 +1073,25 @@
         body.theme-minimal .player-list-item .host-label { color: #007BFF; font-size: 0.7rem;}
         body.theme-minimal .kick-player-btn { border: 1px solid #DC3545; color: #DC3545; padding: 0.15rem 0.4rem; font-size: 0.7rem;}
         body.theme-minimal .kick-player-btn:hover { background: #DC3545; color: white; }
+
+        /* NEW: Voice Chat Styles for Minimal */
+        body.theme-minimal .player-list-item.is-speaking,
+        body.theme-minimal .game-player-pod.is-speaking { 
+            border-color: #28A745; /* Standard Green for speaking border */
+            box-shadow: 0 0 10px rgba(40,167,69,0.5); /* Green glow */
+        }
+        body.theme-minimal .voice-chat-btn {
+            background: #6F42C1; /* Darker Purple */
+            border: 1px solid #6F42C1;
+            color: #FFF;
+            border-radius: 8px;
+            font-weight: normal;
+            text-shadow: none;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        body.theme-minimal .voice-chat-btn svg {
+            color: #FFF; /* White icon */
+        }
 
         body.theme-minimal .profile-modal-content h2,
         body.theme-minimal .custom-confirm-modal h2,
@@ -1787,38 +1878,6 @@
             vertical-align: middle;
             margin-right: 0.25rem; /* Equivalent to mr-1 */
         }
-
-        /* NEW: Microphone Button Styles */
-        .mic-active {
-            color: #28A745; /* Green for active mic */
-        }
-        .mic-muted {
-            color: #DC3545; /* Red for muted mic */
-        }
-        .mic-disconnected {
-            color: #6C757D; /* Gray for disconnected/unavailable mic */
-        }
-
-        /* Theme-specific mic button styles */
-        body.theme-classic #mic-toggle-btn.mic-active { color: #228B22; }
-        body.theme-classic #mic-toggle-btn.mic-muted { color: #CD5C5C; }
-        body.theme-classic #mic-toggle-btn.mic-disconnected { color: #808080; }
-
-        body.theme-cyberpunk #mic-toggle-btn.mic-active { color: #39FF14; }
-        body.theme-cyberpunk #mic-toggle-btn.mic-muted { color: #FF0077; }
-        body.theme-cyberpunk #mic-toggle-btn.mic-disconnected { color: #3A3A3A; }
-
-        body.theme-forest #mic-toggle-btn.mic-active { color: #2E8B57; }
-        body.theme-forest #mic-toggle-btn.mic-muted { color: #B22222; }
-        body.theme-forest #mic-toggle-btn.mic-disconnected { color: #6C7A89; }
-
-        body.theme-ocean #mic-toggle-btn.mic-active { color: #4CAF50; }
-        body.theme-ocean #mic-toggle-btn.mic-muted { color: #FF5252; }
-        body.theme-ocean #mic-toggle-btn.mic-disconnected { color: #9E9E9E; }
-
-        body.theme-minimal #mic-toggle-btn.mic-active { color: #28A745; }
-        body.theme-minimal #mic-toggle-btn.mic-muted { color: #DC3545; }
-        body.theme-minimal #mic-toggle-btn.mic-disconnected { color: #6C757D; }
     </style>
 </head>
 <body class="theme-classic">
@@ -1976,17 +2035,6 @@
                         <path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/>
                     </svg>
                     <span>بروزرسانی</span>
-                </button>
-                <button id="mic-toggle-btn" class="icon-btn hidden" disabled>
-                    <!-- Microphone icon -->
-                    <svg id="mic-icon-on" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-mic">
-                        <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="22"/>
-                    </svg>
-                    <!-- Muted microphone icon -->
-                    <svg id="mic-icon-off" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-mic-off hidden">
-                        <line x1="2" x2="22" y1="2" y2="22"/><path d="M10 9v3a2 2 0 0 0 3.41 1.41L15 14V5a3 3 0 0 0-3-3A9 9 0 0 0 3 12v1"/><path d="M19 10v2a7 7 0 0 1-.12 1.46"/><path d="M12 19v3"/><path d="M8.34 14.66A9 9 0 0 0 12 19"/>
-                    </svg>
-                    <span id="mic-status-text">میکروفون</span>
                 </button>
                 <button id="my-lobbies-btn" class="icon-btn">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-users">
@@ -2221,6 +2269,17 @@
 
                     <!-- Action Buttons Footer -->
                     <div class="lobby-actions-footer">
+                        <!-- NEW: Voice Chat Toggle Button -->
+                        <button id="toggle-voice-chat-btn" class="classic-btn btn-purple-classic voice-chat-btn text-base sm:text-lg py-2 px-4 flex items-center justify-center whitespace-nowrap" disabled>
+                            <svg id="mic-icon-on" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-mic ml-2">
+                                <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="22"/>
+                            </svg>
+                            <svg id="mic-icon-off" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-mic-off ml-2" style="display: none;">
+                                <line x1="2" x2="22" y1="2" y2="22"/><path d="M10 9v3a2 2 0 0 0 3.41 1.41L15 14M8 20h8"/><path d="M12 2a3 3 0 0 0-3 3v3m5 0v-3a3 3 0 0 0-3-3"/><path d="M19 10v2a7 7 0 0 1-1.12 3.37M5 10v2a7 7 0 0 0 9 6.36"/>
+                            </svg>
+                            <span id="voice-chat-status">روشن کردن میکروفون</span>
+                        </button>
+
                         <div id="host-actions-container" style="display: none;">
                             <button id="start-game-btn" class="classic-btn start-game-btn" disabled>
                                 شروع بازی
@@ -2503,11 +2562,11 @@
         const cancelJoinPasswordBtn = document.getElementById('cancel-join-password-btn');
         const passwordPromptMessageBox = document.getElementById('password-prompt-message-box');
 
-        // NEW: Voice Chat DOM Elements
-        const micToggleBtn = document.getElementById('mic-toggle-btn');
+        // NEW: Voice Chat Elements
+        const toggleVoiceChatBtn = document.getElementById('toggle-voice-chat-btn');
         const micIconOn = document.getElementById('mic-icon-on');
         const micIconOff = document.getElementById('mic-icon-off');
-        const micStatusText = document.getElementById('mic-status-text');
+        const voiceChatStatus = document.getElementById('voice-chat-status');
 
         // State variables
         let authMode = 'login'; // Default mode is login
@@ -2520,6 +2579,7 @@
         let unsubscribeUserProfile = null; // NEW: Listener for real-time user profile updates
         let unsubscribePendingLobbyNames = null; // NEW: Listener for pending lobby names
         let unsubscribeGameSettings = null; // NEW: Listener for real-time game settings
+        let unsubscribeVoicePresence = null; // NEW: Listener for voice presence in lobby
         let isInitialAuthCheckComplete = false; // Flag to ensure initial loading screen transition happens only once
         let userHasActiveLobby = false; // Track if the current user has an active lobby (created or joined)
         let currentLobbyId = null; // Stores the ID of the lobby the current user is in
@@ -2528,13 +2588,9 @@
         let isRefreshing = false; // NEW: State for refresh button
         let gameEntryCost = 100; // NEW: Default game entry cost, will be fetched from Firebase
         let currentTheme = 'classic'; // NEW: To store the currently active theme
+        let mediaStream = null; // NEW: To store the microphone stream
+        let isVoiceChatActive = false; // NEW: To track if user is currently broadcasting voice presence
 
-        // NEW: Voice Chat State Variables
-        let localStream = null; // User's local microphone stream
-        let peerConnections = new Map(); // Map<UID, RTCPeerConnection>
-        let isMicMuted = false;
-        let signalingListeners = new Map(); // Map<UID, Function> to store unsubscribe functions for signaling
-        let voiceChatInitialized = false; // Flag to ensure setup runs once per lobby entry
 
         // Promise resolver for custom confirmation modal
         let resolveCustomConfirm;
@@ -2546,7 +2602,7 @@
         // NEW: Max pending proposals limit
         const MAX_PENDING_PROPOSALS = 5;
 
-        // Function to clear all game-related intervals and voice chat
+        // Function to clear all game-related intervals
         function clearGameIntervals() {
             if (gameCountdownInterval) {
                 clearInterval(gameCountdownInterval);
@@ -2556,7 +2612,6 @@
                 clearInterval(gameTimerInterval);
                 gameTimerInterval = null;
             }
-            cleanupVoiceChat(); // NEW: Also clean up voice chat
         }
 
         // Function to reset game UI elements
@@ -2584,6 +2639,15 @@
             // Ensure all overlays are hidden (explicitly display: none for immediate effect if needed)
             gameCountdownOverlay.style.display = 'none';
             gameVotingOverlay.style.display = 'none';
+
+            // NEW: Reset voice chat
+            if (isVoiceChatActive) {
+                toggleVoiceChat(); // Turn off mic and presence
+            }
+            toggleVoiceChatBtn.disabled = true; // Disable voice chat button until in a lobby
+            voiceChatStatus.textContent = "روشن کردن میکروفون";
+            micIconOn.style.display = 'block';
+            micIconOff.style.display = 'none';
         }
 
         // NEW: Theme Configurations
@@ -2888,7 +2952,8 @@
             if (unsubscribeKickedPlayers) { unsubscribeKickedPlayers(); unsubscribeKickedPlayers = null; }
             if (unsubscribeLobbyChat) { unsubscribeLobbyChat(); unsubscribeLobbyChat = null; }
             if (unsubscribePendingLobbyNames) { unsubscribePendingLobbyNames(); unsubscribePendingLobbyNames = null; }
-            clearGameIntervals(); // This will now also call cleanupVoiceChat()
+            if (unsubscribeVoicePresence) { unsubscribeVoicePresence(); unsubscribeVoicePresence = null; } // NEW: cleanup voice presence
+            clearGameIntervals();
             resetGameUI();
 
 
@@ -3085,8 +3150,9 @@
                 if (unsubscribeKickedPlayers) unsubscribeKickedPlayers();
                 if (unsubscribeLobbyChat) unsubscribeLobbyChat();
                 if (unsubscribePendingLobbyNames) unsubscribePendingLobbyNames();
+                if (unsubscribeVoicePresence) unsubscribeVoicePresence(); // NEW: cleanup voice presence
                 
-                unsubscribeUserProfile = unsubscribeLobbies = unsubscribeLobbyDetail = unsubscribeKickedPlayers = unsubscribeLobbyChat = unsubscribePendingLobbyNames = null;
+                unsubscribeUserProfile = unsubscribeLobbies = unsubscribeLobbyDetail = unsubscribeKickedPlayers = unsubscribeLobbyChat = unsubscribePendingLobbyNames = unsubscribeVoicePresence = null;
                 clearGameIntervals();
                 
                 currentUserData = null;
@@ -3397,7 +3463,7 @@
 
         async function openCreateLobbyModal(mode = 'create') {
             if (!auth.currentUser) {
-                showCreateLobbyMessageBox("ابتدا وارد حساب کاربری خود شوید.", "error");
+                showMessageBox("ابتدا وارد حساب کاربری خود شوید.", "error");
                 return;
             }
 
@@ -3503,7 +3569,7 @@
                     isChatLocked: false, // NEW: Chat is open by default
                     gameSettings: { 
                         maxPlayers: 4, 
-                        gameDurationMinutes: gameDurationMinutes // NEW
+                        gameDurationMinutes: gameDurationMinutes
                     }
                 };
         
@@ -3556,10 +3622,9 @@
             if (unsubscribeKickedPlayers) { unsubscribeKickedPlayers(); unsubscribeKickedPlayers = null; }
             if (unsubscribeLobbyChat) { unsubscribeLobbyChat(); unsubscribeLobbyChat = null; }
             if (unsubscribePendingLobbyNames) { unsubscribePendingLobbyNames(); unsubscribePendingLobbyNames = null; }
-            clearGameIntervals(); // This will now also call cleanupVoiceChat()
-            resetGameUI(); 
-            // NEW: Hide mic button when viewing lobby list
-            micToggleBtn.classList.add('hidden');
+            if (unsubscribeVoicePresence) { unsubscribeVoicePresence(); unsubscribeVoicePresence = null; } // NEW: cleanup voice presence
+            clearGameIntervals();
+            resetGameUI(); // Reset UI elements and stop mic
 
             lobbiesList.innerHTML = '<p>در حال بارگذاری لابی‌ها...</p>';
             userHasActiveLobby = false; // Reset this flag when entering lobby list view
@@ -3760,313 +3825,15 @@
             }
         }
         
-        // NEW: WebRTC Configuration
-        // Public STUN servers for NAT traversal.
-        const rtcConfig = {
-            iceServers: [
-                { urls: 'stun:stun.l.google.com:19302' },
-                { urls: 'stun:stun1.l.google.com:19302' },
-                { urls: 'stun:stun2.l.google.com:19302' },
-                { urls: 'stun:stun3.l.google.com:19302' },
-                { urls: 'stun:stun4.l.google.com:19302' },
-            ]
-            // For more complex networks (firewalls), TURN servers are needed.
-            // A basic STUN-only setup is generally sufficient for most casual uses.
-        };
-
-        /**
-         * NEW: Gets the user's microphone stream.
-         */
-        async function getLocalAudioStream() {
-            if (localStream) {
-                return localStream;
-            }
-            try {
-                const stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
-                localStream = stream;
-                console.log("دسترسی به میکروفون با موفقیت گرفته شد.");
-                return stream;
-            } catch (error) {
-                console.error("خطا در دسترسی به میکروفون:", error);
-                showMessageBox("خطا در دسترسی به میکروفون. لطفاً دسترسی را اعطا کنید.", "error");
-                micToggleBtn.classList.add('mic-disconnected');
-                micToggleBtn.disabled = true;
-                micStatusText.textContent = 'قطع شده';
-                return null;
-            }
-        }
-
-        /**
-         * NEW: Sends WebRTC signaling data to Firestore.
-         * @param {string} receiverId - The UID of the player to send the signal to.
-         * @param {string} type - 'offer', 'answer', or 'candidate'.
-         * @param {object} data - The RTCSessionDescriptionInit or RTCIceCandidateInit object.
-         */
-        async function sendWebRTCSignal(receiverId, type, data) {
-            if (!currentLobbyId || !auth.currentUser) return;
-
-            const signalData = {
-                senderId: auth.currentUser.uid,
-                receiverId: receiverId,
-                type: type,
-                data: JSON.parse(JSON.stringify(data)), // Ensure plain object for Firestore
-                timestamp: serverTimestamp()
-            };
-            try {
-                await addDoc(collection(db, `global_lobbies/${currentLobbyId}/webrtc_signals`), signalData);
-                // console.log(`سیگنال ${type} به ${receiverId} ارسال شد.`);
-            } catch (error) {
-                console.error(`خطا در ارسال سیگنال ${type} به Firestore:`, error);
-            }
-        }
-
-        /**
-         * NEW: Creates and configures an RTCPeerConnection for a given remote peer.
-         * @param {string} remoteUid - The UID of the remote peer.
-         * @returns {RTCPeerConnection} The configured PeerConnection.
-         */
-        function createPeerConnection(remoteUid) {
-            const pc = new RTCPeerConnection(rtcConfig);
-            peerConnections.set(remoteUid, pc);
-
-            // Add local audio track
-            if (localStream) {
-                localStream.getTracks().forEach(track => {
-                    if (track.kind === 'audio') {
-                        pc.addTrack(track, localStream);
-                    }
-                });
-            }
-
-            // Handle ICE candidates
-            pc.onicecandidate = (event) => {
-                if (event.candidate) {
-                    sendWebRTCSignal(remoteUid, 'candidate', event.candidate);
-                }
-            };
-
-            // Handle incoming remote audio tracks
-            pc.ontrack = (event) => {
-                if (event.track.kind === 'audio') {
-                    console.log(`دریافت آهنگ صوتی از ${remoteUid}`);
-                    const remoteAudio = new Audio();
-                    remoteAudio.srcObject = event.streams[0];
-                    remoteAudio.autoplay = true;
-                    // Note: No need to append to DOM, autoplay handles it.
-                    // This is for playback only. If you need to visualize active speaker,
-                    // you'd need more complex audio analysis here.
-                }
-            };
-
-            // Handle connection state changes (for debugging/robustness)
-            pc.onconnectionstatechange = () => {
-                console.log(`وضعیت اتصال برای ${remoteUid}: ${pc.connectionState}`);
-                if (pc.connectionState === 'disconnected' || pc.connectionState === 'failed' || pc.connectionState === 'closed') {
-                    console.warn(`Peer connection to ${remoteUid} disconnected or failed. Attempting to restart...`);
-                    // Optionally, attempt to re-initiate connection here if it's a critical peer.
-                    // For simplicity, we'll let the user re-join or rely on host.
-                }
-            };
-
-            return pc;
-        }
-
-        /**
-         * NEW: Sets up WebRTC connections with all other players in the lobby.
-         * Initiates offers to existing players, and sets up listeners for all.
-         * @param {object} lobbyData - The current lobby data.
-         */
-        async function startVoiceChat(lobbyData) {
-            if (!auth.currentUser || !localStream) {
-                console.warn("نمی‌توان چت صوتی را شروع کرد: کاربر یا استریم محلی در دسترس نیست.");
-                return;
-            }
-            if (voiceChatInitialized) {
-                console.log("چت صوتی قبلاً برای این لابی آغاز شده است.");
-                return;
-            }
-
-            voiceChatInitialized = true;
-            micToggleBtn.classList.remove('hidden');
-            micToggleBtn.disabled = false;
-            updateMicUI(); // Set initial UI state
-
-            const myUid = auth.currentUser.uid;
-            const players = lobbyData.players || {};
-            const playerUids = Object.keys(players);
-
-            // 1. Set up listeners for incoming signals from ALL other players
-            const signalsRef = collection(db, `global_lobbies/${currentLobbyId}/webrtc_signals`);
-            const qSignals = query(signalsRef, orderBy("timestamp", "asc"));
-            const unsubscribeSignals = onSnapshot(qSignals, async (snapshot) => {
-                snapshot.docChanges().forEach(async (change) => {
-                    if (change.type === "added") {
-                        const signal = change.doc.data();
-                        const signalId = change.doc.id;
-
-                        // Only process signals meant for me or general candidates
-                        if (signal.receiverId === myUid || (signal.type === 'candidate' && signal.receiverId === 'all')) {
-                            const senderUid = signal.senderId;
-
-                            // If sender is me, ignore (unless specific debug needed)
-                            if (senderUid === myUid) return;
-
-                            let pc = peerConnections.get(senderUid);
-
-                            if (!pc && signal.type === 'offer') {
-                                // If no peer connection exists for this sender and it's an offer, create one
-                                console.log(`دریافت پیشنهاد از ${senderUid}. ایجاد RTCPeerConnection.`);
-                                pc = createPeerConnection(senderUid);
-                            } else if (!pc) {
-                                console.warn(`دریافت سیگنال ${signal.type} از ${senderUid} اما RTCPeerConnection وجود ندارد. نادیده گرفته شد.`);
-                                return; // Cannot process without a PC
-                            }
-
-                            try {
-                                if (signal.type === 'offer') {
-                                    await pc.setRemoteDescription(new RTCSessionDescription(signal.data));
-                                    const answer = await pc.createAnswer();
-                                    await pc.setLocalDescription(answer);
-                                    await sendWebRTCSignal(senderUid, 'answer', answer);
-                                    console.log(`پاسخ به پیشنهاد از ${senderUid} ارسال شد.`);
-                                } else if (signal.type === 'answer') {
-                                    await pc.setRemoteDescription(new RTCSessionDescription(signal.data));
-                                    console.log(`پاسخ از ${senderUid} تنظیم شد.`);
-                                } else if (signal.type === 'candidate') {
-                                    if (pc.remoteDescription && pc.remoteDescription.type) { // Ensure remote description is set first
-                                        await pc.addIceCandidate(new RTCIceCandidate(signal.data));
-                                        // console.log(`کاندید ICE از ${senderUid} اضافه شد.`);
-                                    } else {
-                                        console.warn(`کاندید ICE از ${senderUid} نادیده گرفته شد: remoteDescription هنوز تنظیم نشده است.`);
-                                    }
-                                }
-                            } catch (e) {
-                                console.error(`خطا در پردازش سیگنال ${signal.type} از ${senderUid}:`, e);
-                            }
-                        }
-                        // After processing, delete the signal to keep Firestore clean
-                        await deleteDoc(change.doc.ref);
-                    }
-                });
-            }, (error) => {
-                console.error("خطا در گوش دادن به سیگنال‌های WebRTC:", error);
-                showMessageBox("خطا در چت صوتی: ارتباط قطع شد.", "error");
-            });
-            signalingListeners.set('main', unsubscribeSignals);
-
-
-            // 2. Initiate offers to all existing players if I'm a new participant
-            for (const uid of playerUids) {
-                if (uid !== myUid) {
-                    if (!peerConnections.has(uid)) {
-                        const pc = createPeerConnection(uid);
-                        try {
-                            const offer = await pc.createOffer();
-                            await pc.setLocalDescription(offer);
-                            await sendWebRTCSignal(uid, 'offer', offer);
-                            console.log(`پیشنهاد به ${uid} ارسال شد.`);
-                        } catch (e) {
-                            console.error(`خطا در ایجاد/ارسال پیشنهاد به ${uid}:`, e);
-                        }
-                    }
-                }
-            }
-        }
-
-        /**
-         * NEW: Cleans up all WebRTC resources and stops listening for signals.
-         */
-        function cleanupVoiceChat() {
-            if (localStream) {
-                localStream.getTracks().forEach(track => track.stop());
-                localStream = null;
-                console.log("استریم میکروفون متوقف شد.");
-            }
-
-            peerConnections.forEach((pc, uid) => {
-                console.log(`بستن PeerConnection به ${uid}`);
-                pc.close();
-            });
-            peerConnections.clear();
-
-            signalingListeners.forEach(unsubscribe => unsubscribe());
-            signalingListeners.clear();
-            
-            voiceChatInitialized = false; // Reset flag
-
-            micToggleBtn.classList.add('hidden');
-            micToggleBtn.disabled = true;
-            micToggleBtn.classList.remove('mic-active', 'mic-muted', 'mic-disconnected');
-            micIconOn.classList.remove('hidden');
-            micIconOff.classList.add('hidden');
-            micStatusText.textContent = 'میکروفون';
-            console.log("چت صوتی پاکسازی شد.");
-        }
-
-        /**
-         * NEW: Toggles microphone mute state.
-         */
-        function toggleMic() {
-            if (localStream) {
-                const audioTrack = localStream.getAudioTracks()[0];
-                if (audioTrack) {
-                    audioTrack.enabled = !audioTrack.enabled;
-                    isMicMuted = !audioTrack.enabled;
-                    updateMicUI();
-                }
-            } else {
-                showMessageBox("میکروفون در دسترس نیست.", "error");
-            }
-        }
-
-        /**
-         * NEW: Updates the microphone button UI based on mute state.
-         */
-        function updateMicUI() {
-            micToggleBtn.classList.remove('mic-active', 'mic-muted', 'mic-disconnected');
-            if (localStream) {
-                const audioTrack = localStream.getAudioTracks()[0];
-                if (audioTrack && audioTrack.enabled) {
-                    micToggleBtn.classList.add('mic-active');
-                    micIconOn.classList.remove('hidden');
-                    micIconOff.classList.add('hidden');
-                    micStatusText.textContent = 'فعال';
-                } else if (audioTrack) { // Muted but stream exists
-                    micToggleBtn.classList.add('mic-muted');
-                    micIconOn.classList.add('hidden');
-                    micIconOff.classList.remove('hidden');
-                    micStatusText.textContent = 'بی‌صدا';
-                } else { // Stream exists but no audio track (unlikely if getUserMedia succeeded)
-                    micToggleBtn.classList.add('mic-disconnected');
-                    micIconOn.classList.add('hidden');
-                    micIconOff.classList.remove('hidden');
-                    micStatusText.textContent = 'خطا';
-                }
-            } else { // No stream, likely permission denied or device not found
-                micToggleBtn.classList.add('mic-disconnected');
-                micIconOn.classList.add('hidden');
-                micIconOff.classList.remove('hidden');
-                micStatusText.textContent = 'قطع شده';
-                micToggleBtn.disabled = true;
-            }
-        }
-
         function setupLobbyDetailListener(lobbyId) {
             console.log(`Listening to lobby details for ID: ${lobbyId}`);
             if (unsubscribeLobbies) { unsubscribeLobbies(); unsubscribeLobbies = null; }
             if (unsubscribeKickedPlayers) { unsubscribeKickedPlayers(); unsubscribeKickedPlayers = null; }
             if (unsubscribeLobbyChat) { unsubscribeLobbyChat(); unsubscribeLobbyChat = null; }
             if (unsubscribePendingLobbyNames) { unsubscribePendingLobbyNames(); unsubscribePendingLobbyNames = null; }
-            clearGameIntervals(); // This will now also call cleanupVoiceChat()
-            resetGameUI();
-
-            // NEW: Get local audio stream and initialize voice chat
-            getLocalAudioStream().then(stream => {
-                if (stream) {
-                    // This listener ensures voice chat is started only when lobby data is available
-                    // and also handles game state changes.
-                }
-            });
+            if (unsubscribeVoicePresence) { unsubscribeVoicePresence(); unsubscribeVoicePresence = null; } // NEW: cleanup voice presence
+            clearGameIntervals();
+            resetGameUI(); // Reset UI elements and stop mic
 
             const lobbyRef = doc(db, `global_lobbies`, lobbyId);
             const unsubscribe = onSnapshot(lobbyRef, async (docSnap) => {
@@ -4096,13 +3863,17 @@
                     }
                     return;
                 }
+                
+                // NEW: Enable voice chat button when in a lobby
+                toggleVoiceChatBtn.disabled = false;
+                unsubscribeVoicePresence = setupVoicePresenceListener(lobbyId); // NEW: Setup voice presence listener
+
 
                 if (lobbyData.status === 'playing') {
                     setupGameUI(lobbyId, lobbyData);
                     hostActionsContainer.style.display = 'none';
                     leaveLobbyBtn.classList.add('hidden');
-                    // Voice chat starts when entering lobby detail, but ensures it's configured for game
-                    startVoiceChat(lobbyData); // Ensure voice chat is active during game
+                    return;
                 } else {
                     resetGameUI();
                     if (isCurrentUserHost) {
@@ -4113,14 +3884,7 @@
                         hostActionsContainer.style.display = 'none';
                         leaveLobbyBtn.classList.add('hidden');
                     }
-                    // Voice chat for lobby (non-game state)
-                    startVoiceChat(lobbyData); 
                 }
-                
-                // NEW: Ensure mic button is visible and enabled only in lobby detail
-                micToggleBtn.classList.remove('hidden');
-                micToggleBtn.disabled = false;
-                updateMicUI(); // Update UI state based on mic status
 
                 const playersMap = lobbyData.players || {};
                 const playerCount = Object.keys(playersMap).length;
@@ -4143,6 +3907,7 @@
                     const playerItem = document.createElement('div');
                     playerItem.className = 'player-list-item';
                     if (isHost) playerItem.classList.add('is-host');
+                    playerItem.dataset.playerUid = player.uid; // NEW: Add UID for speaking status
 
                     const kickButtonHtml = (isCurrentUserHost && !isHost) 
                         ? `<button class="kick-player-btn" data-player-uid="${player.uid}" data-player-name="${player.displayName}">اخراج</button>` 
@@ -4361,6 +4126,110 @@
                 console.warn("Could not load chat messages:", error.message);
             });
         }
+
+        // NEW: Voice Chat Presence Functions
+        async function toggleVoiceChat() {
+            if (!currentLobbyId || !auth.currentUser) {
+                showMessageBox("برای استفاده از چت صوتی، باید در یک لابی فعال باشید.", "error");
+                return;
+            }
+
+            if (!isVoiceChatActive) {
+                // Request microphone access
+                try {
+                    mediaStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                    console.log("Microphone access granted.");
+                    
+                    // Update UI
+                    micIconOn.style.display = 'none';
+                    micIconOff.style.display = 'block';
+                    voiceChatStatus.textContent = "خاموش کردن میکروفون";
+                    isVoiceChatActive = true;
+
+                    // Publish presence to Firestore
+                    const presenceRef = doc(db, `global_lobbies/${currentLobbyId}/voice_presence`, auth.currentUser.uid);
+                    await setDoc(presenceRef, {
+                        displayName: currentUserData.displayName,
+                        timestamp: serverTimestamp()
+                    });
+                    console.log("Voice presence published to Firestore.");
+
+                } catch (error) {
+                    console.error("Error accessing microphone:", error);
+                    micIconOn.style.display = 'block';
+                    micIconOff.style.display = 'none';
+                    voiceChatStatus.textContent = "اجازه دسترسی به میکروفون رد شد";
+                    isVoiceChatActive = false;
+                    if (error.name === "NotAllowedError" || error.name === "PermissionDeniedError") {
+                        showMessageBox("دسترسی به میکروفون رد شد. لطفاً در تنظیمات مرورگر اجازه دهید.", "error");
+                    } else if (error.name === "NotFoundError" || error.name === "DevicesNotFoundError") {
+                        showMessageBox("میکروفون یافت نشد.", "error");
+                    } else {
+                        showMessageBox(`خطا در دسترسی به میکروفون: ${error.message}`, "error");
+                    }
+                }
+            } else {
+                // Stop microphone stream
+                if (mediaStream) {
+                    mediaStream.getTracks().forEach(track => track.stop());
+                    mediaStream = null;
+                    console.log("Microphone stopped.");
+                }
+
+                // Remove presence from Firestore
+                const presenceRef = doc(db, `global_lobbies/${currentLobbyId}/voice_presence`, auth.currentUser.uid);
+                try {
+                    await deleteDoc(presenceRef);
+                    console.log("Voice presence removed from Firestore.");
+                } catch (error) {
+                    console.error("Error removing voice presence:", error);
+                    // Non-critical error, continue
+                }
+
+                // Update UI
+                micIconOn.style.display = 'block';
+                micIconOff.style.display = 'none';
+                voiceChatStatus.textContent = "روشن کردن میکروفون";
+                isVoiceChatActive = false;
+            }
+        }
+
+        function setupVoicePresenceListener(lobbyId) {
+            if (!lobbyId) return;
+            const presenceCollectionRef = collection(db, `global_lobbies/${lobbyId}/voice_presence`);
+            
+            return onSnapshot(presenceCollectionRef, (snapshot) => {
+                const speakingPlayers = new Set();
+                snapshot.forEach(doc => {
+                    speakingPlayers.add(doc.id); // Add UID of speaking player
+                });
+
+                // Update player list items
+                playerListContainer.querySelectorAll('.player-list-item').forEach(item => {
+                    const uid = item.dataset.playerUid;
+                    if (speakingPlayers.has(uid)) {
+                        item.classList.add('is-speaking');
+                    } else {
+                        item.classList.remove('is-speaking');
+                    }
+                });
+
+                // Update game player pods (if game is active)
+                gamePlayerStatus.querySelectorAll('.game-player-pod').forEach(pod => {
+                    // Assuming gamePlayerStatus pods also have a data-player-uid attribute
+                    const uid = pod.dataset.playerUid; 
+                     if (speakingPlayers.has(uid)) {
+                        pod.classList.add('is-speaking');
+                    } else {
+                        pod.classList.remove('is-speaking');
+                    }
+                });
+
+                console.log("Updated speaking status for players:", Array.from(speakingPlayers));
+            }, (error) => {
+                console.error("Error listening to voice presence:", error);
+            });
+        }
         
         // --- Game Logic Functions (NEW) ---
 
@@ -4437,7 +4306,7 @@
         function setupGameUI(lobbyId, lobbyData) {
             console.log(`Setting up game UI for lobby ID: ${lobbyId}`);
             clearGameIntervals();
-            resetGameUI();
+            resetGameUI(); // NEW: Ensures mic is turned off on game start/re-setup
 
             const gameState = lobbyData.gameState;
             const myUid = auth.currentUser.uid;
@@ -4457,6 +4326,7 @@
                     playerPod.className = `game-player-pod flex-grow`;
                     const isAI = gameState.roles[pUid] === 'AI';
                     playerPod.classList.add(isAI ? 'is-ai' : 'is-human');
+                    playerPod.dataset.playerUid = pUid; // NEW: Add UID for speaking status
                     if (pUid === myUid) {
                         myRole.textContent = isAI ? 'هوش مصنوعی' : 'انسان';
                         gameRoleDisplay.classList.remove('hidden');
@@ -4474,6 +4344,10 @@
                 });
             }
 
+            // NEW: Enable voice chat button when game starts (if in lobby)
+            toggleVoiceChatBtn.disabled = false;
+            if (unsubscribeVoicePresence) unsubscribeVoicePresence(); // Clean up old listener if any
+            unsubscribeVoicePresence = setupVoicePresenceListener(lobbyId); // Setup voice presence listener for game
 
             const currentTime = Date.now();
             const lobbyRef = doc(db, 'global_lobbies', lobbyId);
@@ -4505,7 +4379,7 @@
                         countdownNumber.style.animation = 'countdown-pulse 1s ease-out forwards';
                     }
 
-                    if (countdownSecs <= 0) {
+                                        if (countdownSecs <= 0) {
                         clearInterval(gameCountdownInterval);
                         gameCountdownInterval = null;
                         gameCountdownOverlay.classList.add('hidden');
@@ -4868,7 +4742,6 @@
         ratedGameBtn.addEventListener('click', () => showMessageBox("بازی امتیازی به زودی!", "info"));
 
         backToMainBtn.addEventListener('click', () => {
-            cleanupVoiceChat(); // NEW: Cleanup voice chat when leaving lobby screen
             setActiveScreen(mainScreen);
         });
 
@@ -5163,6 +5036,9 @@
             }
         });
 
+        // NEW: Voice chat button listener
+        toggleVoiceChatBtn.addEventListener('click', toggleVoiceChat);
+
         leaveGameFromLobbyBtn.addEventListener('click', async () => {
             if (!currentLobbyId || !auth.currentUser) return;
 
@@ -5224,9 +5100,6 @@
             setActiveScreen(lobbyScreen);
             unsubscribeLobbies = setupLobbyListener('');
         });
-
-        // NEW: Event listener for the microphone toggle button
-        micToggleBtn.addEventListener('click', toggleMic);
 
     </script>
 </body>
