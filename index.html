@@ -4427,7 +4427,8 @@
                 lobbyChatInput.placeholder = "بازی به پایان رسید.";
 
                 winnerText.textContent = gameState.winner === 'Human' ? 'تیم انسان‌ها برنده شد!' : 'هوش مصنوعی برنده شد!';
-                winnerText.classList.toggle('text-                reasonText.textContent = gameState.winReason || 'بازی به پایان رسید.';
+                winnerText.classList.toggle('text-red-500', gameState.winner === 'AI');
+                                reasonText.textContent = gameState.winReason || 'بازی به پایان رسید.';
             }
 
             aiScore.textContent = `AI: ${gameState.aiScore || 0}`;
