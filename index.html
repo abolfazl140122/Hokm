@@ -35,6 +35,172 @@
                         box-shadow 0.8s ease-in-out, transform 0.3s ease; /* Keep transform faster */
         }
 
+        /* ================================================= */
+        /* === START: NEW ANIMATED LOADING SCREEN STYLES === */
+        /* ================================================= */
+
+        #loading-screen {
+            background-color: #050510; /* A very dark blue, almost black */
+            overflow: hidden; /* Important for animations */
+        }
+
+        .loading-screen-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #binary-background {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            font-family: 'Share Tech Mono', monospace;
+            color: rgba(0, 255, 13, 0.2); /* Faint green */
+            font-size: 14px;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            overflow: hidden;
+            z-index: 1;
+            user-select: none;
+        }
+
+        .magnifying-glass {
+            position: absolute;
+            z-index: 3;
+            animation: magnify-roam 15s infinite alternate ease-in-out;
+        }
+
+        .glass-lens {
+            width: 180px;
+            height: 180px;
+            border-radius: 50%;
+            border: 15px solid #888;
+            background-color: rgba(255, 255, 255, 0.1);
+            box-shadow: 0 0 30px rgba(255, 255, 255, 0.5), inset 0 0 15px rgba(0, 0, 0, 0.5);
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(2px);
+            -webkit-backdrop-filter: blur(2px);
+        }
+
+        .glass-lens .icon-human,
+        .glass-lens .icon-ai {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 100px;
+            height: 100px;
+            color: #00FF85; /* Bright green scan color */
+            animation-duration: 6s;
+            animation-iteration-count: infinite;
+            animation-timing-function: ease-in-out;
+            opacity: 0;
+        }
+
+        .glass-lens .icon-human {
+            animation-name: fade-icons-A;
+        }
+
+        .glass-lens .icon-ai {
+            animation-name: fade-icons-B;
+        }
+        
+        .glass-handle {
+            width: 30px;
+            height: 100px;
+            background: linear-gradient(#666, #333);
+            position: absolute;
+            bottom: -60px;
+            right: -60px;
+            transform: rotate(-45deg);
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.7);
+        }
+
+        .loading-text-container {
+            z-index: 2;
+            text-align: center;
+        }
+
+        #loading-main-text {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 2.5rem;
+            color: #DAA520; /* Gold to match classic theme */
+            text-shadow: 0 0 10px #FFD700;
+            border-right: .15em solid #FFD700; /* Blinking cursor */
+            white-space: nowrap;
+            overflow: hidden;
+            animation:
+                typing 3s steps(30, end) infinite alternate,
+                blink-caret .75s step-end infinite;
+            margin: 0 auto;
+            letter-spacing: .15em;
+        }
+
+        #loading-sub-text {
+            font-family: 'Merriweather', serif;
+            color: #E0E0E0;
+            font-size: 1.2rem;
+            margin-top: 1rem;
+            opacity: 0;
+            animation: fade-in-slow 4s forwards;
+            animation-delay: 1s;
+        }
+        
+        /* Typing animation */
+        @keyframes typing {
+            from { width: 0 }
+            to { width: 100% }
+        }
+
+        /* Cursor blink animation */
+        @keyframes blink-caret {
+            from, to { border-color: transparent }
+            50% { border-color: #FFD700; }
+        }
+
+        /* Magnifying glass movement */
+        @keyframes magnify-roam {
+            0% { top: 20%; left: 15%; transform: rotate(0deg); }
+            25% { top: 50%; left: 70%; transform: rotate(20deg); }
+            50% { top: 60%; left: 25%; transform: rotate(-10deg); }
+            75% { top: 30%; left: 80%; transform: rotate(5deg); }
+            100% { top: 20%; left: 15%; transform: rotate(0deg); }
+        }
+
+        /* Icon cross-fade animations */
+        @keyframes fade-icons-A {
+            0%, 45% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+            50%, 100% { opacity: 0; transform: translate(-50%, -50%) scale(0.9); }
+        }
+        @keyframes fade-icons-B {
+            0%, 50% { opacity: 0; transform: translate(-50%, -50%) scale(0.9); }
+            55%, 100% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+        }
+
+        /* Subtext fade-in */
+        @keyframes fade-in-slow {
+            to { opacity: 0.8; }
+        }
+
+        /* Hide the old spinner and text as they are no longer used */
+        body .spinner, 
+        body .loading-text {
+            display: none;
+        }
+
+        /* =============================================== */
+        /* === END: NEW ANIMATED LOADING SCREEN STYLES === */
+        /* =============================================== */
+
+
         /* === THEME: CLASSIC (Existing styles moved under this class) === */
         body.theme-classic {
             font-family: 'Merriweather', serif; /* Default body font for readability */
@@ -57,16 +223,7 @@
         body.theme-classic span {
             color: #E0E0E0; /* Default text color */
         }
-
-        body.theme-classic .spinner {
-            border: 4px solid rgba(255, 255, 255, 0.3);
-            border-top: 4px solid #DAA520; /* Gold spinner */
-        }
         
-        body.theme-classic .loading-text {
-            color: #DAA520; /* Gold for loading text */
-        }
-
         body.theme-classic .classic-card {
             background: linear-gradient(145deg, #4B0000 0%, #660000 60%, #800000 100%); /* Deeper ruby red velvet effect */
             border: 4px solid #DAA520; /* Goldenrod border */
@@ -275,12 +432,17 @@
         body.theme-cyberpunk span {
             color: #00FFFF; /* Default text color */
         }
-        body.theme-cyberpunk .spinner {
-            border-top-color: #00FFFF;
-        }
-        body.theme-cyberpunk .loading-text {
-            color: #FF00FF; /* Magenta for loading text */
-        }
+        
+        /* Cyberpunk loading screen adjustments */
+        body.theme-cyberpunk #loading-screen { background-color: #0F0F1A; }
+        body.theme-cyberpunk #binary-background { color: rgba(255, 0, 255, 0.2); }
+        body.theme-cyberpunk #loading-main-text { color: #00FFFF; text-shadow: 0 0 10px #00FFFF; border-color: #00FFFF; }
+        body.theme-cyberpunk #loading-sub-text { color: #FF00FF; }
+        body.theme-cyberpunk .glass-lens { border-color: #FF00FF; box-shadow: 0 0 30px rgba(0, 255, 255, 0.5), inset 0 0 15px rgba(0, 0, 0, 0.5); }
+        body.theme-cyberpunk .glass-handle { background: linear-gradient(#3A003A, #1A001A); }
+        body.theme-cyberpunk .glass-lens .icon-human, body.theme-cyberpunk .glass-lens .icon-ai { color: #FF00FF; }
+
+
         body.theme-cyberpunk .classic-card {
             background: linear-gradient(145deg, #2A002A 0%, #4B004B 100%);
             border: 3px solid #FF00FF;
@@ -481,10 +643,7 @@
         body.theme-forest span {
             color: #D4EDDA; /* Default text color */
         }
-        body.theme-forest .spinner { border-top-color: #79A3B1; }
-        body.theme-forest .loading-text {
-            color: #92B4A1; /* Muted teal-green for loading text */
-        }
+        
         body.theme-forest .classic-card {
             background: linear-gradient(145deg, #2D4034 0%, #4D6454 100%);
             border: 4px solid #79A3B1; /* Muted blue-green */
@@ -677,10 +836,7 @@
         body.theme-ocean span {
             color: #BBDEFB; /* Default text color */
         }
-        body.theme-ocean .spinner { border-top-color: #42A5F5; }
-        body.theme-ocean .loading-text {
-            color: #64B5F6; /* Medium blue for loading text */
-        }
+        
         body.theme-ocean .classic-card {
             background: linear-gradient(145deg, #0A192F 0%, #1A2E4F 100%);
             border: 4px solid #42A5F5; /* Blue */
@@ -875,10 +1031,7 @@
         body.theme-minimal span {
             color: #333; /* Default text color, adjusted to be dark */
         }
-        body.theme-minimal .spinner { border-top-color: #007BFF; }
-        body.theme-minimal .loading-text {
-            color: #007BFF; /* Blue for loading text */
-        }
+
         body.theme-minimal .classic-card {
             background-color: #FFF;
             border: 1px solid #E0E0E0;
@@ -1717,6 +1870,12 @@
                 height: 1.2rem;
                 margin-left: 0.2rem; /* Adjusted margin */
             }
+            /* Responsive loading screen */
+            #loading-main-text { font-size: 1.8rem; }
+            #loading-sub-text { font-size: 1rem; }
+            .glass-lens { width: 140px; height: 140px; border-width: 10px; }
+            .glass-handle { width: 25px; height: 80px; bottom: -50px; right: -50px; }
+            .glass-lens .icon-human, .glass-lens .icon-ai { width: 80px; height: 80px; }
         }
         
         /* Lobby Type Toggle Styles */
@@ -1794,12 +1953,32 @@
     <div id="app" class="relative w-full h-full flex justify-center items-center">
 
         <!-- All Modals and other screens remain the same... -->
-        <!-- 1. Loading Screen -->
-        <!-- Starts visible, then hidden by JS after initial load -->
-        <div id="loading-screen" class="absolute inset-0 flex flex-col justify-center items-center bg-gray-900 z-50 page-transition-active page-transition-visible">
-            <div class="spinner mb-4"></div>
-            <p class="text-xl md:text-2xl font-semibold loading-text">در حال بارگذاری...</p>
+        <!-- 1. Loading Screen (NEW GRAPHICAL VERSION) -->
+        <div id="loading-screen" class="absolute inset-0 flex flex-col justify-center items-center z-50 page-transition-active page-transition-visible">
+            <div class="loading-screen-container">
+                <div id="binary-background"></div>
+                
+                <div class="magnifying-glass">
+                    <div class="glass-lens">
+                        <!-- Human Icon -->
+                        <svg class="icon-human" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+                        </svg>
+                        <!-- AI Icon -->
+                        <svg class="icon-ai" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                            <rect width="16" height="16" x="4" y="4" rx="2" /><rect width="6" height="6" x="9" y="9" rx="1" /><path d="M9 2v2" /><path d="M15 2v2" /><path d="M9 20v2" /><path d="M15 20v2" /><path d="M20 9h2" /><path d="M20 14h2" /><path d="M2 9h2" /><path d="M2 14h2" />
+                        </svg>
+                    </div>
+                    <div class="glass-handle"></div>
+                </div>
+
+                <div class="loading-text-container">
+                    <h1 id="loading-main-text">جستجوی بازیکنان</h1>
+                    <p id="loading-sub-text">در حال اتصال به سرور...</p>
+                </div>
+            </div>
         </div>
+
 
         <!-- 2. Authentication Screen (Login/Register) -->
         <div id="auth-screen" class="hidden absolute inset-0 flex justify-center items-center bg-gray-900 bg-opacity-90 z-40 page-transition-active page-transition-hidden">
@@ -2310,6 +2489,10 @@
         const registerToggleBtn = document.getElementById('register-toggle-btn');
         const submitAuthBtn = document.getElementById('submit-auth-btn');
         const messageBox = document.getElementById('message-box'); 
+        
+        // NEW: Loading Screen specific elements
+        const binaryBackground = document.getElementById('binary-background');
+        const loadingSubText = document.getElementById('loading-sub-text');
 
         // Main Screen UI Elements
         const menuBtn = document.getElementById('menu-btn');
@@ -2488,6 +2671,49 @@
         
         // NEW: Max pending proposals limit
         const MAX_PENDING_PROPOSALS = 5;
+
+        // ===============================================
+        // === START: NEW JS FOR ANIMATED LOADING SCREEN ===
+        // ===============================================
+
+        /**
+         * Creates a random-looking background of binary code.
+         */
+        function createBinaryBackground() {
+            if (!binaryBackground) return;
+            const screenArea = window.innerWidth * window.innerHeight;
+            const chars = Math.floor(screenArea / 150); // Adjust density
+            let binaryString = '';
+            for (let i = 0; i < chars; i++) {
+                binaryString += Math.random() > 0.5 ? '1 ' : '0 ';
+            }
+            binaryBackground.textContent = binaryString;
+        }
+
+        /**
+         * Sets a random thematic subtext for the loading screen.
+         */
+        function setRandomLoadingSubtext() {
+            if (!loadingSubText) return;
+            const subtexts = [
+                "آیا می‌توانی هوش مصنوعی را در میان انسان‌ها بیابی؟",
+                "هر پیامی می‌تواند یک سرنخ باشد...",
+                "سکوت، گاهی بلندتر از فریاد است.",
+                "در دنیای دیجیتال، به چه کسی می‌توان اعتماد کرد؟",
+                "در حال تحلیل بازیکنان...",
+                "برقراری ارتباط امن..."
+            ];
+            const randomIndex = Math.floor(Math.random() * subtexts.length);
+            loadingSubText.textContent = subtexts[randomIndex];
+        }
+
+        // Initialize the new loading screen graphics immediately.
+        createBinaryBackground();
+        setRandomLoadingSubtext();
+
+        // =============================================
+        // === END: NEW JS FOR ANIMATED LOADING SCREEN ===
+        // =============================================
 
         // Function to clear all game-related intervals
         function clearGameIntervals() {
@@ -4124,15 +4350,76 @@
 
                 let countdownSecs = Math.ceil((gameState.countdownEndTime - currentTime) / 1000);
                 countdownNumber.textContent = Math.max(0, countdownSecs);
+                countdownNumber.textContent = Math.max(0, countdownSecs);
+                // ... [تمام کد قبلی تا اینجا]
+
+        function setupGameUI(lobbyId, lobbyData) {
+            console.log(`Setting up game UI for lobby ID: ${lobbyId}`);
+            clearGameIntervals();
+            resetGameUI();
+
+            const gameState = lobbyData.gameState;
+            const myUid = auth.currentUser.uid;
+            
+            gameInfoPanel.classList.remove('hidden');
+            leaveGameFromLobbyBtn.classList.remove('hidden');
+            
+            hostActionsContainer.style.display = 'none';
+            leaveLobbyBtn.classList.add('hidden');
+            
+            playerListContainer.innerHTML = ''; 
+
+            gamePlayerStatus.innerHTML = '';
+            if (Array.isArray(gameState.players) && lobbyData.players) {
+                gameState.players.forEach(pUid => {
+                    const playerPod = document.createElement('div');
+                    playerPod.className = `game-player-pod flex-grow`;
+                    const isAI = gameState.roles[pUid] === 'AI';
+                    playerPod.classList.add(isAI ? 'is-ai' : 'is-human');
+                    if (pUid === myUid) {
+                        myRole.textContent = isAI ? 'هوش مصنوعی' : 'انسان';
+                        gameRoleDisplay.classList.remove('hidden');
+                    }
+                    
+                    const isPlayerInLobby = lobbyData.players && lobbyData.players[pUid];
+                    const playerStatusText = isPlayerInLobby ? 'آنلاین' : 'ترک کرده';
+                    
+                    playerPod.innerHTML = `
+                        <span class="player-name">${gameState.playerNames[pUid] || 'ناشناس'}</span>
+                        <span class="player-role">${isAI ? 'هوش مصنوعی' : 'انسان'}</span>
+                        <span class="player-status">${playerStatusText}</span>
+                    `;
+                    gamePlayerStatus.appendChild(playerPod);
+                });
+            }
+
+
+            const currentTime = Date.now();
+            const lobbyRef = doc(db, 'global_lobbies', lobbyId);
+
+            if (gameState.status === 'countdown') {
+                gameCountdownOverlay.style.display = 'flex'; // Use flex for centering
+                gameVotingOverlay.style.display = 'none';
+                gameResultDisplay.classList.add('hidden');
+                gameTimerDisplay.classList.add('hidden');
+                gameScoresDisplay.classList.add('hidden');
+
+                lobbyChatInput.disabled = true;
+                lobbyChatSendBtn.disabled = true;
+                lobbyChatInput.placeholder = "بازی در حال شروع است...";
+
+                let countdownSecs = Math.ceil((gameState.countdownEndTime - currentTime) / 1000);
+                countdownNumber.textContent = Math.max(0, countdownSecs);
+                // --- START: ادامه کد از اینجا ---
                 countdownNumber.style.animation = 'none';
-                countdownNumber.offsetHeight;
+                countdownNumber.offsetHeight; // Trigger reflow to restart animation
                 countdownNumber.style.animation = 'countdown-pulse 1s ease-out forwards';
 
 
                 gameCountdownInterval = setInterval(async () => {
                     countdownSecs--;
                     countdownNumber.textContent = Math.max(0, countdownSecs);
-                    if (!gameCountdownOverlay.classList.contains('hidden')) {
+                    if (gameCountdownOverlay.style.display !== 'none') {
                         countdownNumber.style.animation = 'none';
                         countdownNumber.offsetHeight;
                         countdownNumber.style.animation = 'countdown-pulse 1s ease-out forwards';
@@ -4141,7 +4428,7 @@
                     if (countdownSecs <= 0) {
                         clearInterval(gameCountdownInterval);
                         gameCountdownInterval = null;
-                        gameCountdownOverlay.classList.add('hidden');
+                        gameCountdownOverlay.style.display = 'none';
                         if (auth.currentUser && lobbyData.hostId === auth.currentUser.uid) {
                             await updateDoc(lobbyRef, {
                                 'gameState.status': 'active',
@@ -4152,8 +4439,8 @@
                 }, 1000);
 
             } else if (gameState.status === 'active' && gameState.gameStartTimestamp) {
-                gameCountdownOverlay.classList.add('hidden');
-                gameVotingOverlay.classList.add('hidden');
+                gameCountdownOverlay.style.display = 'none';
+                gameVotingOverlay.style.display = 'none';
                 gameResultDisplay.classList.add('hidden');
                 gameTimerDisplay.classList.remove('hidden');
                 gameScoresDisplay.classList.remove('hidden');
@@ -4187,8 +4474,8 @@
                 }
 
             } else if (gameState.status === 'voting') {
-                gameCountdownOverlay.classList.add('hidden');
-                gameVotingOverlay.classList.remove('hidden');
+                gameCountdownOverlay.style.display = 'none';
+                gameVotingOverlay.style.display = 'flex';
                 gameResultDisplay.classList.add('hidden');
                 gameTimerDisplay.classList.add('hidden');
                 
@@ -4199,8 +4486,8 @@
                 renderVotingOptions(lobbyId, myUid, gameState, lobbyData);
                 
             } else if (gameState.status === 'ended') {
-                gameCountdownOverlay.classList.add('hidden');
-                gameVotingOverlay.classList.remove('hidden');
+                gameCountdownOverlay.style.display = 'none';
+                gameVotingOverlay.style.display = 'flex';
                 gameResultDisplay.classList.remove('hidden');
                 gameTimerDisplay.classList.add('hidden');
                 votingOptions.classList.add('hidden');
@@ -4232,27 +4519,25 @@
                 return;
             }
 
-            const livingPlayers = gameState.players.filter(uid => lobbyData.players && lobbyData.players[uid]);
-            const aiPlayers = livingPlayers.filter(uid => gameState.roles[uid] === 'AI');
-            const humanPlayers = livingPlayers.filter(uid => gameState.roles[uid] === 'Human' && uid !== myUid);
+            // Players eligible to be voted for (everyone except the voter themselves)
+            const eligibleToVoteFor = gameState.players.filter(uid => 
+                uid !== myUid && lobbyData.players && lobbyData.players[uid]
+            );
 
-            if (aiPlayers.length > 0) {
-                const aiButton = document.createElement('button');
-                aiButton.className = 'voting-btn ai-vote';
-                aiButton.textContent = `رای به هوش مصنوعی (${gameState.playerNames[aiPlayers[0]]})`;
-                aiButton.onclick = () => castVote(lobbyId, myUid, aiPlayers[0]);
-                votingOptions.appendChild(aiButton);
-            }
-
-            humanPlayers.forEach(playerUid => {
-                const humanButton = document.createElement('button');
-                humanButton.className = 'voting-btn human-vote';
-                humanButton.textContent = `رای به انسان (${gameState.playerNames[playerUid]})`;
-                humanButton.onclick = () => castVote(lobbyId, myUid, playerUid);
-                votingOptions.appendChild(humanButton);
+            eligibleToVoteFor.forEach(playerUid => {
+                const isAI = gameState.roles[playerUid] === 'AI';
+                const button = document.createElement('button');
+                button.className = `voting-btn ${isAI ? 'ai-vote' : 'human-vote'}`;
+                button.textContent = `رای به ${gameState.playerNames[playerUid]}`;
+                button.onclick = () => castVote(lobbyId, myUid, playerUid);
+                votingOptions.appendChild(button);
             });
 
+
             votingOptions.classList.remove('hidden');
+            votingTitle.classList.remove('hidden');
+            votingInstructions.classList.remove('hidden');
+            votingInstructions.textContent = "برای چه کسی رای می‌دهید؟";
         }
 
         async function castVote(lobbyId, voterUid, votedForUid) {
@@ -4276,21 +4561,23 @@
 
                     // Update the vote
                     const newVotes = { ...gameState.votes, [voterUid]: votedForUid };
-                    transaction.update(lobbyRef, { 'gameState.votes': newVotes });
-
-                    // Check if all living human players have voted (logic only for host to resolve)
-                    // This check is duplicated client-side for UX, but primary resolution is server-side via host.
-                    const livingHumanPlayers = gameState.players.filter(uid => 
-                        gameState.roles[uid] === 'Human' && lobbyData.players && lobbyData.players[uid]
-                    );
-                    const totalVotesExpected = livingHumanPlayers.length; 
-                    const actualVotesCount = Object.keys(newVotes).length;
-
-                    if (actualVotesCount >= totalVotesExpected) {
+                    
+                    // This logic now runs for every vote, but only the host will resolve
+                    // Check if all living players have voted
+                    const livingPlayers = gameState.players.filter(uid => lobbyData.players && lobbyData.players[uid]);
+                    const allHaveVoted = livingPlayers.every(uid => newVotes[uid]);
+                    
+                    if (allHaveVoted) {
+                        // If all votes are in, Host will resolve the game
                         if (auth.currentUser && lobbyData.hostId === auth.currentUser.uid) {
-                            // If current user is host and all votes are in, resolve the game
-                            await resolveVotes(lobbyId, { ...gameState, votes: newVotes }, lobbyData);
+                           await resolveVotes(transaction, lobbyRef, { ...gameState, votes: newVotes }, lobbyData);
+                        } else {
+                            // Non-hosts just update their vote
+                           transaction.update(lobbyRef, { 'gameState.votes': newVotes });
                         }
+                    } else {
+                        // Not all votes are in yet, just update the votes map
+                        transaction.update(lobbyRef, { 'gameState.votes': newVotes });
                     }
                 });
                 showMessageBox(`رای شما ثبت شد.`, "success");
@@ -4300,57 +4587,47 @@
             }
         }
 
-        async function resolveVotes(lobbyId, gameState, lobbyData) {
-            const lobbyRef = doc(db, 'global_lobbies', lobbyId);
+        async function resolveVotes(transaction, lobbyRef, gameState, lobbyData) {
             const votes = gameState.votes || {};
-            const playerUidsInGame = gameState.players || [];
             const roles = gameState.roles || {};
-            const currentLobbyPlayers = lobbyData.players || {};
+            
+            const voteCounts = {};
+            Object.values(votes).forEach(votedFor => {
+                voteCounts[votedFor] = (voteCounts[votedFor] || 0) + 1;
+            });
 
-            // Filter players who were in the game AND are still in the lobby
-            const livingPlayersInGameAndLobby = playerUidsInGame.filter(uid => currentLobbyPlayers[uid]);
-            const livingHumanPlayers = livingPlayersInGameAndLobby.filter(uid => roles[uid] === 'Human');
-            const livingAIPlayers = livingPlayersInGameAndLobby.filter(uid => roles[uid] === 'AI');
-
-            let winner = null;
-            let winReason = '';
-
-            // Edge cases for sudden player leaves during voting
-            if (livingHumanPlayers.length === 0 && livingAIPlayers.length > 0) {
-                winner = 'AI';
-                winReason = `تمام انسان‌ها از بازی خارج شدند. هوش مصنوعی برنده است.`;
-            } else if (livingAIPlayers.length === 0 && livingHumanPlayers.length > 0) {
-                winner = 'Human';
-                winReason = `هوش مصنوعی از بازی خارج شد. انسان‌ها برنده هستند.`;
-            } else if (livingHumanPlayers.length === 0 && livingAIPlayers.length === 0) {
-                winner = 'None'; // Or draw, depending on game rules
-                winReason = `تمام بازیکنان از بازی خارج شدند.`;
-            } else if (livingPlayersInGameAndLobby.length === 2 && livingAIPlayers.length === 1 && livingHumanPlayers.length === 1) {
-                // Special case: 1 AI vs 1 Human remains after initial vote phase, AI wins (if this is Hokm-like)
-                winner = 'AI';
-                winReason = `فقط هوش مصنوعی و یک انسان باقی ماندند. هوش مصنوعی برنده است.`;
-            } else {
-                // Normal voting resolution
-                if (livingAIPlayers.length > 0) {
-                    const aiPlayerUid = livingAIPlayers[0]; // Assuming only one AI
-                    const votesForAI = Object.values(votes).filter(votedUid => votedUid === aiPlayerUid).length;
-                    
-                    // Simple majority of living human players
-                    if (votesForAI > livingHumanPlayers.length / 2) {
-                        winner = 'AI';
-                        winReason = `بیشتر بازیکنان به هوش مصنوعی رای دادند.`;
-                    } else {
-                        winner = 'Human';
-                        winReason = `بازیکنان هوش مصنوعی را تشخیص ندادند. انسان‌ها برنده شدند.`;
-                    }
-                } else {
-                    // No AI left, humans win by default
-                    winner = 'Human';
-                    winReason = `هوش مصنوعی از بازی خارج شد. انسان‌ها برنده شدند.`;
+            let maxVotes = 0;
+            let playersWithMaxVotes = [];
+            for (const player in voteCounts) {
+                if (voteCounts[player] > maxVotes) {
+                    maxVotes = voteCounts[player];
+                    playersWithMaxVotes = [player];
+                } else if (voteCounts[player] === maxVotes) {
+                    playersWithMaxVotes.push(player);
                 }
             }
             
-            await updateDoc(lobbyRef, {
+            let winner = null;
+            let winReason = '';
+
+            if (playersWithMaxVotes.length === 1) {
+                const eliminatedPlayer = playersWithMaxVotes[0];
+                const eliminatedPlayerRole = roles[eliminatedPlayer];
+
+                if (eliminatedPlayerRole === 'AI') {
+                    winner = 'Human';
+                    winReason = `هوش مصنوعی با موفقیت شناسایی و حذف شد!`;
+                } else {
+                    winner = 'AI';
+                    winReason = `یک انسان به اشتباه حذف شد! هوش مصنوعی برنده شد.`;
+                }
+            } else {
+                winner = 'AI'; // Draw results in an AI win
+                winReason = 'رای‌ها مساوی بود و هیچ‌کس حذف نشد. هوش مصنوعی برنده شد.';
+            }
+
+            // Use the transaction object to perform the update
+            transaction.update(lobbyRef, {
                 'gameState.status': 'ended',
                 'gameState.winner': winner,
                 'gameState.winReason': winReason
@@ -4588,18 +4865,6 @@
                 const newLobbyId = await createLobby(lobbyName, auth.currentUser.uid, currentUserData.displayName, lobbyType, password, gameDuration);
                 showCreateLobbyMessageBox("لابی شما با موفقیت ساخته شد!", "success");
                 
-                // ===================================================================
-                // === تغییر کلیدی: طبق درخواست شما، این بخش کامنت شد تا نام لابی ===
-                // === بعد از استفاده از لیست نام‌های تایید شده حذف نشود.          ===
-                // ===================================================================
-                /*
-                // Remove the used lobby name from the user's approved list
-                const userDocRef = doc(db, `artifacts/${appId}/users/${auth.currentUser.uid}/profile/data`);
-                await updateDoc(userDocRef, {
-                    approvedLobbyNames: arrayRemove(lobbyName)
-                });
-                */
-
                 setTimeout(() => {
                     closeCreateLobbyModal();
                     currentLobbyId = newLobbyId;
@@ -4826,14 +5091,9 @@
                         if (!currentLobbyDoc.exists()) {
                             throw new Error("Lobby not found or already closed.");
                         }
-                        const currentLobbyData = currentLobbyDoc.data();
-                        const currentPlayers = { ...currentLobbyData.players };
-                        delete currentPlayers[myUid];
+                        // Remove the player by using deleteField on the map
+                        transaction.update(lobbyRef, { [`players.${myUid}`]: deleteField() });
 
-                        transaction.update(lobbyRef, { players: currentPlayers });
-
-                        // Host (if still in game) will resolve game state based on remaining players
-                        // The onSnapshot listener will update UI for everyone
                     });
                 }
                 
@@ -4841,11 +5101,6 @@
             } catch (error) {
                 console.error("Error leaving game:", error);
                 showMessageBox("خطا در خروج از بازی: " + error.message, "error");
-            } finally {
-                // Regardless of outcome, transition user away from the game.
-                // This will be handled by the onSnapshot listener for lobbyDetailScreen
-                // if the lobby is deleted or player removed.
-                // If the transaction fails, the user remains in the lobby's state.
             }
         });
 
