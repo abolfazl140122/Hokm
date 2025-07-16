@@ -1,1 +1,348 @@
-//سلام
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>بازی متنی - ورود / ثبت نام</title>
+    <!-- Tailwind CSS CDN for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts for Classic Look & New Themes -->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Merriweather:wght@400;700&family=Share+Tech+Mono&family=Orbitron:wght@400..900&family=Inter:wght@400;700&display=swap" rel="stylesheet">
+    
+    <!-- ========================================================================= -->
+    <!-- === بخش CSS: تمام استایل‌های مورد نیاز برای این صفحه در اینجا قرار دارد === -->
+    <!-- ========================================================================= -->
+    <style>
+        /* استایل‌های عمومی */
+        html, body, #app {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            transition: background-color 0.8s ease-in-out, color 0.8s ease-in-out;
+        }
+
+        /* استایل‌های تم کلاسیک (پیش‌فرض) */
+        body.theme-classic {
+            font-family: 'Merriweather', serif;
+            background: radial-gradient(ellipse at bottom, #100C08 0%, #000000 100%);
+            color: #E0E0E0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        body.theme-classic h1,
+        body.theme-classic h2 {
+            font-family: 'Playfair Display', serif;
+            color: #FFD700;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+
+        /* استایل کارت اصلی (فرم) */
+        .classic-card {
+            background: linear-gradient(145deg, #4B0000 0%, #660000 60%, #800000 100%);
+            border: 4px solid #DAA520;
+            box-shadow: 0 15px 30px rgba(0,0,0,0.6), inset 0 0 15px rgba(255,255,255,0.1);
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            position: relative;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        .classic-card::before { /* Top left ornamental corner */
+            content: '';
+            position: absolute;
+            top: -10px;
+            left: -10px;
+            width: 30px;
+            height: 30px;
+            border-top: 5px solid #FFD700;
+            border-left: 5px solid #FFD700;
+            border-radius: 5px 0 0 0;
+            box-shadow: 0 0 10px rgba(255,215,0,0.5);
+        }
+        .classic-card::after { /* Bottom right ornamental corner */
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            right: -10px;
+            width: 30px;
+            height: 30px;
+            border-bottom: 5px solid #FFD700;
+            border-right: 5px solid #FFD700;
+            border-radius: 0 0 5px 0;
+            box-shadow: 0 0 10px rgba(255,215,0,0.5);
+        }
+
+        /* استایل دکمه‌ها */
+        .classic-btn {
+            border: 2px solid #DAA520;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.4), inset 0 0 8px rgba(255,255,255,0.1);
+            color: #FFFFFF;
+            border-radius: 15px;
+            font-weight: 700;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.6);
+            transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+            padding: 0.875rem 1.5rem;
+            font-size: 1.125rem;
+            position: relative;
+            overflow: hidden;
+        }
+        .classic-btn:hover {
+            transform: translateY(-5px) scale(1.03);
+            box-shadow: 0 12px 24px rgba(0,0,0,0.6), inset 0 0 10px rgba(255,255,255,0.2);
+        }
+        .classic-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: rgba(255,255,255,0.1);
+            transform: skewX(-30deg);
+            transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+        .classic-btn:hover::before {
+            left: 100%;
+        }
+        .classic-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-blue-classic { background: linear-gradient(145deg, #4682B4 0%, #2A52BE 100%); }
+        .btn-green-classic { background: linear-gradient(145deg, #228B22 0%, #006400 100%); }
+        .btn-purple-classic { background: linear-gradient(145deg, #8A2BE2 0%, #6A0DAD 100%); }
+
+        /* استایل فیلدهای ورودی (input) */
+        input {
+            background-color: #202020;
+            border: 2px solid #5A5A5A;
+            color: #E0E0E0;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.5);
+            padding: 0.875rem;
+            border-radius: 0.75rem;
+        }
+        input::placeholder { color: #A0A0A0; }
+        input:focus {
+            border-color: #DAA520 !important;
+            box-shadow: 0 0 0 4px rgba(218, 165, 32, 0.5) !important, inset 0 2px 4px rgba(0,0,0,0.5) !important;
+            outline: none;
+        }
+
+    </style>
+</head>
+<body class="theme-classic">
+
+    <!-- ========================================================================= -->
+    <!-- === بخش HTML: ساختار بصری صفحه ورود/ثبت‌نام === -->
+    <!-- ========================================================================= -->
+    <div id="app" class="relative w-full h-full flex justify-center items-center">
+
+        <!-- صفحه احراز هویت (ورود/ثبت نام) -->
+        <div id="auth-screen" class="absolute inset-0 flex justify-center items-center z-40">
+            <div class="classic-card p-6 sm:p-8 w-11/12 max-w-md text-center">
+                <h2 class="text-2xl sm:text-3xl font-bold mb-6">ورود / ثبت نام</h2>
+                <form id="auth-form" class="space-y-5">
+                    <div>
+                        <input type="email" id="email" placeholder="ایمیل شما" class="w-full" required>
+                    </div>
+                    <div id="display-name-field" class="hidden">
+                         <input type="text" id="display-name" placeholder="نام نمایشی (در بازی)" class="w-full">
+                    </div>
+                    <div>
+                        <input type="password" id="password" placeholder="رمز عبور (حداقل ۶ کاراکتر)" class="w-full" required>
+                    </div>
+                    <!-- دکمه‌های جابجایی بین حالت ورود و ثبت‌نام -->
+                    <div class="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4 sm:space-x-reverse mt-6">
+                        <button type="button" id="login-toggle-btn" class="w-full sm:w-1/2 classic-btn btn-blue-classic text-xl sm:text-2xl hidden">
+                            ورود
+                        </button>
+                        <button type="button" id="register-toggle-btn" class="w-full sm:w-1/2 classic-btn btn-green-classic text-xl sm:text-2xl">
+                            ثبت نام
+                        </button>
+                    </div>
+                    <!-- دکمه اصلی ارسال فرم -->
+                    <button type="submit" id="submit-auth-btn" class="w-full mt-4 classic-btn btn-purple-classic text-xl sm:text-2xl">
+                        ورود
+                    </button>
+                </form>
+                <!-- جعبه پیام برای نمایش خطاها یا موفقیت -->
+                <div id="message-box" class="mt-5 p-3.5 rounded-xl text-base text-center hidden" role="alert"></div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- ========================================================================= -->
+    <!-- === بخش JavaScript: منطق این صفحه === -->
+    <!-- ========================================================================= -->
+    
+    <!-- Firebase SDKs -->
+    <script type="module">
+        // Import the functions you need from the SDKs you need
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js"; 
+
+        // --- پیکربندی فایربیس ---
+        // این بخش را با اطلاعات پروژه فایربیس خود جایگزین کنید
+        const firebaseConfig = {
+            apiKey: "AIzaSyBpVHnjF5gdTm3vJiHEoAZCowsRkTapj_4", 
+            authDomain: "hokm-d6911.firebaseapp.com",
+            projectId: "hokm-d6911",
+            storageBucket: "hokm-d6911.appspot.com",
+            messagingSenderId: "128133280011",
+            appId: "1:128133280011:web:c9fe28f5201eef7a3a320e"
+        };
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        
+        // --- دسترسی به عناصر HTML ---
+        const authForm = document.getElementById('auth-form');
+        const emailInput = document.getElementById('email');
+        const displayNameInput = document.getElementById('display-name');
+        const displayNameField = document.getElementById('display-name-field');
+        const passwordInput = document.getElementById('password');
+        const loginToggleBtn = document.getElementById('login-toggle-btn');
+        const registerToggleBtn = document.getElementById('register-toggle-btn');
+        const submitAuthBtn = document.getElementById('submit-auth-btn');
+        const messageBox = document.getElementById('message-box'); 
+        
+        // --- متغیرهای وضعیت ---
+        let authMode = 'login'; // حالت پیش‌فرض ورود است
+
+        // --- توابع کمکی ---
+
+        // تابع برای نمایش پیام به کاربر
+        function showMessageBox(message, type = 'error') {
+            messageBox.textContent = message;
+            messageBox.className = 'mt-5 p-3.5 rounded-xl text-base text-center'; // Reset classes
+            if (type === 'error') {
+                messageBox.classList.add('bg-red-500', 'text-white');
+            } else if (type === 'success') {
+                messageBox.classList.add('bg-green-500', 'text-white');
+            }
+            messageBox.classList.remove('hidden');
+            // مخفی کردن پیام بعد از 5 ثانیه
+            setTimeout(() => {
+                messageBox.classList.add('hidden');
+            }, 5000);
+        }
+
+        // تابع برای ترجمه خطاهای فایربیس به فارسی
+        function getFirebaseErrorMessage(errorCode) {
+            const messages = {
+                'auth/invalid-email': "فرمت ایمیل نامعتبر است.",
+                'auth/user-disabled': "حساب کاربری شما غیرفعال شده است.",
+                'auth/user-not-found': "کاربری با این ایمیل یافت نشد.",
+                'auth/wrong-password': "ایمیل یا رمز عبور اشتباه است.",
+                'auth/invalid-credential': "ایمیل یا رمز عبور اشتباه است.",
+                'auth/email-already-in-use': "این ایمیل قبلاً ثبت نام شده است.",
+                'auth/weak-password': "رمز عبور باید حداقل ۶ کاراکتر باشد.",
+                'auth/network-request-failed': "مشکل در اتصال به اینترنت.",
+                'auth/too-many-requests': "تعداد تلاش‌های ناموفق بیش از حد مجاز.",
+            };
+            return messages[errorCode] || "خطایی ناشناخته رخ داده است.";
+        }
+        
+        // --- منطق اصلی صفحه ---
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            emailInput.focus();
+
+            // بررسی وضعیت کاربر: اگر کاربر از قبل لاگین کرده باشد، مستقیم به صفحه اصلی برود
+            onAuthStateChanged(auth, (user) => {
+                if (user) {
+                    console.log(`کاربر ${user.email} از قبل لاگین کرده است. در حال انتقال به صفحه اصلی...`);
+                    window.location.href = 'safe_asli.html'; // نام فایل صفحه اصلی شما
+                } else {
+                    console.log("کاربر لاگین نکرده است. فرم ورود/ثبت‌نام نمایش داده می‌شود.");
+                }
+            });
+
+            // رویداد کلیک برای دکمه "ورود"
+            loginToggleBtn.addEventListener('click', () => {
+                authMode = 'login';
+                displayNameField.classList.add('hidden');
+                submitAuthBtn.textContent = 'ورود';
+                loginToggleBtn.classList.add('hidden');
+                registerToggleBtn.classList.remove('hidden');
+                authForm.reset();
+                messageBox.classList.add('hidden');
+                emailInput.focus();
+            });
+
+            // رویداد کلیک برای دکمه "ثبت نام"
+            registerToggleBtn.addEventListener('click', () => {
+                authMode = 'register';
+                displayNameField.classList.remove('hidden');
+                submitAuthBtn.textContent = 'ثبت نام';
+                registerToggleBtn.classList.add('hidden');
+                loginToggleBtn.classList.remove('hidden');
+                authForm.reset();
+                messageBox.classList.add('hidden');
+                emailInput.focus();
+            });
+
+            // رویداد ارسال فرم
+            authForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const email = emailInput.value.trim();
+                const password = passwordInput.value.trim();
+                const displayName = displayNameInput.value.trim();
+
+                // اعتبارسنجی ورودی‌ها
+                if (!email || !password) {
+                    showMessageBox("لطفاً ایمیل و رمز عبور را وارد کنید.", 'error');
+                    return;
+                }
+                if (authMode === 'register' && !displayName) {
+                    showMessageBox("لطفاً نام نمایشی را وارد کنید.", 'error');
+                    return;
+                }
+                
+                submitAuthBtn.disabled = true;
+                submitAuthBtn.textContent = 'در حال پردازش...';
+
+                try {
+                    if (authMode === 'login') {
+                        // حالت ورود
+                        await signInWithEmailAndPassword(auth, email, password);
+                        // onAuthStateChanged بقیه کارها را انجام می‌دهد (انتقال به صفحه اصلی)
+                    } else {
+                        // حالت ثبت نام
+                        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                        
+                        // ساخت پروفایل کاربر در Firestore
+                        const userDocRef = doc(db, `artifacts/default-app-id/users/${userCredential.user.uid}/profile/data`);
+                        await setDoc(userDocRef, {
+                            displayName: displayName,
+                            email: userCredential.user.email,
+                            coins: 500, // سکه اولیه
+                            approvedLobbyNames: [],
+                            banStatus: { isBanned: false },
+                            createdAt: serverTimestamp(),
+                            theme: 'classic'
+                        });
+                        console.log("پروفایل کاربر با موفقیت در Firestore ساخته شد.");
+                        // onAuthStateChanged بقیه کارها را انجام می‌دهد (انتقال به صفحه اصلی)
+                    }
+                } catch (error) { 
+                    showMessageBox(getFirebaseErrorMessage(error.code), 'error');
+                } finally {
+                    submitAuthBtn.disabled = false;
+                    submitAuthBtn.textContent = authMode === 'login' ? 'ورود' : 'ثبت نام';
+                }
+            });
+        });
+
+    </script>
+</body>
+</html>
