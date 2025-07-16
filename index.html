@@ -2448,7 +2448,7 @@
         // Import the functions you need from the SDKs you need
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, signInWithCustomToken, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        // REVISED: Imported writeBatch for atomic updates
+        // BUG FIX: Added 'runTransaction' to the import list for robust game initialization.
         import { getFirestore, doc, setDoc, getDoc, collection, addDoc, serverTimestamp, query, where, onSnapshot, updateDoc, arrayUnion, arrayRemove, deleteDoc, getDocs, orderBy, deleteField, increment, writeBatch, runTransaction } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js"; 
 
         // Initialize Firebase
@@ -4151,7 +4151,7 @@
                     timestamp: serverTimestamp(),
                     isDeleted: false
                 });
-                lobbyChatInput.value = '';
+                                lobbyChatInput.value = '';
             } catch (error) {
                 console.error("Error sending chat message:", error);
                 showMessageBox("خطا در ارسال پیام.", "error");
@@ -4240,67 +4240,89 @@
             });
         }
         
-        // --- Game Logic Functions (NEW) ---
+        // --- Game Logic Functions (NEW & BUG-FIXED) ---
 
-        async function initializeGameInFirestore(lobbyId, lobbyData) {
-            const playerUIDs = Object.keys(lobbyData.players);
-            const playerNames = lobbyData.players;
-
-            if (playerUIDs.length !== (lobbyData.gameSettings?.maxPlayers || 4)) {
-                throw new Error(`برای شروع بازی باید ${lobbyData.gameSettings?.maxPlayers || 4} بازیکن در لابی باشند.`);
-            }
-
-            const currentEntryCost = gameEntryCost;
-            const batch = writeBatch(db);
-
-            for (const playerId of playerUIDs) {
-                const playerProfileRef = doc(db, `artifacts/${appId}/users/${playerId}/profile/data`);
-                const playerProfileSnap = await getDoc(playerProfileRef);
-                if (!playerProfileSnap.exists() || (playerProfileSnap.data().coins || 0) < currentEntryCost) {
-                    throw new Error(`بازیکن ${playerNames[playerId]} سکه کافی برای شروع بازی ندارد. (نیاز: ${currentEntryCost} سکه)`);
-                }
-                batch.update(playerProfileRef, { coins: increment(-currentEntryCost) });
-            }
-            
-            console.log(`Successfully prepared to deduct ${currentEntryCost} coins from all players.`);
-
-            const shuffledPlayers = [...playerUIDs].sort(() => Math.random() - 0.5);
-            const roles = {};
-            roles[shuffledPlayers[0]] = 'AI';
-            for (let i = 1; i < shuffledPlayers.length; i++) {
-                roles[shuffledPlayers[i]] = 'Human';
-            }
-
-            const gameDurationMinutes = lobbyData.gameSettings?.gameDurationMinutes || 5;
-            const countdownDurationSeconds = 5;
-
-            const initialGameState = {
-                players: playerUIDs,
-                playerNames: playerNames,
-                roles: roles,
-                status: 'countdown',
-                winner: null,
-                winReason: null,
-                gameStartTimestamp: null,
-                gameDurationSeconds: gameDurationMinutes * 60,
-                countdownEndTime: Date.now() + countdownDurationSeconds * 1000 + 500, // Added buffer
-                votes: {},
-                aiScore: 0,
-                humanScore: 0
-            };
-            
+        /**
+         * BUG FIX: Uses a Firestore Transaction to initialize the game.
+         * This ensures that either all operations (checking coins, deducting coins, updating lobby state)
+         * succeed together, or they all fail, preventing the bug where the game doesn't start.
+         */
+        async function initializeGameInFirestore(lobbyId) {
             const lobbyRef = doc(db, 'global_lobbies', lobbyId);
-            batch.update(lobbyRef, {
-                gameState: initialGameState,
-                status: "playing"
-            });
-
+            
             try {
-                await batch.commit();
-                console.log(`Game state initialized and coins deducted for lobby ${lobbyId}`);
+                await runTransaction(db, async (transaction) => {
+                    // 1. Read the lobby document within the transaction
+                    const lobbyDoc = await transaction.get(lobbyRef);
+                    if (!lobbyDoc.exists()) {
+                        throw new Error("لابی یافت نشد یا در حین شروع بازی بسته شده است.");
+                    }
+                    const lobbyData = lobbyDoc.data();
+                    const playerUIDs = Object.keys(lobbyData.players);
+                    const playerNames = lobbyData.players;
+
+                    if (playerUIDs.length !== (lobbyData.gameSettings?.maxPlayers || 4)) {
+                        throw new Error(`برای شروع بازی باید ${lobbyData.gameSettings?.maxPlayers || 4} بازیکن در لابی باشند.`);
+                    }
+
+                    // 2. Read all player profiles to check their coin balance
+                    const currentEntryCost = gameEntryCost;
+                    const playerProfileRefs = playerUIDs.map(playerId => doc(db, `artifacts/${appId}/users/${playerId}/profile/data`));
+                    const playerProfileDocs = await Promise.all(playerProfileRefs.map(ref => transaction.get(ref)));
+
+                    for (const playerDoc of playerProfileDocs) {
+                        if (!playerDoc.exists() || (playerDoc.data().coins || 0) < currentEntryCost) {
+                            const deficientPlayerName = playerNames[playerDoc.id] || 'یک بازیکن';
+                            throw new Error(`${deficientPlayerName} سکه کافی برای شروع بازی ندارد. (نیاز: ${currentEntryCost})`);
+                        }
+                    }
+
+                    // 3. If all checks pass, perform the writes
+                    
+                    // a. Deduct coins from each player
+                    playerProfileDocs.forEach(playerDoc => {
+                        transaction.update(playerDoc.ref, { coins: increment(-currentEntryCost) });
+                    });
+                    
+                    // b. Generate the game state
+                    const shuffledPlayers = [...playerUIDs].sort(() => Math.random() - 0.5);
+                    const roles = {};
+                    roles[shuffledPlayers[0]] = 'AI';
+                    for (let i = 1; i < shuffledPlayers.length; i++) {
+                        roles[shuffledPlayers[i]] = 'Human';
+                    }
+
+                    const gameDurationMinutes = lobbyData.gameSettings?.gameDurationMinutes || 5;
+                    const countdownDurationSeconds = 5;
+
+                    const initialGameState = {
+                        players: playerUIDs,
+                        playerNames: playerNames,
+                        roles: roles,
+                        status: 'countdown',
+                        winner: null,
+                        winReason: null,
+                        gameStartTimestamp: null,
+                        gameDurationSeconds: gameDurationMinutes * 60,
+                        countdownEndTime: Date.now() + countdownDurationSeconds * 1000 + 500, // Added buffer
+                        votes: {},
+                        aiScore: 0,
+                        humanScore: 0
+                    };
+                    
+                    // c. Update the lobby to "playing" and add the gameState
+                    transaction.update(lobbyRef, {
+                        gameState: initialGameState,
+                        status: "playing"
+                    });
+                });
+                
+                console.log(`Transaction successful: Game state initialized and coins deducted for lobby ${lobbyId}`);
             } catch (error) {
-                console.error("Error committing batch for game start:", error);
-                throw new Error("Failed to initialize game.");
+                // The transaction will automatically roll back on error.
+                // We just need to catch it and show the user.
+                console.error("Game Initialization Transaction Failed:", error);
+                throw error; // Re-throw the specific error to be displayed to the user
             }
         }
         
@@ -4833,15 +4855,15 @@
 
         startGameBtn.addEventListener('click', async () => {
             if (currentLobbyId && auth.currentUser) {
+                startGameBtn.disabled = true; // Disable button immediately
                 try {
-                    const lobbyRef = doc(db, 'global_lobbies', currentLobbyId);
-                    const lobbySnap = await getDoc(lobbyRef);
-                    if (lobbySnap.exists()) {
-                        await initializeGameInFirestore(currentLobbyId, lobbySnap.data());
-                    }
+                    await initializeGameInFirestore(currentLobbyId);
+                    // The onSnapshot listener will handle the UI transition to the game.
                 } catch (error) {
-                    console.error("Error starting game:", error);
+                    console.error("Error starting game from button click:", error);
                     showMessageBox(`خطا در شروع بازی: ${error.message}`, "error");
+                    // Re-enable the button if starting fails, so the host can try again
+                    startGameBtn.disabled = false; 
                 }
             }
         });
