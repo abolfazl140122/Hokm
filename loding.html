@@ -1,1 +1,111 @@
-//سلام
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>بازی متنی - در حال بارگذاری</title>
+    <!-- Tailwind CSS CDN for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts for Classic Look & New Themes -->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Merriweather:wght@400;700&family=Share+Tech+Mono&family=Orbitron:wght@400..900&family=Inter:wght@400;700&display=swap" rel="stylesheet">
+    
+    <!-- ========================================================================= -->
+    <!-- === بخش CSS: تمام استایل‌های مورد نیاز فقط برای این صفحه در اینجا قرار دارد === -->
+    <!-- ========================================================================= -->
+    <style>
+        /* استایل‌های عمومی برای صفحه */
+        html, body, #app {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            transition: background-color 0.8s ease-in-out, color 0.8s ease-in-out;
+        }
+
+        /* استایل‌های تم کلاسیک (پیش‌فرض) */
+        body.theme-classic {
+            font-family: 'Merriweather', serif;
+            background: radial-gradient(ellipse at bottom, #100C08 0%, #000000 100%);
+            color: #E0E0E0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        body.theme-classic h1,
+        body.theme-classic h2 {
+            font-family: 'Playfair Display', serif;
+            color: #FFD700;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+
+        /* استایل اسپینر (آیکون چرخان لودینگ) */
+        .spinner {
+            width: 56px; /* w-14 */
+            height: 56px; /* h-14 */
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        /* انیمیشن چرخش */
+        @keyframes spin {
+            from {
+                transform: rotate(0deg);
+            }
+            to {
+                transform: rotate(360deg);
+            }
+        }
+        
+        /* استایل اسپینر برای تم کلاسیک */
+        body.theme-classic .spinner {
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-top: 4px solid #DAA520; /* Gold spinner */
+        }
+        
+        /* استایل متن لودینگ برای تم کلاسیک */
+        body.theme-classic .loading-text {
+            color: #DAA520; /* Gold for loading text */
+        }
+        
+        /* در اینجا می‌توان استایل‌های دیگر تم‌ها را نیز برای همین عناصر اضافه کرد */
+        /* برای سادگی، فعلاً فقط تم کلاسیک لحاظ شده است */
+
+    </style>
+</head>
+<body class="theme-classic">
+
+    <!-- ========================================================================= -->
+    <!-- === بخش HTML: ساختار بصری صفحه لودینگ === -->
+    <!-- ========================================================================= -->
+    <div id="app" class="relative w-full h-full flex justify-center items-center">
+
+        <!-- صفحه لودینگ -->
+        <div id="loading-screen" class="absolute inset-0 flex flex-col justify-center items-center z-50">
+            <div class="spinner mb-4"></div>
+            <p class="text-xl md:text-2xl font-semibold loading-text">در حال بارگذاری...</p>
+        </div>
+
+    </div>
+
+    <!-- ========================================================================= -->
+    <!-- === بخش JavaScript: منطق این صفحه === -->
+    <!-- ========================================================================= -->
+    <script>
+        // این اسکریپت ساده، پس از چند ثانیه کاربر را به صفحه بعدی هدایت می‌کند.
+        // این کار، فرآیند بارگذاری اولیه بازی را شبیه‌سازی می‌کند.
+
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log("صفحه لودینگ نمایش داده شد. منتظر انتقال به صفحه ثبت نام...");
+
+            // پس از 3 ثانیه (3000 میلی‌ثانیه)، به صفحه ثبت نام منتقل شو.
+            // این زمان را می‌توانید کم یا زیاد کنید.
+            setTimeout(() => {
+                // نام فایل بعدی شما sabt_name.html بود.
+                window.location.href = 'sabt_name.html'; 
+            }, 3000);
+        });
+    </script>
+</body>
+</html>
