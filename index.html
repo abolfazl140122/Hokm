@@ -4764,16 +4764,22 @@
         }
 
         async function checkForAIQuestionScenario(lobbyData) {
-            const gameState = lobbyData.gameState;
-            const myUid = auth.currentUser.uid;
-            
-            if (gameState.phase === 'active' && gameState.livingPlayers.length === 2 && gameState.aiQuestion?.state === 'pending') {
-                const aiPlayer = gameState.livingPlayers.find(uid => gameState.roles[uid] === 'AI');
-                if (myUid === aiPlayer) {
-                    openAIQuestionModal();
-                }
-            }
+    // اگر gameState وجود ندارد (یعنی بازی هنوز شروع نشده)، از تابع خارج شو
+    if (!lobbyData || !lobbyData.gameState) {
+        return;
+    }
+    
+    const gameState = lobbyData.gameState;
+    const myUid = auth.currentUser.uid;
+    
+    // این بخش بدون تغییر باقی می‌ماند
+    if (gameState.phase === 'active' && gameState.livingPlayers.length === 2 && gameState.aiQuestion?.state === 'pending') {
+        const aiPlayer = gameState.livingPlayers.find(uid => gameState.roles[uid] === 'AI');
+        if (myUid === aiPlayer) {
+            openAIQuestionModal();
         }
+    }
+}
 
         // --- Event Listeners ---
         function initializeAuthScreen() {
