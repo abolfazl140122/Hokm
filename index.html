@@ -4093,6 +4093,9 @@
                     lobbyChatSendBtn.disabled = false;
                     lobbyChatInput.placeholder = "پیام خود را بنویسید...";
                 }
+                
+                // NEW: Check for 1v1 AI question scenario
+                checkForAIQuestionScenario(lobbyData);
 
             }, (error) => {
                 console.error("Lobby detail listener error:", error);
@@ -4282,73 +4285,95 @@
         
         // --- Game Logic Functions (HEAVILY REVISED) ---
 
+        /**
+         * The core function to start a game. It uses a Firestore transaction
+         * to ensure all steps (checking coins, deducting coins, updating lobby)
+         * happen atomically. This prevents partial updates and data corruption.
+         * @param {string} lobbyId - The ID of the lobby to start the game in.
+         * @param {object} lobbyData - The current data of the lobby.
+         */
         async function initializeGameInFirestore(lobbyId, lobbyData) {
-            const playerUIDs = Object.keys(lobbyData.players);
-            const playerNames = lobbyData.players;
-            const settings = lobbyData.gameSettings;
-            const maxPlayers = settings.maxPlayers;
-
-            if (playerUIDs.length !== maxPlayers) {
-                throw new Error(`برای شروع بازی باید ${maxPlayers} بازیکن در لابی باشند.`);
-            }
-
-            const currentEntryCost = gameEntryCost;
-            for (const playerId of playerUIDs) {
-                const playerProfileRef = doc(db, `artifacts/${appId}/users/${playerId}/profile/data`);
-                const playerProfileSnap = await getDoc(playerProfileRef);
-                if (!playerProfileSnap.exists() || (playerProfileSnap.data().coins || 0) < currentEntryCost) {
-                    throw new Error(`بازیکن ${playerNames[playerId]} سکه کافی برای شروع بازی ندارد.`);
-                }
-            }
-
-            const batch = writeBatch(db);
-            for (const playerId of playerUIDs) {
-                const playerProfileRef = doc(db, `artifacts/${appId}/users/${playerId}/profile/data`);
-                batch.update(playerProfileRef, { coins: increment(-currentEntryCost) });
-            }
-            await batch.commit();
-            console.log(`Successfully deducted ${currentEntryCost} coins from all players.`);
-
-            const shuffledPlayers = [...playerUIDs].sort(() => Math.random() - 0.5);
-            const roles = {};
-            roles[shuffledPlayers[0]] = 'AI'; // First player is AI
-            for (let i = 1; i < shuffledPlayers.length; i++) {
-                roles[shuffledPlayers[i]] = 'Human';
-            }
-
-            const countdownDurationSeconds = 5;
-            const initialGameState = {
-                phase: 'countdown', // New phase system: countdown, active, nomination_voting, defense, execution_voting, ended
-                turn: 1,
-                players: playerUIDs, // All original players
-                livingPlayers: playerUIDs, // Players currently in the game
-                playerNames: playerNames,
-                roles: roles,
-                killedPlayers: {}, // { uid: { role: 'Human', turn: 1 } }
-                winner: null,
-                winReason: null,
-                
-                // Timers
-                countdownEndTime: Date.now() + countdownDurationSeconds * 1000 + 500,
-                phaseEndTime: null, // Will be set at the start of each timed phase
-                
-                // Voting state
-                nominatedPlayer: null,
-                nominationVotes: {}, // { voterUid: votedForUid }
-                executionVotes: {}, // { voterUid: 'execute' | 'spare' }
-
-                // Scores
-                aiScore: 0,
-                humanScore: 0,
-                aiQuestion: null // For the 1v1 scenario
-            };
-
             const lobbyRef = doc(db, 'global_lobbies', lobbyId);
-            await updateDoc(lobbyRef, {
-                gameState: initialGameState,
-                status: "playing"
-            });
-            console.log(`Game state initialized for lobby ${lobbyId}`);
+            const playerUIDs = Object.keys(lobbyData.players);
+            
+            try {
+                await runTransaction(db, async (transaction) => {
+                    // 1. Read the lobby document within the transaction to ensure we have the latest data.
+                    const freshLobbyDoc = await transaction.get(lobbyRef);
+                    if (!freshLobbyDoc.exists()) {
+                        throw "لابی یافت نشد. ممکن است بسته شده باشد.";
+                    }
+                    const freshLobbyData = freshLobbyDoc.data();
+                    const currentPlayers = Object.keys(freshLobbyData.players);
+                    const settings = freshLobbyData.gameSettings;
+                    const maxPlayers = settings.maxPlayers;
+
+                    // 2. Validate conditions for starting the game.
+                    if (freshLobbyData.status !== 'waiting') {
+                        throw "بازی از قبل شروع شده یا تمام شده است.";
+                    }
+                    if (currentPlayers.length !== maxPlayers) {
+                        throw `برای شروع بازی باید ${maxPlayers} بازیکن در لابی باشند.`;
+                    }
+                    
+                    // 3. Read all player profiles and check their coin balance.
+                    const playerProfileRefs = currentPlayers.map(uid => doc(db, `artifacts/${appId}/users/${uid}/profile/data`));
+                    const playerDocs = await Promise.all(playerProfileRefs.map(ref => transaction.get(ref)));
+
+                    for (const playerDoc of playerDocs) {
+                        if (!playerDoc.exists() || (playerDoc.data().coins || 0) < gameEntryCost) {
+                            const deficientPlayerName = freshLobbyData.players[playerDoc.id] || `بازیکن (${playerDoc.id.substring(0,4)})`;
+                            throw `${deficientPlayerName} سکه کافی برای شروع بازی ندارد.`;
+                        }
+                    }
+
+                    // 4. If all checks pass, prepare updates.
+                    
+                    // 4a. Deduct coins from each player.
+                    playerDocs.forEach(playerDoc => {
+                        transaction.update(playerDoc.ref, { coins: increment(-gameEntryCost) });
+                    });
+
+                    // 4b. Prepare the initial game state.
+                    const shuffledPlayers = [...currentPlayers].sort(() => Math.random() - 0.5);
+                    const roles = {};
+                    roles[shuffledPlayers[0]] = 'AI';
+                    for (let i = 1; i < shuffledPlayers.length; i++) {
+                        roles[shuffledPlayers[i]] = 'Human';
+                    }
+
+                    const initialGameState = {
+                        phase: 'countdown',
+                        turn: 1,
+                        players: currentPlayers,
+                        livingPlayers: currentPlayers,
+                        playerNames: freshLobbyData.players,
+                        roles: roles,
+                        killedPlayers: {},
+                        winner: null,
+                        winReason: null,
+                        countdownEndTime: Date.now() + 5 * 1000 + 500, // 5 seconds from now + buffer
+                        phaseEndTime: null,
+                        nominatedPlayer: null,
+                        nominationVotes: {},
+                        executionVotes: {},
+                        aiScore: 0,
+                        humanScore: 0,
+                        aiQuestion: null
+                    };
+
+                    // 4c. Update the lobby document itself.
+                    transaction.update(lobbyRef, {
+                        status: "playing",
+                        gameState: initialGameState
+                    });
+                });
+                console.log(`Transaction successful: Game started for lobby ${lobbyId}`);
+            } catch (error) {
+                console.error("Transaction failed: ", error);
+                // The error message will be whatever was thrown inside the transaction.
+                throw new Error(error);
+            }
         }
         
         function setupGameUI(lobbyId, lobbyData) {
@@ -4742,7 +4767,7 @@
             const gameState = lobbyData.gameState;
             const myUid = auth.currentUser.uid;
             
-            if (gameState.livingPlayers.length === 2 && gameState.aiQuestion?.state === 'pending') {
+            if (gameState.phase === 'active' && gameState.livingPlayers.length === 2 && gameState.aiQuestion?.state === 'pending') {
                 const aiPlayer = gameState.livingPlayers.find(uid => gameState.roles[uid] === 'AI');
                 if (myUid === aiPlayer) {
                     openAIQuestionModal();
@@ -5036,15 +5061,26 @@
 
         startGameBtn.addEventListener('click', async () => {
             if (currentLobbyId && auth.currentUser) {
+                startGameBtn.disabled = true;
+                startGameBtn.textContent = 'در حال شروع...';
                 try {
                     const lobbyRef = doc(db, 'global_lobbies', currentLobbyId);
                     const lobbySnap = await getDoc(lobbyRef);
                     if (lobbySnap.exists()) {
                         await initializeGameInFirestore(currentLobbyId, lobbySnap.data());
+                        // The onSnapshot listener will handle the UI update automatically
                     }
                 } catch (error) {
                     console.error("Error starting game:", error);
                     showMessageBox(`خطا در شروع بازی: ${error.message}`, "error");
+                    // Re-enable the button on failure
+                    startGameBtn.disabled = false;
+                    const lobbySnap = await getDoc(doc(db, 'global_lobbies', currentLobbyId));
+                    if (lobbySnap.exists()) {
+                        const playerCount = Object.keys(lobbySnap.data().players || {}).length;
+                        const maxPlayers = lobbySnap.data().gameSettings?.maxPlayers || 4;
+                        startGameBtn.textContent = `شروع بازی (${playerCount}/${maxPlayers})`;
+                    }
                 }
             }
         });
