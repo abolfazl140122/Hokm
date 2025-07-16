@@ -2449,7 +2449,7 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, signInWithCustomToken, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         // REVISED: Imported writeBatch for atomic updates
-        import { getFirestore, doc, setDoc, getDoc, collection, addDoc, serverTimestamp, query, where, onSnapshot, updateDoc, arrayUnion, arrayRemove, deleteDoc, getDocs, orderBy, deleteField, increment, writeBatch } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js"; 
+        import { getFirestore, doc, setDoc, getDoc, collection, addDoc, serverTimestamp, query, where, onSnapshot, updateDoc, arrayUnion, arrayRemove, deleteDoc, getDocs, orderBy, deleteField, increment, writeBatch, runTransaction } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js"; 
 
         // Initialize Firebase
         const firebaseConfig = {
@@ -2462,8 +2462,8 @@
             measurementId: "G-LN0S9W86MK"
         };
         const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
         const db = getFirestore(app);
+        const auth = getAuth(app);
 
         // Global variables for Firebase context (as per environment instructions)
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
@@ -3392,7 +3392,7 @@
         }
 
         // NEW: Function to render the list of approved lobby names for management (deletion)
-        function renderApprovedLobbyNamesManagementList() {
+                function renderApprovedLobbyNamesManagementList() {
             if (!currentUserData || !currentUserData.approvedLobbyNames) {
                 approvedLobbyNamesManagementList.innerHTML = '<p class="text-center">هیچ نام لابی تأیید شده‌ای ندارید.</p>';
                 approvedLobbyNamesManagementArea.classList.add('hidden');
@@ -3618,7 +3618,7 @@
             setTimeout(() => {
                 createLobbyModal.classList.add('hidden');
                 createLobbyModal.classList.remove('profile-modal-leave-active');
-                                createLobbyForm.reset();
+                createLobbyForm.reset();
 
                 newLobbyPasswordField.classList.add('hidden');
                 document.querySelectorAll('.lobby-type-btn').forEach(btn => btn.classList.remove('active'));
@@ -3989,7 +3989,7 @@
                 const isChatLocked = lobbyData.isChatLocked || false;
 
                 if (unsubscribeLobbyChat) unsubscribeLobbyChat();
-                unsubscribeLobbyChat = setupLobbyChatListener(lobbyId, lobbyData.hostId);
+                unsubscribeLobbyChat = setupLobbyChatListener(lobbyId, lobbyData.hostId, lobbyData.gameState?.roles[myUid] === 'AI');
 
                 detailLobbyName.innerHTML = formatLobbyNameWithColor(lobbyData.name);
                 detailHostName.textContent = `سازنده: ${playersMap[lobbyData.hostId] || 'ناشناس'}`;
@@ -4131,12 +4131,10 @@
             });
         }
         
-        async function sendLobbyMessage(lobbyId, text) {
+        async function sendLobbyMessage(lobbyId, text, isAiPlayer) {
             if (!text.trim() || !auth.currentUser || !currentUserData) return;
             
-            const lobbyDocRef = doc(db, `global_lobbies`, lobbyId);
-            const lobbySnap = await getDoc(lobbyDocRef);
-            if (lobbySnap.exists() && lobbySnap.data().status === 'playing') {
+            if (isAiPlayer) {
                 const moderationResult = await checkMessageForLiteraryAIStyle(text);
                 if (!moderationResult.is_literary) {
                     showMessageBox(`پیام شما به دلیل لحن نامناسب ارسال نشد: ${moderationResult.reason}`, "error");
@@ -4173,9 +4171,24 @@
             }
         }
 
-        function setupLobbyChatListener(lobbyId, hostId) {
+        function setupLobbyChatListener(lobbyId, hostId, isAiPlayer = false) {
             const messagesRef = collection(db, `global_lobbies/${lobbyId}/messages`);
             const q = query(messagesRef, orderBy("timestamp", "asc"));
+
+            lobbyChatForm.onsubmit = (e) => {
+                e.preventDefault();
+                sendLobbyMessage(lobbyId, lobbyChatInput.value, isAiPlayer);
+            };
+
+            lobbyChatMessages.onclick = (e) => {
+                const deleteButton = e.target.closest('.delete-message-btn');
+                if (deleteButton) {
+                    const messageId = deleteButton.dataset.messageId;
+                    if (currentLobbyId && messageId) {
+                        deleteLobbyMessage(currentLobbyId, messageId);
+                    }
+                }
+            };
 
             return onSnapshot(q, (snapshot) => {
                 const wasScrolledToBottom = lobbyChatMessages.scrollTop + lobbyChatMessages.clientHeight >= lobbyChatMessages.scrollHeight - 20;
@@ -4233,11 +4246,12 @@
             const playerUIDs = Object.keys(lobbyData.players);
             const playerNames = lobbyData.players;
 
-            if (playerUIDs.length !== 4) {
-                throw new Error("برای شروع بازی باید 4 بازیکن در لابی باشند.");
+            if (playerUIDs.length !== (lobbyData.gameSettings?.maxPlayers || 4)) {
+                throw new Error(`برای شروع بازی باید ${lobbyData.gameSettings?.maxPlayers || 4} بازیکن در لابی باشند.`);
             }
 
             const currentEntryCost = gameEntryCost;
+            const batch = writeBatch(db);
 
             for (const playerId of playerUIDs) {
                 const playerProfileRef = doc(db, `artifacts/${appId}/users/${playerId}/profile/data`);
@@ -4245,20 +4259,10 @@
                 if (!playerProfileSnap.exists() || (playerProfileSnap.data().coins || 0) < currentEntryCost) {
                     throw new Error(`بازیکن ${playerNames[playerId]} سکه کافی برای شروع بازی ندارد. (نیاز: ${currentEntryCost} سکه)`);
                 }
-            }
-
-            const batch = writeBatch(db);
-            for (const playerId of playerUIDs) {
-                const playerProfileRef = doc(db, `artifacts/${appId}/users/${playerId}/profile/data`);
                 batch.update(playerProfileRef, { coins: increment(-currentEntryCost) });
             }
-            await batch.commit();
-            console.log(`Successfully deducted ${currentEntryCost} coins from all players.`);
-
-            if (currentUserData && playerUIDs.includes(currentUserData.uid)) {
-                currentUserData.coins -= currentEntryCost;
-                updateUserCoinsDisplay();
-            }
+            
+            console.log(`Successfully prepared to deduct ${currentEntryCost} coins from all players.`);
 
             const shuffledPlayers = [...playerUIDs].sort(() => Math.random() - 0.5);
             const roles = {};
@@ -4279,40 +4283,36 @@
                 winReason: null,
                 gameStartTimestamp: null,
                 gameDurationSeconds: gameDurationMinutes * 60,
-                countdownEndTime: Date.now() + countdownDurationSeconds * 1000 + 500,
+                countdownEndTime: Date.now() + countdownDurationSeconds * 1000 + 500, // Added buffer
                 votes: {},
                 aiScore: 0,
                 humanScore: 0
             };
-
+            
             const lobbyRef = doc(db, 'global_lobbies', lobbyId);
+            batch.update(lobbyRef, {
+                gameState: initialGameState,
+                status: "playing"
+            });
+
             try {
-                await updateDoc(lobbyRef, {
-                    gameState: initialGameState,
-                    status: "playing"
-                });
-                console.log(`Game state initialized for lobby ${lobbyId}`);
+                await batch.commit();
+                console.log(`Game state initialized and coins deducted for lobby ${lobbyId}`);
             } catch (error) {
-                console.error("Error initializing game state:", error);
-                await updateDoc(lobbyRef, { status: "waiting" });
+                console.error("Error committing batch for game start:", error);
                 throw new Error("Failed to initialize game.");
             }
         }
         
         function setupGameUI(lobbyId, lobbyData) {
-            console.log(`Setting up game UI for lobby ID: ${lobbyId}`);
-            clearGameIntervals();
-            resetGameUI();
-
+            console.log(`Setting up game UI for lobby ID: ${lobbyId}, status: ${lobbyData.gameState.status}`);
             const gameState = lobbyData.gameState;
             const myUid = auth.currentUser.uid;
             
+            clearGameIntervals(); 
+            
             gameInfoPanel.classList.remove('hidden');
             leaveGameFromLobbyBtn.classList.remove('hidden');
-            
-            hostActionsContainer.style.display = 'none';
-            leaveLobbyBtn.classList.add('hidden');
-            
             playerListContainer.innerHTML = ''; 
 
             gamePlayerStatus.innerHTML = '';
@@ -4321,24 +4321,29 @@
                     const playerPod = document.createElement('div');
                     playerPod.className = `game-player-pod flex-grow`;
                     const isAI = gameState.roles[pUid] === 'AI';
-                    playerPod.classList.add(isAI ? 'is-ai' : 'is-human');
+                    
+                    const isPlayerInLobby = lobbyData.players && lobbyData.players[pUid];
+                    const playerStatusText = isPlayerInLobby ? 'آنلاین' : 'ترک کرده';
+
+                    let roleText = 'درحال تعیین...';
+                    if (gameState.status === 'ended' || pUid === myUid) {
+                        roleText = isAI ? 'هوش مصنوعی' : 'انسان';
+                    } else {
+                        roleText = 'نامشخص';
+                    }
                     if (pUid === myUid) {
                         myRole.textContent = isAI ? 'هوش مصنوعی' : 'انسان';
                         gameRoleDisplay.classList.remove('hidden');
                     }
                     
-                    const isPlayerInLobby = lobbyData.players && lobbyData.players[pUid];
-                    const playerStatusText = isPlayerInLobby ? 'آنلاین' : 'ترک کرده';
-                    
                     playerPod.innerHTML = `
                         <span class="player-name">${gameState.playerNames[pUid] || 'ناشناس'}</span>
-                        <span class="player-role">${isAI ? 'هوش مصنوعی' : 'انسان'}</span>
+                        <span class="player-role">${roleText}</span>
                         <span class="player-status">${playerStatusText}</span>
                     `;
                     gamePlayerStatus.appendChild(playerPod);
                 });
             }
-
 
             const currentTime = Date.now();
             const lobbyRef = doc(db, 'global_lobbies', lobbyId);
@@ -4346,43 +4351,27 @@
             if (gameState.status === 'countdown') {
                 gameCountdownOverlay.style.display = 'flex';
                 gameVotingOverlay.style.display = 'none';
-                gameResultDisplay.classList.add('hidden');
                 gameTimerDisplay.classList.add('hidden');
-                gameScoresDisplay.classList.add('hidden');
-
+                
                 lobbyChatInput.disabled = true;
-                lobbyChatSendBtn.disabled = true;
                 lobbyChatInput.placeholder = "بازی در حال شروع است...";
 
-                let countdownSecs = Math.ceil((gameState.countdownEndTime - currentTime) / 1000);
-                countdownNumber.textContent = Math.max(0, countdownSecs);
-                countdownNumber.style.animation = 'none';
-                countdownNumber.offsetHeight; // Trigger reflow to restart animation
-                countdownNumber.style.animation = 'countdown-pulse 1s ease-out forwards';
-
-
                 gameCountdownInterval = setInterval(async () => {
-                    countdownSecs--;
+                    let countdownSecs = Math.ceil((gameState.countdownEndTime - Date.now()) / 1000);
                     countdownNumber.textContent = Math.max(0, countdownSecs);
-                    if (gameCountdownOverlay.style.display !== 'none') {
-                        countdownNumber.style.animation = 'none';
-                        countdownNumber.offsetHeight;
-                        countdownNumber.style.animation = 'countdown-pulse 1s ease-out forwards';
-                    }
+                    countdownNumber.style.animation = 'none';
+                    void countdownNumber.offsetWidth; 
+                    countdownNumber.style.animation = 'countdown-pulse 1s ease-out forwards';
 
                     if (countdownSecs <= 0) {
                         clearInterval(gameCountdownInterval);
-                        gameCountdownInterval = null;
-                        gameCountdownOverlay.style.display = 'none';
                         if (auth.currentUser && lobbyData.hostId === auth.currentUser.uid) {
                             try {
                                 await updateDoc(lobbyRef, {
                                     'gameState.status': 'active',
                                     'gameState.gameStartTimestamp': serverTimestamp()
                                 });
-                            } catch (error) {
-                                console.error("Error updating game state to active:", error);
-                            }
+                            } catch (error) { console.error("Error updating game state to active:", error); }
                         }
                     }
                 }, 1000);
@@ -4390,52 +4379,40 @@
             } else if (gameState.status === 'active' && gameState.gameStartTimestamp) {
                 gameCountdownOverlay.style.display = 'none';
                 gameVotingOverlay.style.display = 'none';
-                gameResultDisplay.classList.add('hidden');
                 gameTimerDisplay.classList.remove('hidden');
-                gameScoresDisplay.classList.remove('hidden');
-
+                
                 lobbyChatInput.disabled = false;
-                lobbyChatSendBtn.disabled = false;
                 lobbyChatInput.placeholder = "پیام خود را بنویسید...";
 
-                if (!gameTimerInterval) {
-                    gameTimerInterval = setInterval(async () => {
-                        const startMillis = gameState.gameStartTimestamp ? gameState.gameStartTimestamp.toMillis() : Date.now();
-                        const elapsedMs = Date.now() - startMillis;
-                        const remainingMs = gameState.gameDurationSeconds * 1000 - elapsedMs;
+                gameTimerInterval = setInterval(async () => {
+                    const startMillis = gameState.gameStartTimestamp.toMillis();
+                    const elapsedMs = Date.now() - startMillis;
+                    const remainingMs = gameState.gameDurationSeconds * 1000 - elapsedMs;
 
-                        if (remainingMs <= 0) {
-                            clearInterval(gameTimerInterval);
-                            gameTimerInterval = null;
-                            gameTimerDisplay.textContent = "00:00";
-                            if (auth.currentUser && lobbyData.hostId === auth.currentUser.uid) {
-                                try {
-                                    await updateDoc(lobbyRef, { 'gameState.status': 'voting' });
-                                } catch(error) {
-                                    console.error("Error updating game state to voting:", error);
-                                }
-                            }
-                            return;
+                    if (remainingMs <= 0) {
+                        clearInterval(gameTimerInterval);
+                        gameTimerDisplay.textContent = "00:00";
+                        if (auth.currentUser && lobbyData.hostId === auth.currentUser.uid) {
+                            try { await updateDoc(lobbyRef, { 'gameState.status': 'voting' }); } 
+                            catch(error) { console.error("Error updating game state to voting:", error); }
                         }
+                        return;
+                    }
 
-                        const remainingSeconds = Math.max(0, Math.floor(remainingMs / 1000));
-                        const minutes = Math.floor(remainingSeconds / 60);
-                        const seconds = remainingSeconds % 60;
-                        gameTimerDisplay.textContent = 
-                            `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
-                    }, 1000);
-                }
+                    const remainingSeconds = Math.max(0, Math.floor(remainingMs / 1000));
+                    const minutes = Math.floor(remainingSeconds / 60);
+                    const seconds = remainingSeconds % 60;
+                    gameTimerDisplay.textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+                }, 1000);
 
             } else if (gameState.status === 'voting') {
                 gameCountdownOverlay.style.display = 'none';
                 gameVotingOverlay.style.display = 'flex';
-                gameResultDisplay.classList.add('hidden');
                 gameTimerDisplay.classList.add('hidden');
                 
                 lobbyChatInput.disabled = true;
-                lobbyChatSendBtn.disabled = true;
                 lobbyChatInput.placeholder = "رای‌گیری در جریان است. چت موقتاً غیرفعال شد.";
-
+                
                 renderVotingOptions(lobbyId, myUid, gameState, lobbyData);
                 
             } else if (gameState.status === 'ended') {
@@ -4448,7 +4425,6 @@
                 votingInstructions.classList.add('hidden');
                 
                 lobbyChatInput.disabled = true;
-                lobbyChatSendBtn.disabled = true;
                 lobbyChatInput.placeholder = "بازی به پایان رسید.";
 
                 winnerText.textContent = gameState.winner === 'Human' ? 'تیم انسان‌ها برنده شد!' : 'هوش مصنوعی برنده شد!';
@@ -4465,6 +4441,12 @@
             votingOptions.innerHTML = '';
             
             const hasVoted = gameState.votes && gameState.votes[myUid];
+            const isPlayerInLobby = lobbyData.players && lobbyData.players[myUid];
+
+            if (!isPlayerInLobby) {
+                votingInstructions.textContent = "شما بازی را ترک کرده‌اید و نمی‌توانید رای دهید.";
+                return;
+            }
 
             if (hasVoted) {
                 const votedForName = gameState.playerNames[gameState.votes[myUid]] || 'ناشناس';
@@ -4472,33 +4454,30 @@
                 return;
             }
 
-            // Players eligible to be voted for (everyone except the voter themselves)
             const eligibleToVoteFor = gameState.players.filter(uid => 
                 uid !== myUid && lobbyData.players && lobbyData.players[uid]
             );
 
+            if (eligibleToVoteFor.length === 0) {
+                 votingInstructions.textContent = "بازیکن دیگری برای رای دادن وجود ندارد.";
+                 return;
+            }
+
             eligibleToVoteFor.forEach(playerUid => {
-                const isAI = gameState.roles[playerUid] === 'AI';
                 const button = document.createElement('button');
-                button.className = 'voting-btn';
-                // We don't color buttons based on role here to avoid giving hints
-                button.classList.add('btn-blue-classic');
+                button.className = 'voting-btn btn-blue-classic';
                 button.textContent = `رای به ${gameState.playerNames[playerUid]}`;
                 button.onclick = () => castVote(lobbyId, myUid, playerUid);
                 votingOptions.appendChild(button);
             });
 
-
-            votingOptions.classList.remove('hidden');
-            votingTitle.classList.remove('hidden');
-            votingInstructions.classList.remove('hidden');
             votingInstructions.textContent = "برای چه کسی رای می‌دهید؟";
         }
 
         async function castVote(lobbyId, voterUid, votedForUid) {
             const lobbyRef = doc(db, 'global_lobbies', lobbyId);
             try {
-                await db.runTransaction(async (transaction) => {
+                await runTransaction(db, async (transaction) => {
                     const lobbyDoc = await transaction.get(lobbyRef);
                     if (!lobbyDoc.exists()) throw new Error("لابی یافت نشد یا بسته شده است.");
                     
@@ -4509,14 +4488,14 @@
                     if (gameState.votes && gameState.votes[voterUid]) throw new Error("شما قبلاً رای داده‌اید.");
 
                     const newVotes = { ...gameState.votes, [voterUid]: votedForUid };
-                    transaction.update(lobbyRef, { 'gameState.votes': newVotes });
-
+                    
                     const livingPlayers = gameState.players.filter(uid => lobbyData.players && lobbyData.players[uid]);
                     const allHaveVoted = livingPlayers.every(uid => newVotes[uid]);
 
-                    if (allHaveVoted && lobbyData.hostId === auth.currentUser.uid) {
-                        // Pass the transaction object to resolveVotes
+                    if (allHaveVoted) {
                         await resolveVotesInTransaction(transaction, lobbyRef, { ...gameState, votes: newVotes }, lobbyData);
+                    } else {
+                        transaction.update(lobbyRef, { 'gameState.votes': newVotes });
                     }
                 });
                 showMessageBox(`رای شما ثبت شد.`, "success");
@@ -4535,7 +4514,7 @@
                 voteCounts[votedFor] = (voteCounts[votedFor] || 0) + 1;
             });
 
-            let maxVotes = -1;
+            let maxVotes = 0;
             let playersWithMaxVotes = [];
             for (const player in voteCounts) {
                 if (voteCounts[player] > maxVotes) {
@@ -4552,13 +4531,14 @@
             if (playersWithMaxVotes.length === 1 && maxVotes > 0) {
                 const eliminatedPlayer = playersWithMaxVotes[0];
                 const eliminatedPlayerRole = roles[eliminatedPlayer];
+                const eliminatedPlayerName = lobbyData.players[eliminatedPlayer] || 'بازیکن ناشناس';
 
                 if (eliminatedPlayerRole === 'AI') {
                     winner = 'Human';
-                    winReason = `هوش مصنوعی (${lobbyData.players[eliminatedPlayer]}) با موفقیت شناسایی و حذف شد!`;
+                    winReason = `هوش مصنوعی (${eliminatedPlayerName}) با موفقیت شناسایی و حذف شد!`;
                 } else {
                     winner = 'AI';
-                    winReason = `یک انسان (${lobbyData.players[eliminatedPlayer]}) به اشتباه حذف شد! هوش مصنوعی برنده شد.`;
+                    winReason = `یک انسان (${eliminatedPlayerName}) به اشتباه حذف شد! هوش مصنوعی برنده شد.`;
                 }
             } else {
                 winner = 'AI'; // Draw or no majority results in an AI win
@@ -4974,23 +4954,6 @@
             }
         });
         
-        lobbyChatForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-            if (currentLobbyId) {
-                sendLobbyMessage(currentLobbyId, lobbyChatInput.value);
-            }
-        });
-
-        lobbyChatMessages.addEventListener('click', (e) => {
-            const deleteButton = e.target.closest('.delete-message-btn');
-            if (deleteButton) {
-                const messageId = deleteButton.dataset.messageId;
-                if (currentLobbyId && messageId) {
-                    deleteLobbyMessage(currentLobbyId, messageId);
-                }
-            }
-        });
-
         leaveGameFromLobbyBtn.addEventListener('click', async () => {
             if (!currentLobbyId || !auth.currentUser) return;
 
@@ -5013,7 +4976,7 @@
                         return;
                     }
                 } else {
-                    await db.runTransaction(async (transaction) => {
+                    await runTransaction(db, async (transaction) => {
                         const currentLobbyDoc = await transaction.get(lobbyRef);
                         if (!currentLobbyDoc.exists()) {
                             throw new Error("Lobby not found or already closed.");
