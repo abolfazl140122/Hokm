@@ -1951,16 +1951,8 @@
 
     <!-- Main container for all screens -->
     <div id="app" class="relative w-full h-full flex justify-center items-center">
-        
-        <!-- NEW: Maintenance Mode Screen (Highest Z-index) -->
-        <div id="maintenance-screen" class="hidden fixed inset-0 flex justify-center items-center z-60 bg-black bg-opacity-80">
-            <div class="classic-card p-8 w-11/12 max-w-lg text-center">
-                <h2 class="text-3xl font-bold mb-4">... در حال بروزرسانی ...</h2>
-                <p id="maintenance-message-text" class="text-xl">لطفاً کمی صبر کنید. به زودی باز خواهیم گشت.</p>
-            </div>
-        </div>
 
-
+        <!-- All Modals and other screens remain the same... -->
         <!-- 1. Loading Screen (NEW GRAPHICAL VERSION) -->
         <div id="loading-screen" class="absolute inset-0 flex flex-col justify-center items-center z-50 page-transition-active page-transition-visible">
             <div class="loading-screen-container">
@@ -2501,10 +2493,6 @@
         // NEW: Loading Screen specific elements
         const binaryBackground = document.getElementById('binary-background');
         const loadingSubText = document.getElementById('loading-sub-text');
-        
-        // NEW: Maintenance Screen elements
-        const maintenanceScreen = document.getElementById('maintenance-screen');
-        const maintenanceMessageText = document.getElementById('maintenance-message-text');
 
         // Main Screen UI Elements
         const menuBtn = document.getElementById('menu-btn');
@@ -2673,7 +2661,6 @@
         let isRefreshing = false; // NEW: State for refresh button
         let gameEntryCost = 100; // NEW: Default game entry cost, will be fetched from Firebase
         let currentTheme = 'classic'; // NEW: To store the currently active theme
-        let isMaintenanceModeActive = false; // NEW: State for maintenance mode
 
         // Promise resolver for custom confirmation modal
         let resolveCustomConfirm;
@@ -2956,7 +2943,7 @@
                 return { is_appropriate: true, reason: "API key missing. Moderation skipped." };
             }
 
-            const prompt = `As a highly rigorous and professional content moderation AI, meticulously analyze the following lobby name for compliance with the strictest community guidelines across *all* languages. You must absolutely identify and disallow any political, racist, sexual, offensive, vulgar, violent, or otherwise inappropriate content, including but not to limited to terms like "fuck", "asshole", "shit", "bitch", and their equivalents in Persian such as "کیر", "کون", "کس", "کسکش", "جنده", "حرومزاده", "بیناموس" etc., regardless of how they are spelled (e.g., phonetic or deliberate misspellings to evade detection). Your analysis should consider the context and intent where possible. Your response *must* be a JSON object: {"is_appropriate": boolean, "reason": string}. If 'is_appropriate' is false, provide a *brief, objective, and precise* reason identifying the specific type of violation (e.g., "Contains offensive language", "Political reference detected", "Violates decency standards"). If appropriate, 'reason' should be an empty string. Lobby name to analyze: "${lobbyName}"`;
+            const prompt = `As a highly rigorous and professional content moderation AI, meticulously analyze the following lobby name for compliance with the strictest community guidelines across *all* languages. You must absolutely identify and disallow any political, racist, sexual, offensive, vulgar, violent, or otherwise inappropriate content, including but not limited to terms like "fuck", "asshole", "shit", "bitch", and their equivalents in Persian such as "کیر", "کون", "کس", "کسکش", "جنده", "حرومزاده", "بیناموس" etc., regardless of how they are spelled (e.g., phonetic or deliberate misspellings to evade detection). Your analysis should consider the context and intent where possible. Your response *must* be a JSON object: {"is_appropriate": boolean, "reason": string}. If 'is_appropriate' is false, provide a *brief, objective, and precise* reason identifying the specific type of violation (e.g., "Contains offensive language", "Political reference detected", "Violates decency standards"). If appropriate, 'reason' should be an empty string. Lobby name to analyze: "${lobbyName}"`;
             let chatHistory = [{ role: "user", parts: [{ text: prompt }] }];
             const payload = { contents: chatHistory, generationConfig: { responseMimeType: "application/json", responseSchema: { type: "OBJECT", properties: { "is_appropriate": { "type": "BOOLEAN" }, "reason": { "type": "STRING" } }, "propertyOrdering": ["is_appropriate", "reason"] } } };
             const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`;
@@ -3061,12 +3048,6 @@
         // Function to transition between screens
         function setActiveScreen(newScreen) {
             console.log(`درخواست تغییر صفحه به: ${newScreen.id}. صفحه فعلی: ${currentActiveScreen.id}`);
-            
-            // NEW: Do not change screen if in maintenance mode, unless it's to hide the maintenance screen itself
-            if (isMaintenanceModeActive) {
-                console.log("تغییر صفحه در حالت تعمیرات مسدود شد.");
-                return;
-            }
 
             if (currentActiveScreen === newScreen) return;
             
@@ -3180,62 +3161,30 @@
         }
         
         // =========================================================================
-        // === START OF MODIFIED AUTH & REAL-TIME SETTINGS LOGIC =================
+        // === START OF CORRECTED AUTH & REAL-TIME SETTINGS LOGIC =================
         // =========================================================================
 
         /**
-         * MODIFIED: Sets up a real-time listener for game settings.
-         * Now listens for maintenance mode status as well.
+         * NEW: Sets up a real-time listener for game settings (like entry cost).
+         * This ensures any changes in Firestore are immediately reflected in the app.
          */
         function setupGameSettingsListener() {
-            if (unsubscribeGameSettings) unsubscribeGameSettings(); // Clean up previous listener
+            if (unsubscribeGameSettings) unsubscribeGameSettings(); // Clean up previous listener if any
 
             const configRef = doc(db, `artifacts/${appId}/config/game_settings`);
             unsubscribeGameSettings = onSnapshot(configRef, (docSnap) => {
                 if (docSnap.exists()) {
-                    const settings = docSnap.data();
-                    
-                    // 1. Handle Game Entry Cost (existing logic)
-                    const newCost = settings.gameEntryCost;
+                    const newCost = docSnap.data().gameEntryCost;
                     if (typeof newCost === 'number') {
                         gameEntryCost = newCost;
                         friendlyGameCostSpan.textContent = gameEntryCost.toLocaleString('fa-IR');
                         console.log(`هزینه ورودی بازی به صورت لحظه‌ای به ${gameEntryCost} تغییر کرد.`);
                     }
-
-                    // 2. Handle Maintenance Mode (NEW logic)
-                    const appIsEnabled = settings.isAppEnabled;
-                    const message = settings.maintenanceMessage || "برنامه موقتا از دسترس خارج است. لطفاً بعدا مراجعه کنید.";
-
-                    if (appIsEnabled === false) {
-                        // Enter maintenance mode
-                        if (!isMaintenanceModeActive) {
-                            console.log("ورود به حالت تعمیرات...");
-                            isMaintenanceModeActive = true;
-                            maintenanceMessageText.textContent = message;
-                            maintenanceScreen.classList.remove('hidden');
-                        }
-                    } else {
-                        // Exit maintenance mode
-                        if (isMaintenanceModeActive) {
-                            console.log("خروج از حالت تعمیرات...");
-                            isMaintenanceModeActive = false;
-                            maintenanceScreen.classList.add('hidden');
-                            
-                            // After exiting maintenance, decide which screen to show
-                            // This safely resets the user's view.
-                            if (!isInitialAuthCheckComplete) {
-                                // This case is unlikely but safe to handle
-                                setActiveScreen(auth.currentUser ? mainScreen : authScreen);
-                                isInitialAuthCheckComplete = true;
-                            } else {
-                                setActiveScreen(auth.currentUser ? mainScreen : authScreen);
-                            }
-                        }
-                    }
-
                 } else {
-                    console.warn("سند تنظیمات بازی یافت نشد. از مقادیر پیش‌فرض استفاده می‌شود.");
+                    console.warn("سند تنظیمات بازی یافت نشد. از مقدار پیش‌فرض استفاده می‌شود.");
+                    // Fallback to default if somehow the document is deleted after app start
+                    gameEntryCost = 100;
+                    friendlyGameCostSpan.textContent = gameEntryCost.toLocaleString('fa-IR');
                 }
             }, (error) => {
                 console.error("خطا در گوش دادن به تنظیمات بازی:", error);
@@ -3247,8 +3196,11 @@
 
             // Part 1: Manage User Data and Listeners
             if (user) {
+                // If a user is logged in, set up listeners.
                 if (unsubscribeUserProfile) unsubscribeUserProfile();
+                // setupGameSettingsListener is now called once in performAsyncAppSetup(), no need to call it here.
 
+                // Setup listener for user profile
                 const userDocRef = doc(db, `artifacts/${appId}/users/${user.uid}/profile/data`);
                 unsubscribeUserProfile = onSnapshot(userDocRef, (docSnap) => {
                     if (docSnap.exists()) {
@@ -3257,31 +3209,37 @@
                         headerUserId.textContent = `شناسه: ${currentUserData.uid.substring(0, 8)}...`;
                         updateUserCoinsDisplay();
                         
-                        const savedTheme = currentUserData.theme || 'classic';
-                        if (currentTheme !== savedTheme) {
+                        // NEW: Apply user's saved theme
+                        const savedTheme = currentUserData.theme || 'classic'; // Default to 'classic'
+                        if (currentTheme !== savedTheme) { // Only apply if different to avoid unnecessary transitions
                             applyTheme(savedTheme);
                         }
 
-                        if (!createLobbyModal.classList.contains('hidden')) {
-                           renderApprovedLobbyNamesManagementList();
-                           updateCreateLobbyModalUI(createLobbyModalTitle.textContent === 'مدیریت نام‌های لابی و ساخت لابی' ? 'myLobbies' : 'create');
+                        // Also update the approved lobby names list in the modal whenever profile data changes
+                        if (!createLobbyModal.classList.contains('hidden')) { // Only if modal is open
+                           renderApprovedLobbyNamesManagementList(); // Rerender management list
+                           // Re-evaluate approved names dropdown & proposal area visibility
+                           updateCreateLobbyModalUI(createLobbyModalTitle.textContent === 'مدیریت نام‌های لابی و ساخت لابی' ? 'myLobbies' : 'create'); // Use the new helper here
                         }
                     } else {
                         console.warn("User profile document not found. Creating a default one.");
+                        // Create a default profile if it doesn't exist
                         setDoc(userDocRef, {
                             displayName: user.displayName || user.email.split('@')[0],
                             email: user.email,
-                            coins: 500,
+                            coins: 500, // Starting coins
                             approvedLobbyNames: [],
                             banStatus: { isBanned: false },
                             createdAt: serverTimestamp(),
-                            theme: 'classic'
+                            theme: 'classic' // NEW: Add default theme
                         }, { merge: true }).then(() => {
                             console.log("Default user profile created.");
-                            applyTheme('classic');
-                        }).catch(e => console.error("Error creating default user profile:", e));
+                            applyTheme('classic'); // Apply default theme
+                        }).catch(e => {
+                            console.error("Error creating default user profile:", e);
+                        });
                         currentUserData = { uid: user.uid, email: user.email, displayName: 'کاربر جدید', coins: 0, approvedLobbyNames: [], theme: 'classic' };
-                        applyTheme('classic');
+                        applyTheme('classic'); // Ensure default is applied immediately
                     }
                 }, (error) => {
                     console.error("خطا در گوش دادن به user profile:", error);
@@ -3290,6 +3248,8 @@
             } else {
                 // User is logged out. Clean up all data and listeners.
                 if (unsubscribeUserProfile) unsubscribeUserProfile();
+                // unsubscribeGameSettings is intentionally not cleared here, as it's a global setting.
+                // ... (other listener cleanups) ...
                 if (unsubscribeLobbies) unsubscribeLobbies();
                 if (unsubscribeLobbyDetail) unsubscribeLobbyDetail();
                 if (unsubscribeKickedPlayers) unsubscribeKickedPlayers();
@@ -3305,68 +3265,45 @@
                 
                 resetGameUI();
                 updateUserCoinsDisplay();
-                applyTheme('classic');
+                applyTheme('classic'); // Reset to classic theme on logout
             }
 
             // Part 2: Manage Screen Transitions (no change needed here)
             if (!isInitialAuthCheckComplete) {
-                // The settings listener will handle showing maintenance screen if needed
-                if (!isMaintenanceModeActive) {
-                    setActiveScreen(user ? mainScreen : authScreen);
-                }
+                setActiveScreen(user ? mainScreen : authScreen);
                 isInitialAuthCheckComplete = true;
             } else {
-                 if (!isMaintenanceModeActive) {
-                    if (user && currentActiveScreen === authScreen) {
-                        setActiveScreen(mainScreen);
-                    } else if (!user && currentActiveScreen !== authScreen) {
-                        setActiveScreen(authScreen);
-                    }
-                 }
+                if (user && currentActiveScreen === authScreen) {
+                    setActiveScreen(mainScreen);
+                } else if (!user && currentActiveScreen !== authScreen) {
+                    setActiveScreen(authScreen);
+                }
             }
         });
 
-        /**
-         * MODIFIED: Initializes app-wide settings.
-         * Now automatically creates maintenance mode fields if they don't exist.
-         */
         async function performAsyncAppSetup() {
             console.log("Performing asynchronous app setup...");
 
+            // Ensure game_settings config exists at startup. If not, create it.
+            // The real-time listener will then pick up the value.
             try {
                 const configRef = doc(db, `artifacts/${appId}/config/game_settings`);
                 const configSnap = await getDoc(configRef);
-                
                 if (!configSnap.exists()) {
                     console.log("`game_settings` document not found. Creating with default values...");
-                    await setDoc(configRef, { 
-                        gameEntryCost: 100,
-                        isAppEnabled: true, // Default: app is ON
-                        maintenanceMessage: "برنامه به زودی در دسترس خواهد بود." 
-                    });
+                    await setDoc(configRef, { gameEntryCost: 100 });
                     console.log("Default `game_settings` config created successfully.");
-                } else {
-                    // Document exists, check if new fields need to be added without overwriting existing ones.
-                    const data = configSnap.data();
-                    const updates = {};
-                    if (!data.hasOwnProperty('isAppEnabled')) {
-                        updates.isAppEnabled = true;
-                    }
-                    if (!data.hasOwnProperty('maintenanceMessage')) {
-                        updates.maintenanceMessage = "برنامه به زودی در دسترس خواهد بود.";
-                    }
-                    if (Object.keys(updates).length > 0) {
-                        console.log("Adding new maintenance fields to existing config...");
-                        await updateDoc(configRef, updates);
-                    }
                 }
             } catch (error) {
                 console.error("CRITICAL: Error initializing game settings config:", error);
+                // We might want a more prominent error display here if this is fatal.
                 showMessageBox("خطا در بارگذاری تنظیمات بازی.", "error");
             }
             
+            // NEW: Setup listener for game settings
             setupGameSettingsListener();
 
+            // Handle initial authentication
             if (initialAuthToken) {
                 try {
                     await signInWithCustomToken(auth, initialAuthToken);
@@ -3376,9 +3313,10 @@
             }
             console.log("Firebase initialization finished.");
         }
+        // Call the async setup function
         performAsyncAppSetup();
 
-        // --- END OF MODIFIED LOGIC ---
+        // --- END OF CORRECTED AUTH & REAL-TIME SETTINGS LOGIC ---
 
         // Maps Firebase auth error codes to user-friendly Persian messages.
         function getFirebaseErrorMessage(errorCode) {
@@ -4370,7 +4308,7 @@
             const myUid = auth.currentUser.uid;
             
             gameInfoPanel.classList.remove('hidden');
-                        leaveGameFromLobbyBtn.classList.remove('hidden');
+            leaveGameFromLobbyBtn.classList.remove('hidden');
             
             hostActionsContainer.style.display = 'none';
             leaveLobbyBtn.classList.add('hidden');
