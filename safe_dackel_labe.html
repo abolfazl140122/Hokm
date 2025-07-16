@@ -1,1 +1,709 @@
-//سلام
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>بازی متنی - داخل لابی</title>
+    <!-- Tailwind CSS CDN for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Merriweather:wght@400;700&family=Share+Tech+Mono&family=Orbitron:wght@400..900&family=Inter:wght@400;700&display=swap" rel="stylesheet">
+    
+    <!-- ========================================================================= -->
+    <!-- === بخش CSS: تمام استایل‌های مورد نیاز برای این صفحه === -->
+    <!-- ========================================================================= -->
+    <style>
+        /* استایل‌های عمومی */
+        html, body, #app {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            transition: background-color 0.8s ease-in-out, color 0.8s ease-in-out;
+        }
+
+        /* تم کلاسیک (پیش‌فرض) */
+        body.theme-classic {
+            font-family: 'Merriweather', serif;
+            background: radial-gradient(ellipse at bottom, #100C08 0%, #000000 100%);
+            color: #E0E0E0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        body.theme-classic h1, body.theme-classic h2, body.theme-classic h3 {
+            font-family: 'Playfair Display', serif;
+            color: #FFD700;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+
+        /* استایل کارت اصلی (فرم) */
+        .classic-card {
+            background: linear-gradient(145deg, #4B0000 0%, #660000 60%, #800000 100%);
+            border: 4px solid #DAA520;
+            box-shadow: 0 15px 30px rgba(0,0,0,0.6), inset 0 0 15px rgba(255,255,255,0.1);
+            border-radius: 20px;
+        }
+        
+        /* استایل دکمه‌ها */
+        .classic-btn {
+            border: 2px solid #DAA520;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.4), inset 0 0 8px rgba(255,255,255,0.1);
+            color: #FFFFFF;
+            border-radius: 15px;
+            font-weight: 700;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.6);
+            transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+            padding: 0.75rem 1.25rem;
+            font-size: 1rem;
+        }
+        .classic-btn:hover:not(:disabled) {
+            transform: translateY(-5px) scale(1.03);
+            box-shadow: 0 12px 24px rgba(0,0,0,0.6), inset 0 0 10px rgba(255,255,255,0.2);
+        }
+        .classic-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+            background: linear-gradient(145deg, #A9A9A9 0%, #808080 100%);
+        }
+
+        .btn-blue-classic { background: linear-gradient(145deg, #4682B4 0%, #2A52BE 100%); }
+        .btn-green-classic { background: linear-gradient(145deg, #228B22 0%, #006400 100%); }
+        .btn-red-classic { background: linear-gradient(145deg, #CD5C5C 0%, #B22222 100%); }
+        .btn-gray-classic { background: linear-gradient(145deg, #A9A9A9 0%, #808080 100%); }
+        .btn-brown-classic { background: linear-gradient(145deg, #8B4513 0%, #69320E 100%); }
+
+        /* استایل فیلدهای ورودی (input) */
+        input {
+            background-color: #202020;
+            border: 2px solid #5A5A5A;
+            color: #E0E0E0;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.5);
+            padding: 0.875rem;
+            border-radius: 0.75rem;
+        }
+        input:focus {
+            border-color: #DAA520 !important;
+            box-shadow: 0 0 0 4px rgba(218, 165, 32, 0.5) !important, inset 0 2px 4px rgba(0,0,0,0.5) !important;
+            outline: none;
+        }
+        
+        /* کانتینر اصلی صفحه داخل لابی */
+        .lobby-detail-content {
+            border-radius: 20px;
+            background: linear-gradient(145deg, #1A1A1A 0%, #0D0D0D 100%);
+            border: 3px solid #DAA520;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.7);
+            padding: 1.5rem;
+            width: 95%;
+            max-width: 1200px;
+            height: 90vh; /* ارتفاع صفحه */
+            display: flex;
+            flex-direction: row; /* چیدمان ستونی در کنار هم */
+            gap: 1.5rem;
+            overflow: hidden;
+        }
+        
+        /* سایدبار (اطلاعات لابی و لیست بازیکنان) */
+        .lobby-sidebar {
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+            width: 300px;
+            background-color: rgba(0,0,0,0.3);
+            border: 1px solid #444;
+            border-radius: 15px;
+            padding: 1rem;
+            overflow-y: auto;
+        }
+        
+        /* پنل اصلی (چت و دکمه‌ها) */
+        .lobby-main-panel {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+            min-width: 0;
+            overflow: hidden;
+        }
+        
+        /* لیست بازیکنان */
+        .player-list-item {
+            background-color: rgba(255, 255, 255, 0.05);
+            border: 1px solid transparent;
+            border-radius: 8px;
+            padding: 0.75rem;
+            margin-bottom: 0.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .player-list-item.is-host { border-color: #FFD700; }
+        .player-list-item .player-name { color: #E0E0E0; font-weight: bold; }
+        .player-list-item .host-label { color: #FFD700; font-size: 0.8rem; margin-right: 0.5rem; }
+        .kick-player-btn {
+            background: none;
+            border: 1px solid #B22222;
+            color: #B22222;
+            border-radius: 5px;
+            padding: 0.2rem 0.5rem;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .kick-player-btn:hover { background: #B22222; color: white; }
+        
+        /* بخش چت */
+        .lobby-chat-container {
+            background-color: rgba(0,0,0,0.4);
+            border: 2px solid #5A5A5A;
+            border-radius: 10px;
+            padding: 0.75rem;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        .lobby-chat-messages {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding-right: 0.5rem;
+        }
+        .chat-message {
+            padding: 0.5rem 0.75rem;
+            border-radius: 10px;
+            margin-bottom: 0.5rem;
+            max-width: 80%;
+            word-wrap: break-word;
+            background-color: #333;
+            align-self: flex-start;
+        }
+        .chat-message.current-user {
+            background-color: #4682B4;
+            align-self: flex-end;
+        }
+        .chat-message .sender-name {
+            font-weight: bold;
+            display: block;
+            color: #FFD700;
+            font-size: 0.9em;
+            margin-bottom: 0.2rem;
+        }
+
+        /* کاورهای بازی (شمارش معکوس، رای‌گیری و...) */
+        .game-overlay {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background-color: rgba(0,0,0,0.9);
+            z-index: 40;
+            transition: opacity 0.3s ease-in-out;
+        }
+        @keyframes countdown-pulse {
+            0% { transform: scale(0.5); opacity: 0; }
+            50% { transform: scale(1.1); opacity: 1; }
+            100% { transform: scale(1); opacity: 0; }
+        }
+        .countdown-effect {
+            animation: countdown-pulse 1s ease-out forwards;
+        }
+        .voting-btn {
+            border: 3px solid #FFD700;
+            padding: 1rem 2rem;
+            font-size: 1.5rem;
+            border-radius: 15px;
+            font-weight: bold;
+            color: white;
+        }
+        .voting-btn.ai-vote { background: linear-gradient(145deg, #E24B4B 0%, #B22222 100%); }
+        .voting-btn.human-vote { background: linear-gradient(145deg, #4BBEE2 0%, #2A52BE 100%); }
+
+        /* استایل اسکرول بار */
+        .custom-scrollbar::-webkit-scrollbar { width: 8px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #202020; border-radius: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #DAA520; border-radius: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #FFD700; }
+        
+        /* استایل برای مودال‌های پاپ‌آپ */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background-color: rgba(0,0,0,0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 50;
+        }
+        
+        /* ریسپانسیو برای صفحه‌های کوچک */
+        @media (max-width: 860px) {
+            .lobby-detail-content {
+                flex-direction: column;
+                height: 95vh;
+                padding: 1rem;
+            }
+            .lobby-sidebar {
+                width: 100%;
+                max-height: 250px;
+                flex-shrink: 0;
+            }
+            .lobby-main-panel {
+                min-height: 0;
+            }
+        }
+    </style>
+</head>
+<body class="theme-classic">
+
+    <!-- ========================================================================= -->
+    <!-- === بخش HTML: ساختار بصری صفحه داخل لابی === -->
+    <!-- ========================================================================= -->
+    <div id="app" class="relative w-full h-full p-4 flex justify-center items-center">
+
+        <div id="lobby-detail-screen" class="w-full h-full">
+            <div class="lobby-detail-content">
+                
+                <!-- سایدبار: اطلاعات لابی و بازیکنان -->
+                <div class="lobby-sidebar custom-scrollbar">
+                    <h2 id="detail-lobby-name" class="text-2xl sm:text-3xl font-bold truncate">...</h2>
+                    <p id="detail-host-name" class="text-md mt-2">سازنده: ...</p>
+                    <p id="detail-player-count" class="text-sm font-semibold mb-4">بازیکنان: ...</p>
+                    
+                    <div class="w-full h-px bg-yellow-600 mb-4"></div>
+
+                    <!-- لیست بازیکنان -->
+                    <div id="player-list-container" class="flex-grow min-h-0 overflow-y-auto custom-scrollbar">
+                        <!-- آیتم‌های لیست بازیکنان اینجا قرار می‌گیرند -->
+                        <p class="text-center">در حال بارگذاری بازیکنان...</p>
+                    </div>
+                </div>
+
+                <!-- پنل اصلی: چت و کنترل‌ها -->
+                <div class="lobby-main-panel">
+                    
+                    <!-- کاور شمارش معکوس -->
+                    <div id="game-countdown-overlay" class="game-overlay hidden">
+                        <div class="text-7xl font-extrabold countdown-effect" style="opacity:0; transform: scale(0.5);"></div>
+                        <p class="text-2xl mt-4">بازی در حال شروع است...</p>
+                    </div>
+
+                    <!-- کاور رای‌گیری و نمایش نتایج -->
+                    <div id="game-voting-overlay" class="game-overlay hidden">
+                        <h2 class="text-4xl font-bold mb-6" id="voting-title">رای‌گیری آغاز شد!</h2>
+                        <p class="text-xl mb-8" id="voting-instructions">برای چه کسی رای می‌دهید؟</p>
+                        <div id="voting-options" class="flex flex-wrap justify-center gap-4">
+                            <!-- دکمه‌های رای‌گیری اینجا قرار می‌گیرند -->
+                        </div>
+                        <div id="game-result-display" class="hidden text-center mt-10">
+                            <h2 class="text-5xl font-extrabold mb-4" id="winnerText"></h2>
+                            <p class="text-2xl" id="reasonText"></p>
+                            <button id="return-to-lobbies-btn" class="classic-btn btn-blue-classic mt-8 py-3 px-6">بازگشت به لیست لابی‌ها</button>
+                        </div>
+                    </div>
+
+                    <!-- کانتینر چت -->
+                    <div class="lobby-chat-container flex-grow min-h-0">
+                        <div id="lobby-chat-messages" class="lobby-chat-messages custom-scrollbar">
+                            <!-- پیام‌های چت اینجا نمایش داده می‌شوند -->
+                        </div>
+                        <form id="lobby-chat-form" class="flex gap-2 mt-3 flex-shrink-0">
+                            <input type="text" id="lobby-chat-input" placeholder="پیام خود را بنویسید..." autocomplete="off" class="w-full">
+                            <button type="submit" id="lobby-chat-send-btn" class="classic-btn btn-blue-classic text-sm py-2 px-4">ارسال</button>
+                        </form>
+                    </div>
+
+                    <!-- دکمه‌های کنترلی پایین صفحه -->
+                    <div class="flex flex-wrap justify-between items-center gap-4 mt-4 flex-shrink-0">
+                        <div id="host-actions-container" class="flex flex-wrap gap-4" style="display: none;">
+                            <button id="start-game-btn" class="classic-btn btn-green-classic" disabled>شروع بازی</button>
+                            <button id="toggle-chat-lock-btn" class="classic-btn btn-gray-classic text-sm">قفل کردن چت</button>
+                            <button id="view-kicked-players-btn" class="classic-btn btn-brown-classic text-sm">لیست اخراجی‌ها</button>
+                        </div>
+                        <button id="leave-lobby-btn" class="classic-btn btn-red-classic">ترک لابی</button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        
+        <!-- مودال پاپ‌آپ برای تایید اخراج بازیکن -->
+        <div id="kick-player-confirm-modal" class="modal-overlay hidden">
+            <div class="classic-card p-6 sm:p-8 w-11/12 max-w-md text-center relative">
+                <h2 class="text-2xl sm:text-3xl font-bold mb-6">اخراج بازیکن</h2>
+                <p class="text-lg mb-8">آیا مطمئن هستید که می‌خواهید <span id="kick-player-confirm-name" class="font-bold"></span> را از لابی اخراج کنید؟</p>
+                <div class="flex justify-around gap-4">
+                    <button id="kick-player-confirm-btn" class="w-1/2 classic-btn btn-red-classic">اخراج کردن</button>
+                    <button id="cancel-kick-player-btn" class="w-1/2 classic-btn btn-gray-classic">انصراف</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- ========================================================================= -->
+    <!-- === بخش JavaScript: منطق این صفحه === -->
+    <!-- ========================================================================= -->
+    <script type="module">
+        // Import the functions you need from the SDKs
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, getDoc, updateDoc, deleteDoc, onSnapshot, collection, addDoc, query, orderBy, serverTimestamp, deleteField, arrayUnion, arrayRemove, writeBatch, increment } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js"; 
+
+        // --- پیکربندی فایربیس ---
+        const firebaseConfig = {
+            apiKey: "AIzaSyBpVHnjF5gdTm3vJiHEoAZCowsRkTapj_4", 
+            authDomain: "hokm-d6911.firebaseapp.com",
+            projectId: "hokm-d6911",
+            storageBucket: "hokm-d6911.appspot.com",
+            messagingSenderId: "128133280011",
+            appId: "1:128133280011:web:c9fe28f5201eef7a3a320e"
+        };
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // --- دسترسی به عناصر HTML ---
+        const detailLobbyName = document.getElementById('detail-lobby-name');
+        const detailHostName = document.getElementById('detail-host-name');
+        const detailPlayerCount = document.getElementById('detail-player-count');
+        const playerListContainer = document.getElementById('player-list-container');
+        const lobbyChatMessages = document.getElementById('lobby-chat-messages');
+        const lobbyChatForm = document.getElementById('lobby-chat-form');
+        const lobbyChatInput = document.getElementById('lobby-chat-input');
+        const hostActionsContainer = document.getElementById('host-actions-container');
+        const startGameBtn = document.getElementById('start-game-btn');
+        const leaveLobbyBtn = document.getElementById('leave-lobby-btn');
+        const kickPlayerConfirmModal = document.getElementById('kick-player-confirm-modal');
+        const kickPlayerConfirmName = document.getElementById('kick-player-confirm-name');
+        const kickPlayerConfirmBtn = document.getElementById('kick-player-confirm-btn');
+        const cancelKickPlayerBtn = document.getElementById('cancel-kick-player-btn');
+        // عناصر مربوط به بازی
+        const gameCountdownOverlay = document.getElementById('game-countdown-overlay');
+        const countdownNumber = gameCountdownOverlay.querySelector('.countdown-effect');
+        const gameVotingOverlay = document.getElementById('game-voting-overlay');
+        const votingOptions = document.getElementById('voting-options');
+        const gameResultDisplay = document.getElementById('game-result-display');
+        const winnerText = document.getElementById('winnerText');
+        const reasonText = document.getElementById('reasonText');
+        const returnToLobbiesBtn = document.getElementById('return-to-lobbies-btn');
+
+        // --- متغیرهای وضعیت ---
+        let currentLobbyId = null;
+        let currentUser = null;
+        let currentUserData = null; // برای نگهداری اطلاعات پروفایل مثل نام نمایشی
+        let unsubscribeLobby = null; // برای قطع کردن لیسنر لابی
+        let unsubscribeChat = null; // برای قطع کردن لیسنر چت
+        let playerToKick = null; // برای نگهداری اطلاعات بازیکنی که قرار است اخراج شود
+        let gameTimerInterval = null;
+
+        // --- توابع کمکی ---
+
+        // تابع برای گرفتن ID لابی از URL
+        function getLobbyIdFromUrl() {
+            const params = new URLSearchParams(window.location.search);
+            return params.get('lobbyId');
+        }
+
+        function showAlert(message, type = 'error') {
+            // در یک پروژه واقعی، اینجا یک مودال زیبا نمایش داده می‌شود
+            alert(`${type === 'error' ? 'خطا' : 'موفق'}: ${message}`);
+        }
+        
+        function formatLobbyNameWithColor(name) {
+            if (!name) return '...';
+            const regex = /^\[#([0-9A-Fa-f]{6})\](.*)/;
+            const match = name.match(regex);
+            if (match) {
+                const colorCode = match[1];
+                const cleanName = match[2].trim();
+                return `<span style="color:#${colorCode};">${cleanName}</span>`;
+            }
+            return name;
+        }
+
+        // تابع برای نمایش مودال تایید اخراج
+        function showKickConfirmModal(playerId, playerName) {
+            playerToKick = { id: playerId, name: playerName };
+            kickPlayerConfirmName.textContent = playerName;
+            kickPlayerConfirmModal.classList.remove('hidden');
+        }
+
+        // تابع برای بستن مودال تایید اخراج
+        function hideKickConfirmModal() {
+            playerToKick = null;
+            kickPlayerConfirmModal.classList.add('hidden');
+        }
+        
+        // تابع برای اخراج بازیکن
+        async function kickPlayer(lobbyId, player) {
+            const lobbyRef = doc(db, 'global_lobbies', lobbyId);
+            try {
+                await updateDoc(lobbyRef, {
+                    [`players.${player.id}`]: deleteField(), // حذف بازیکن از لیست
+                    kickedPlayers: arrayUnion({ uid: player.id, displayName: player.name }) // افزودن به لیست اخراجی‌ها
+                });
+                showAlert(`بازیکن "${player.name}" با موفقیت اخراج شد.`, 'success');
+                hideKickConfirmModal();
+            } catch (e) {
+                console.error("Error kicking player:", e);
+                showAlert("خطا در اخراج بازیکن.", 'error');
+            }
+        }
+        
+        // --- منطق اصلی صفحه ---
+
+        // 1. گوش دادن به وضعیت احراز هویت کاربر
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                currentUser = user;
+                // دریافت اطلاعات پروفایل کاربر
+                const userProfileRef = doc(db, `artifacts/default-app-id/users/${user.uid}/profile/data`);
+                const docSnap = await getDoc(userProfileRef);
+                if (docSnap.exists()) {
+                    currentUserData = docSnap.data();
+                } else {
+                    // اگر پروفایل وجود نداشت (که نباید اتفاق بیفتد)، به صفحه ثبت نام برگرد
+                    window.location.href = 'sabt_name.html';
+                    return;
+                }
+
+                // 2. دریافت ID لابی و شروع گوش دادن به تغییرات آن
+                currentLobbyId = getLobbyIdFromUrl();
+                if (currentLobbyId) {
+                    setupLobbyListener(currentLobbyId);
+                } else {
+                    showAlert("شناسه لابی مشخص نشده است. در حال بازگشت...");
+                    window.location.href = 'safe_list_libey.html'; // نام فایل لیست لابی‌ها
+                }
+            } else {
+                // اگر کاربر لاگین نکرده، او را به صفحه ورود بفرست
+                showAlert("برای ورود به لابی، ابتدا باید وارد حساب کاربری خود شوید.");
+                window.location.href = 'sabt_name.html';
+            }
+        });
+        
+        // 3. تابع اصلی برای گوش دادن به تغییرات لحظه‌ای لابی
+        function setupLobbyListener(lobbyId) {
+            if (unsubscribeLobby) unsubscribeLobby(); // قطع لیسنر قبلی
+            if (unsubscribeChat) unsubscribeChat();
+
+            const lobbyRef = doc(db, 'global_lobbies', lobbyId);
+            unsubscribeLobby = onSnapshot(lobbyRef, (docSnap) => {
+                if (!docSnap.exists()) {
+                    showAlert("این لابی دیگر وجود ندارد یا بسته شده است.");
+                    window.location.href = 'safe_list_libey.html';
+                    return;
+                }
+
+                const lobbyData = docSnap.data();
+                
+                // بررسی اینکه آیا کاربر هنوز در لابی هست یا اخراج شده
+                if (!lobbyData.players || !lobbyData.players[currentUser.uid]) {
+                    showAlert("شما از این لابی خارج شده‌اید.");
+                    window.location.href = 'safe_list_libey.html';
+                    return;
+                }
+                
+                // اگر بازی شروع شده باشد، UI بازی را نمایش بده
+                if (lobbyData.status === 'playing') {
+                    renderGameUI(lobbyData);
+                } else {
+                    // اگر بازی در حال انتظار است، UI لابی را نمایش بده
+                    renderLobbyUI(lobbyData);
+                }
+            });
+            
+            // راه‌اندازی لیسنر برای چت
+            setupChatListener(lobbyId);
+        }
+        
+        // تابع برای رندر کردن UI در حالت لابی (قبل از شروع بازی)
+        function renderLobbyUI(lobbyData) {
+            // مخفی کردن کاورهای بازی
+            gameCountdownOverlay.classList.add('hidden');
+            gameVotingOverlay.classList.add('hidden');
+            if(gameTimerInterval) clearInterval(gameTimerInterval);
+
+            const isHost = currentUser.uid === lobbyData.hostId;
+            const playersMap = lobbyData.players || {};
+            const playerCount = Object.keys(playersMap).length;
+            const maxPlayers = lobbyData.gameSettings?.maxPlayers || 4;
+            
+            // نمایش اطلاعات اصلی لابی
+            detailLobbyName.innerHTML = formatLobbyNameWithColor(lobbyData.name);
+            detailHostName.textContent = `سازنده: ${playersMap[lobbyData.hostId] || 'ناشناس'}`;
+            detailPlayerCount.textContent = `بازیکنان: ${playerCount}/${maxPlayers}`;
+            
+            // نمایش/عدم نمایش دکمه‌های هاست
+            hostActionsContainer.style.display = isHost ? 'flex' : 'none';
+            if (isHost) {
+                startGameBtn.disabled = playerCount !== maxPlayers;
+                startGameBtn.textContent = `شروع بازی (${playerCount}/${maxPlayers})`;
+            }
+            
+            // رندر کردن لیست بازیکنان
+            playerListContainer.innerHTML = '';
+            for (const [uid, displayName] of Object.entries(playersMap)) {
+                const playerItem = document.createElement('div');
+                playerItem.className = 'player-list-item';
+                if (uid === lobbyData.hostId) playerItem.classList.add('is-host');
+                
+                const hostLabel = uid === lobbyData.hostId ? '<span class="host-label">(سازنده)</span>' : '';
+                const kickButton = isHost && uid !== currentUser.uid 
+                    ? `<button class="kick-player-btn" data-player-id="${uid}" data-player-name="${displayName}">اخراج</button>` 
+                    : '';
+                    
+                playerItem.innerHTML = `
+                    <div class="flex items-center">
+                        <span class="player-name">${displayName}</span>
+                        ${hostLabel}
+                    </div>
+                    ${kickButton}
+                `;
+                playerListContainer.appendChild(playerItem);
+            }
+            
+            // افزودن رویداد به دکمه‌های اخراج
+            document.querySelectorAll('.kick-player-btn').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    showKickConfirmModal(e.target.dataset.playerId, e.target.dataset.playerName);
+                });
+            });
+        }
+        
+        // تابع برای رندر کردن UI در حین بازی
+        function renderGameUI(lobbyData) {
+            hostActionsContainer.style.display = 'none'; // مخفی کردن دکمه‌های هاست
+            playerListContainer.innerHTML = '<p class="text-center font-bold">بازی در جریان است...</p>';
+            
+            const gameState = lobbyData.gameState;
+            
+            if (!gameState) return;
+
+            // مدیریت وضعیت‌های مختلف بازی
+            switch (gameState.status) {
+                case 'countdown':
+                    gameCountdownOverlay.classList.remove('hidden');
+                    if (!gameTimerInterval) {
+                        gameTimerInterval = setInterval(() => {
+                           const remaining = Math.ceil((gameState.countdownEndTime - Date.now()) / 1000);
+                           countdownNumber.textContent = Math.max(0, remaining);
+                           if (remaining <= 0) clearInterval(gameTimerInterval);
+                        }, 1000);
+                    }
+                    break;
+                case 'active':
+                    gameCountdownOverlay.classList.add('hidden');
+                    // اینجا منطق نمایش تایمر اصلی بازی پیاده‌سازی می‌شود
+                    break;
+                case 'voting':
+                    gameVotingOverlay.classList.remove('hidden');
+                    gameResultDisplay.classList.add('hidden');
+                    // منطق نمایش دکمه‌های رای‌گیری
+                    break;
+                case 'ended':
+                    gameVotingOverlay.classList.remove('hidden');
+                    votingOptions.innerHTML = ''; // مخفی کردن دکمه‌های رای
+                    gameResultDisplay.classList.remove('hidden');
+                    winnerText.textContent = gameState.winner === 'Human' ? 'تیم انسان‌ها برنده شد!' : 'هوش مصنوعی برنده شد!';
+                    reasonText.textContent = gameState.winReason || '';
+                    break;
+            }
+        }
+        
+        // 4. تابع برای گوش دادن به چت لابی
+        function setupChatListener(lobbyId) {
+            const messagesRef = collection(db, `global_lobbies/${lobbyId}/messages`);
+            const q = query(messagesRef, orderBy("timestamp", "asc"));
+
+            unsubscribeChat = onSnapshot(q, (snapshot) => {
+                lobbyChatMessages.innerHTML = '';
+                snapshot.forEach(doc => {
+                    const msg = doc.data();
+                    const messageDiv = document.createElement('div');
+                    messageDiv.classList.add('chat-message');
+                    if (msg.senderUid === currentUser.uid) {
+                        messageDiv.classList.add('current-user');
+                    }
+                    messageDiv.innerHTML = `
+                        <span class="sender-name">${msg.senderName}</span>
+                        <p>${msg.text}</p>
+                    `;
+                    lobbyChatMessages.appendChild(messageDiv);
+                });
+                lobbyChatMessages.scrollTop = lobbyChatMessages.scrollHeight;
+            });
+        }
+        
+        // --- رویدادها ---
+
+        // ارسال پیام در چت
+        lobbyChatForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const text = lobbyChatInput.value.trim();
+            if (text && currentLobbyId && currentUserData) {
+                lobbyChatInput.value = '';
+                const messagesRef = collection(db, `global_lobbies/${currentLobbyId}/messages`);
+                await addDoc(messagesRef, {
+                    text: text,
+                    senderUid: currentUser.uid,
+                    senderName: currentUserData.displayName,
+                    timestamp: serverTimestamp()
+                });
+            }
+        });
+        
+        // ترک کردن لابی
+        leaveLobbyBtn.addEventListener('click', async () => {
+            if (!confirm("آیا مطمئن هستید که می‌خواهید لابی را ترک کنید؟")) return;
+            
+            const lobbyRef = doc(db, 'global_lobbies', currentLobbyId);
+            const lobbySnap = await getDoc(lobbyRef);
+            if (!lobbySnap.exists()) return;
+
+            if (lobbySnap.data().hostId === currentUser.uid) {
+                // اگر هاست باشد، لابی را حذف می‌کند
+                await deleteDoc(lobbyRef);
+            } else {
+                // اگر بازیکن عادی باشد، فقط از لیست حذف می‌شود
+                await updateDoc(lobbyRef, {
+                    [`players.${currentUser.uid}`]: deleteField()
+                });
+            }
+        });
+
+        // شروع بازی (توسط هاست)
+        startGameBtn.addEventListener('click', async () => {
+             // اینجا منطق کسر سکه و شروع بازی پیاده‌سازی می‌شود
+             // برای سادگی، فعلا فقط وضعیت را تغییر می‌دهیم
+             const lobbyRef = doc(db, 'global_lobbies', currentLobbyId);
+             await updateDoc(lobbyRef, {
+                 status: "playing",
+                 gameState: {
+                     status: 'countdown',
+                     countdownEndTime: Date.now() + 5000 // 5 ثانیه شمارش معکوس
+                 }
+             });
+        });
+
+        // رویدادهای مودال اخراج
+        kickPlayerConfirmBtn.addEventListener('click', () => {
+            if (playerToKick) {
+                kickPlayer(currentLobbyId, playerToKick);
+            }
+        });
+        cancelKickPlayerBtn.addEventListener('click', hideKickConfirmModal);
+        
+        // بازگشت به لیست لابی‌ها بعد از پایان بازی
+        returnToLobbiesBtn.addEventListener('click', () => {
+            window.location.href = 'safe_list_libey.html';
+        });
+
+    </script>
+</body>
+</html>
