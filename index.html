@@ -4013,6 +4013,24 @@
                     }
                     return;
                 }
+                
+                // *** START: HOST-ONLY GAME STATE TRANSITION LOGIC (BUG FIX) ***
+                if (isCurrentUserHost && lobbyData.gameState) {
+                    const gameState = lobbyData.gameState;
+                    // Check if nomination voting is complete
+                    if (gameState.phase === 'nomination_voting' && Object.keys(gameState.nominationVotes).length >= gameState.livingPlayers.length) {
+                        await host_resolveNominationVotes(lobbyId, lobbyData);
+                        return; // Stop further processing as a state change is happening
+                    }
+                    // Check if execution voting is complete
+                    const voters = gameState.livingPlayers.filter(uid => uid !== gameState.nominatedPlayer);
+                    if (gameState.phase === 'execution_voting' && Object.keys(gameState.executionVotes).length >= voters.length) {
+                        await host_resolveExecutionVotes(lobbyId, lobbyData);
+                        return; // Stop further processing as a state change is happening
+                    }
+                }
+                // *** END: HOST-ONLY GAME STATE TRANSITION LOGIC (BUG FIX) ***
+
 
                 // If game is active, hand over to game UI setup
                 if (lobbyData.status === 'playing' && lobbyData.gameState) {
@@ -4283,7 +4301,7 @@
             });
         }
         
-        // --- Game Logic Functions (HEAVILY REVISED) ---
+                // --- Game Logic Functions (HEAVILY REVISED) ---
 
         /**
          * The core function to start a game. It uses a Firestore transaction
@@ -4589,55 +4607,76 @@
             const myUid = auth.currentUser.uid;
             const lobbyRef = doc(db, 'global_lobbies', lobbyId);
 
-            await runTransaction(db, async (transaction) => {
-                const lobbyDoc = await transaction.get(lobbyRef);
-                if (!lobbyDoc.exists()) throw new Error("لابی یافت نشد.");
-                const lobbyData = lobbyDoc.data();
-                const gameState = lobbyData.gameState;
+            // This function now *only* registers the vote. The host will handle the resolution.
+            try {
+                 await runTransaction(db, async (transaction) => {
+                    const lobbyDoc = await transaction.get(lobbyRef);
+                    if (!lobbyDoc.exists()) throw new Error("لابی یافت نشد.");
+                    const gameState = lobbyDoc.data().gameState;
 
-                if (gameState.phase !== 'nomination_voting' || gameState.nominationVotes[myUid]) return;
-
-                const newVotes = { ...gameState.nominationVotes, [myUid]: targetUid };
-                transaction.update(lobbyRef, { 'gameState.nominationVotes': newVotes });
-
-                // If all living players have voted, host resolves the vote
-                if (Object.keys(newVotes).length === gameState.livingPlayers.length && lobbyData.hostId === myUid) {
-                    const voteCounts = {};
-                    Object.values(newVotes).forEach(votedFor => {
-                        voteCounts[votedFor] = (voteCounts[votedFor] || 0) + 1;
-                    });
+                    // Do not proceed if already voted or not in the right phase
+                    if (gameState.phase !== 'nomination_voting' || gameState.nominationVotes[myUid]) {
+                        return;
+                    }
                     
-                    let maxVotes = 0;
-                    let nominatedPlayers = [];
-                    for (const player in voteCounts) {
-                        if (voteCounts[player] > maxVotes) {
-                            maxVotes = voteCounts[player];
-                            nominatedPlayers = [player];
-                        } else if (voteCounts[player] === maxVotes) {
-                            nominatedPlayers.push(player);
-                        }
-                    }
-
-                    if (nominatedPlayers.length === 1) { // A single player is nominated
-                        const defenseTimeSeconds = lobbyData.gameSettings.defenseTimeSeconds;
-                        transaction.update(lobbyRef, {
-                            'gameState.phase': 'defense',
-                            'gameState.nominatedPlayer': nominatedPlayers[0],
-                            'gameState.phaseEndTime': Date.now() + defenseTimeSeconds * 1000
-                        });
-                    } else { // Draw, so restart the 'active' phase
-                        const gameDurationSeconds = lobbyData.gameSettings.gameDurationMinutes * 60;
-                        transaction.update(lobbyRef, {
-                            'gameState.phase': 'active',
-                            'gameState.turn': gameState.turn + 1,
-                            'gameState.nominationVotes': {},
-                            'gameState.phaseEndTime': Date.now() + gameDurationSeconds * 1000
-                        });
-                    }
-                }
-            });
+                    transaction.update(lobbyRef, {
+                        [`gameState.nominationVotes.${myUid}`]: targetUid
+                    });
+                });
+            } catch (error) {
+                console.error("Error casting nomination vote:", error);
+                showMessageBox("خطا در ثبت رای.", "error");
+            }
         }
         
+        async function host_resolveNominationVotes(lobbyId, lobbyData) {
+            const lobbyRef = doc(db, 'global_lobbies', lobbyId);
+            const gameState = lobbyData.gameState;
+            
+            console.log("Host is resolving nomination votes...");
+
+            const voteCounts = {};
+            Object.values(gameState.nominationVotes).forEach(votedFor => {
+                voteCounts[votedFor] = (voteCounts[votedFor] || 0) + 1;
+            });
+            
+            let maxVotes = 0;
+            let nominatedPlayers = [];
+            for (const player in voteCounts) {
+                if (voteCounts[player] > maxVotes) {
+                    maxVotes = voteCounts[player];
+                    nominatedPlayers = [player];
+                } else if (voteCounts[player] === maxVotes) {
+                    nominatedPlayers.push(player);
+                }
+            }
+
+            const updates = {};
+            if (nominatedPlayers.length === 1) { // A single player is nominated
+                console.log(`Nomination resolved. Player ${nominatedPlayers[0]} is going to defense.`);
+                const defenseTimeSeconds = lobbyData.gameSettings.defenseTimeSeconds;
+                updates['gameState.phase'] = 'defense';
+                updates['gameState.nominatedPlayer'] = nominatedPlayers[0];
+                updates['gameState.phaseEndTime'] = Date.now() + defenseTimeSeconds * 1000;
+            } else { // Draw, so restart the 'active' phase
+                console.log("Nomination resulted in a draw. Restarting active phase.");
+                const gameDurationSeconds = lobbyData.gameSettings.gameDurationMinutes * 60;
+                updates['gameState.phase'] = 'active';
+                updates['gameState.turn'] = gameState.turn + 1;
+                updates['gameState.phaseEndTime'] = Date.now() + gameDurationSeconds * 1000;
+                updates['gameState.nominatedPlayer'] = null;
+                updates['gameState.nominationVotes'] = {};
+                updates['gameState.executionVotes'] = {};
+            }
+
+            try {
+                await updateDoc(lobbyRef, updates);
+            } catch (error) {
+                console.error("Host failed to resolve nomination votes:", error);
+            }
+        }
+
+
         function renderExecutionVotingOptions(lobbyId, lobbyData) {
             const gameState = lobbyData.gameState;
             const myUid = auth.currentUser.uid;
@@ -4670,26 +4709,34 @@
             const myUid = auth.currentUser.uid;
             const lobbyRef = doc(db, 'global_lobbies', lobbyId);
 
-            await runTransaction(db, async (transaction) => {
-                const lobbyDoc = await transaction.get(lobbyRef);
-                if (!lobbyDoc.exists()) throw new Error("لابی یافت نشد.");
-                const lobbyData = lobbyDoc.data();
-                const gameState = lobbyData.gameState;
+            // This function now *only* registers the vote. The host will handle the resolution.
+            try {
+                await runTransaction(db, async (transaction) => {
+                    const lobbyDoc = await transaction.get(lobbyRef);
+                    if (!lobbyDoc.exists()) throw new Error("لابی یافت نشد.");
+                    const gameState = lobbyDoc.data().gameState;
 
-                if (gameState.phase !== 'execution_voting' || myUid === gameState.nominatedPlayer || gameState.executionVotes[myUid]) return;
-
-                const newVotes = { ...gameState.executionVotes, [myUid]: vote };
-                transaction.update(lobbyRef, { 'gameState.executionVotes': newVotes });
-
-                const voters = gameState.livingPlayers.filter(uid => uid !== gameState.nominatedPlayer);
-                if (Object.keys(newVotes).length === voters.length && lobbyData.hostId === myUid) {
-                    await resolveExecutionVotes(transaction, lobbyRef, lobbyData);
-                }
-            });
+                    // Do not proceed if already voted, not in the right phase, or the nominated player
+                    if (gameState.phase !== 'execution_voting' || myUid === gameState.nominatedPlayer || gameState.executionVotes[myUid]) {
+                        return;
+                    }
+                    
+                    transaction.update(lobbyRef, {
+                         [`gameState.executionVotes.${myUid}`]: vote
+                    });
+                });
+            } catch (error) {
+                console.error("Error casting execution vote:", error);
+                showMessageBox("خطا در ثبت رای.", "error");
+            }
         }
 
-        async function resolveExecutionVotes(transaction, lobbyRef, lobbyData) {
+        async function host_resolveExecutionVotes(lobbyId, lobbyData) {
+            const lobbyRef = doc(db, 'global_lobbies', lobbyId);
             const gameState = lobbyData.gameState;
+
+            console.log("Host is resolving execution votes...");
+            
             const voters = gameState.livingPlayers.filter(uid => uid !== gameState.nominatedPlayer);
             const votes = gameState.executionVotes;
 
@@ -4701,6 +4748,7 @@
             
             let updates = {};
             if (executeCount >= threshold) { // Player is executed
+                console.log(`Execution resolved. Player ${gameState.nominatedPlayer} is being removed.`);
                 const killedPlayer = gameState.nominatedPlayer;
                 const newLivingPlayers = gameState.livingPlayers.filter(uid => uid !== killedPlayer);
                 
@@ -4730,6 +4778,8 @@
                      updates['gameState.phase'] = 'active'; // or a special phase
                      updates['gameState.aiQuestion'] = { state: 'pending' };
                 }
+            } else {
+                 console.log(`Execution resolved. Player ${gameState.nominatedPlayer} survives.`);
             }
             
             // If not executed or if game continues, reset for next turn
@@ -4743,7 +4793,11 @@
                 updates['gameState.executionVotes'] = {};
             }
             
-            transaction.update(lobbyRef, updates);
+            try {
+                await updateDoc(lobbyRef, updates);
+            } catch (error) {
+                console.error("Host failed to resolve execution votes:", error);
+            }
         }
 
         function openAIQuestionModal() {
@@ -4764,22 +4818,16 @@
         }
 
         async function checkForAIQuestionScenario(lobbyData) {
-    // اگر gameState وجود ندارد (یعنی بازی هنوز شروع نشده)، از تابع خارج شو
-    if (!lobbyData || !lobbyData.gameState) {
-        return;
-    }
-    
-    const gameState = lobbyData.gameState;
-    const myUid = auth.currentUser.uid;
-    
-    // این بخش بدون تغییر باقی می‌ماند
-    if (gameState.phase === 'active' && gameState.livingPlayers.length === 2 && gameState.aiQuestion?.state === 'pending') {
-        const aiPlayer = gameState.livingPlayers.find(uid => gameState.roles[uid] === 'AI');
-        if (myUid === aiPlayer) {
-            openAIQuestionModal();
+            const gameState = lobbyData.gameState;
+            const myUid = auth.currentUser.uid;
+            
+            if (gameState.phase === 'active' && gameState.livingPlayers.length === 2 && gameState.aiQuestion?.state === 'pending') {
+                const aiPlayer = gameState.livingPlayers.find(uid => gameState.roles[uid] === 'AI');
+                if (myUid === aiPlayer) {
+                    openAIQuestionModal();
+                }
+            }
         }
-    }
-}
 
         // --- Event Listeners ---
         function initializeAuthScreen() {
