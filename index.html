@@ -2179,7 +2179,7 @@
                     <h2 class="text-2xl sm:text-3xl font-bold mb-6">پروفایل کاربری</h2>
                     <p><strong>نام نمایشی:</strong> <span id="profile-display-name">---</span></p>
                     <p><strong>ایمیل:</strong> <span id="profile-email">---</span></p>
-                    <p><strong>شناسه کاربر (UID):</strong> <span id="profile-uid" class="break-all text-sm">---</span></p>
+                                        <p><strong>شناسه کاربر (UID):</strong> <span id="profile-uid" class="break-all text-sm">---</span></p>
                     <p><strong>سکه‌ها:</strong> <span id="profile-coins" class="font-bold">---</span></p>
                     <button id="back-to-main-menu-from-profile" class="w-full classic-btn btn-gray-classic text-lg sm:text-xl">
                         بازگشت
@@ -3260,11 +3260,10 @@
                             applyTheme(savedTheme);
                         }
 
-                        // Also update the approved lobby names list in the modal whenever profile data changes
+                        // REVISED: Also update the approved lobby names list in the modal whenever profile data changes
                         if (!createLobbyModal.classList.contains('hidden')) { // Only if modal is open
-                           renderApprovedLobbyNamesManagementList(); // Rerender management list
-                           // Re-evaluate approved names dropdown & proposal area visibility
-                           updateCreateLobbyModalUI(createLobbyModalTitle.textContent === 'مدیریت نام‌های لابی و ساخت لابی' ? 'myLobbies' : 'create'); // Use the new helper here
+                           // The `updateCreateLobbyModalUI` function will now handle all UI updates correctly based on new `currentUserData`.
+                           updateCreateLobbyModalUI(createLobbyModalTitle.textContent === 'مدیریت نام‌های لابی و ساخت لابی' ? 'myLobbies' : 'create');
                         }
                     } else {
                         console.warn("User profile document not found. Creating a default one.");
@@ -3294,7 +3293,6 @@
                 // User is logged out. Clean up all data and listeners.
                 if (unsubscribeUserProfile) unsubscribeUserProfile();
                 // unsubscribeGameSettings is intentionally not cleared here, as it's a global setting.
-                // ... (other listener cleanups) ...
                 if (unsubscribeLobbies) unsubscribeLobbies();
                 if (unsubscribeLobbyDetail) unsubscribeLobbyDetail();
                 if (unsubscribeKickedPlayers) unsubscribeKickedPlayers();
@@ -3381,10 +3379,10 @@
         }
 
         /**
+         * // REVISED & CENTRALIZED: The main function to handle the link between admin approval and user data.
          * Checks for lobby name proposals marked as "approved" by an admin,
          * adds them to the user's profile, and updates the proposal status to "processed".
-         * This function acts as the missing link between admin approval and user data.
-         * NOTE: In a production environment, this is ideally handled by a Cloud Function for reliability.
+         * This function uses a batch write for atomicity and is the core of the fix.
          */
         async function processNewlyApprovedLobbyNames() {
             if (!auth.currentUser) return;
@@ -3399,7 +3397,7 @@
             try {
                 const approvedSnapshot = await getDocs(qApproved);
                 if (approvedSnapshot.empty) {
-                    // No new approvals to process
+                    // No new approvals to process, we can return early.
                     return;
                 }
 
@@ -3426,13 +3424,14 @@
 
                 // 3. Commit all changes
                 await batch.commit();
-                console.log(`Processed ${namesToAdd.length} newly approved lobby names for the user.`);
+                console.log(`Processed and added ${namesToAdd.length} newly approved lobby names to the user's profile.`);
                 // The onSnapshot listener on the user's profile will automatically pick up this change
                 // and update currentUserData, triggering UI updates.
 
             } catch (error) {
                 console.error("Error processing newly approved lobby names:", error);
-                // We can show a message, but it's a background process, so console log is sufficient
+                // This is a background process, so console logging is sufficient for now.
+                // In a production app, you might want to report this to an error tracking service.
             }
         }
 
@@ -3497,8 +3496,8 @@
         }
 
 
-        // NEW: Function to update the UI of the Create Lobby modal based on mode and user data
-        async function updateCreateLobbyModalUI(mode) {
+        // NEW & REVISED: Function to update the UI of the Create Lobby modal based on mode and user data
+        function updateCreateLobbyModalUI(mode) {
             // Clear any previous pending names listener from a prior modal opening
             if (unsubscribePendingLobbyNames) {
                 unsubscribePendingLobbyNames();
@@ -3527,15 +3526,14 @@
                 approvedNames.forEach(name => {
                     const option = document.createElement('option');
                     option.value = name;
-                    option.innerHTML = formatLobbyNameWithColor(name);
+                    option.innerHTML = formatLobbyNameWithColor(name); // Use innerHTML for styled options
                     approvedLobbyNamesSelect.appendChild(option);
                 });
                 lobbyNameSelectionArea.classList.remove('hidden'); // Show the dropdown
-                submitCreateLobbyBtn.disabled = true; // Still disabled until selection
+                submitCreateLobbyBtn.disabled = !approvedLobbyNamesSelect.value; // Disable if no selection
                 submitCreateLobbyBtn.classList.remove('hidden'); // Make sure create button is visible
             } else {
                 lobbyNameSelectionArea.classList.add('hidden'); // Hide the dropdown if no approved names
-                submitCreateLobbyBtn.disabled = true;
                 submitCreateLobbyBtn.classList.add('hidden'); // Hide create button if no approved names
             }
 
@@ -3610,12 +3608,14 @@
         }
 
 
+        // REVISED: Make the function async to await the processing of new names.
         async function openCreateLobbyModal(mode = 'create') {
             if (!auth.currentUser || !currentUserData) {
                 showCreateLobbyMessageBox("ابتدا وارد حساب کاربری خود شوید.", "error");
                 return;
             }
-
+            
+            // FIX: Await the processing of any pending approvals before showing the modal.
             await processNewlyApprovedLobbyNames();
             
             if (userHasActiveLobby && currentLobbyId && mode === 'create') {
@@ -3649,9 +3649,8 @@
             maxPlayersInput.value = 4;
             defenseTimeInput.value = 60;
 
-
             // Use the new helper function to manage UI visibility
-            await updateCreateLobbyModalUI(mode); 
+            updateCreateLobbyModalUI(mode); // This is now non-async, as the data is already fresh.
 
             if (mode === 'myLobbies' && (!currentUserData.approvedLobbyNames || currentUserData.approvedLobbyNames.length === 0)) {
                  showCreateLobbyMessageBox("شما هیچ نام لابی تایید شده‌ای برای مدیریت یا ساخت لابی ندارید.", "info");
@@ -4013,24 +4012,6 @@
                     }
                     return;
                 }
-                
-                // *** START: HOST-ONLY GAME STATE TRANSITION LOGIC (BUG FIX) ***
-                if (isCurrentUserHost && lobbyData.gameState) {
-                    const gameState = lobbyData.gameState;
-                    // Check if nomination voting is complete
-                    if (gameState.phase === 'nomination_voting' && Object.keys(gameState.nominationVotes).length >= gameState.livingPlayers.length) {
-                        await host_resolveNominationVotes(lobbyId, lobbyData);
-                        return; // Stop further processing as a state change is happening
-                    }
-                    // Check if execution voting is complete
-                    const voters = gameState.livingPlayers.filter(uid => uid !== gameState.nominatedPlayer);
-                    if (gameState.phase === 'execution_voting' && Object.keys(gameState.executionVotes).length >= voters.length) {
-                        await host_resolveExecutionVotes(lobbyId, lobbyData);
-                        return; // Stop further processing as a state change is happening
-                    }
-                }
-                // *** END: HOST-ONLY GAME STATE TRANSITION LOGIC (BUG FIX) ***
-
 
                 // If game is active, hand over to game UI setup
                 if (lobbyData.status === 'playing' && lobbyData.gameState) {
@@ -4301,7 +4282,7 @@
             });
         }
         
-                // --- Game Logic Functions (HEAVILY REVISED) ---
+        // --- Game Logic Functions (HEAVILY REVISED) ---
 
         /**
          * The core function to start a game. It uses a Firestore transaction
@@ -4607,76 +4588,55 @@
             const myUid = auth.currentUser.uid;
             const lobbyRef = doc(db, 'global_lobbies', lobbyId);
 
-            // This function now *only* registers the vote. The host will handle the resolution.
-            try {
-                 await runTransaction(db, async (transaction) => {
-                    const lobbyDoc = await transaction.get(lobbyRef);
-                    if (!lobbyDoc.exists()) throw new Error("لابی یافت نشد.");
-                    const gameState = lobbyDoc.data().gameState;
+            await runTransaction(db, async (transaction) => {
+                const lobbyDoc = await transaction.get(lobbyRef);
+                if (!lobbyDoc.exists()) throw new Error("لابی یافت نشد.");
+                const lobbyData = lobbyDoc.data();
+                const gameState = lobbyData.gameState;
 
-                    // Do not proceed if already voted or not in the right phase
-                    if (gameState.phase !== 'nomination_voting' || gameState.nominationVotes[myUid]) {
-                        return;
-                    }
-                    
-                    transaction.update(lobbyRef, {
-                        [`gameState.nominationVotes.${myUid}`]: targetUid
+                if (gameState.phase !== 'nomination_voting' || gameState.nominationVotes[myUid]) return;
+
+                const newVotes = { ...gameState.nominationVotes, [myUid]: targetUid };
+                transaction.update(lobbyRef, { 'gameState.nominationVotes': newVotes });
+
+                // If all living players have voted, host resolves the vote
+                if (Object.keys(newVotes).length === gameState.livingPlayers.length && lobbyData.hostId === myUid) {
+                    const voteCounts = {};
+                    Object.values(newVotes).forEach(votedFor => {
+                        voteCounts[votedFor] = (voteCounts[votedFor] || 0) + 1;
                     });
-                });
-            } catch (error) {
-                console.error("Error casting nomination vote:", error);
-                showMessageBox("خطا در ثبت رای.", "error");
-            }
+                    
+                    let maxVotes = 0;
+                    let nominatedPlayers = [];
+                    for (const player in voteCounts) {
+                        if (voteCounts[player] > maxVotes) {
+                            maxVotes = voteCounts[player];
+                            nominatedPlayers = [player];
+                        } else if (voteCounts[player] === maxVotes) {
+                            nominatedPlayers.push(player);
+                        }
+                    }
+
+                    if (nominatedPlayers.length === 1) { // A single player is nominated
+                        const defenseTimeSeconds = lobbyData.gameSettings.defenseTimeSeconds;
+                        transaction.update(lobbyRef, {
+                            'gameState.phase': 'defense',
+                            'gameState.nominatedPlayer': nominatedPlayers[0],
+                            'gameState.phaseEndTime': Date.now() + defenseTimeSeconds * 1000
+                        });
+                    } else { // Draw, so restart the 'active' phase
+                        const gameDurationSeconds = lobbyData.gameSettings.gameDurationMinutes * 60;
+                        transaction.update(lobbyRef, {
+                            'gameState.phase': 'active',
+                            'gameState.turn': gameState.turn + 1,
+                            'gameState.nominationVotes': {},
+                            'gameState.phaseEndTime': Date.now() + gameDurationSeconds * 1000
+                        });
+                    }
+                }
+            });
         }
         
-        async function host_resolveNominationVotes(lobbyId, lobbyData) {
-            const lobbyRef = doc(db, 'global_lobbies', lobbyId);
-            const gameState = lobbyData.gameState;
-            
-            console.log("Host is resolving nomination votes...");
-
-            const voteCounts = {};
-            Object.values(gameState.nominationVotes).forEach(votedFor => {
-                voteCounts[votedFor] = (voteCounts[votedFor] || 0) + 1;
-            });
-            
-            let maxVotes = 0;
-            let nominatedPlayers = [];
-            for (const player in voteCounts) {
-                if (voteCounts[player] > maxVotes) {
-                    maxVotes = voteCounts[player];
-                    nominatedPlayers = [player];
-                } else if (voteCounts[player] === maxVotes) {
-                    nominatedPlayers.push(player);
-                }
-            }
-
-            const updates = {};
-            if (nominatedPlayers.length === 1) { // A single player is nominated
-                console.log(`Nomination resolved. Player ${nominatedPlayers[0]} is going to defense.`);
-                const defenseTimeSeconds = lobbyData.gameSettings.defenseTimeSeconds;
-                updates['gameState.phase'] = 'defense';
-                updates['gameState.nominatedPlayer'] = nominatedPlayers[0];
-                updates['gameState.phaseEndTime'] = Date.now() + defenseTimeSeconds * 1000;
-            } else { // Draw, so restart the 'active' phase
-                console.log("Nomination resulted in a draw. Restarting active phase.");
-                const gameDurationSeconds = lobbyData.gameSettings.gameDurationMinutes * 60;
-                updates['gameState.phase'] = 'active';
-                updates['gameState.turn'] = gameState.turn + 1;
-                updates['gameState.phaseEndTime'] = Date.now() + gameDurationSeconds * 1000;
-                updates['gameState.nominatedPlayer'] = null;
-                updates['gameState.nominationVotes'] = {};
-                updates['gameState.executionVotes'] = {};
-            }
-
-            try {
-                await updateDoc(lobbyRef, updates);
-            } catch (error) {
-                console.error("Host failed to resolve nomination votes:", error);
-            }
-        }
-
-
         function renderExecutionVotingOptions(lobbyId, lobbyData) {
             const gameState = lobbyData.gameState;
             const myUid = auth.currentUser.uid;
@@ -4709,34 +4669,26 @@
             const myUid = auth.currentUser.uid;
             const lobbyRef = doc(db, 'global_lobbies', lobbyId);
 
-            // This function now *only* registers the vote. The host will handle the resolution.
-            try {
-                await runTransaction(db, async (transaction) => {
-                    const lobbyDoc = await transaction.get(lobbyRef);
-                    if (!lobbyDoc.exists()) throw new Error("لابی یافت نشد.");
-                    const gameState = lobbyDoc.data().gameState;
+            await runTransaction(db, async (transaction) => {
+                const lobbyDoc = await transaction.get(lobbyRef);
+                if (!lobbyDoc.exists()) throw new Error("لابی یافت نشد.");
+                const lobbyData = lobbyDoc.data();
+                const gameState = lobbyData.gameState;
 
-                    // Do not proceed if already voted, not in the right phase, or the nominated player
-                    if (gameState.phase !== 'execution_voting' || myUid === gameState.nominatedPlayer || gameState.executionVotes[myUid]) {
-                        return;
-                    }
-                    
-                    transaction.update(lobbyRef, {
-                         [`gameState.executionVotes.${myUid}`]: vote
-                    });
-                });
-            } catch (error) {
-                console.error("Error casting execution vote:", error);
-                showMessageBox("خطا در ثبت رای.", "error");
-            }
+                if (gameState.phase !== 'execution_voting' || myUid === gameState.nominatedPlayer || gameState.executionVotes[myUid]) return;
+
+                const newVotes = { ...gameState.executionVotes, [myUid]: vote };
+                transaction.update(lobbyRef, { 'gameState.executionVotes': newVotes });
+
+                const voters = gameState.livingPlayers.filter(uid => uid !== gameState.nominatedPlayer);
+                if (Object.keys(newVotes).length === voters.length && lobbyData.hostId === myUid) {
+                    await resolveExecutionVotes(transaction, lobbyRef, lobbyData);
+                }
+            });
         }
 
-        async function host_resolveExecutionVotes(lobbyId, lobbyData) {
-            const lobbyRef = doc(db, 'global_lobbies', lobbyId);
+        async function resolveExecutionVotes(transaction, lobbyRef, lobbyData) {
             const gameState = lobbyData.gameState;
-
-            console.log("Host is resolving execution votes...");
-            
             const voters = gameState.livingPlayers.filter(uid => uid !== gameState.nominatedPlayer);
             const votes = gameState.executionVotes;
 
@@ -4748,7 +4700,6 @@
             
             let updates = {};
             if (executeCount >= threshold) { // Player is executed
-                console.log(`Execution resolved. Player ${gameState.nominatedPlayer} is being removed.`);
                 const killedPlayer = gameState.nominatedPlayer;
                 const newLivingPlayers = gameState.livingPlayers.filter(uid => uid !== killedPlayer);
                 
@@ -4778,8 +4729,6 @@
                      updates['gameState.phase'] = 'active'; // or a special phase
                      updates['gameState.aiQuestion'] = { state: 'pending' };
                 }
-            } else {
-                 console.log(`Execution resolved. Player ${gameState.nominatedPlayer} survives.`);
             }
             
             // If not executed or if game continues, reset for next turn
@@ -4793,11 +4742,7 @@
                 updates['gameState.executionVotes'] = {};
             }
             
-            try {
-                await updateDoc(lobbyRef, updates);
-            } catch (error) {
-                console.error("Host failed to resolve execution votes:", error);
-            }
+            transaction.update(lobbyRef, updates);
         }
 
         function openAIQuestionModal() {
