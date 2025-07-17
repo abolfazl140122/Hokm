@@ -2179,7 +2179,7 @@
                     <h2 class="text-2xl sm:text-3xl font-bold mb-6">پروفایل کاربری</h2>
                     <p><strong>نام نمایشی:</strong> <span id="profile-display-name">---</span></p>
                     <p><strong>ایمیل:</strong> <span id="profile-email">---</span></p>
-                                        <p><strong>شناسه کاربر (UID):</strong> <span id="profile-uid" class="break-all text-sm">---</span></p>
+                    <p><strong>شناسه کاربر (UID):</strong> <span id="profile-uid" class="break-all text-sm">---</span></p>
                     <p><strong>سکه‌ها:</strong> <span id="profile-coins" class="font-bold">---</span></p>
                     <button id="back-to-main-menu-from-profile" class="w-full classic-btn btn-gray-classic text-lg sm:text-xl">
                         بازگشت
@@ -3260,10 +3260,11 @@
                             applyTheme(savedTheme);
                         }
 
-                        // REVISED: Also update the approved lobby names list in the modal whenever profile data changes
+                        // Also update the approved lobby names list in the modal whenever profile data changes
                         if (!createLobbyModal.classList.contains('hidden')) { // Only if modal is open
-                           // The `updateCreateLobbyModalUI` function will now handle all UI updates correctly based on new `currentUserData`.
-                           updateCreateLobbyModalUI(createLobbyModalTitle.textContent === 'مدیریت نام‌های لابی و ساخت لابی' ? 'myLobbies' : 'create');
+                           renderApprovedLobbyNamesManagementList(); // Rerender management list
+                           // Re-evaluate approved names dropdown & proposal area visibility
+                           updateCreateLobbyModalUI(createLobbyModalTitle.textContent === 'مدیریت نام‌های لابی و ساخت لابی' ? 'myLobbies' : 'create'); // Use the new helper here
                         }
                     } else {
                         console.warn("User profile document not found. Creating a default one.");
@@ -3293,6 +3294,7 @@
                 // User is logged out. Clean up all data and listeners.
                 if (unsubscribeUserProfile) unsubscribeUserProfile();
                 // unsubscribeGameSettings is intentionally not cleared here, as it's a global setting.
+                // ... (other listener cleanups) ...
                 if (unsubscribeLobbies) unsubscribeLobbies();
                 if (unsubscribeLobbyDetail) unsubscribeLobbyDetail();
                 if (unsubscribeKickedPlayers) unsubscribeKickedPlayers();
@@ -3379,10 +3381,10 @@
         }
 
         /**
-         * // REVISED & CENTRALIZED: The main function to handle the link between admin approval and user data.
          * Checks for lobby name proposals marked as "approved" by an admin,
          * adds them to the user's profile, and updates the proposal status to "processed".
-         * This function uses a batch write for atomicity and is the core of the fix.
+         * This function acts as the missing link between admin approval and user data.
+         * NOTE: In a production environment, this is ideally handled by a Cloud Function for reliability.
          */
         async function processNewlyApprovedLobbyNames() {
             if (!auth.currentUser) return;
@@ -3397,7 +3399,7 @@
             try {
                 const approvedSnapshot = await getDocs(qApproved);
                 if (approvedSnapshot.empty) {
-                    // No new approvals to process, we can return early.
+                    // No new approvals to process
                     return;
                 }
 
@@ -3424,14 +3426,13 @@
 
                 // 3. Commit all changes
                 await batch.commit();
-                console.log(`Processed and added ${namesToAdd.length} newly approved lobby names to the user's profile.`);
+                console.log(`Processed ${namesToAdd.length} newly approved lobby names for the user.`);
                 // The onSnapshot listener on the user's profile will automatically pick up this change
                 // and update currentUserData, triggering UI updates.
 
             } catch (error) {
                 console.error("Error processing newly approved lobby names:", error);
-                // This is a background process, so console logging is sufficient for now.
-                // In a production app, you might want to report this to an error tracking service.
+                // We can show a message, but it's a background process, so console log is sufficient
             }
         }
 
@@ -3496,8 +3497,8 @@
         }
 
 
-        // NEW & REVISED: Function to update the UI of the Create Lobby modal based on mode and user data
-        function updateCreateLobbyModalUI(mode) {
+        // NEW: Function to update the UI of the Create Lobby modal based on mode and user data
+        async function updateCreateLobbyModalUI(mode) {
             // Clear any previous pending names listener from a prior modal opening
             if (unsubscribePendingLobbyNames) {
                 unsubscribePendingLobbyNames();
@@ -3526,14 +3527,15 @@
                 approvedNames.forEach(name => {
                     const option = document.createElement('option');
                     option.value = name;
-                    option.innerHTML = formatLobbyNameWithColor(name); // Use innerHTML for styled options
+                    option.innerHTML = formatLobbyNameWithColor(name);
                     approvedLobbyNamesSelect.appendChild(option);
                 });
                 lobbyNameSelectionArea.classList.remove('hidden'); // Show the dropdown
-                submitCreateLobbyBtn.disabled = !approvedLobbyNamesSelect.value; // Disable if no selection
+                submitCreateLobbyBtn.disabled = true; // Still disabled until selection
                 submitCreateLobbyBtn.classList.remove('hidden'); // Make sure create button is visible
             } else {
                 lobbyNameSelectionArea.classList.add('hidden'); // Hide the dropdown if no approved names
+                submitCreateLobbyBtn.disabled = true;
                 submitCreateLobbyBtn.classList.add('hidden'); // Hide create button if no approved names
             }
 
@@ -3608,14 +3610,12 @@
         }
 
 
-        // REVISED: Make the function async to await the processing of new names.
         async function openCreateLobbyModal(mode = 'create') {
             if (!auth.currentUser || !currentUserData) {
                 showCreateLobbyMessageBox("ابتدا وارد حساب کاربری خود شوید.", "error");
                 return;
             }
-            
-            // FIX: Await the processing of any pending approvals before showing the modal.
+
             await processNewlyApprovedLobbyNames();
             
             if (userHasActiveLobby && currentLobbyId && mode === 'create') {
@@ -3649,8 +3649,9 @@
             maxPlayersInput.value = 4;
             defenseTimeInput.value = 60;
 
+
             // Use the new helper function to manage UI visibility
-            updateCreateLobbyModalUI(mode); // This is now non-async, as the data is already fresh.
+            await updateCreateLobbyModalUI(mode); 
 
             if (mode === 'myLobbies' && (!currentUserData.approvedLobbyNames || currentUserData.approvedLobbyNames.length === 0)) {
                  showCreateLobbyMessageBox("شما هیچ نام لابی تایید شده‌ای برای مدیریت یا ساخت لابی ندارید.", "info");
