@@ -326,8 +326,7 @@
         body.theme-classic .create-lobby-modal h2,
         body.theme-classic .kick-player-confirm-modal h2,
         body.theme-classic .kicked-players-list-modal h2,
-        body.theme-classic .enter-password-modal h2,
-        body.theme-classic #server-lock-modal h2 {
+        body.theme-classic .enter-password-modal h2 {
             color: #FFD700;
         }
 
@@ -340,8 +339,7 @@
         body.theme-classic .kick-player-confirm-modal p,
         body.theme-classic .kicked-message-modal p,
         body.theme-classic .kicked-players-list-modal p,
-        body.theme-classic .enter-password-modal p,
-        body.theme-classic #server-lock-modal p {
+        body.theme-classic .enter-password-modal p {
             color: #E0E0E0;
         }
         body.theme-classic .lobby-proposal-message.text-red-400 {
@@ -542,8 +540,7 @@
         body.theme-cyberpunk .create-lobby-modal h2,
         body.theme-cyberpunk .kick-player-confirm-modal h2,
         body.theme-cyberpunk .kicked-players-list-modal h2,
-        body.theme-cyberpunk .enter-password-modal h2,
-        body.theme-cyberpunk #server-lock-modal h2 {
+        body.theme-cyberpunk .enter-password-modal h2 {
             color: #FF00FF;
         }
         body.theme-cyberpunk .profile-modal-content p,
@@ -555,8 +552,7 @@
         body.theme-cyberpunk .kick-player-confirm-modal p,
         body.theme-cyberpunk .kicked-message-modal p,
         body.theme-cyberpunk .kicked-players-list-modal p,
-        body.theme-cyberpunk .enter-password-modal p,
-        body.theme-cyberpunk #server-lock-modal p {
+        body.theme-cyberpunk .enter-password-modal p {
             color: #00FFFF;
         }
         body.theme-cyberpunk .lobby-proposal-message.text-red-400 {
@@ -736,8 +732,7 @@
         body.theme-forest .create-lobby-modal h2,
         body.theme-forest .kick-player-confirm-modal h2,
         body.theme-forest .kicked-players-list-modal h2,
-        body.theme-forest .enter-password-modal h2,
-        body.theme-forest #server-lock-modal h2 {
+        body.theme-forest .enter-password-modal h2 {
             color: #92B4A1;
         }
         body.theme-forest .profile-modal-content p,
@@ -749,8 +744,7 @@
         body.theme-forest .kick-player-confirm-modal p,
         body.theme-forest .kicked-message-modal p,
         body.theme-forest .kicked-players-list-modal p,
-        body.theme-forest .enter-password-modal p,
-        body.theme-forest #server-lock-modal p {
+        body.theme-forest .enter-password-modal p {
             color: #D4EDDA;
         }
         body.theme-forest .lobby-proposal-message.text-red-400 {
@@ -932,8 +926,7 @@
         body.theme-ocean .create-lobby-modal h2,
         body.theme-ocean .kick-player-confirm-modal h2,
         body.theme-ocean .kicked-players-list-modal h2,
-        body.theme-ocean .enter-password-modal h2,
-        body.theme-ocean #server-lock-modal h2 {
+        body.theme-ocean .enter-password-modal h2 {
             color: #64B5F6;
         }
         body.theme-ocean .profile-modal-content p,
@@ -945,8 +938,7 @@
         body.theme-ocean .kick-player-confirm-modal p,
         body.theme-ocean .kicked-message-modal p,
         body.theme-ocean .kicked-players-list-modal p,
-        body.theme-ocean .enter-password-modal p,
-        body.theme-ocean #server-lock-modal p {
+        body.theme-ocean .enter-password-modal p {
             color: #BBDEFB;
         }
         body.theme-ocean .lobby-proposal-message.text-red-400 {
@@ -1168,8 +1160,7 @@
         body.theme-minimal .create-lobby-modal h2,
         body.theme-minimal .kick-player-confirm-modal h2,
         body.theme-minimal .kicked-players-list-modal h2,
-        body.theme-minimal .enter-password-modal h2,
-        body.theme-minimal #server-lock-modal h2 {
+        body.theme-minimal .enter-password-modal h2 {
             color: #007BFF;
         }
         body.theme-minimal .profile-modal-content p,
@@ -1181,8 +1172,7 @@
         body.theme-minimal .kick-player-confirm-modal p,
         body.theme-minimal .kicked-message-modal p,
         body.theme-minimal .kicked-players-list-modal p,
-        body.theme-minimal .enter-password-modal p,
-        body.theme-minimal #server-lock-modal p {
+        body.theme-minimal .enter-password-modal p {
             color: #333; /* Default text on light modals */
         }
         body.theme-minimal .lobby-proposal-message.text-red-400 {
@@ -1962,26 +1952,7 @@
     <!-- Main container for all screens -->
     <div id="app" class="relative w-full h-full flex justify-center items-center">
 
-        <!-- NEW: Server Lock Screen -->
-        <div id="server-lock-screen" class="hidden absolute inset-0 flex justify-center items-center bg-black bg-opacity-80 z-60">
-            <div id="server-lock-modal" class="classic-card p-6 sm:p-8 w-11/12 max-w-md text-center">
-                <h2 class="text-2xl sm:text-3xl font-bold mb-4">ورود به سرور</h2>
-                <p class="mb-6">سرور با رمز عبور محافظت می‌شود. لطفاً برای ورود رمز را وارد کنید.</p>
-                <form id="server-lock-form" class="space-y-4">
-                    <div>
-                        <input type="password" id="server-lock-password-input" placeholder="رمز عبور سرور"
-                               class="w-full focus:outline-none focus:ring-2 focus:ring-blue-500 text-center"
-                               required>
-                    </div>
-                    <button type="submit"
-                            class="w-full mt-2 classic-btn btn-green-classic text-xl sm:text-2xl">
-                        ورود
-                    </button>
-                </form>
-                <div id="server-lock-message-box" class="mt-4 p-3 rounded-xl text-base text-center hidden" role="alert"></div>
-            </div>
-        </div>
-
+        <!-- All Modals and other screens remain the same... -->
         <!-- 1. Loading Screen (NEW GRAPHICAL VERSION) -->
         <div id="loading-screen" class="absolute inset-0 flex flex-col justify-center items-center z-50 page-transition-active page-transition-visible">
             <div class="loading-screen-container">
@@ -2519,12 +2490,6 @@
         const submitAuthBtn = document.getElementById('submit-auth-btn');
         const messageBox = document.getElementById('message-box'); 
         
-        // NEW: Server Lock Screen Elements
-        const serverLockScreen = document.getElementById('server-lock-screen');
-        const serverLockForm = document.getElementById('server-lock-form');
-        const serverLockPasswordInput = document.getElementById('server-lock-password-input');
-        const serverLockMessageBox = document.getElementById('server-lock-message-box');
-
         // NEW: Loading Screen specific elements
         const binaryBackground = document.getElementById('binary-background');
         const loadingSubText = document.getElementById('loading-sub-text');
@@ -2696,7 +2661,6 @@
         let isRefreshing = false; // NEW: State for refresh button
         let gameEntryCost = 100; // NEW: Default game entry cost, will be fetched from Firebase
         let currentTheme = 'classic'; // NEW: To store the currently active theme
-        let serverLockPassword = null; // NEW: Stores the server-wide password if it exists
 
         // Promise resolver for custom confirmation modal
         let resolveCustomConfirm;
@@ -2933,8 +2897,6 @@
         const showMessageBox = (msg, type) => showCustomMessage(messageBox, msg, type);
         // Wrapper for create lobby message box
         const showCreateLobbyMessageBox = (msg, type) => showCustomMessage(createLobbyMessageBox, msg, type);
-        // NEW: Wrapper for server lock message box
-        const showServerLockMessage = (msg, type) => showCustomMessage(serverLockMessageBox, msg, type);
 
 
         // Function to show custom confirmation modal
@@ -3199,14 +3161,16 @@
         }
         
         // =========================================================================
-        // === START OF AUTH & CONFIG LOGIC (WITH SERVER LOCK) =====================
+        // === START OF CORRECTED AUTH & REAL-TIME SETTINGS LOGIC =================
         // =========================================================================
 
         /**
          * NEW: Sets up a real-time listener for game settings (like entry cost).
+         * This ensures any changes in Firestore are immediately reflected in the app.
          */
         function setupGameSettingsListener() {
-            if (unsubscribeGameSettings) unsubscribeGameSettings();
+            if (unsubscribeGameSettings) unsubscribeGameSettings(); // Clean up previous listener if any
+
             const configRef = doc(db, `artifacts/${appId}/config/game_settings`);
             unsubscribeGameSettings = onSnapshot(configRef, (docSnap) => {
                 if (docSnap.exists()) {
@@ -3218,6 +3182,7 @@
                     }
                 } else {
                     console.warn("سند تنظیمات بازی یافت نشد. از مقدار پیش‌فرض استفاده می‌شود.");
+                    // Fallback to default if somehow the document is deleted after app start
                     gameEntryCost = 100;
                     friendlyGameCostSpan.textContent = gameEntryCost.toLocaleString('fa-IR');
                 }
@@ -3228,16 +3193,14 @@
         
         onAuthStateChanged(auth, async (user) => {
             console.log("onAuthStateChanged triggered. User:", user ? user.uid : "logged out");
-            
-            // NEW: If the server is locked, pause all auth state changes.
-            if (serverLockPassword) {
-                console.log("Server lock is active. onAuthStateChanged is paused.");
-                return;
-            }
 
             // Part 1: Manage User Data and Listeners
             if (user) {
+                // If a user is logged in, set up listeners.
                 if (unsubscribeUserProfile) unsubscribeUserProfile();
+                // setupGameSettingsListener is now called once in performAsyncAppSetup(), no need to call it here.
+
+                // Setup listener for user profile
                 const userDocRef = doc(db, `artifacts/${appId}/users/${user.uid}/profile/data`);
                 unsubscribeUserProfile = onSnapshot(userDocRef, (docSnap) => {
                     if (docSnap.exists()) {
@@ -3245,52 +3208,67 @@
                         headerDisplayName.textContent = currentUserData.displayName || 'کاربر ناشناس';
                         headerUserId.textContent = `شناسه: ${currentUserData.uid.substring(0, 8)}...`;
                         updateUserCoinsDisplay();
-                        const savedTheme = currentUserData.theme || 'classic';
-                        if (currentTheme !== savedTheme) {
+                        
+                        // NEW: Apply user's saved theme
+                        const savedTheme = currentUserData.theme || 'classic'; // Default to 'classic'
+                        if (currentTheme !== savedTheme) { // Only apply if different to avoid unnecessary transitions
                             applyTheme(savedTheme);
                         }
-                        if (!createLobbyModal.classList.contains('hidden')) {
-                           renderApprovedLobbyNamesManagementList();
-                           updateCreateLobbyModalUI(createLobbyModalTitle.textContent === 'مدیریت نام‌های لابی و ساخت لابی' ? 'myLobbies' : 'create');
+
+                        // Also update the approved lobby names list in the modal whenever profile data changes
+                        if (!createLobbyModal.classList.contains('hidden')) { // Only if modal is open
+                           renderApprovedLobbyNamesManagementList(); // Rerender management list
+                           // Re-evaluate approved names dropdown & proposal area visibility
+                           updateCreateLobbyModalUI(createLobbyModalTitle.textContent === 'مدیریت نام‌های لابی و ساخت لابی' ? 'myLobbies' : 'create'); // Use the new helper here
                         }
                     } else {
                         console.warn("User profile document not found. Creating a default one.");
+                        // Create a default profile if it doesn't exist
                         setDoc(userDocRef, {
                             displayName: user.displayName || user.email.split('@')[0],
                             email: user.email,
-                            coins: 500,
+                            coins: 500, // Starting coins
                             approvedLobbyNames: [],
                             banStatus: { isBanned: false },
                             createdAt: serverTimestamp(),
-                            theme: 'classic'
+                            theme: 'classic' // NEW: Add default theme
                         }, { merge: true }).then(() => {
                             console.log("Default user profile created.");
-                            applyTheme('classic');
-                        }).catch(e => console.error("Error creating default user profile:", e));
+                            applyTheme('classic'); // Apply default theme
+                        }).catch(e => {
+                            console.error("Error creating default user profile:", e);
+                        });
                         currentUserData = { uid: user.uid, email: user.email, displayName: 'کاربر جدید', coins: 0, approvedLobbyNames: [], theme: 'classic' };
-                        applyTheme('classic');
+                        applyTheme('classic'); // Ensure default is applied immediately
                     }
                 }, (error) => {
                     console.error("خطا در گوش دادن به user profile:", error);
                 });
+
             } else {
+                // User is logged out. Clean up all data and listeners.
                 if (unsubscribeUserProfile) unsubscribeUserProfile();
+                // unsubscribeGameSettings is intentionally not cleared here, as it's a global setting.
+                // ... (other listener cleanups) ...
                 if (unsubscribeLobbies) unsubscribeLobbies();
                 if (unsubscribeLobbyDetail) unsubscribeLobbyDetail();
                 if (unsubscribeKickedPlayers) unsubscribeKickedPlayers();
                 if (unsubscribeLobbyChat) unsubscribeLobbyChat();
                 if (unsubscribePendingLobbyNames) unsubscribePendingLobbyNames();
+                
                 unsubscribeUserProfile = unsubscribeLobbies = unsubscribeLobbyDetail = unsubscribeKickedPlayers = unsubscribeLobbyChat = unsubscribePendingLobbyNames = null;
                 clearGameIntervals();
+                
                 currentUserData = null;
                 currentLobbyId = null;
                 userHasActiveLobby = false;
+                
                 resetGameUI();
                 updateUserCoinsDisplay();
-                applyTheme('classic');
+                applyTheme('classic'); // Reset to classic theme on logout
             }
 
-            // Part 2: Manage Screen Transitions
+            // Part 2: Manage Screen Transitions (no change needed here)
             if (!isInitialAuthCheckComplete) {
                 setActiveScreen(user ? mainScreen : authScreen);
                 isInitialAuthCheckComplete = true;
@@ -3302,60 +3280,30 @@
                 }
             }
         });
-        
-        /**
-         * NEW: Checks for a server-wide password lock.
-         * If a password is set in `config/server`, it displays the lock screen.
-         * If not, the app proceeds as normal.
-         */
-        async function checkServerLock() {
-            const serverConfigRef = doc(db, `artifacts/${appId}/config/server`);
-            try {
-                const docSnap = await getDoc(serverConfigRef);
-                // Check if doc exists and password field is a non-empty string
-                if (docSnap.exists() && docSnap.data().password && docSnap.data().password.trim() !== '') {
-                    serverLockPassword = docSnap.data().password;
-                    // Show the lock screen
-                    serverLockScreen.classList.remove('hidden');
-                    serverLockPasswordInput.focus();
-                    console.log("Server is locked. Awaiting password.");
-                } else {
-                    // No password, proceed normally.
-                    console.log("Server is not locked. Proceeding with startup.");
-                }
-            } catch (error) {
-                console.error("Critical error checking server lock:", error);
-                // In case of a read error, it's safer to lock the app and show an error.
-                serverLockPassword = 'LOCKDOWN_MODE_DUE_TO_ERROR'; // Prevent entry
-                showServerLockMessage('خطا در بررسی وضعیت سرور. دسترسی ممکن نیست.', 'error');
-                serverLockScreen.classList.remove('hidden');
-                serverLockForm.classList.add('hidden'); // Hide the form as it's useless now
-            }
-        }
 
         async function performAsyncAppSetup() {
             console.log("Performing asynchronous app setup...");
 
-            // Step 1: Check for server-wide lock first. This is the highest priority.
-            await checkServerLock();
-
-            // Step 2: Set up other configurations if not locked.
-            // Ensure game_settings config exists
+            // Ensure game_settings config exists at startup. If not, create it.
+            // The real-time listener will then pick up the value.
             try {
                 const configRef = doc(db, `artifacts/${appId}/config/game_settings`);
                 const configSnap = await getDoc(configRef);
                 if (!configSnap.exists()) {
+                    console.log("`game_settings` document not found. Creating with default values...");
                     await setDoc(configRef, { gameEntryCost: 100 });
+                    console.log("Default `game_settings` config created successfully.");
                 }
             } catch (error) {
                 console.error("CRITICAL: Error initializing game settings config:", error);
+                // We might want a more prominent error display here if this is fatal.
                 showMessageBox("خطا در بارگذاری تنظیمات بازی.", "error");
             }
             
-            // Step 3: Setup listener for game settings
+            // NEW: Setup listener for game settings
             setupGameSettingsListener();
 
-            // Step 4: Handle initial authentication if a token is provided
+            // Handle initial authentication
             if (initialAuthToken) {
                 try {
                     await signInWithCustomToken(auth, initialAuthToken);
@@ -3365,12 +3313,10 @@
             }
             console.log("Firebase initialization finished.");
         }
-        
         // Call the async setup function
         performAsyncAppSetup();
 
-        // --- END OF AUTH & CONFIG LOGIC (WITH SERVER LOCK) ---
-
+        // --- END OF CORRECTED AUTH & REAL-TIME SETTINGS LOGIC ---
 
         // Maps Firebase auth error codes to user-friendly Persian messages.
         function getFirebaseErrorMessage(errorCode) {
@@ -3392,6 +3338,8 @@
         /**
          * Checks for lobby name proposals marked as "approved" by an admin,
          * adds them to the user's profile, and updates the proposal status to "processed".
+         * This function acts as the missing link between admin approval and user data.
+         * NOTE: In a production environment, this is ideally handled by a Cloud Function for reliability.
          */
         async function processNewlyApprovedLobbyNames() {
             if (!auth.currentUser) return;
@@ -3400,12 +3348,15 @@
             const qApproved = query(
                 proposedLobbyNamesRef,
                 where("userId", "==", auth.currentUser.uid),
-                where("status", "==", "approved")
+                where("status", "==", "approved") // Find names marked as "approved"
             );
 
             try {
                 const approvedSnapshot = await getDocs(qApproved);
-                if (approvedSnapshot.empty) return;
+                if (approvedSnapshot.empty) {
+                    // No new approvals to process
+                    return;
+                }
 
                 const namesToAdd = [];
                 const docsToUpdate = [];
@@ -3414,22 +3365,33 @@
                     docsToUpdate.push(doc.ref);
                 });
 
+                // Use a batch write for atomicity: update user profile AND proposal status together
                 const batch = writeBatch(db);
+                
+                // 1. Update the user's profile with the new names
                 const userProfileRef = doc(db, `artifacts/${appId}/users/${auth.currentUser.uid}/profile/data`);
                 batch.update(userProfileRef, {
                     approvedLobbyNames: arrayUnion(...namesToAdd)
                 });
+
+                // 2. Update each proposal's status to "processed" to prevent re-processing
                 docsToUpdate.forEach(docRef => {
                     batch.update(docRef, { status: "processed" });
                 });
+
+                // 3. Commit all changes
                 await batch.commit();
-                console.log(`Processed ${namesToAdd.length} newly approved lobby names.`);
+                console.log(`Processed ${namesToAdd.length} newly approved lobby names for the user.`);
+                // The onSnapshot listener on the user's profile will automatically pick up this change
+                // and update currentUserData, triggering UI updates.
+
             } catch (error) {
                 console.error("Error processing newly approved lobby names:", error);
+                // We can show a message, but it's a background process, so console log is sufficient
             }
         }
 
-        // Function to render the list of approved lobby names for management (deletion)
+        // NEW: Function to render the list of approved lobby names for management (deletion)
         function renderApprovedLobbyNamesManagementList() {
             if (!currentUserData || !currentUserData.approvedLobbyNames) {
                 approvedLobbyNamesManagementList.innerHTML = '<p class="text-center">هیچ نام لابی تأیید شده‌ای ندارید.</p>';
@@ -3469,7 +3431,7 @@
             }
         }
 
-        // Function to delete an approved lobby name from user's profile
+        // NEW: Function to delete an approved lobby name from user's profile
         async function deleteApprovedLobbyName(nameToDelete) {
             if (!auth.currentUser || !currentUserData) {
                 showCreateLobbyMessageBox("خطا: اطلاعات کاربری در دسترس نیست.", "error");
@@ -3482,6 +3444,7 @@
                     approvedLobbyNames: arrayRemove(nameToDelete)
                 });
                 showCreateLobbyMessageBox(`نام لابی "${nameToDelete}" با موفقیت حذف شد.`, "success");
+                // The onSnapshot for user profile will re-trigger and update UI.
             } catch (error) {
                 console.error("Error deleting approved lobby name:", error);
                 showCreateLobbyMessageBox(`خطا در حذف نام لابی: ${error.message}`, "error");
@@ -3489,27 +3452,32 @@
         }
 
 
-        // Function to update the UI of the Create Lobby modal based on mode and user data
+        // NEW: Function to update the UI of the Create Lobby modal based on mode and user data
         async function updateCreateLobbyModalUI(mode) {
+            // Clear any previous pending names listener from a prior modal opening
             if (unsubscribePendingLobbyNames) {
                 unsubscribePendingLobbyNames();
                 unsubscribePendingLobbyNames = null;
             }
 
             if (!auth.currentUser || !currentUserData) {
+                // Initial state if user data isn't loaded yet
                 approvedLobbyNamesSelect.innerHTML = '<option value="">در حال بارگذاری اطلاعات...</option>';
                 lobbyNameSelectionArea.classList.add('hidden');
                 lobbyNameProposalArea.classList.add('hidden');
                 pendingLobbyNamesArea.classList.add('hidden');
-                approvedLobbyNamesManagementArea.classList.add('hidden');
-                submitCreateLobbyBtn.classList.add('hidden');
+                approvedLobbyNamesManagementArea.classList.add('hidden'); // Also hide management area
+                submitCreateLobbyBtn.classList.add('hidden'); // Hide create button too
                 submitLobbyNameForApprovalBtn.classList.add('hidden');
                 return;
             }
 
             const approvedNames = currentUserData.approvedLobbyNames || [];
+            
+            // Clear existing options for the dropdown
             approvedLobbyNamesSelect.innerHTML = '<option value="">نام لابی را انتخاب کنید</option>';
             
+            // Populate dropdown if approved names exist
             if (approvedNames.length > 0) {
                 approvedNames.forEach(name => {
                     const option = document.createElement('option');
@@ -3517,27 +3485,30 @@
                     option.innerHTML = formatLobbyNameWithColor(name);
                     approvedLobbyNamesSelect.appendChild(option);
                 });
-                lobbyNameSelectionArea.classList.remove('hidden');
-                submitCreateLobbyBtn.disabled = true;
-                submitCreateLobbyBtn.classList.remove('hidden');
+                lobbyNameSelectionArea.classList.remove('hidden'); // Show the dropdown
+                submitCreateLobbyBtn.disabled = true; // Still disabled until selection
+                submitCreateLobbyBtn.classList.remove('hidden'); // Make sure create button is visible
             } else {
-                lobbyNameSelectionArea.classList.add('hidden');
+                lobbyNameSelectionArea.classList.add('hidden'); // Hide the dropdown if no approved names
                 submitCreateLobbyBtn.disabled = true;
-                submitCreateLobbyBtn.classList.add('hidden');
+                submitCreateLobbyBtn.classList.add('hidden'); // Hide create button if no approved names
             }
 
+            // Manage visibility based on mode
             if (mode === 'create') {
                 createLobbyModalTitle.textContent = 'ساخت لابی جدید';
-                lobbyNameProposalArea.classList.remove('hidden');
-                submitLobbyNameForApprovalBtn.classList.remove('hidden');
+                lobbyNameProposalArea.classList.remove('hidden'); // Always show proposal area in create mode
+                submitLobbyNameForApprovalBtn.classList.remove('hidden'); // Always show its button
             } else { // mode === 'myLobbies'
-                createLobbyModalTitle.textContent = 'مدیریت نام‌های لابی و ساخت لابی';
-                lobbyNameProposalArea.classList.add('hidden');
-                submitLobbyNameForApprovalBtn.classList.add('hidden');
+                createLobbyModalTitle.textContent = 'مدیریت نام‌های لابی و ساخت لابی'; // More accurate title
+                lobbyNameProposalArea.classList.add('hidden'); // Hide proposal area in myLobbies mode
+                submitLobbyNameForApprovalBtn.classList.add('hidden'); // Hide its button
             }
 
+            // Render and manage approved names list for deletion (visible in both modes)
             renderApprovedLobbyNamesManagementList();
 
+            // Set up listener for PENDING requests for the current user
             const proposedLobbyNamesRef = collection(db, `artifacts/${appId}/proposedLobbyNames`);
             const qPending = query(
                 proposedLobbyNamesRef,
@@ -3546,7 +3517,7 @@
             );
 
             unsubscribePendingLobbyNames = onSnapshot(qPending, (snapshot) => {
-                pendingLobbyNamesList.innerHTML = '';
+                pendingLobbyNamesList.innerHTML = ''; // Clear existing list
                 const pendingCount = snapshot.size;
                 if (pendingCount === 0) {
                     pendingLobbyNamesList.innerHTML = '<p class="text-center">هیچ نام لابی در انتظار تایید ندارید.</p>';
@@ -3562,9 +3533,11 @@
                     });
                 }
 
+                // Control proposal input based on pending limit (only for 'create' mode)
                 if (mode === 'create') {
                     if (pendingCount >= MAX_PENDING_PROPOSALS) {
                         lobbyProposalMessage.textContent = `شما ${pendingCount} درخواست نام لابی در انتظار تایید دارید. تا زمانی که درخواست‌های شما بررسی نشوند، نمی‌توانید درخواست جدیدی ارسال کنید.`;
+                        lobbyProposalMessage.classList.remove('text-gray-400');
                         lobbyProposalMessage.classList.add('text-red-400');
                         submitLobbyNameForApprovalBtn.disabled = true;
                         proposedLobbyNameInput.disabled = true;
@@ -3572,6 +3545,7 @@
                     } else {
                         lobbyProposalMessage.textContent = "بعد از ارسال، ادمین نام لابی شما را بررسی و تأیید می‌کند. سپس می‌توانید از آن نام استفاده کنید.";
                         lobbyProposalMessage.classList.remove('text-red-400');
+                        lobbyProposalMessage.classList.add('text-gray-400');
                         submitLobbyNameForApprovalBtn.disabled = false;
                         proposedLobbyNameInput.disabled = false;
                         proposedLobbyNameInput.placeholder = "مثال: [#FFD700]لابی طلایی من";
@@ -3582,7 +3556,7 @@
                 pendingLobbyNamesList.innerHTML = `<p class="text-red-400 text-center">خطا در بارگذاری درخواست‌های شما.</p>`;
             });
 
-            proposedLobbyNameInput.value = '';
+            proposedLobbyNameInput.value = ''; // Clear proposed input field
             if (mode === 'create' && approvedNames.length === 0) {
                 proposedLobbyNameInput.focus();
             } else if (approvedNames.length > 0) {
@@ -3599,6 +3573,7 @@
 
             await processNewlyApprovedLobbyNames();
             
+            // Check if the user is already a host of an active lobby (only relevant for 'create' mode)
             if (userHasActiveLobby && currentLobbyId && mode === 'create') {
                 try {
                     const activeLobbyRef = doc(db, `global_lobbies`, currentLobbyId);
@@ -3628,8 +3603,10 @@
             newLobbyPasswordField.classList.add('hidden');
             gameDurationInput.value = 5;
 
+            // Use the new helper function to manage UI visibility
             await updateCreateLobbyModalUI(mode); 
 
+            // Special handling for 'myLobbies' mode: show specific message if no approved lobbies to manage
             if (mode === 'myLobbies' && (!currentUserData.approvedLobbyNames || currentUserData.approvedLobbyNames.length === 0)) {
                  showCreateLobbyMessageBox("شما هیچ نام لابی تایید شده‌ای برای مدیریت یا ساخت لابی ندارید.", "info");
             }
@@ -3648,13 +3625,16 @@
                 document.querySelector('input[value="public"]').nextElementSibling.classList.add('active');
                 gameDurationInput.value = 5; 
                 lobbyProposalMessage.classList.remove('text-red-400'); 
+                lobbyProposalMessage.classList.add('text-gray-400');
                 
+                // Ensure all related areas are hidden when closing
                 lobbyNameSelectionArea.classList.add('hidden');
                 lobbyNameProposalArea.classList.add('hidden');
                 pendingLobbyNamesArea.classList.add('hidden');
                 approvedLobbyNamesManagementArea.classList.add('hidden');
-                submitCreateLobbyBtn.classList.add('hidden');
-                submitLobbyNameForApprovalBtn.classList.add('hidden');
+                submitCreateLobbyBtn.classList.add('hidden'); // Hide it again on close
+                submitLobbyNameForApprovalBtn.classList.add('hidden'); // Hide it again on close
+
 
                 if (unsubscribePendingLobbyNames) {
                     unsubscribePendingLobbyNames();
@@ -3690,10 +3670,10 @@
                     },
                     kickedPlayers: [], // Still an array of objects
                     createdAt: serverTimestamp(),
-                    isChatLocked: false,
+                    isChatLocked: false, // NEW: Chat is open by default
                     gameSettings: { 
                         maxPlayers: 4, 
-                        gameDurationMinutes: gameDurationMinutes
+                        gameDurationMinutes: gameDurationMinutes // NEW
                     }
                 };
         
@@ -4348,7 +4328,7 @@
                     }
                     
                     const isPlayerInLobby = lobbyData.players && lobbyData.players[pUid];
-                                        const playerStatusText = isPlayerInLobby ? 'آنلاین' : 'ترک کرده';
+                    const playerStatusText = isPlayerInLobby ? 'آنلاین' : 'ترک کرده';
                     
                     playerPod.innerHTML = `
                         <span class="player-name">${gameState.playerNames[pUid] || 'ناشناس'}</span>
@@ -5055,26 +5035,6 @@
             userHasActiveLobby = false;
             setActiveScreen(lobbyScreen);
             unsubscribeLobbies = setupLobbyListener('');
-        });
-
-        // NEW: Server Lock Form Event Listener
-        serverLockForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-            const enteredPassword = serverLockPasswordInput.value;
-            if (enteredPassword === serverLockPassword) {
-                showServerLockMessage('رمز صحیح است. در حال ورود...', 'success');
-                serverLockPassword = null; // Unlock the app state
-                serverLockScreen.classList.add('page-transition-hidden');
-                setTimeout(() => {
-                    serverLockScreen.classList.add('hidden');
-                    // Manually trigger onAuthStateChanged to resume the normal app flow
-                    onAuthStateChanged(auth, auth.currentUser); 
-                }, 600); // Match transition time
-            } else {
-                showServerLockMessage('رمز عبور اشتباه است.', 'error');
-                serverLockPasswordInput.value = '';
-                serverLockPasswordInput.focus();
-            }
         });
 
     </script>
