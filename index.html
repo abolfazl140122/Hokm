@@ -409,30 +409,6 @@
         body.theme-classic .game-player-pod .player-name { color: #E0E0E0; }
         body.theme-classic .game-player-pod .player-role { color: #DAA520; }
         body.theme-classic .game-player-pod .player-status { color: #C0C0C0; }
-        
-        /* NEW MAFIA-STYLE LAYOUT FOR CLASSIC THEME */
-        body.theme-classic #game-table-container {
-            background-image: url('https://www.transparenttextures.com/patterns/arabesque.png'), radial-gradient(ellipse at center, #380000 0%, #1a0000 70%);
-            background-color: #2b0f0f;
-        }
-        body.theme-classic .player-seat .player-avatar {
-            background: linear-gradient(145deg, #4B0000, #800000);
-            border: 3px solid #DAA520;
-            box-shadow: 0 0 10px rgba(255,215,0,0.5), inset 0 0 5px rgba(0,0,0,0.5);
-        }
-        body.theme-classic .player-seat .player-name { color: #FFD700; }
-        body.theme-classic .player-seat .player-role { color: #E0E0E0; }
-        body.theme-classic .player-seat.is-ai .player-avatar { border-color: #B22222; box-shadow: 0 0 15px #ff4848; }
-        body.theme-classic .player-seat.is-human .player-avatar { border-color: #4682B4; box-shadow: 0 0 15px #6495ED; }
-        body.theme-classic .player-seat.current-active-player .player-avatar {
-            border-color: #FFFFFF;
-            box-shadow: 0 0 25px 5px #FFFFFF;
-        }
-        body.theme-classic .game-chat-log {
-             background-color: rgba(0,0,0,0.7);
-             border-top: 2px solid #DAA520;
-        }
-
 
         body.theme-classic .voting-btn { border: 3px solid #FFD700; }
         body.theme-classic .voting-btn.ai-vote { background: linear-gradient(145deg, #E24B4B 0%, #B22222 100%); color: white; }
@@ -1697,7 +1673,6 @@
             min-width: 0;
             overflow: hidden; /* To contain overlays without affecting scrollbars for chat */
         }
-        
         /* Ensure overlay z-index is higher than chat but lower than other modals */
         #game-countdown-overlay, #game-voting-overlay {
             z-index: 40; /* Higher than chat (which is inside lobby-main-panel) but lower than global modals (z-50) */
@@ -1917,7 +1892,7 @@
             animation: countdown-pulse 1s ease-out forwards;
         }
 
-        /* NEW: Game Player Status Pods (OLD STYLE) */
+        /* NEW: Game Player Status Pods */
         .game-player-pod {
             display: flex;
             flex-direction: column;
@@ -1970,141 +1945,6 @@
             vertical-align: middle;
             margin-right: 0.25rem; /* Equivalent to mr-1 */
         }
-        
-        /* ================================================= */
-        /* === START: NEW MAFIA-STYLE GAME LAYOUT STYLES === */
-        /* ================================================= */
-
-        #game-table-container {
-            position: absolute;
-            inset: 0; /* Fill the entire parent (.lobby-detail-content) */
-            overflow: hidden;
-            border-radius: 20px; /* Match parent's border radius */
-            background-size: cover;
-            background-position: center;
-            transition: opacity 0.5s ease-in-out;
-        }
-
-        .player-seat {
-            position: absolute;
-            width: 100px;
-            height: 120px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: flex-start;
-            text-align: center;
-            transition: all 0.4s ease-in-out;
-            opacity: 0; /* Hidden by default */
-            pointer-events: none; /* Can't interact when hidden */
-        }
-        
-        .player-seat.visible {
-            opacity: 1;
-            pointer-events: auto;
-        }
-
-        .player-seat .player-avatar {
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 0.5rem;
-            transition: all 0.3s ease;
-            background-size: cover;
-            background-position: center;
-            color: #ffffff; /* For icon fallback */
-        }
-        
-        .player-seat .player-avatar svg {
-            width: 40px;
-            height: 40px;
-        }
-
-        .player-seat .player-name {
-            font-size: 0.9rem;
-            font-weight: bold;
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.7);
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            width: 100%;
-        }
-        
-        .player-seat .player-role {
-            font-size: 0.75rem;
-            opacity: 0.8;
-        }
-        
-        /* Player Seat Positioning for 4 Players */
-        #player-seat-0 { top: 5%; left: 50%; transform: translateX(-50%); }
-        #player-seat-1 { top: 50%; right: 5%; transform: translateY(-50%); }
-        #player-seat-2 { bottom: 5%; left: 50%; transform: translateX(-50%); }
-        #player-seat-3 { top: 50%; left: 5%; transform: translateY(-50%); }
-        
-        /* Player Seat state styles */
-        .player-seat.is-ai .player-avatar {
-            animation: pulse-red 2s infinite;
-        }
-        .player-seat.is-human .player-avatar {
-             animation: pulse-blue 2s infinite;
-        }
-        .player-seat.current-active-player .player-avatar {
-            transform: scale(1.1);
-            animation: pulse-white 1.5s infinite;
-        }
-
-        @keyframes pulse-red { 0%, 100% { box-shadow: 0 0 15px #ff4848; } 50% { box-shadow: 0 0 25px #ff4848; } }
-        @keyframes pulse-blue { 0%, 100% { box-shadow: 0 0 15px #6495ED; } 50% { box-shadow: 0 0 25px #6495ED; } }
-        @keyframes pulse-white { 0%, 100% { box-shadow: 0 0 20px #ffffff; } 50% { box-shadow: 0 0 35px #ffffff; } }
-
-        /* Chat Log for Game View */
-        .game-chat-log {
-            position: absolute;
-            bottom: 0;
-            left: 10%;
-            right: 10%;
-            height: 35%;
-            max-height: 250px;
-            display: flex;
-            flex-direction: column;
-            border-radius: 15px 15px 0 0;
-            overflow: hidden;
-            backdrop-filter: blur(5px);
-            -webkit-backdrop-filter: blur(5px);
-            z-index: 10;
-        }
-
-        .game-chat-log .lobby-chat-messages {
-            padding: 0.75rem;
-        }
-        
-        .game-chat-log .lobby-chat-input-form {
-            padding: 0.75rem;
-            border-top: 1px solid rgba(255,255,255,0.2);
-            background-color: rgba(0,0,0,0.3);
-        }
-        
-        /* Responsive for Mafia Layout */
-        @media (max-width: 768px) {
-            .player-seat { width: 80px; height: 100px; }
-            .player-seat .player-avatar { width: 60px; height: 60px; }
-            .player-seat .player-name { font-size: 0.8rem; }
-            
-            #player-seat-0 { top: 2%; }
-            #player-seat-1 { right: 2%; }
-            #player-seat-2 { bottom: 38%; } /* Adjusted for chat box */
-            #player-seat-3 { left: 2%; }
-
-            .game-chat-log { left: 2%; right: 2%; height: 35%; }
-        }
-
-        /* =============================================== */
-        /* === END: NEW MAFIA-STYLE GAME LAYOUT STYLES === */
-        /* =============================================== */
-
     </style>
 </head>
 <body class="theme-classic">
@@ -2133,8 +1973,8 @@
                 </div>
 
                 <div class="loading-text-container">
-                    <h1 id="loading-main-text">درحال اتصال به سرور...</h1>
-                    <p id="loading-sub-text">لطفا کمی صبر کنید.</p>
+                    <h1 id="loading-main-text">جستجوی بازیکنان</h1>
+                    <p id="loading-sub-text">در حال اتصال به سرور...</p>
                 </div>
             </div>
         </div>
@@ -2450,74 +2290,48 @@
         <div id="lobby-detail-screen" class="hidden absolute inset-0 z-30 page-transition-active page-transition-hidden lobby-detail-screen-full">
             <div class="lobby-detail-content">
                 
-                <!-- START: PRE-GAME VIEW (SIDEBAR + MAIN PANEL) - Hidden during game -->
-                <div id="pre-game-view" class="flex flex-row gap-6 w-full h-full">
-                    <!-- Sidebar: Lobby Info & Players -->
-                    <div class="lobby-sidebar">
-                        <h2 id="detail-lobby-name" class="text-2xl sm:text-3xl font-bold truncate">نام لابی</h2>
-                        <p id="detail-host-name" class="text-md mt-2">سازنده: ---</p>
-                        <p id="detail-player-count" class="text-sm font-semibold mb-4">بازیکنان: 0/4</p>
-                        
-                        <div class="w-full h-px bg-yellow-600 mb-4"></div>
+                <!-- Sidebar: Lobby Info & Players -->
+                <div class="lobby-sidebar">
+                    <h2 id="detail-lobby-name" class="text-2xl sm:text-3xl font-bold truncate">نام لابی</h2>
+                    <p id="detail-host-name" class="text-md mt-2">سازنده: ---</p>
+                    <p id="detail-player-count" class="text-sm font-semibold mb-4">بازیکنان: 0/4</p>
+                    
+                    <div class="w-full h-px bg-yellow-600 mb-4"></div>
 
-                        <!-- Player List / Status Display (Old style for pre-game) -->
-                        <div id="game-player-status" class="flex flex-wrap justify-center gap-2 p-2 bg-gray-800 rounded-lg mb-4 shadow-inner">
-                            <!-- Player status pods will be injected here -->
-                        </div>
-
-                        <div id="player-list-container" class="flex-grow min-h-0 overflow-y-auto">
-                            <!-- Player list items will be dynamically loaded here (for non-game state) -->
-                        </div>
+                    <!-- Player List / Status Display (moved here for game view) -->
+                    <div id="game-player-status" class="flex flex-wrap justify-center gap-2 p-2 bg-gray-800 rounded-lg mb-4 shadow-inner">
+                        <!-- Player status pods will be injected here -->
                     </div>
 
-                    <!-- Main Panel: Chat & Actions -->
-                    <div class="lobby-main-panel">
-                        <div class="lobby-chat-container flex-grow min-h-0">
-                            <!-- Messages will be injected here by shared chat listener -->
-                        </div>
-                        <!-- Action Buttons Footer -->
-                        <div class="lobby-actions-footer">
-                            <div id="host-actions-container" style="display: none;">
-                                <button id="start-game-btn" class="classic-btn start-game-btn" disabled>
-                                    شروع بازی
-                                </button>
-                                <button id="toggle-chat-lock-btn" class="classic-btn btn-gray-classic text-sm py-2 px-4">
-                                    قفل کردن چت
-                                </button>
-                                <button id="view-kicked-players-btn" class="classic-btn btn-brown-classic text-sm py-2 px-4">
-                                    لیست اخراجی‌ها
-                                </button>
-                            </div>
-                            <!-- Leave Lobby Button (now only for host to close lobby outside of game) -->
-                            <button id="leave-lobby-btn" class="classic-btn btn-red-classic text-sm py-2 px-4 hidden">
-                                بستن لابی
-                            </button>
-                        </div>
+                    <div id="player-list-container" class="flex-grow min-h-0 overflow-y-auto">
+                        <!-- Player list items will be dynamically loaded here (for non-game state) -->
                     </div>
                 </div>
-                <!-- END: PRE-GAME VIEW -->
 
+                <!-- Main Panel: Chat & Actions (Now contains game elements) -->
+                <div class="lobby-main-panel">
 
-                <!-- START: NEW MAFIA-STYLE GAME VIEW - Hidden before game starts -->
-                <div id="game-table-container" class="hidden">
-                    <!-- Player Seats -->
-                    <div id="player-seat-0" class="player-seat"></div>
-                    <div id="player-seat-1" class="player-seat"></div>
-                    <div id="player-seat-2" class="player-seat"></div>
-                    <div id="player-seat-3" class="player-seat"></div>
-                    
                     <!-- Game Header for inside the lobby chat -->
-                    <div id="game-info-panel" class="absolute top-2 right-4 bg-gray-800 bg-opacity-70 rounded-lg p-3 flex justify-between items-center shadow-md border border-yellow-600 hidden z-10">
+                    <div id="game-info-panel" class="bg-gray-800 bg-opacity-70 rounded-lg p-3 mb-4 flex justify-between items-center shadow-md border border-yellow-600 hidden">
                         <div class="flex items-center space-x-4 space-x-reverse text-lg font-bold">
                             <span id="game-timer-display" class="text-3xl text-green-400 font-extrabold mr-4 hidden">--:--</span>
                             <div id="game-role-display" class="text-xl">نقش: <span id="my-role">---</span></div>
+                            <div id="game-scores-display" class="text-xl text-blue-300 hidden">
+                                <span id="ai-score">AI: 0</span> | <span id="human-score">Human: 0</span>
+                            </div>
                         </div>
                         <button id="leave-game-from-lobby-btn" class="classic-btn btn-red-classic text-sm py-2 px-4 hidden">ترک بازی</button>
                     </div>
 
-                    <!-- Game Chat Container (Reusing lobby chat styles, but repositioned) -->
-                    <div class="game-chat-log">
-                        <div id="lobby-chat-messages" class="lobby-chat-messages custom-scrollbar">
+                    <!-- Countdown Overlay (now relative to lobby-main-panel) -->
+                    <div id="game-countdown-overlay" class="absolute inset-0 flex flex-col justify-center items-center bg-black bg-opacity-90 z-40 hidden">
+                        <div class="text-7xl font-extrabold countdown-effect" style="opacity:0; transform: scale(0.5);"></div>
+                        <p class="text-2xl mt-4">بازی در حال شروع است...</p>
+                    </div>
+
+                    <!-- Game Chat Container (Reusing lobby chat styles) -->
+                    <div class="lobby-chat-container flex-grow min-h-0">
+                        <div id="lobby-chat-messages" class="lobby-chat-messages">
                             <!-- Game messages and events will appear here -->
                         </div>
                         <form id="lobby-chat-form" class="lobby-chat-input-form flex-shrink-0">
@@ -2526,30 +2340,42 @@
                         </form>
                     </div>
 
-                </div>
-                <!-- END: NEW MAFIA-STYLE GAME VIEW -->
-
-                <!-- Countdown & Voting Overlays (cover the entire lobby-detail-content) -->
-                <div id="game-countdown-overlay" class="absolute inset-0 flex flex-col justify-center items-center bg-black bg-opacity-90 z-40 hidden">
-                    <div class="text-7xl font-extrabold countdown-effect" style="opacity:0; transform: scale(0.5);"></div>
-                    <p class="text-2xl mt-4">بازی در حال شروع است...</p>
-                </div>
-                <div id="game-voting-overlay" class="absolute inset-0 flex flex-col justify-center items-center bg-black bg-opacity-90 z-40 hidden">
-                    <h2 class="text-4xl font-bold mb-6" id="voting-title">رای‌گیری آغاز شد!</h2>
-                    <p class="text-xl mb-8" id="voting-instructions">برای چه کسی رای می‌دهید؟</p>
-                    <div id="voting-options" class="flex flex-wrap justify-center gap-4">
-                        <!-- Voting buttons will be injected here -->
+                    <!-- Voting/Game End Overlay (now relative to lobby-main-panel) -->
+                    <div id="game-voting-overlay" class="absolute inset-0 flex flex-col justify-center items-center bg-black bg-opacity-90 z-40 hidden">
+                        <h2 class="text-4xl font-bold mb-6" id="voting-title">رای‌گیری آغاز شد!</h2>
+                        <p class="text-xl mb-8" id="voting-instructions">برای چه کسی رای می‌دهید؟</p>
+                        <div id="voting-options" class="flex flex-wrap justify-center gap-4">
+                            <!-- Voting buttons will be injected here -->
+                        </div>
+                        <div id="game-result-display" class="hidden text-center mt-10">
+                            <h2 class="text-5xl font-extrabold mb-4" id="winnerText"></h2>
+                            <p class="text-2xl" id="reasonText"></p>
+                            <button id="return-to-lobbies-btn" class="classic-btn btn-blue-classic mt-8 py-3 px-6">بازگشت به لابی‌ها</button>
+                        </div>
                     </div>
-                    <div id="game-result-display" class="hidden text-center mt-10">
-                        <h2 class="text-5xl font-extrabold mb-4" id="winnerText"></h2>
-                        <p class="text-2xl" id="reasonText"></p>
-                        <button id="return-to-lobbies-btn" class="classic-btn btn-blue-classic mt-8 py-3 px-6">بازگشت به لابی‌ها</button>
+
+                    <!-- Action Buttons Footer -->
+                    <div class="lobby-actions-footer">
+                        <div id="host-actions-container" style="display: none;">
+                            <button id="start-game-btn" class="classic-btn start-game-btn" disabled>
+                                شروع بازی
+                            </button>
+                             <button id="toggle-chat-lock-btn" class="classic-btn btn-gray-classic text-sm py-2 px-4">
+                                قفل کردن چت
+                            </button>
+                            <button id="view-kicked-players-btn" class="classic-btn btn-brown-classic text-sm py-2 px-4">
+                                لیست اخراجی‌ها
+                            </button>
+                        </div>
+                        <!-- Leave Lobby Button (now only for host to close lobby outside of game) -->
+                        <button id="leave-lobby-btn" class="classic-btn btn-red-classic text-sm py-2 px-4 hidden">
+                            بستن لابی
+                        </button>
                     </div>
                 </div>
 
             </div>
         </div>
-
 
         <!-- ... All other modals (kick, kicked message, etc.) remain the same ... -->
         <!-- 10. Kick Player Confirmation Modal -->
@@ -2765,15 +2591,17 @@
         const lobbyChatForm = document.getElementById('lobby-chat-form');
         const lobbyChatInput = document.getElementById('lobby-chat-input');
         const lobbyChatSendBtn = document.getElementById('lobby-chat-send-btn');
-        const preGameView = document.getElementById('pre-game-view'); // NEW: Pre-game container
 
         // Game specific UI elements within Lobby Detail Screen (NEW)
-        const gameTableContainer = document.getElementById('game-table-container'); // NEW: Mafia-style view
         const gameInfoPanel = document.getElementById('game-info-panel');
         const gameTimerDisplay = document.getElementById('game-timer-display');
         const gameRoleDisplay = document.getElementById('game-role-display');
         const myRole = document.getElementById('my-role');
+        const gameScoresDisplay = document.getElementById('game-scores-display');
+        const aiScore = document.getElementById('ai-score');
+        const humanScore = document.getElementById('human-score');
         const leaveGameFromLobbyBtn = document.getElementById('leave-game-from-lobby-btn'); // Player-initiated leave during game
+        const gamePlayerStatus = document.getElementById('game-player-status');
         const gameCountdownOverlay = document.getElementById('game-countdown-overlay');
         const countdownNumber = gameCountdownOverlay.querySelector('.countdown-effect');
         const gameVotingOverlay = document.getElementById('game-voting-overlay');
@@ -2901,32 +2729,30 @@
 
         // Function to reset game UI elements
         function resetGameUI() {
-            // Hide mafia-style view and show pre-game view
-            gameTableContainer.classList.add('hidden');
-            preGameView.classList.remove('hidden');
-
-            // Reset overlays
+            gameInfoPanel.classList.add('hidden');
+            gameTimerDisplay.classList.add('hidden');
+            gameRoleDisplay.classList.add('hidden');
+            myRole.textContent = '---'; // Reset role display
+            gameScoresDisplay.classList.add('hidden');
+            leaveGameFromLobbyBtn.classList.add('hidden');
+            gamePlayerStatus.innerHTML = ''; // Clear player pods
             gameCountdownOverlay.classList.add('hidden');
             gameVotingOverlay.classList.add('hidden');
             gameResultDisplay.classList.add('hidden');
-
-            // Reset voting options and titles
             votingOptions.innerHTML = '';
-            votingOptions.classList.remove('hidden');
-            votingTitle.classList.remove('hidden');
-            votingInstructions.classList.remove('hidden');
-
-            // Re-enable chat
+            votingOptions.classList.remove('hidden'); // Ensure it's not hidden for next game
+            votingTitle.classList.remove('hidden'); // Ensure it's not hidden
+            votingInstructions.classList.remove('hidden'); // Ensure it's not hidden
+            
             lobbyChatInput.disabled = false;
             lobbyChatSendBtn.disabled = false;
             lobbyChatInput.placeholder = "پیام خود را بنویسید...";
-            lobbyChatInput.value = '';
+            lobbyChatInput.value = ''; // Clear any previous input
 
-            // Ensure overlays are properly hidden
+            // Ensure all overlays are hidden (explicitly display: none for immediate effect if needed)
             gameCountdownOverlay.style.display = 'none';
             gameVotingOverlay.style.display = 'none';
         }
-
 
         // NEW: Theme Configurations
         const themeConfigs = {
@@ -4123,6 +3949,7 @@
                 }
                 
                 const lobbyData = docSnap.data();
+                const isCurrentUserHost = auth.currentUser && lobbyData.hostId === auth.currentUser.uid;
                 const myUid = auth.currentUser.uid;
 
                 if (!lobbyData.players || !lobbyData.players[myUid]) {
@@ -4139,13 +3966,82 @@
                     return;
                 }
 
+                if (lobbyData.status === 'playing' && lobbyData.gameState) {
+                    setupGameUI(lobbyId, lobbyData);
+                    hostActionsContainer.style.display = 'none';
+                    leaveLobbyBtn.classList.add('hidden');
+                    return;
+                } else {
+                    resetGameUI();
+                    if (isCurrentUserHost) {
+                        hostActionsContainer.style.display = 'flex';
+                        leaveLobbyBtn.classList.remove('hidden');
+                        leaveLobbyBtn.textContent = 'بستن لابی';
+                    } else {
+                        hostActionsContainer.style.display = 'none';
+                        leaveLobbyBtn.classList.add('hidden');
+                    }
+                }
+
+                const playersMap = lobbyData.players || {};
+                const playerCount = Object.keys(playersMap).length;
+                const maxPlayers = lobbyData.gameSettings?.maxPlayers || 4;
+                const isChatLocked = lobbyData.isChatLocked || false;
+
                 if (unsubscribeLobbyChat) unsubscribeLobbyChat();
                 unsubscribeLobbyChat = setupLobbyChatListener(lobbyId, lobbyData.hostId);
-                
-                if (lobbyData.status === 'playing' && lobbyData.gameState) {
-                    setupMafiaStyleGameUI(lobbyId, lobbyData);
+
+                detailLobbyName.innerHTML = formatLobbyNameWithColor(lobbyData.name);
+                detailHostName.textContent = `سازنده: ${playersMap[lobbyData.hostId] || 'ناشناس'}`;
+                detailPlayerCount.textContent = `بازیکنان: ${playerCount}/${maxPlayers}`;
+
+                playerListContainer.innerHTML = '';
+                gamePlayerStatus.innerHTML = ''; 
+                const playerList = Object.entries(playersMap).map(([uid, displayName]) => ({ uid, displayName }));
+
+                for (const player of playerList) {
+                    const isHost = player.uid === lobbyData.hostId;
+                    const playerItem = document.createElement('div');
+                    playerItem.className = 'player-list-item';
+                    if (isHost) playerItem.classList.add('is-host');
+
+                    const kickButtonHtml = (isCurrentUserHost && !isHost) 
+                        ? `<button class="kick-player-btn" data-player-uid="${player.uid}" data-player-name="${player.displayName}">اخراج</button>` 
+                        : '';
+                    
+                    const hostLabelHtml = isHost ? '<span class="host-label">(سازنده)</span>' : '';
+
+                    playerItem.innerHTML = `
+                        <div class="flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="mr-2 lucide lucude-user"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                            <span class="player-name">${player.displayName}</span>
+                            ${hostLabelHtml}
+                        </div>
+                        ${kickButtonHtml}
+                    `;
+                    playerListContainer.appendChild(playerItem);
+                }
+
+                playerListContainer.querySelectorAll('.kick-player-btn').forEach(button => {
+                    button.addEventListener('click', (e) => {
+                       openKickPlayerConfirmModal(e.currentTarget.dataset.playerName, e.currentTarget.dataset.playerUid);
+                    });
+                });
+
+                if (isCurrentUserHost) {
+                    startGameBtn.disabled = playerCount !== maxPlayers;
+                    startGameBtn.textContent = `شروع بازی (${playerCount}/${maxPlayers})`;
+                    toggleChatLockBtn.textContent = isChatLocked ? 'باز کردن چت' : 'قفل کردن چت';
+                }
+
+                if (isChatLocked && !isCurrentUserHost) {
+                    lobbyChatInput.disabled = true;
+                    lobbyChatSendBtn.disabled = true;
+                    lobbyChatInput.placeholder = "چت توسط سازنده قفل شده است";
                 } else {
-                    setupPreGameUI(lobbyId, lobbyData);
+                    lobbyChatInput.disabled = false;
+                    lobbyChatSendBtn.disabled = false;
+                    lobbyChatInput.placeholder = "پیام خود را بنویسید...";
                 }
 
             }, (error) => {
@@ -4307,7 +4203,8 @@
 
                     const messageContentHtml = messageData.isDeleted ? `
                         <p class="message-text-deleted">${messageData.text}</p>
-                                            <span class="sender-name">${messageData.senderName}</span>
+                    ` : `
+                        <span class="sender-name">${messageData.senderName}</span>
                         <p class="message-text">${messageData.text}</p>
                     `;
 
@@ -4330,200 +4227,7 @@
             });
         }
         
-        // --- Game Logic Functions (NEW & UPDATED) ---
-        
-        function setupPreGameUI(lobbyId, lobbyData) {
-            console.log(`Setting up Pre-Game UI for lobby ID: ${lobbyId}`);
-            resetGameUI(); // Ensures mafia view is hidden and pre-game is visible
-            
-            const isCurrentUserHost = auth.currentUser && lobbyData.hostId === auth.currentUser.uid;
-            const playersMap = lobbyData.players || {};
-            const playerCount = Object.keys(playersMap).length;
-            const maxPlayers = lobbyData.gameSettings?.maxPlayers || 4;
-            const isChatLocked = lobbyData.isChatLocked || false;
-
-            // Update lobby info in the sidebar
-            detailLobbyName.innerHTML = formatLobbyNameWithColor(lobbyData.name);
-            detailHostName.textContent = `سازنده: ${playersMap[lobbyData.hostId] || 'ناشناس'}`;
-            detailPlayerCount.textContent = `بازیکنان: ${playerCount}/${maxPlayers}`;
-
-            // Populate player list
-            playerListContainer.innerHTML = '';
-            const playerList = Object.entries(playersMap).map(([uid, displayName]) => ({ uid, displayName }));
-
-            for (const player of playerList) {
-                const isHost = player.uid === lobbyData.hostId;
-                const playerItem = document.createElement('div');
-                playerItem.className = 'player-list-item';
-                if (isHost) playerItem.classList.add('is-host');
-
-                const kickButtonHtml = (isCurrentUserHost && !isHost) 
-                    ? `<button class="kick-player-btn" data-player-uid="${player.uid}" data-player-name="${player.displayName}">اخراج</button>` 
-                    : '';
-                
-                const hostLabelHtml = isHost ? '<span class="host-label">(سازنده)</span>' : '';
-
-                playerItem.innerHTML = `
-                    <div class="flex items-center">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="mr-2 lucide lucude-user"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-                        <span class="player-name">${player.displayName}</span>
-                        ${hostLabelHtml}
-                    </div>
-                    ${kickButtonHtml}
-                `;
-                playerListContainer.appendChild(playerItem);
-            }
-
-            // Add kick button listeners
-            playerListContainer.querySelectorAll('.kick-player-btn').forEach(button => {
-                button.addEventListener('click', (e) => {
-                   openKickPlayerConfirmModal(e.currentTarget.dataset.playerName, e.currentTarget.dataset.playerUid);
-                });
-            });
-
-            // Update host controls
-            if (isCurrentUserHost) {
-                hostActionsContainer.style.display = 'flex';
-                leaveLobbyBtn.classList.remove('hidden');
-                leaveLobbyBtn.textContent = 'بستن لابی';
-                startGameBtn.disabled = playerCount !== maxPlayers;
-                startGameBtn.textContent = `شروع بازی (${playerCount}/${maxPlayers})`;
-                toggleChatLockBtn.textContent = isChatLocked ? 'باز کردن چت' : 'قفل کردن چت';
-            } else {
-                hostActionsContainer.style.display = 'none';
-                leaveLobbyBtn.classList.add('hidden');
-            }
-
-            // Update chat controls for all users
-            if (isChatLocked && !isCurrentUserHost) {
-                lobbyChatInput.disabled = true;
-                lobbyChatSendBtn.disabled = true;
-                lobbyChatInput.placeholder = "چت توسط سازنده قفل شده است";
-            } else {
-                lobbyChatInput.disabled = false;
-                lobbyChatSendBtn.disabled = false;
-                lobbyChatInput.placeholder = "پیام خود را بنویسید...";
-            }
-        }
-        
-        function setupMafiaStyleGameUI(lobbyId, lobbyData) {
-            console.log(`Setting up Mafia-Style Game UI for lobby ID: ${lobbyId}`);
-            preGameView.classList.add('hidden');
-            gameTableContainer.classList.remove('hidden');
-
-            const gameState = lobbyData.gameState;
-            const myUid = auth.currentUser.uid;
-            
-            // Populate player seats
-            const playerSeats = gameTableContainer.querySelectorAll('.player-seat');
-            // Reset all seats first
-            playerSeats.forEach(seat => {
-                seat.innerHTML = '';
-                seat.className = 'player-seat'; // Reset classes
-            });
-            
-            if (Array.isArray(gameState.players) && lobbyData.players) {
-                gameState.players.forEach((pUid, index) => {
-                    const seat = playerSeats[index];
-                    if (!seat) return; // Should not happen if maxPlayers is 4
-
-                    const isAI = gameState.roles[pUid] === 'AI';
-                    const playerRoleText = myUid === pUid || gameState.status === 'ended' ? (isAI ? 'هوش مصنوعی' : 'انسان') : '???';
-                    
-                    seat.innerHTML = `
-                        <div class="player-avatar">
-                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="10" r="3"/><path d="M7 20.662V19a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v1.662"/></svg>
-                        </div>
-                        <div class="player-name">${gameState.playerNames[pUid] || 'ناشناس'}</div>
-                        <div class="player-role">${playerRoleText}</div>
-                    `;
-                    seat.classList.add('visible');
-                    seat.classList.add(isAI ? 'is-ai' : 'is-human');
-
-                    if (myUid === pUid) {
-                        myRole.textContent = isAI ? 'هوش مصنوعی' : 'انسان';
-                    }
-                });
-            }
-            
-            gameInfoPanel.classList.remove('hidden');
-            gameRoleDisplay.classList.remove('hidden');
-            leaveGameFromLobbyBtn.classList.remove('hidden');
-
-            const currentTime = Date.now();
-            const lobbyRef = doc(db, 'global_lobbies', lobbyId);
-
-            if (gameState.status === 'countdown') {
-                gameCountdownOverlay.style.display = 'flex';
-                gameVotingOverlay.style.display = 'none';
-                gameTimerDisplay.classList.add('hidden');
-
-                let countdownSecs = Math.ceil((gameState.countdownEndTime - currentTime) / 1000);
-                countdownNumber.textContent = Math.max(0, countdownSecs);
-                countdownNumber.style.animation = 'none';
-                void countdownNumber.offsetHeight;
-                countdownNumber.style.animation = 'countdown-pulse 1s ease-out forwards';
-
-                if(gameCountdownInterval) clearInterval(gameCountdownInterval);
-                gameCountdownInterval = setInterval(async () => {
-                    countdownSecs--;
-                    countdownNumber.textContent = Math.max(0, countdownSecs);
-                    if (gameCountdownOverlay.style.display !== 'none') {
-                        countdownNumber.style.animation = 'none';
-                        void countdownNumber.offsetHeight;
-                        countdownNumber.style.animation = 'countdown-pulse 1s ease-out forwards';
-                    }
-                    if (countdownSecs <= 0) {
-                        clearInterval(gameCountdownInterval);
-                        if (auth.currentUser && lobbyData.hostId === auth.currentUser.uid) {
-                            await updateDoc(lobbyRef, {
-                                'gameState.status': 'active',
-                                'gameState.gameStartTimestamp': serverTimestamp()
-                            });
-                        }
-                    }
-                }, 1000);
-
-            } else if (gameState.status === 'active' && gameState.gameStartTimestamp) {
-                gameCountdownOverlay.style.display = 'none';
-                gameVotingOverlay.style.display = 'none';
-                gameTimerDisplay.classList.remove('hidden');
-                
-                if (gameTimerInterval) clearInterval(gameTimerInterval);
-                gameTimerInterval = setInterval(async () => {
-                    const elapsedMs = Date.now() - gameState.gameStartTimestamp.toMillis();
-                    const remainingMs = (gameState.gameDurationSeconds * 1000) - elapsedMs;
-                    if (remainingMs <= 0) {
-                        clearInterval(gameTimerInterval);
-                        gameTimerDisplay.textContent = "00:00";
-                        if (auth.currentUser && lobbyData.hostId === auth.currentUser.uid) {
-                            await updateDoc(lobbyRef, { 'gameState.status': 'voting' });
-                        }
-                    } else {
-                        const mins = Math.floor(remainingMs / 60000);
-                        const secs = Math.floor((remainingMs % 60000) / 1000);
-                        gameTimerDisplay.textContent = `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
-                    }
-                }, 1000);
-
-            } else if (gameState.status === 'voting') {
-                gameCountdownOverlay.style.display = 'none';
-                gameVotingOverlay.style.display = 'flex';
-                renderVotingOptions(lobbyId, myUid, gameState, lobbyData);
-                
-            } else if (gameState.status === 'ended') {
-                gameCountdownOverlay.style.display = 'none';
-                gameVotingOverlay.style.display = 'flex';
-                votingOptions.classList.add('hidden');
-                votingTitle.classList.add('hidden');
-                votingInstructions.classList.add('hidden');
-                gameResultDisplay.classList.remove('hidden');
-                
-                winnerText.textContent = gameState.winner === 'Human' ? 'تیم انسان‌ها برنده شد!' : 'هوش مصنوعی برنده شد!';
-                reasonText.textContent = gameState.winReason || 'بازی به پایان رسید.';
-            }
-        }
-
+        // --- Game Logic Functions (NEW) ---
 
         async function initializeGameInFirestore(lobbyId, lobbyData) {
             const playerUIDs = Object.keys(lobbyData.players);
@@ -4567,7 +4271,7 @@
             const countdownDurationSeconds = 5;
 
             const initialGameState = {
-                players: playerUIDs, // keep original order for seating
+                players: playerUIDs,
                 playerNames: playerNames,
                 roles: roles,
                 status: 'countdown',
@@ -4576,16 +4280,187 @@
                 gameStartTimestamp: null,
                 gameDurationSeconds: gameDurationMinutes * 60,
                 countdownEndTime: Date.now() + countdownDurationSeconds * 1000 + 500,
-                votes: {}
+                votes: {},
+                aiScore: 0,
+                humanScore: 0
             };
 
             const lobbyRef = doc(db, 'global_lobbies', lobbyId);
-            await updateDoc(lobbyRef, {
-                gameState: initialGameState,
-                status: "playing"
-            });
+            try {
+                await updateDoc(lobbyRef, {
+                    gameState: initialGameState,
+                    status: "playing"
+                });
+                console.log(`Game state initialized for lobby ${lobbyId}`);
+            } catch (error) {
+                console.error("Error initializing game state:", error);
+                await updateDoc(lobbyRef, { status: "waiting" });
+                throw new Error("Failed to initialize game.");
+            }
         }
         
+        function setupGameUI(lobbyId, lobbyData) {
+            console.log(`Setting up game UI for lobby ID: ${lobbyId}`);
+            clearGameIntervals();
+            resetGameUI();
+
+            const gameState = lobbyData.gameState;
+            const myUid = auth.currentUser.uid;
+            
+            gameInfoPanel.classList.remove('hidden');
+            leaveGameFromLobbyBtn.classList.remove('hidden');
+            
+            hostActionsContainer.style.display = 'none';
+            leaveLobbyBtn.classList.add('hidden');
+            
+            playerListContainer.innerHTML = ''; 
+
+            gamePlayerStatus.innerHTML = '';
+            if (Array.isArray(gameState.players) && lobbyData.players) {
+                gameState.players.forEach(pUid => {
+                    const playerPod = document.createElement('div');
+                    playerPod.className = `game-player-pod flex-grow`;
+                    const isAI = gameState.roles[pUid] === 'AI';
+                    playerPod.classList.add(isAI ? 'is-ai' : 'is-human');
+                    if (pUid === myUid) {
+                        myRole.textContent = isAI ? 'هوش مصنوعی' : 'انسان';
+                        gameRoleDisplay.classList.remove('hidden');
+                    }
+                    
+                    const isPlayerInLobby = lobbyData.players && lobbyData.players[pUid];
+                    const playerStatusText = isPlayerInLobby ? 'آنلاین' : 'ترک کرده';
+                    
+                    playerPod.innerHTML = `
+                        <span class="player-name">${gameState.playerNames[pUid] || 'ناشناس'}</span>
+                        <span class="player-role">${isAI ? 'هوش مصنوعی' : 'انسان'}</span>
+                        <span class="player-status">${playerStatusText}</span>
+                    `;
+                    gamePlayerStatus.appendChild(playerPod);
+                });
+            }
+
+
+            const currentTime = Date.now();
+            const lobbyRef = doc(db, 'global_lobbies', lobbyId);
+
+            if (gameState.status === 'countdown') {
+                gameCountdownOverlay.style.display = 'flex';
+                gameVotingOverlay.style.display = 'none';
+                gameResultDisplay.classList.add('hidden');
+                gameTimerDisplay.classList.add('hidden');
+                gameScoresDisplay.classList.add('hidden');
+
+                lobbyChatInput.disabled = true;
+                lobbyChatSendBtn.disabled = true;
+                lobbyChatInput.placeholder = "بازی در حال شروع است...";
+
+                let countdownSecs = Math.ceil((gameState.countdownEndTime - currentTime) / 1000);
+                countdownNumber.textContent = Math.max(0, countdownSecs);
+                countdownNumber.style.animation = 'none';
+                countdownNumber.offsetHeight; // Trigger reflow to restart animation
+                countdownNumber.style.animation = 'countdown-pulse 1s ease-out forwards';
+
+
+                gameCountdownInterval = setInterval(async () => {
+                    countdownSecs--;
+                    countdownNumber.textContent = Math.max(0, countdownSecs);
+                    if (gameCountdownOverlay.style.display !== 'none') {
+                        countdownNumber.style.animation = 'none';
+                        countdownNumber.offsetHeight;
+                        countdownNumber.style.animation = 'countdown-pulse 1s ease-out forwards';
+                    }
+
+                    if (countdownSecs <= 0) {
+                        clearInterval(gameCountdownInterval);
+                        gameCountdownInterval = null;
+                        gameCountdownOverlay.style.display = 'none';
+                        if (auth.currentUser && lobbyData.hostId === auth.currentUser.uid) {
+                            try {
+                                await updateDoc(lobbyRef, {
+                                    'gameState.status': 'active',
+                                    'gameState.gameStartTimestamp': serverTimestamp()
+                                });
+                            } catch (error) {
+                                console.error("Error updating game state to active:", error);
+                            }
+                        }
+                    }
+                }, 1000);
+
+            } else if (gameState.status === 'active' && gameState.gameStartTimestamp) {
+                gameCountdownOverlay.style.display = 'none';
+                gameVotingOverlay.style.display = 'none';
+                gameResultDisplay.classList.add('hidden');
+                gameTimerDisplay.classList.remove('hidden');
+                gameScoresDisplay.classList.remove('hidden');
+
+                lobbyChatInput.disabled = false;
+                lobbyChatSendBtn.disabled = false;
+                lobbyChatInput.placeholder = "پیام خود را بنویسید...";
+
+                if (!gameTimerInterval) {
+                    gameTimerInterval = setInterval(async () => {
+                        const startMillis = gameState.gameStartTimestamp ? gameState.gameStartTimestamp.toMillis() : Date.now();
+                        const elapsedMs = Date.now() - startMillis;
+                        const remainingMs = gameState.gameDurationSeconds * 1000 - elapsedMs;
+
+                        if (remainingMs <= 0) {
+                            clearInterval(gameTimerInterval);
+                            gameTimerInterval = null;
+                            gameTimerDisplay.textContent = "00:00";
+                            if (auth.currentUser && lobbyData.hostId === auth.currentUser.uid) {
+                                try {
+                                    await updateDoc(lobbyRef, { 'gameState.status': 'voting' });
+                                } catch(error) {
+                                    console.error("Error updating game state to voting:", error);
+                                }
+                            }
+                            return;
+                        }
+
+                        const remainingSeconds = Math.max(0, Math.floor(remainingMs / 1000));
+                        const minutes = Math.floor(remainingSeconds / 60);
+                        const seconds = remainingSeconds % 60;
+                        gameTimerDisplay.textContent = 
+                            `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+                    }, 1000);
+                }
+
+            } else if (gameState.status === 'voting') {
+                gameCountdownOverlay.style.display = 'none';
+                gameVotingOverlay.style.display = 'flex';
+                gameResultDisplay.classList.add('hidden');
+                gameTimerDisplay.classList.add('hidden');
+                
+                lobbyChatInput.disabled = true;
+                lobbyChatSendBtn.disabled = true;
+                lobbyChatInput.placeholder = "رای‌گیری در جریان است. چت موقتاً غیرفعال شد.";
+
+                renderVotingOptions(lobbyId, myUid, gameState, lobbyData);
+                
+            } else if (gameState.status === 'ended') {
+                gameCountdownOverlay.style.display = 'none';
+                gameVotingOverlay.style.display = 'flex';
+                gameResultDisplay.classList.remove('hidden');
+                gameTimerDisplay.classList.add('hidden');
+                votingOptions.classList.add('hidden');
+                votingTitle.classList.add('hidden');
+                votingInstructions.classList.add('hidden');
+                
+                lobbyChatInput.disabled = true;
+                lobbyChatSendBtn.disabled = true;
+                lobbyChatInput.placeholder = "بازی به پایان رسید.";
+
+                winnerText.textContent = gameState.winner === 'Human' ? 'تیم انسان‌ها برنده شد!' : 'هوش مصنوعی برنده شد!';
+                winnerText.classList.toggle('text-green-500', gameState.winner === 'Human');
+                winnerText.classList.toggle('text-red-500', gameState.winner === 'AI');
+                reasonText.textContent = gameState.winReason || 'بازی به پایان رسید.';
+            }
+
+            aiScore.textContent = `AI: ${gameState.aiScore || 0}`;
+            humanScore.textContent = `Human: ${gameState.humanScore || 0}`;
+        }
+
         function renderVotingOptions(lobbyId, myUid, gameState, lobbyData) {
             votingOptions.innerHTML = '';
             
@@ -4603,8 +4478,11 @@
             );
 
             eligibleToVoteFor.forEach(playerUid => {
+                const isAI = gameState.roles[playerUid] === 'AI';
                 const button = document.createElement('button');
-                button.className = 'voting-btn btn-blue-classic';
+                button.className = 'voting-btn';
+                // We don't color buttons based on role here to avoid giving hints
+                button.classList.add('btn-blue-classic');
                 button.textContent = `رای به ${gameState.playerNames[playerUid]}`;
                 button.onclick = () => castVote(lobbyId, myUid, playerUid);
                 votingOptions.appendChild(button);
@@ -5162,3 +5040,176 @@
     </script>
 </body>
 </html>
+
+
+
+
+کد سرور تنظیم شده در فایر بیش یرای این  پروژه :
+
+rules_version = '2';
+
+service cloud.firestore {
+
+  match /databases/{database}/documents {
+
+    // Helper Functions (بدون تغییر)
+
+    function getLobby(lobbyId) {
+
+      return get(/databases/$(database)/documents/global_lobbies/$(lobbyId));
+
+    }
+
+    function isPlayerInLobby(lobbyId) {
+
+      return request.auth.uid in getLobby(lobbyId).data.players;
+
+    }
+
+    // Main Rules for Lobbies (بدون تغییر)
+
+    match /global_lobbies/{lobbyId} {
+
+      allow read, create: if request.auth != null;
+
+      allow delete: if request.auth.uid == getLobby(lobbyId).data.hostId;
+
+      allow update: if request.auth != null && (
+
+        request.auth.uid == getLobby(lobbyId).data.hostId ||
+
+        (
+
+          !(request.auth.uid in getLobby(lobbyId).data.players) &&
+
+          (request.auth.uid in request.resource.data.players) &&
+
+          (getLobby(lobbyId).data.players.size() < getLobby(lobbyId).data.gameSettings.maxPlayers)
+
+        ) ||
+
+        (
+
+          (request.auth.uid in getLobby(lobbyId).data.players) &&
+
+          !(request.auth.uid in request.resource.data.players)
+
+        )
+
+      );
+
+      // Subcollection for lobby chat messages (بدون تغییر)
+
+      match /messages/{messageId} {
+
+        allow read: if request.auth != null && isPlayerInLobby(lobbyId);
+
+        allow create: if request.auth != null && isPlayerInLobby(lobbyId)
+
+                       && request.resource.data.text is string
+
+                       && request.resource.data.text.size() > 0 && request.resource.data.text.size() < 300
+
+                       && request.resource.data.senderUid == request.auth.uid
+
+                       && request.resource.data.senderName is string
+
+                       && request.resource.data.timestamp == request.time;
+
+        allow update: if request.auth != null && isPlayerInLobby(lobbyId)
+
+                      && (
+
+                        get(/databases/$(database)/documents/global_lobbies/$(lobbyId)/messages/$(messageId)).data.senderUid == request.auth.uid ||
+
+                        getLobby(lobbyId).data.hostId == request.auth.uid
+
+                      );
+
+        allow delete: if false;
+
+      }
+
+    }
+
+    // User's private profile data (بدون تغییر)
+
+    match /artifacts/{appId}/users/{userId}/profile/data {
+
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+
+    }
+
+    // =======================================================
+
+    // === START OF FIXED RULES / شروع قوانین اصلاح شده ===
+
+    // =======================================================
+
+    // *** اصلاح شده ***
+
+    // دلیل: برای رفع خطای "عدم دسترسی" در هنگام بارگذاری اولیه بازی.
+
+    // این قانون به هر کسی (حتی کاربران لاگین نکرده) اجازه می‌دهد تنظیمات اصلی بازی را بخواند.
+
+    // این کار برای فایل‌های کانفیگ عمومی کاملا امن و استاندارد است.
+
+    match /artifacts/{appId}/config/game_settings {
+
+        // هر کسی می‌تواند تنظیمات را بخواند، چون برای شروع بازی لازم است
+
+        allow read: if true; // <-- تغییر اصلی اینجاست
+
+        // فقط کاربر احراز هویت شده می‌تواند این داکیومنت را برای اولین بار ایجاد کند (بدون تغییر)
+
+        allow create: if request.auth != null;
+
+        // هیچ‌کس از سمت کلاینت نمی‌تواند آن را آپدیت یا حذف کند (امنیت حفظ شده است)
+
+        allow update, delete: if false;
+
+    }
+
+    // RULE 2 (بدون تغییر): Rule for Proposed Lobby Names
+
+    // این قانون مشکلی نداشت و نیازی به تغییر ندارد.
+
+    match /artifacts/{appId}/proposedLobbyNames/{proposalId} {
+
+      allow create: if request.auth != null;
+
+      allow read: if request.auth != null;
+
+      allow update: if request.auth != null
+
+                    && get(/databases/$(database)/documents/artifacts/$(appId)/proposedLobbyNames/$(proposalId)).data.userId == request.auth.uid
+
+                    && request.resource.data.status == 'processed';
+
+      allow delete: if false;
+
+    }
+
+    // =======================================================
+
+    // === END OF FIXED RULES / پایان قوانین اصلاح شده ===
+
+    // =======================================================
+
+  }
+
+}
+
+
+کد قوانین Realtime database پروژه من در فایر بیس :
+
+
+{
+  "rules": {
+    // این قوانین به همه اجازه خواندن و نوشتن را تا تاریخ 5 آگوست 2025 می‌دهند.
+    // این برای یک اپلیکیشن عمومی بسیار ناامن است.
+    // اگر این کد از Realtime Database استفاده نمی‌کند، به این قوانین نیازی نیست.
+    ".read": "now < 1754339400000",
+    ".write": "now < 1754339400000"
+  }
+}
