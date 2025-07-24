@@ -4,115 +4,32 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>بازی متنی - در حال بارگذاری</title>
-    <!-- Tailwind CSS CDN for styling -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Google Fonts for Classic Look & New Themes -->
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Merriweather:wght@400;700&family=Share+Tech+Mono&family=Orbitron:wght@400..900&family=Inter:wght@400;700&display=swap" rel="stylesheet">
-    <style>
-        /* All CSS from the original file goes here... */
-        /* General Classic Theme Background and Fonts */
-        html, body, #app { height: 100%; margin: 0; padding: 0; overflow: hidden; transition: background-color 0.8s ease-in-out, color 0.8s ease-in-out; }
-        .classic-card, .classic-btn, input, select, .app-header, .lobby-header, .app-footer, .lobby-footer, .lobby-item, .lobby-chat-container, .chat-message, .game-player-pod, .voting-btn, .lobby-type-btn { transition: background 0.8s ease-in-out, background-color 0.8s ease-in-out, color 0.8s ease-in-out, border-color 0.8s ease-in-out, box-shadow 0.8s ease-in-out, transform 0.3s ease; }
-        body.theme-classic { font-family: 'Merriweather', serif; background: radial-gradient(ellipse at bottom, #100C08 0%, #000000 100%); color: #E0E0E0; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
-        body.theme-classic h1, body.theme-classic h2 { font-family: 'Playfair Display', serif; color: #FFD700; text-shadow: 2px 2px 4px rgba(0,0,0,0.5); }
-        body.theme-classic p, body.theme-classic span { color: #E0E0E0; }
-        body.theme-classic .spinner { border: 4px solid rgba(255, 255, 255, 0.3); border-top: 4px solid #DAA520; }
-        body.theme-classic .loading-text { color: #DAA520; }
-        /* ... (The rest of the massive CSS block) ... */
-        .coin-icon { width: 1.25rem; height: 1.25rem; display: inline-block; vertical-align: middle; margin-right: 0.25rem; }
-    </style>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body class="theme-classic">
 
-    <!-- Main container for all screens -->
     <div id="app" class="relative w-full h-full flex justify-center items-center">
-
-        <!-- 1. Loading Screen -->
-        <!-- This is the only visible screen on this page -->
-        <div id="loading-screen" class="absolute inset-0 flex flex-col justify-center items-center bg-gray-900 z-50">
-            <div class="spinner w-16 h-16 rounded-full animate-spin mb-4"></div>
-            <p class="text-xl md:text-2xl font-semibold loading-text">در حال بارگذاری...</p>
+        <!-- Loading Screen -->
+        <div id="loading-screen" class="absolute inset-0 flex flex-col justify-center items-center z-50">
+            <div class="loading-screen-container">
+                <div id="binary-background"></div>
+                <div class="magnifying-glass">
+                    <div class="glass-lens">
+                        <svg class="icon-human" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                        <svg class="icon-ai" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect width="16" height="16" x="4" y="4" rx="2" /><rect width="6" height="6" x="9" y="9" rx="1" /><path d="M9 2v2" /><path d="M15 2v2" /><path d="M9 20v2" /><path d="M15 20v2" /><path d="M20 9h2" /><path d="M20 14h2" /><path d="M2 9h2" /><path d="M2 14h2" /></svg>
+                    </div>
+                    <div class="glass-handle"></div>
+                </div>
+                <div class="loading-text-container">
+                    <h1 id="loading-main-text">درحال اتصال به سرور...</h1>
+                    <p id="loading-sub-text">لطفا کمی صبر کنید.</p>
+                </div>
+            </div>
         </div>
-
     </div>
 
-    <!-- Firebase SDKs -->
-    <script type="module">
-        // Import the functions you need from the SDKs you need
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInWithCustomToken, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, setDoc, getDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-
-        // Initialize Firebase
-        const firebaseConfig = {
-            apiKey: "AIzaSyBpVHnjF5gdTm3vJiHEoAZCowsRkTapj_4",
-            authDomain: "hokm-d6911.firebaseapp.com",
-            projectId: "hokm-d6911",
-            storageBucket: "hokm-d6911.appspot.com",
-            messagingSenderId: "128133280011",
-            appId: "1:128133280011:web:c9fe28f5201eef7a3a320e",
-            measurementId: "G-LN0S9W86MK"
-        };
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-
-        // Global variables for Firebase context
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
-
-        // Theme handling function (needed for body class on next page)
-        function applyTheme(themeName) {
-            const themeClasses = ['theme-classic', 'theme-cyberpunk', 'theme-forest', 'theme-ocean', 'theme-minimal'];
-            document.body.classList.remove(...themeClasses);
-            document.body.classList.add(`theme-${themeName}`);
-        }
-
-        onAuthStateChanged(auth, async (user) => {
-            if (user) {
-                // User is signed in.
-                // Fetch their saved theme, or default to classic
-                try {
-                    const userDocRef = doc(db, `artifacts/${appId}/users/${user.uid}/profile/data`);
-                    const docSnap = await getDoc(userDocRef);
-                    if (docSnap.exists() && docSnap.data().theme) {
-                        applyTheme(docSnap.data().theme);
-                    } else {
-                        applyTheme('classic');
-                    }
-                } catch (e) {
-                    applyTheme('classic'); // Default on error
-                }
-                // Redirect to the main page
-                window.location.href = 'index.html';
-            } else {
-                // No user is signed in.
-                // Redirect to the authentication page
-                applyTheme('classic'); // Ensure default theme for login page
-                window.location.href = 'sabt_name.html';
-            }
-        });
-
-        // App initialization
-        async function performAsyncAppSetup() {
-            console.log("Performing asynchronous app setup...");
-            if (initialAuthToken) {
-                try {
-                    await signInWithCustomToken(auth, initialAuthToken);
-                    // onAuthStateChanged will handle the redirect
-                } catch (error) {
-                    console.error("Error signing in with initial custom token:", error);
-                    // If token fails, onAuthStateChanged will fire with user=null, redirecting to login.
-                }
-            } else {
-                // If no initial token, onAuthStateChanged will fire with user=null, redirecting to login.
-            }
-            console.log("Firebase initialization finished.");
-        }
-        
-        // Start the process
-        performAsyncAppSetup();
-
-    </script>
+    <script type="module" src="app.js"></script>
 </body>
 </html>
