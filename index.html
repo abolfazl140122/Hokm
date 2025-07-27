@@ -1973,8 +1973,8 @@
                 </div>
 
                 <div class="loading-text-container">
-                    <h1 id="loading-main-text">جستجوی بازیکنان</h1>
-                    <p id="loading-sub-text">در حال اتصال به سرور...</p>
+                    <h1 id="loading-main-text">درحال اتصال به سرور...</h1>
+                    <p id="loading-sub-text">لطفا کمی صبر کنید.</p>
                 </div>
             </div>
         </div>
@@ -2449,7 +2449,7 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, signInWithCustomToken, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         // REVISED: Imported writeBatch for atomic updates
-        import { getFirestore, doc, setDoc, getDoc, collection, addDoc, serverTimestamp, query, where, onSnapshot, updateDoc, arrayUnion, arrayRemove, deleteDoc, getDocs, orderBy, deleteField, increment, writeBatch } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js"; 
+        import { getFirestore, doc, setDoc, getDoc, collection, addDoc, serverTimestamp, query, where, onSnapshot, updateDoc, arrayUnion, arrayRemove, deleteDoc, getDocs, orderBy, deleteField, increment, writeBatch, runTransaction } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js"; 
 
         // Initialize Firebase
         const firebaseConfig = {
@@ -2462,9 +2462,9 @@
             measurementId: "G-LN0S9W86MK"
         };
         const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
         const db = getFirestore(app);
-
+        const auth = getAuth(app);
+        
         // Global variables for Firebase context (as per environment instructions)
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
         const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
@@ -4288,8 +4288,7 @@
             const lobbyRef = doc(db, 'global_lobbies', lobbyId);
             try {
                 await updateDoc(lobbyRef, {
-                    gameState: initialGameState,
-                    status: "playing"
+                    gameState: initial                    status: "playing"
                 });
                 console.log(`Game state initialized for lobby ${lobbyId}`);
             } catch (error) {
@@ -4498,7 +4497,7 @@
         async function castVote(lobbyId, voterUid, votedForUid) {
             const lobbyRef = doc(db, 'global_lobbies', lobbyId);
             try {
-                await db.runTransaction(async (transaction) => {
+                await runTransaction(db, async (transaction) => {
                     const lobbyDoc = await transaction.get(lobbyRef);
                     if (!lobbyDoc.exists()) throw new Error("لابی یافت نشد یا بسته شده است.");
                     
@@ -5013,7 +5012,7 @@
                         return;
                     }
                 } else {
-                    await db.runTransaction(async (transaction) => {
+                    await runTransaction(db, async (transaction) => {
                         const currentLobbyDoc = await transaction.get(lobbyRef);
                         if (!currentLobbyDoc.exists()) {
                             throw new Error("Lobby not found or already closed.");
